@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ProductStatus } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
+import { ClicksService } from '../clicks/clicks.service';
 import { makePage, PageResult } from '../common/dto/pagination.dto';
 import { ProductListQueryDto, ProductSort } from './dto/storefront.dto';
 
@@ -26,7 +27,10 @@ const NEW_ARRIVAL_DAYS = 30;
 
 @Injectable()
 export class ProductsPublicService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly clicks: ClicksService,
+  ) {}
 
   async list(q: ProductListQueryDto): Promise<PageResult<unknown>> {
     const page = q.page ?? 1;
@@ -140,7 +144,7 @@ export class ProductsPublicService {
         include: cardInclude,
       }),
     ]);
-    return makePage(this.shape(data), total, page, pageSize);
+    return makePage(await this.shape(data), total, page, pageSize);
   }
 
   private async searchedList(
@@ -187,7 +191,7 @@ export class ProductsPublicService {
       (a, b) => (order.get(a.id) ?? 999) - (order.get(b.id) ?? 999),
     );
     const sliced = sorted.slice((page - 1) * pageSize, page * pageSize);
-    return makePage(this.shape(sliced), total, page, pageSize);
+    return makePage(await this.shape(sliced), total, page, pageSize);
   }
 
   async getBySlug(slug: string) {
@@ -250,10 +254,10 @@ export class ProductsPublicService {
   // ────────────────── Shape: hide noisy internal fields ──────────────────
 
   private shape(products: ProductWithIncludes[]) {
-    return products.map((p) => this.shapeOne(p));
+    return Promise.all(products.map((p) => this.shapeOne(p)));
   }
 
-  private shapeOne(p: ProductWithIncludes) {
+  private async shapeOne(p: ProductWithIncludes) {
     const aiImages = p.images.filter((i) => i.isAiGenerated);
     const retailerImages = p.images.filter((i) => !i.isAiGenerated);
     const primary = p.images.find((i) => i.isPrimary) ?? p.images[0] ?? null;
@@ -341,6 +345,15 @@ export class ProductsPublicService {
             url: affiliate?.convertedUrl ?? bestListing.retailerProductUrl,
             partner: affiliate?.partner ?? null,
             pending: affiliate?.pendingConversion ?? true,
+            // Phase 5: short-lived click-tracking ID. Web prefixes with the API
+            // host and renders <a href="{host}/go/{trackingId}">.
+            trackingId: await this.clicks.mint({
+              productId: p.id,
+              retailer: bestListing.retailer,
+              partner: affiliate?.partner ?? null,
+              partnerUrl:
+                affiliate?.convertedUrl ?? bestListing.retailerProductUrl,
+            }),
           }
         : null,
     };

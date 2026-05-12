@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ValidationPipe } from '@nestjs/common';
+import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
@@ -14,7 +14,10 @@ async function bootstrap() {
   });
 
   app.useLogger(app.get(Logger));
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    // BUILD_GUIDE §5.2: short tracking links live at /go/:trackingId, not under /api.
+    exclude: [{ path: 'go/:trackingId', method: RequestMethod.GET }],
+  });
 
   const config = app.get(ConfigService);
   const webOrigin = config.get<string>('WEB_ORIGIN') ?? 'http://localhost:3000';

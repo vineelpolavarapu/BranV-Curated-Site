@@ -4,6 +4,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
+import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { useClickReturn } from './click-return/ClickReturnProvider';
 
 const retailerLabel: Record<string, string> = {
   flipkart: 'Flipkart',
@@ -119,8 +121,10 @@ export function ProductCard({ product }: { product: ProductCardData }) {
 
         {product.buyNow && (
           <BuyNowButton
-            href={product.buyNow.url}
+            href={resolveBuyNowHref(product.buyNow)}
             retailer={product.buyNow.retailer}
+            trackingId={product.buyNow.trackingId}
+            productTitle={product.title}
           />
         )}
       </div>
@@ -132,18 +136,29 @@ export function BuyNowButton({
   href,
   retailer,
   size = 'sm',
+  trackingId,
+  productTitle,
 }: {
   href: string;
   retailer: string;
   size?: 'sm' | 'lg';
+  trackingId?: string | null;
+  productTitle?: string;
 }) {
   const label = retailerLabel[retailer] ?? retailer;
+  const { startTracking } = useClickReturn();
+  const onClick = () => {
+    if (trackingId && productTitle) {
+      startTracking({ trackingId, productTitle });
+    }
+  };
   return (
     <a
       // PRD §14.1: every affiliate Buy Now is `nofollow sponsored` per Google policy.
       href={href}
       target="_blank"
       rel="noopener noreferrer nofollow sponsored"
+      onClick={onClick}
       className={`mt-2 inline-flex items-center justify-center rounded-md bg-neutral-900 font-medium text-white transition hover:bg-neutral-800 ${
         size === 'lg' ? 'px-5 py-3 text-base' : 'px-3 py-2 text-xs'
       }`}

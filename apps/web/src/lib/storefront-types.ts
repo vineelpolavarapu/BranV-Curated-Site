@@ -50,6 +50,7 @@ export interface ProductCardData {
     url: string;
     partner: string | null;
     pending: boolean;
+    trackingId: string | null;
   } | null;
 }
 

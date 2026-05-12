@@ -18,6 +18,8 @@ import { UploadsModule } from './uploads/uploads.module';
 import { ScrapeModule } from './scrape/scrape.module';
 import { AffiliateModule } from './affiliate/affiliate.module';
 import { StorefrontModule } from './storefront/storefront.module';
+import { ClicksModule } from './clicks/clicks.module';
+import { WardrobeModule } from './wardrobe/wardrobe.module';
 import { CorrelationIdMiddleware } from './common/correlation-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TwoFactorGuard } from './common/guards/two-factor.guard';
@@ -62,6 +64,8 @@ import { TwoFactorGuard } from './common/guards/two-factor.guard';
     AvatarsModule,
     UploadsModule,
     StorefrontModule,
+    ClicksModule,
+    WardrobeModule,
   ],
   providers: [
     // Global JWT auth — opt out per-route with @Public().

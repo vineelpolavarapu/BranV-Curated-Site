@@ -5,8 +5,10 @@ import { BrandsPublicController } from './brands-public.controller';
 import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
 import { HomeController } from './home.controller';
+import { ClicksModule } from '../clicks/clicks.module';
 
 @Module({
+  imports: [ClicksModule],
   controllers: [
     ProductsPublicController,
     BrandsPublicController,

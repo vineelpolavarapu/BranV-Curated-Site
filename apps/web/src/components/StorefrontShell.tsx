@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
+import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 
 const SHOP_CATEGORIES = [
   { name: 'Clothing', slug: 'clothing' },
@@ -15,12 +16,14 @@ const SHOP_CATEGORIES = [
 
 export function StorefrontShell({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen pb-16 md:pb-0">
-      <SiteHeader />
-      {children}
-      <SiteFooter />
-      <MobileBottomNav />
-    </div>
+    <ClickReturnProvider>
+      <div className="min-h-screen pb-16 md:pb-0">
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+        <MobileBottomNav />
+      </div>
+    </ClickReturnProvider>
   );
 }
 

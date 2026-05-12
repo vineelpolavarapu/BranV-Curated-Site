@@ -46,6 +46,9 @@ model User {
   passwordResets      PasswordReset[]
   auditLogs           AuditLog[]          @relation("ActorAuditLogs")
   createdProducts     Product[]           @relation("ProductCreatedBy")
+  clickEvents             ClickEvent[]             @relation("UserClicks")
+  selfReportedConversions SelfReportedConversion[] @relation("UserConversions")
+  wardrobeItems           WardrobeItem[]           @relation("UserWardrobe")
 
   @@index([email])
   @@map("users")
@@ -241,6 +244,8 @@ model Product {
   variants         ProductVariant[]
   images           ProductImage[]
   retailerListings ProductRetailerListing[]
+  clickEvents      ClickEvent[]
+  wardrobeItems    WardrobeItem[]
 
   @@index([status])
   @@index([brandId])
@@ -324,6 +329,77 @@ model AffiliateLink {
   @@index([productRetailerListingId])
   @@index([pendingConversion])
   @@map("affiliate_links")
+}
+
+// ──────────────────────── PHASE 5 — CLICK-OUT FLOW ────────────────────────
+
+enum ClickReportOutcome {
+  PURCHASED
+  BROWSING
+  NEEDS_HELP
+}
+
+model ClickEvent {
+  id            String            @id @default(cuid())
+  trackingId    String            @unique
+  productId     String
+  product       Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  retailer      String
+  partner       AffiliatePartner?
+  partnerUrl    String
+  sourcePageUrl String?
+  userId        String?
+  user          User?             @relation("UserClicks", fields: [userId], references: [id], onDelete: SetNull)
+  sessionId     String?
+  userAgent     String?
+  ipCountry     String?
+  utm           Json?
+  redirectedAt  DateTime          @default(now())
+
+  reports        SelfReportedConversion[]
+  wardrobeItems  WardrobeItem[]
+
+  @@index([productId])
+  @@index([userId])
+  @@index([redirectedAt])
+  @@map("click_events")
+}
+
+model SelfReportedConversion {
+  id           String             @id @default(cuid())
+  clickEventId String
+  clickEvent   ClickEvent         @relation(fields: [clickEventId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?              @relation("UserConversions", fields: [userId], references: [id], onDelete: SetNull)
+  outcome      ClickReportOutcome
+  reportedAt   DateTime           @default(now())
+
+  @@index([clickEventId])
+  @@index([userId])
+  @@index([outcome])
+  @@map("self_reported_conversions")
+}
+
+model WardrobeItem {
+  id                 String      @id @default(cuid())
+  userId             String
+  user               User        @relation("UserWardrobe", fields: [userId], references: [id], onDelete: Cascade)
+  productId          String
+  product            Product     @relation(fields: [productId], references: [id], onDelete: Restrict)
+  retailer           String
+  clickEventId       String?
+  clickEvent         ClickEvent? @relation(fields: [clickEventId], references: [id], onDelete: SetNull)
+  selfReportedPrice  Decimal?    @db.Decimal(12, 2)
+  selfReportedDate   DateTime?
+  notes              String?
+  tags               String[]    @default([])
+  removedAt          DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt])
+  @@map("wardrobe_items")
 }
 
 model Avatar {

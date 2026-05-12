@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
-interface AutocompleteHits {
+export interface AutocompleteHits {
   products: Array<{ slug: string; title: string; brand: string }>;
   brands: Array<{ slug: string; name: string }>;
   categories: Array<{ slug: string; name: string; path: string }>;

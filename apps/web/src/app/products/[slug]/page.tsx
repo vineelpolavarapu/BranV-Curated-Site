@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { apiServer } from '@/lib/api-server';
+import { resolveBuyNowHref } from '@/lib/click-tracking';
 import { ProductCardData } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard, BuyNowButton, formatINR } from '@/components/ProductCard';
@@ -218,9 +219,11 @@ function Summary({ product }: { product: ProductCardData }) {
       {product.buyNow && (
         <div className="mt-6">
           <BuyNowButton
-            href={product.buyNow.url}
+            href={resolveBuyNowHref(product.buyNow)}
             retailer={product.buyNow.retailer}
             size="lg"
+            trackingId={product.buyNow.trackingId}
+            productTitle={product.title}
           />
           <p className="mt-2 text-xs text-neutral-500">
             We earn a small commission when you buy through our link — at no
