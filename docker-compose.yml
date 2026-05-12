@@ -1,0 +1,67 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: branv-postgres
+    environment:
+      POSTGRES_USER: branv
+      POSTGRES_PASSWORD: branv
+      POSTGRES_DB: branv_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U branv -d branv_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: branv-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: branv-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: branv
+      MINIO_ROOT_PASSWORD: branv-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio-init:
+    image: minio/mc:latest
+    container_name: branv-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 branv branv-secret &&
+      mc mb --ignore-existing local/branv-dev &&
+      mc anonymous set download local/branv-dev &&
+      exit 0
+      "
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

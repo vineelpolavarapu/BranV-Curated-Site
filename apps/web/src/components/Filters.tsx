@@ -1,0 +1,426 @@
+'use client';
+
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useMemo, useState } from 'react';
+
+export interface FilterDefinition {
+  attributeKey: string;
+  displayName: string;
+  filterType: 'SELECT' | 'MULTI_SELECT' | 'RANGE' | 'TOGGLE';
+  optionsJson?: string[] | null;
+}
+
+export interface FilterContext {
+  /** Per-category attribute filters from /api/categories/:slug/filters. */
+  categoryFilters?: FilterDefinition[];
+  /** Universal brand options for the brand multi-select. */
+  brands?: Array<{ slug: string; name: string }>;
+  /** Retailers that have at least one IN_STOCK listing across results. */
+  retailers?: string[];
+  /** Colors observed across the current result set. */
+  colors?: string[];
+}
+
+const UNIVERSAL_FILTERS = [
+  { key: 'minPrice', type: 'price-min', label: 'Price' },
+  { key: 'discount', type: 'discount', label: 'Discount' },
+  { key: 'brand', type: 'brand', label: 'Brand' },
+  { key: 'retailer', type: 'retailer', label: 'Retailer' },
+] as const;
+
+export function Filters({ context }: { context: FilterContext }) {
+  const [openMobile, setOpenMobile] = useState(false);
+  const search = useSearchParams();
+
+  const activeCount = useMemo(() => {
+    let n = 0;
+    for (const [k] of search.entries()) {
+      if (k !== 'page' && k !== 'sort' && k !== 'q') n += 1;
+    }
+    return n;
+  }, [search]);
+
+  return (
+    <>
+      {/* Mobile trigger */}
+      <button
+        onClick={() => setOpenMobile(true)}
+        className="md:hidden flex items-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium"
+      >
+        Filters
+        {activeCount > 0 && (
+          <span className="rounded-full bg-neutral-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
+            {activeCount}
+          </span>
+        )}
+      </button>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:block">
+        <FilterBody context={context} />
+      </aside>
+
+      {/* Mobile sheet */}
+      {openMobile && (
+        <div
+          className="fixed inset-0 z-40 flex md:hidden"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpenMobile(false);
+          }}
+        >
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Filters</h2>
+              <button
+                onClick={() => setOpenMobile(false)}
+                aria-label="Close filters"
+                className="text-neutral-500"
+              >
+                ✕
+              </button>
+            </div>
+            <FilterBody context={context} onApply={() => setOpenMobile(false)} />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function FilterBody({
+  context,
+  onApply,
+}: {
+  context: FilterContext;
+  onApply?: () => void;
+}) {
+  return (
+    <div className="space-y-6 text-sm">
+      <ActiveFilterChips onCleared={onApply} />
+      {UNIVERSAL_FILTERS.map((f) => {
+        if (f.type === 'price-min') return <PriceFilter key={f.key} />;
+        if (f.type === 'discount') return <DiscountFilter key={f.key} />;
+        if (f.type === 'brand' && context.brands?.length) {
+          return <BrandFilter key={f.key} brands={context.brands} />;
+        }
+        if (f.type === 'retailer' && context.retailers?.length) {
+          return <RetailerFilter key={f.key} retailers={context.retailers} />;
+        }
+        return null;
+      })}
+      {(context.categoryFilters ?? []).map((cf) => (
+        <CategoryFilter key={cf.attributeKey} filter={cf} />
+      ))}
+      <ToggleFilter param="onSale" label="On sale only" />
+      <ToggleFilter param="inStock" label="In stock at retailer" />
+      <ToggleFilter param="isNew" label="New arrivals" />
+      <div className="md:hidden pt-2">
+        <button
+          onClick={onApply}
+          className="w-full rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+        >
+          Apply
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ──────────────── small URL-binding helpers ────────────────
+
+function useUrlParam() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const search = useSearchParams();
+
+  function set(name: string, value: string | undefined) {
+    const next = new URLSearchParams(Array.from(search.entries()));
+    if (value === undefined || value === '') next.delete(name);
+    else next.set(name, value);
+    next.delete('page');
+    router.replace(`${pathname}?${next.toString()}`);
+  }
+  function toggleArrayValue(name: string, value: string) {
+    const next = new URLSearchParams(Array.from(search.entries()));
+    const current = next.getAll(name);
+    next.delete(name);
+    if (current.includes(value)) {
+      current.filter((v) => v !== value).forEach((v) => next.append(name, v));
+    } else {
+      [...current, value].forEach((v) => next.append(name, v));
+    }
+    next.delete('page');
+    router.replace(`${pathname}?${next.toString()}`);
+  }
+  function clearAll() {
+    const keep = new URLSearchParams();
+    const q = search.get('q');
+    if (q) keep.set('q', q);
+    router.replace(`${pathname}?${keep.toString()}`);
+  }
+  return { search, set, toggleArrayValue, clearAll };
+}
+
+// ──────────────── Active filter chips ────────────────
+
+function ActiveFilterChips({ onCleared }: { onCleared?: () => void }) {
+  const { search, clearAll } = useUrlParam();
+  const chips: Array<{ key: string; value: string; label: string }> = [];
+  for (const [k, v] of search.entries()) {
+    if (k === 'page' || k === 'sort' || k === 'q') continue;
+    chips.push({ key: k, value: v, label: `${k}: ${v}` });
+  }
+  if (chips.length === 0) return null;
+  return (
+    <div>
+      <div className="flex flex-wrap gap-1">
+        {chips.map((c) => (
+          <span
+            key={`${c.key}-${c.value}`}
+            className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-700"
+          >
+            {c.label}
+          </span>
+        ))}
+      </div>
+      <button
+        onClick={() => {
+          clearAll();
+          onCleared?.();
+        }}
+        className="mt-2 text-xs text-neutral-500 underline"
+      >
+        Clear all filters
+      </button>
+    </div>
+  );
+}
+
+// ──────────────── Individual filter UIs ────────────────
+
+function PriceFilter() {
+  const { search, set } = useUrlParam();
+  const min = search.get('minPrice') ?? '';
+  const max = search.get('maxPrice') ?? '';
+  return (
+    <Group title="Price">
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          placeholder="Min"
+          value={min}
+          onChange={(e) => set('minPrice', e.target.value || undefined)}
+          className="w-20 rounded border border-neutral-300 px-2 py-1 text-sm"
+        />
+        <span className="text-neutral-400">—</span>
+        <input
+          type="number"
+          placeholder="Max"
+          value={max}
+          onChange={(e) => set('maxPrice', e.target.value || undefined)}
+          className="w-20 rounded border border-neutral-300 px-2 py-1 text-sm"
+        />
+      </div>
+    </Group>
+  );
+}
+
+function DiscountFilter() {
+  const { search, set } = useUrlParam();
+  const current = search.get('discount') ?? '';
+  return (
+    <Group title="Discount">
+      <div className="flex flex-wrap gap-1">
+        {['10', '20', '30', '50'].map((d) => (
+          <button
+            key={d}
+            onClick={() => set('discount', current === d ? undefined : d)}
+            className={`rounded-md border px-2 py-1 text-xs ${
+              current === d
+                ? 'border-neutral-900 bg-neutral-900 text-white'
+                : 'border-neutral-300 hover:bg-neutral-100'
+            }`}
+          >
+            {d}%+
+          </button>
+        ))}
+      </div>
+    </Group>
+  );
+}
+
+function BrandFilter({
+  brands,
+}: {
+  brands: Array<{ slug: string; name: string }>;
+}) {
+  const { search, toggleArrayValue } = useUrlParam();
+  const selected = new Set(search.getAll('brand'));
+  return (
+    <Group title="Brand">
+      <ul className="max-h-44 space-y-1 overflow-auto pr-1">
+        {brands.map((b) => (
+          <li key={b.slug}>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={selected.has(b.slug)}
+                onChange={() => toggleArrayValue('brand', b.slug)}
+              />
+              {b.name}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </Group>
+  );
+}
+
+function RetailerFilter({ retailers }: { retailers: string[] }) {
+  const { search, toggleArrayValue } = useUrlParam();
+  const selected = new Set(search.getAll('retailer'));
+  return (
+    <Group title="Retailer">
+      <ul className="space-y-1">
+        {retailers.map((r) => (
+          <li key={r}>
+            <label className="flex items-center gap-2 text-sm capitalize">
+              <input
+                type="checkbox"
+                checked={selected.has(r)}
+                onChange={() => toggleArrayValue('retailer', r)}
+              />
+              {r}
+            </label>
+          </li>
+        ))}
+      </ul>
+    </Group>
+  );
+}
+
+function CategoryFilter({ filter }: { filter: FilterDefinition }) {
+  const { search, set, toggleArrayValue } = useUrlParam();
+
+  if (filter.filterType === 'TOGGLE') {
+    const checked = search.get(filter.attributeKey) === 'true';
+    return (
+      <Group title={filter.displayName}>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={(e) =>
+              set(filter.attributeKey, e.target.checked ? 'true' : undefined)
+            }
+          />
+          {filter.displayName}
+        </label>
+      </Group>
+    );
+  }
+
+  const options = Array.isArray(filter.optionsJson) ? filter.optionsJson : [];
+  if (options.length === 0) return null;
+
+  // Universal-named keys (size, color, material) map to top-level query params
+  // the API already understands; everything else uses the attributeKey verbatim.
+  const paramName =
+    filter.attributeKey === 'size' || filter.attributeKey === 'color'
+      ? filter.attributeKey
+      : filter.attributeKey === 'material'
+        ? 'material'
+        : filter.attributeKey;
+
+  const selected = new Set(search.getAll(paramName));
+
+  if (filter.filterType === 'SELECT') {
+    const current = search.get(paramName) ?? '';
+    return (
+      <Group title={filter.displayName}>
+        <select
+          value={current}
+          onChange={(e) => set(paramName, e.target.value || undefined)}
+          className="w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+        >
+          <option value="">Any</option>
+          {options.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      </Group>
+    );
+  }
+
+  return (
+    <Group title={filter.displayName}>
+      <div className="flex flex-wrap gap-1">
+        {options.map((o) => {
+          const active = selected.has(o);
+          return (
+            <button
+              key={o}
+              type="button"
+              onClick={() => toggleArrayValue(paramName, o)}
+              className={`rounded-md border px-2 py-1 text-xs ${
+                active
+                  ? 'border-neutral-900 bg-neutral-900 text-white'
+                  : 'border-neutral-300 hover:bg-neutral-100'
+              }`}
+            >
+              {o}
+            </button>
+          );
+        })}
+      </div>
+    </Group>
+  );
+}
+
+function ToggleFilter({ param, label }: { param: string; label: string }) {
+  const { search, set } = useUrlParam();
+  const checked = search.get(param) === 'true';
+  return (
+    <label className="flex items-center gap-2 text-sm">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => set(param, e.target.checked ? 'true' : undefined)}
+      />
+      {label}
+    </label>
+  );
+}
+
+function Group({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+        {title}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+// ──────────────── Sort dropdown (sibling component for listings) ────────────────
+
+export function SortPicker() {
+  const { search, set } = useUrlParam();
+  const value = search.get('sort') ?? 'relevance';
+  return (
+    <select
+      value={value}
+      onChange={(e) => set('sort', e.target.value)}
+      className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm"
+    >
+      <option value="relevance">Relevance</option>
+      <option value="newest">Newest</option>
+      <option value="price_asc">Price: low → high</option>
+      <option value="price_desc">Price: high → low</option>
+      <option value="best_rated">Best rated</option>
+      <option value="popular">Most popular</option>
+    </select>
+  );
+}

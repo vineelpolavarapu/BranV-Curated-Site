@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Env files (commit .env.example only)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Prisma
+apps/api/prisma/migrations/dev.db*
+
+# Docker volumes (declared in compose, but ignore any local dumps)
+docker-data/
+
+# Coverage / test
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Cache
+.turbo/
+.cache/

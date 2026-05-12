@@ -1,0 +1,26 @@
+{
+  "name": "branv",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm --filter \"./packages/*\" build && pnpm --parallel --filter \"./apps/*\" build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "db:migrate": "pnpm --filter @branv/api db:migrate",
+    "db:generate": "pnpm --filter @branv/api db:generate",
+    "seed:admin": "pnpm --filter @branv/api seed:admin",
+    "seed:catalog": "pnpm --filter @branv/api seed:catalog",
+    "setup:search": "pnpm --filter @branv/api setup:search",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

@@ -1,0 +1,331 @@
+import Link from 'next/link';
+import Image from 'next/image';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+import { apiServer } from '@/lib/api-server';
+import { ProductCardData } from '@/lib/storefront-types';
+import { StorefrontShell } from '@/components/StorefrontShell';
+import { ProductCard, BuyNowButton, formatINR } from '@/components/ProductCard';
+
+export const dynamic = 'force-dynamic';
+
+const retailerLabel: Record<string, string> = {
+  flipkart: 'Flipkart',
+  amazon: 'Amazon',
+  myntra: 'Myntra',
+  ajio: 'Ajio',
+  meesho: 'Meesho',
+  nykaa: 'Nykaa',
+  snitch: 'Snitch',
+  bewakoof: 'Bewakoof',
+  thesouledstore: 'The Souled Store',
+  other: 'Retailer',
+};
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const product = await apiServer<ProductCardData>(`/products/${slug}`);
+  if (!product) return { title: 'BranV — Product' };
+  const desc = product.description?.slice(0, 160) ?? `${product.brand.name} on BranV.`;
+  return {
+    title: `${product.title} · ${product.brand.name} · BranV`,
+    description: desc,
+    openGraph: {
+      title: product.title,
+      description: desc,
+      images: product.primaryImage ? [product.primaryImage.url] : [],
+    },
+  };
+}
+
+export default async function ProductDetailPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await props.params;
+  const [product, related] = await Promise.all([
+    apiServer<ProductCardData>(`/products/${slug}`),
+    apiServer<ProductCardData[]>(`/products/${slug}/related`),
+  ]);
+  if (!product) notFound();
+
+  return (
+    <StorefrontShell>
+      <Breadcrumbs product={product} />
+      <ProductSchema product={product} />
+      <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
+        <div className="grid gap-8 md:grid-cols-2">
+          <Gallery product={product} />
+          <Summary product={product} />
+        </div>
+      </section>
+
+      <WhereToBuy product={product} />
+
+      {related && related.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-14">
+          <h2 className="mb-5 text-xl font-semibold tracking-tight">
+            You may also like
+          </h2>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+            {related.slice(0, 8).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
+    </StorefrontShell>
+  );
+}
+
+function Breadcrumbs({ product }: { product: ProductCardData }) {
+  return (
+    <nav className="mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
+      <Link href="/" className="hover:text-neutral-900">Home</Link>
+      <span className="mx-2">/</span>
+      <Link
+        href={`/category/${product.category.slug}`}
+        className="hover:text-neutral-900"
+      >
+        {product.category.name}
+      </Link>
+      {product.subcategory && (
+        <>
+          <span className="mx-2">/</span>
+          <Link
+            href={`/category/${product.subcategory.slug}`}
+            className="hover:text-neutral-900"
+          >
+            {product.subcategory.name}
+          </Link>
+        </>
+      )}
+      <span className="mx-2">/</span>
+      <span className="text-neutral-900">{product.title}</span>
+    </nav>
+  );
+}
+
+function Gallery({ product }: { product: ProductCardData }) {
+  const images = product.gallery.length > 0 ? product.gallery : [];
+  const hero = images[0] ?? product.primaryImage;
+  const rest = images.slice(1);
+
+  return (
+    <div>
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100">
+        {hero && 'url' in hero ? (
+          <>
+            <Image
+              src={hero.url}
+              alt={hero.altText ?? product.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+              unoptimized
+              priority
+            />
+            {hero.isAiGenerated && (
+              <span
+                title="AI-rendered on Vineel's avatar"
+                className="absolute bottom-3 right-3 rounded bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur"
+              >
+                AI-rendered
+              </span>
+            )}
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+            no image
+          </div>
+        )}
+      </div>
+      {rest.length > 0 && (
+        <ul className="mt-3 grid grid-cols-4 gap-2">
+          {rest.map((img, idx) => (
+            <li
+              key={idx}
+              className="relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-100"
+            >
+              <Image
+                src={img.url}
+                alt={img.altText ?? `${product.title} image ${idx + 2}`}
+                fill
+                sizes="100px"
+                unoptimized
+                className="object-cover"
+              />
+              {img.isAiGenerated && (
+                <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-0.5 text-[8px] font-medium uppercase text-white">
+                  AI
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function Summary({ product }: { product: ProductCardData }) {
+  return (
+    <div>
+      <Link
+        href={`/brands/${product.brand.slug}`}
+        className="text-xs font-medium uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
+      >
+        {product.brand.name}
+      </Link>
+      <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
+        {product.title}
+      </h1>
+
+      <div className="mt-4 flex items-baseline gap-3">
+        <span className="text-2xl font-semibold">
+          ₹{formatINR(product.price)}
+        </span>
+        {product.mrp && product.mrp > product.price && (
+          <>
+            <span className="text-base text-neutral-400 line-through">
+              ₹{formatINR(product.mrp)}
+            </span>
+            {product.discountPct && (
+              <span className="text-sm font-medium text-emerald-700">
+                {Math.round(product.discountPct)}% off
+              </span>
+            )}
+          </>
+        )}
+      </div>
+
+      {(product.colors.length > 0 || product.sizes.length > 0) && (
+        <div className="mt-5 space-y-3">
+          {product.colors.length > 0 && (
+            <DisplayList label="Colors" values={product.colors} />
+          )}
+          {product.sizes.length > 0 && (
+            <DisplayList label="Sizes" values={product.sizes} />
+          )}
+          <p className="text-xs text-neutral-500">
+            Size/colour selection happens on the retailer&apos;s site after you
+            click Buy Now.
+          </p>
+        </div>
+      )}
+
+      {product.buyNow && (
+        <div className="mt-6">
+          <BuyNowButton
+            href={product.buyNow.url}
+            retailer={product.buyNow.retailer}
+            size="lg"
+          />
+          <p className="mt-2 text-xs text-neutral-500">
+            We earn a small commission when you buy through our link — at no
+            extra cost to you.
+          </p>
+        </div>
+      )}
+
+      {product.description && (
+        <div className="mt-8 border-t border-neutral-200 pt-6">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+            Description
+          </h2>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+            {product.description}
+          </p>
+        </div>
+      )}
+
+      {product.tags.length > 0 && (
+        <div className="mt-6 flex flex-wrap gap-1">
+          {product.tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-600"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DisplayList({ label, values }: { label: string; values: string[] }) {
+  return (
+    <div>
+      <p className="mb-1 text-xs font-medium uppercase tracking-wider text-neutral-500">
+        {label}
+      </p>
+      <ul className="flex flex-wrap gap-1.5">
+        {values.map((v) => (
+          <li
+            key={v}
+            className="rounded-md border border-neutral-300 px-2 py-1 text-xs"
+          >
+            {v}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function WhereToBuy({ product }: { product: ProductCardData }) {
+  if (product.retailers.length === 0) return null;
+  return (
+    <section className="mx-auto max-w-7xl px-6 pb-12">
+      <h2 className="mb-4 text-xl font-semibold tracking-tight">Where to buy</h2>
+      <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {product.retailers.map((r) => {
+          const label = retailerLabel[r.retailer] ?? r.retailer;
+          return (
+            <li
+              key={r.retailer}
+              className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3"
+            >
+              <div>
+                <p className="font-medium capitalize">{label}</p>
+                {r.rawPrice !== null && (
+                  <p className="text-sm text-neutral-600">
+                    ₹{formatINR(r.rawPrice)}
+                  </p>
+                )}
+              </div>
+              <BuyNowButton href={r.affiliateUrl} retailer={r.retailer} />
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+function ProductSchema({ product }: { product: ProductCardData }) {
+  const ld = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.title,
+    image: product.primaryImage?.url,
+    description: product.description ?? undefined,
+    brand: { '@type': 'Brand', name: product.brand.name },
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: product.currency || 'INR',
+      price: product.price,
+      availability: product.buyNow ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: product.buyNow?.url,
+    },
+  };
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
+    />
+  );
+}
