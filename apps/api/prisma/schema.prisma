@@ -49,6 +49,7 @@ model User {
   clickEvents             ClickEvent[]             @relation("UserClicks")
   selfReportedConversions SelfReportedConversion[] @relation("UserConversions")
   wardrobeItems           WardrobeItem[]           @relation("UserWardrobe")
+  wishlistItems           WishlistItem[]           @relation("UserWishlist")
 
   @@index([email])
   @@map("users")
@@ -246,6 +247,7 @@ model Product {
   retailerListings ProductRetailerListing[]
   clickEvents      ClickEvent[]
   wardrobeItems    WardrobeItem[]
+  wishlistItems    WishlistItem[]
 
   @@index([status])
   @@index([brandId])
@@ -400,6 +402,21 @@ model WardrobeItem {
   @@unique([userId, productId])
   @@index([userId, createdAt])
   @@map("wardrobe_items")
+}
+
+model WishlistItem {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation("UserWishlist", fields: [userId], references: [id], onDelete: Cascade)
+  productId         String
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  notifyOnPriceDrop Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId, createdAt])
+  @@map("wishlist_items")
 }
 
 model Avatar {

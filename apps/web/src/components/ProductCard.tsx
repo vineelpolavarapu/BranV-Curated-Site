@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
 import { resolveBuyNowHref } from '@/lib/click-tracking';
 import { useClickReturn } from './click-return/ClickReturnProvider';
+import { useWishlist } from './wishlist/WishlistProvider';
 
 const retailerLabel: Record<string, string> = {
   flipkart: 'Flipkart',
@@ -22,7 +23,8 @@ const retailerLabel: Record<string, string> = {
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
-  const [liked, setLiked] = useState(false);
+  const { isInWishlist, toggle } = useWishlist();
+  const liked = isInWishlist(product.id);
 
   const primary = product.primaryImage;
   const secondary = product.secondaryImage;
@@ -64,15 +66,15 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </span>
         )}
 
-        {/* Wishlist heart (UI placeholder; wires in Phase 5) */}
+        {/* Wishlist heart — wired to Phase 5 wishlist API. */}
         <button
           type="button"
           aria-pressed={liked}
-          aria-label="Save to wishlist"
+          aria-label={liked ? 'Remove from wishlist' : 'Save to wishlist'}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setLiked((v) => !v);
+            void toggle(product.id);
           }}
           className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white/90 shadow-sm transition hover:scale-110"
         >
