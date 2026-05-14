@@ -91,9 +91,9 @@ branv/
 - [x] **Phase 2 — Brand & Catalog Core + Avatar Library:** brands, categories with attribute schemas, products with variants/images/retailer-listings, avatar library, S3 presigned uploads
 - [x] **Phase 3 — Quick Add Workflow:** scrape-url autofill, Cuelinks/Amazon affiliate conversion, clipboard-paste image upload, bulk mode, localStorage draft, `N` shortcut, pending-conversion retry worker
 - [x] **Phase 4 — Storefront Browse, Filters, Search:** public catalog with faceted filters (universal + category-specific), pg_trgm + tsvector search, autocomplete, product detail w/ schema.org, home + brand pages, mobile bottom nav, AI-rendered disclosure badge
-- [ ] **Phase 5 — Click-Out Flow + Nice Pick + Wardrobe**
-- [ ] **Phase 6 — Articles & Content Management**
-- [ ] **Phase 7 — Drops, Lookbooks, Edits, Home Banners**
+- [x] **Phase 5 — Click-Out Flow + Nice Pick + Wardrobe:** `/go/:trackingId` redirect, Did-you-buy bottom sheet, Nice Pick confetti modal, member wardrobe + wishlist
+- [x] **Phase 6 — Articles & Content Management:** markdown editor with product-embed slash command, schedule → publish worker, schema.org `Article` JSON-LD, dynamic sitemap + robots
+- [x] **Phase 7 — Drops, Lookbooks, Edits, Home Banners:** drop scheduler with notify-me emails + countdown UI, shoppable lookbook hotspots, The Edit collections, scheduled banners, XSS-safe brand stories
 - [ ] **Phase 8 — Reviews, Newsletter, Notifications**
 - [ ] **Phase 9 — Affiliate Sync + Reconciliation**
 - [ ] **Phase 10 — Admin Analytics & Audit**

@@ -3,9 +3,11 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiServer, buildQuery } from '@/lib/api-server';
 import { ProductPage } from '@/lib/storefront-types';
+import { BrandStoryPublic } from '@/lib/phase7-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard } from '@/components/ProductCard';
 import { Filters, SortPicker } from '@/components/Filters';
+import { BrandStorySection } from '@/components/brand/BrandStorySection';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,15 +29,17 @@ export default async function BrandDetailPage(props: {
 }) {
   const { slug } = await props.params;
   const sp = await props.searchParams;
-  const [brand, list] = await Promise.all([
+  const [brand, list, story] = await Promise.all([
     apiServer<BrandDetail>(`/brands/${slug}`),
     apiServer<ProductPage>(`/products${buildQuery({ ...sp, brand: slug })}`),
+    apiServer<BrandStoryPublic | null>(`/brands/${slug}/story`),
   ]);
   if (!brand) notFound();
 
   return (
     <StorefrontShell>
       <BrandHero brand={brand} />
+      {story && <BrandStorySection story={story} />}
       <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
         <div className="grid gap-6 md:grid-cols-[220px_1fr]">
           <Filters context={{}} />

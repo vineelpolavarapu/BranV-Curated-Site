@@ -40,6 +40,7 @@ function SiteHeader() {
         <nav className="hidden flex-1 items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
           <ShopMegaMenu />
           <Link href="/brands" className="hover:text-neutral-950">Brands</Link>
+          <Link href="/articles" className="hover:text-neutral-950">Articles</Link>
           <Link href="/new" className="hover:text-neutral-950">New</Link>
           <Link href="/sale" className="hover:text-neutral-950">Sale</Link>
         </nav>

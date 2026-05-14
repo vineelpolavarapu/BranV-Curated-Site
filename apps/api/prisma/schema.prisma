@@ -46,6 +46,8 @@ model User {
   passwordResets      PasswordReset[]
   auditLogs           AuditLog[]          @relation("ActorAuditLogs")
   createdProducts     Product[]           @relation("ProductCreatedBy")
+  authoredArticles    Article[]           @relation("ArticleAuthor")
+  dropNotifySignups   DropNotifySignup[]
   clickEvents             ClickEvent[]             @relation("UserClicks")
   selfReportedConversions SelfReportedConversion[] @relation("UserConversions")
   wardrobeItems           WardrobeItem[]           @relation("UserWardrobe")
@@ -173,6 +175,7 @@ model Brand {
   updatedAt   DateTime    @updatedAt
 
   products Product[]
+  story    BrandStory?
 
   @@index([status, isFeatured])
   @@map("brands")
@@ -248,6 +251,10 @@ model Product {
   clickEvents      ClickEvent[]
   wardrobeItems    WardrobeItem[]
   wishlistItems    WishlistItem[]
+  articleEmbeds    ArticleProduct[]
+  dropProducts     DropProduct[]
+  editProducts     EditProduct[]
+  lookbookTags     LookbookTag[]
 
   @@index([status])
   @@index([brandId])
@@ -429,4 +436,251 @@ model Avatar {
   updatedAt         DateTime @updatedAt
 
   @@map("avatars")
+}
+
+// ──────────────────────── PHASE 6 — ARTICLES ────────────────────────
+
+enum ArticleStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+model Article {
+  id              String        @id @default(cuid())
+  slug            String        @unique
+  title           String
+  heroUrl         String?
+  excerpt         String?
+  /// Markdown body. Product embeds use `<div data-product="slug"></div>`
+  /// markers that the renderer replaces with shoppable product cards.
+  bodyMd          String        @default("")
+  status          ArticleStatus @default(DRAFT)
+  scheduledAt     DateTime?
+  publishedAt     DateTime?
+  authorId        String?
+  author          User?         @relation("ArticleAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  tags            String[]      @default([])
+  metaTitle       String?
+  metaDescription String?
+  ogImage         String?
+  /// Estimated reading time in minutes (auto-calculated on save at ~225 wpm).
+  readingMinutes  Int?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  articleProducts ArticleProduct[]
+
+  @@index([status, publishedAt])
+  @@index([scheduledAt])
+  @@map("articles")
+}
+
+model ArticleProduct {
+  id        String  @id @default(cuid())
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position  Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, productId])
+  @@index([articleId])
+  @@map("article_products")
+}
+
+// ───────── PHASE 7 — DROPS / LOOKBOOKS / EDITS / BANNERS / BRAND STORIES ─────────
+
+enum DropStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  ARCHIVED
+}
+
+model Drop {
+  id          String     @id @default(cuid())
+  slug        String     @unique
+  name        String
+  heroUrl     String?
+  description String?
+  launchAt    DateTime
+  endsAt      DateTime?
+  status      DropStatus @default(SCHEDULED)
+  /// Stamped when the scheduler flips status → LIVE.
+  publishedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  dropProducts  DropProduct[]
+  notifySignups DropNotifySignup[]
+
+  @@index([status, launchAt])
+  @@index([launchAt])
+  @@map("drops")
+}
+
+model DropProduct {
+  id        String  @id @default(cuid())
+  dropId    String
+  drop      Drop    @relation(fields: [dropId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position  Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([dropId, productId])
+  @@index([dropId])
+  @@map("drop_products")
+}
+
+model DropNotifySignup {
+  id         String    @id @default(cuid())
+  dropId     String
+  drop       Drop      @relation(fields: [dropId], references: [id], onDelete: Cascade)
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email      String
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@unique([dropId, email])
+  @@index([dropId, notifiedAt])
+  @@map("drop_notify_signups")
+}
+
+enum LookbookStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Lookbook {
+  id          String         @id @default(cuid())
+  slug        String         @unique
+  title       String
+  heroUrl     String?
+  description String?
+  status      LookbookStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  images LookbookImage[]
+
+  @@index([status])
+  @@map("lookbooks")
+}
+
+model LookbookImage {
+  id         String   @id @default(cuid())
+  lookbookId String
+  lookbook   Lookbook @relation(fields: [lookbookId], references: [id], onDelete: Cascade)
+  imageUrl   String
+  position   Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  tags LookbookTag[]
+
+  @@index([lookbookId])
+  @@map("lookbook_images")
+}
+
+model LookbookTag {
+  id              String        @id @default(cuid())
+  lookbookImageId String
+  lookbookImage   LookbookImage @relation(fields: [lookbookImageId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// Hotspot position relative to the image, both 0–100.
+  xPercent        Decimal       @db.Decimal(5, 2)
+  yPercent        Decimal       @db.Decimal(5, 2)
+  createdAt       DateTime      @default(now())
+
+  @@index([lookbookImageId])
+  @@map("lookbook_tags")
+}
+
+enum EditStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Edit {
+  id               String     @id @default(cuid())
+  slug             String     @unique
+  title            String
+  heroUrl          String?
+  description      String?
+  status           EditStatus @default(DRAFT)
+  /// At most one edit at a time should be the home feature; admin-enforced.
+  isFeaturedOnHome Boolean    @default(false)
+  publishedAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  editProducts EditProduct[]
+
+  @@index([status])
+  @@index([isFeaturedOnHome])
+  @@map("edits")
+}
+
+model EditProduct {
+  id        String  @id @default(cuid())
+  editId    String
+  edit      Edit    @relation(fields: [editId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  position  Int     @default(0)
+  createdAt DateTime @default(now())
+
+  @@unique([editId, productId])
+  @@index([editId])
+  @@map("edit_products")
+}
+
+enum HomeBannerStatus {
+  ACTIVE
+  HIDDEN
+}
+
+model HomeBanner {
+  id           String           @id @default(cuid())
+  imageUrl     String
+  headline     String?
+  ctaLabel     String?
+  ctaLink      String?
+  displayOrder Int              @default(0)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  status       HomeBannerStatus @default(ACTIVE)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([status, displayOrder])
+  @@map("home_banners")
+}
+
+enum BrandStoryStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model BrandStory {
+  id        String           @id @default(cuid())
+  brandId   String           @unique
+  brand     Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  heroUrl   String?
+  /// Markdown body. Rendered with rehype-sanitize on the storefront so raw
+  /// HTML is stripped — XSS-safe even when admin pastes untrusted content.
+  bodyMd    String           @default("")
+  status    BrandStoryStatus @default(DRAFT)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  @@map("brand_stories")
 }

@@ -21,6 +21,12 @@ import { StorefrontModule } from './storefront/storefront.module';
 import { ClicksModule } from './clicks/clicks.module';
 import { WardrobeModule } from './wardrobe/wardrobe.module';
 import { WishlistModule } from './wishlist/wishlist.module';
+import { ArticlesModule } from './articles/articles.module';
+import { DropsModule } from './drops/drops.module';
+import { LookbooksModule } from './lookbooks/lookbooks.module';
+import { EditsModule } from './edits/edits.module';
+import { BannersModule } from './banners/banners.module';
+import { BrandStoriesModule } from './brand-stories/brand-stories.module';
 import { CorrelationIdMiddleware } from './common/correlation-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TwoFactorGuard } from './common/guards/two-factor.guard';
@@ -68,6 +74,12 @@ import { TwoFactorGuard } from './common/guards/two-factor.guard';
     ClicksModule,
     WardrobeModule,
     WishlistModule,
+    ArticlesModule,
+    DropsModule,
+    LookbooksModule,
+    EditsModule,
+    BannersModule,
+    BrandStoriesModule,
   ],
   providers: [
     // Global JWT auth — opt out per-route with @Public().

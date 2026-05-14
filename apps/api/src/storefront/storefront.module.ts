@@ -6,9 +6,11 @@ import { SearchController } from './search.controller';
 import { SearchService } from './search.service';
 import { HomeController } from './home.controller';
 import { ClicksModule } from '../clicks/clicks.module';
+import { BannersModule } from '../banners/banners.module';
+import { EditsModule } from '../edits/edits.module';
 
 @Module({
-  imports: [ClicksModule],
+  imports: [ClicksModule, BannersModule, EditsModule],
   controllers: [
     ProductsPublicController,
     BrandsPublicController,

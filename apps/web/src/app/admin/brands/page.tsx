@@ -134,6 +134,12 @@ export default function BrandsAdminPage() {
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">
+                      <a
+                        href={`/admin/brands/${b.id}/story`}
+                        className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                      >
+                        Story
+                      </a>
                       <button
                         onClick={() => {
                           setEditing(b);

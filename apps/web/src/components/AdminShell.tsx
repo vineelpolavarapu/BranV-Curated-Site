@@ -11,6 +11,11 @@ const NAV = [
   { href: '/admin/brands', label: 'Brands' },
   { href: '/admin/categories', label: 'Categories' },
   { href: '/admin/products', label: 'Products' },
+  { href: '/admin/articles', label: 'Articles' },
+  { href: '/admin/drops', label: 'Drops' },
+  { href: '/admin/lookbooks', label: 'Lookbooks' },
+  { href: '/admin/edits', label: 'The Edit' },
+  { href: '/admin/banners', label: 'Banners' },
   { href: '/admin/avatars', label: 'Avatars' },
 ];
 

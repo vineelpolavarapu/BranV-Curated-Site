@@ -455,6 +455,7 @@ Migrate: `articles`, `article_products`.
 2. **Markdown editor in admin:**
    - Use Tiptap, MDXEditor, or a simple textarea + react-markdown preview.
    - Custom block: `/product` slash command opens product picker; insertion writes `{% product id="..." %}` or a custom MDX component reference.
+   
    - Server-side renderer parses these and inserts styled product cards into the article body.
 
 3. **Article publication scheduler:** worker every minute flips `SCHEDULED → PUBLISHED` at `scheduled_at`.

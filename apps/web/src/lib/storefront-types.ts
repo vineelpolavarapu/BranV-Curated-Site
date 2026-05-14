@@ -80,6 +80,14 @@ export interface AutocompleteResult {
 }
 
 export interface HomePayload {
+  banners: Array<{
+    id: string;
+    imageUrl: string;
+    headline: string | null;
+    ctaLabel: string | null;
+    ctaLink: string | null;
+    displayOrder: number;
+  }>;
   featuredBrands: Array<{
     id: string;
     slug: string;
@@ -90,4 +98,29 @@ export interface HomePayload {
   }>;
   newArrivals: ProductCardData[];
   newArrivalsCount: number;
+  featuredEdit: {
+    id: string;
+    slug: string;
+    title: string;
+    heroUrl: string | null;
+    description: string | null;
+    productCount: number;
+  } | null;
+  activeDrops: Array<{
+    id: string;
+    slug: string;
+    name: string;
+    heroUrl: string | null;
+    launchAt: string;
+    endsAt: string | null;
+  }>;
+  latestArticles: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string | null;
+    heroUrl: string | null;
+    publishedAt: string | null;
+    readingMinutes: number | null;
+  }>;
 }
