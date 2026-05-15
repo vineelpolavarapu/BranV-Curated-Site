@@ -17,8 +17,6 @@ interface BrandDetail {
   name: string;
   logoUrl: string | null;
   heroUrl: string | null;
-  country: string | null;
-  foundedYear: number | null;
   description: string | null;
   _count: { products: number };
 }
@@ -96,13 +94,7 @@ function BrandHero({ brand }: { brand: BrandDetail }) {
             {brand.name}
           </h1>
           <p className="mt-1 text-sm text-neutral-600">
-            {[
-              brand.country,
-              brand.foundedYear ? `est. ${brand.foundedYear}` : null,
-              `${brand._count.products} products on BranV`,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
+            {brand._count.products} products on BranV
           </p>
           {brand.description && (
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-700">

@@ -284,6 +284,8 @@ export class ProductsPublicService {
       discountPct: p.discountPct ? Number(p.discountPct) : null,
       currency: p.currency,
       tags: p.tags,
+      avgRating: p.avgRating ? Number(p.avgRating) : null,
+      reviewCount: p.reviewCount,
       createdAt: p.createdAt,
       brand: p.brand,
       category: p.category,

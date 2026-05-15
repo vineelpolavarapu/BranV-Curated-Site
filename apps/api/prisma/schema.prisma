@@ -52,6 +52,12 @@ model User {
   selfReportedConversions SelfReportedConversion[] @relation("UserConversions")
   wardrobeItems           WardrobeItem[]           @relation("UserWardrobe")
   wishlistItems           WishlistItem[]           @relation("UserWishlist")
+  reviews                 Review[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
+  newsletterSubscriber    NewsletterSubscriber?
+  uploadedPayouts         AffiliatePayout[]        @relation("PayoutUploadedBy")
+  settingsUpdates         PlatformSetting[]        @relation("SettingsUpdatedBy")
 
   @@index([email])
   @@map("users")
@@ -166,8 +172,6 @@ model Brand {
   name        String
   logoUrl     String?
   heroUrl     String?
-  country     String?
-  foundedYear Int?
   description String?
   isFeatured  Boolean     @default(false)
   status      BrandStatus @default(ACTIVE)
@@ -241,7 +245,10 @@ model Product {
   metaDescription    String?
   tags               String[]      @default([])
   archivedAt         DateTime?
-  /// Click + review count denormalized later in Phase 5/8.
+  /// Denormalized review aggregates — maintained by ReviewsService on
+  /// create / moderate so storefront sort + filter stay cheap.
+  avgRating          Decimal?      @db.Decimal(3, 2)
+  reviewCount        Int           @default(0)
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -255,6 +262,7 @@ model Product {
   dropProducts     DropProduct[]
   editProducts     EditProduct[]
   lookbookTags     LookbookTag[]
+  reviews          Review[]
 
   @@index([status])
   @@index([brandId])
@@ -303,6 +311,10 @@ model ProductRetailerListing {
   retailerImageUrl   String?
   rawPrice           Decimal?           @db.Decimal(12, 2)
   lastSyncedAt       DateTime?
+  /// Increments on each failed sync; reset to 0 on success. After 3
+  /// consecutive failures the listing is flagged for admin review.
+  syncFailedCount    Int                @default(0)
+  syncFailedSince    DateTime?
   availabilityStatus AvailabilityStatus @default(IN_STOCK)
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
@@ -367,6 +379,7 @@ model ClickEvent {
 
   reports        SelfReportedConversion[]
   wardrobeItems  WardrobeItem[]
+  payoutItems    AffiliatePayoutItem[]
 
   @@index([productId])
   @@index([userId])
@@ -683,4 +696,278 @@ model BrandStory {
   updatedAt DateTime         @updatedAt
 
   @@map("brand_stories")
+}
+
+// ───────── PHASE 8 — REVIEWS / NEWSLETTER / NOTIFICATIONS ─────────
+
+enum ReviewStatus {
+  PUBLISHED
+  HIDDEN
+}
+
+model Review {
+  id               String       @id @default(cuid())
+  productId        String
+  product          Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating           Int
+  title            String?
+  body             String?
+  /// Optional gallery — array of S3 URLs uploaded via /uploads/presign.
+  imagesJson       Json?
+  status           ReviewStatus @default(PUBLISHED)
+  moderationReason String?
+  moderatedById    String?
+  moderatedAt      DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@unique([productId, userId])
+  @@index([productId, status, createdAt])
+  @@index([userId])
+  @@map("reviews")
+}
+
+enum NewsletterStatus {
+  PENDING
+  CONFIRMED
+  UNSUBSCRIBED
+}
+
+model NewsletterSubscriber {
+  id                    String           @id @default(cuid())
+  email                 String           @unique
+  userId                String?          @unique
+  user                  User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  source                String?
+  status                NewsletterStatus @default(PENDING)
+  /// sha256 of a single-use confirmation token. Cleared after CONFIRMED.
+  confirmationTokenHash String?          @unique
+  /// sha256 of a long-lived unsubscribe token. Stable across re-subscribes.
+  unsubscribeTokenHash  String           @unique
+  confirmedAt           DateTime?
+  unsubscribedAt        DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@index([status])
+  @@map("newsletter_subscribers")
+}
+
+enum NotificationChannel {
+  EMAIL
+  IN_APP
+  WEB_PUSH
+  SMS
+}
+
+enum NotificationType {
+  WELCOME
+  WISHLIST_PRICE_DROP
+  DROP_LAUNCHING_SOON
+  DROP_LIVE
+  NEW_ARTICLE
+  REVIEW_HIDDEN
+  ADMIN_SYNC_FAILURE
+  ADMIN_WEEKLY_SUMMARY
+  GENERIC
+}
+
+model Notification {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  channel   NotificationChannel @default(IN_APP)
+  /// Free-form: { title, body, link, productId, dropSlug, etc. }
+  payload   Json
+  readAt    DateTime?
+  sentAt    DateTime?
+  createdAt DateTime            @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id        String              @id @default(cuid())
+  userId    String
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  channel   NotificationChannel
+  enabled   Boolean             @default(true)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  @@unique([userId, type, channel])
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+enum OutboxStatus {
+  PENDING
+  DISPATCHED
+  FAILED
+}
+
+/// Outbox pattern (BUILD_GUIDE §8.3): rows are written inside the same DB
+/// transaction as whatever business event produced them. A scheduled
+/// dispatcher reads PENDING and fires the channel-specific side effect
+/// (mail send, in-app insert, …). Survives backend restarts because the
+/// queue lives in the DB.
+model NotificationOutbox {
+  id            String              @id @default(cuid())
+  userId        String?
+  /// Some notifications target an anonymous newsletter subscriber by email.
+  email         String?
+  type          NotificationType
+  channel       NotificationChannel
+  payload       Json
+  status        OutboxStatus        @default(PENDING)
+  attempts      Int                 @default(0)
+  lastError     String?
+  scheduledFor  DateTime            @default(now())
+  dispatchedAt  DateTime?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([status, scheduledFor])
+  @@map("notification_outbox")
+}
+
+// ───────── PHASE 9 — AFFILIATE PAYOUTS / RECONCILIATION ─────────
+
+enum AffiliatePayoutItemStatus {
+  /// Matched to exactly one click_events row.
+  MATCHED
+  /// No click_events candidate within the window/amount band.
+  UNMATCHED
+  /// Multiple candidates within window — admin reviews manually.
+  AMBIGUOUS
+}
+
+/// One row per uploaded CSV file. `csvHash` is sha256 of the file bytes so
+/// re-uploading the same export is a no-op (BUILD_GUIDE §9.1 step 3 — idempotent).
+model AffiliatePayout {
+  id                    String           @id @default(cuid())
+  partner               AffiliatePartner
+  reportedPeriodStart   DateTime?
+  reportedPeriodEnd     DateTime?
+  reportedClicks        Int?
+  reportedOrders        Int?
+  reportedCommissionInr Decimal?         @db.Decimal(14, 2)
+  csvHash               String           @unique
+  csvFilename           String?
+  rowCount              Int              @default(0)
+  matchedCount          Int              @default(0)
+  unmatchedCount        Int              @default(0)
+  ambiguousCount        Int              @default(0)
+  uploadedById          String?
+  uploadedBy            User?            @relation("PayoutUploadedBy", fields: [uploadedById], references: [id], onDelete: SetNull)
+  notes                 String?
+  createdAt             DateTime         @default(now())
+
+  items AffiliatePayoutItem[]
+
+  @@index([partner, createdAt])
+  @@map("affiliate_payouts")
+}
+
+model AffiliatePayoutItem {
+  id                  String                    @id @default(cuid())
+  payoutId            String
+  payout              AffiliatePayout           @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  matchedClickEventId String?
+  matchedClickEvent   ClickEvent?               @relation(fields: [matchedClickEventId], references: [id], onDelete: SetNull)
+  retailerOrderId     String?
+  amountInr           Decimal?                  @db.Decimal(14, 2)
+  commissionInr       Decimal?                  @db.Decimal(14, 2)
+  occurredAt          DateTime?
+  status              AffiliatePayoutItemStatus @default(UNMATCHED)
+  /// Sha256 of the normalized row contents — dedupe within a single payout.
+  rowHash             String
+  /// Verbatim CSV row, for admin debugging.
+  rawRow              Json?
+  createdAt           DateTime                  @default(now())
+
+  @@unique([payoutId, rowHash])
+  @@index([matchedClickEventId])
+  @@index([status])
+  @@map("affiliate_payout_items")
+}
+
+// ───────── PHASE 10 — PLATFORM SETTINGS ─────────
+
+/// Key-value store for runtime-tunable settings (sync thresholds, feature
+/// flags, default currency). Reads are cached in Redis for ~30s by
+/// SettingsService so the next request cycle picks up writes.
+model PlatformSetting {
+  key           String   @id
+  valueJson     Json
+  updatedById   String?
+  updatedBy     User?    @relation("SettingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("platform_settings")
+}
+
+// ───────── PHASE 10 — ANALYTICS ROLLUPS ─────────
+//
+// Hourly worker (AnalyticsRollupService) aggregates raw click_events,
+// self_reported_conversions, and affiliate_payout_items into these summary
+// tables so dashboard queries stay sub-second as raw volume grows. Upserts
+// keep them idempotent; we rebuild the trailing N days each tick so
+// late-arriving reconciliation rows don't get lost.
+
+/// One row per (day × product × retailer). Sourced from click_events.
+model AnalyticsDailyClicks {
+  day         DateTime @db.Date
+  productId   String
+  retailer    String
+  clicks      Int      @default(0)
+  uniqueUsers Int      @default(0)
+  updatedAt   DateTime @updatedAt
+
+  @@id([day, productId, retailer])
+  @@index([day])
+  @@index([productId])
+  @@map("analytics_daily_clicks")
+}
+
+/// One row per (day × product). Sourced from self_reported_conversions and
+/// affiliate_payout_items (reconciled).
+model AnalyticsDailyConversions {
+  day                     DateTime @db.Date
+  productId               String
+  selfReportedPurchases   Int      @default(0)
+  selfReportedBrowsing    Int      @default(0)
+  selfReportedNeedsHelp   Int      @default(0)
+  estimatedCommissionInr  Decimal  @default(0) @db.Decimal(14, 2)
+  reconciledCommissionInr Decimal  @default(0) @db.Decimal(14, 2)
+  updatedAt               DateTime @updatedAt
+
+  @@id([day, productId])
+  @@index([day])
+  @@map("analytics_daily_conversions")
+}
+
+/// One row per (day × surface). `surfaceType` is 'article'|'drop'|'edit'|
+/// 'lookbook'|'home'|'category'|'product'; `surfaceSlug` is the slug or path
+/// segment derived from click_events.sourcePageUrl.
+model AnalyticsContentPerf {
+  day                     DateTime @db.Date
+  surfaceType             String
+  surfaceSlug             String
+  clicks                  Int      @default(0)
+  selfReportedConversions Int      @default(0)
+  reconciledCommissionInr Decimal  @default(0) @db.Decimal(14, 2)
+  updatedAt               DateTime @updatedAt
+
+  @@id([day, surfaceType, surfaceSlug])
+  @@index([day])
+  @@index([surfaceType, day])
+  @@map("analytics_content_perf")
 }

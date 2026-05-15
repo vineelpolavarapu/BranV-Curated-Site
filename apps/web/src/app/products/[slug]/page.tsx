@@ -7,6 +7,7 @@ import { resolveBuyNowHref } from '@/lib/click-tracking';
 import { ProductCardData } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard, BuyNowButton, formatINR } from '@/components/ProductCard';
+import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +64,12 @@ export default async function ProductDetailPage(props: {
       </section>
 
       <WhereToBuy product={product} />
+
+      <ReviewsSection
+        productId={product.id}
+        avgRating={product.avgRating}
+        reviewCount={product.reviewCount}
+      />
 
       {related && related.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-14">

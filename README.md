@@ -94,9 +94,9 @@ branv/
 - [x] **Phase 5 — Click-Out Flow + Nice Pick + Wardrobe:** `/go/:trackingId` redirect, Did-you-buy bottom sheet, Nice Pick confetti modal, member wardrobe + wishlist
 - [x] **Phase 6 — Articles & Content Management:** markdown editor with product-embed slash command, schedule → publish worker, schema.org `Article` JSON-LD, dynamic sitemap + robots
 - [x] **Phase 7 — Drops, Lookbooks, Edits, Home Banners:** drop scheduler with notify-me emails + countdown UI, shoppable lookbook hotspots, The Edit collections, scheduled banners, XSS-safe brand stories
-- [ ] **Phase 8 — Reviews, Newsletter, Notifications**
-- [ ] **Phase 9 — Affiliate Sync + Reconciliation**
-- [ ] **Phase 10 — Admin Analytics & Audit**
+- [x] **Phase 8 — Reviews, Newsletter, Notifications:** wardrobe-gated reviews + admin moderation, double-opt-in newsletter, outbox-pattern notification engine with bell icon + member preferences
+- [x] **Phase 9 — Affiliate Sync + Reconciliation:** nightly price/availability sync with wishlist price-drop notifications, CSV-upload reconciliation (Cuelinks/Amazon/EarnKaro auto-detect), idempotent by file hash, admin variance dashboard
+- [x] **Phase 10 — Admin Analytics & Audit:** dashboard KPIs + 14-day chart + low-conversion alerts, six analytics endpoints, filterable audit-log viewer, Redis-cached platform settings
 - [ ] **Phase 11 — Hardening**
 - [ ] **Phase 12 — Testing & CI/CD**
 - [ ] **Phase 13 — Deployment**

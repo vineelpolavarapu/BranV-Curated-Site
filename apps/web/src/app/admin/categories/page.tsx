@@ -18,6 +18,7 @@ const FILTER_TYPES: FilterType[] = ['SELECT', 'MULTI_SELECT', 'RANGE', 'TOGGLE']
 export default function CategoriesAdminPage() {
   const [categories, setCategories] = useState<CategoryNode[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [expandedL1s, setExpandedL1s] = useState<Set<string>>(new Set());
   const [schemas, setSchemas] = useState<AttributeSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -34,12 +35,34 @@ export default function CategoriesAdminPage() {
       const result = await apiFetch<CategoryNode[]>('/admin/categories');
       if (result.ok && result.data) {
         setCategories(result.data);
-        const firstL1 = result.data.find((c) => !c.parentId);
-        if (firstL1) setSelectedId(firstL1.id);
       }
+      // Don't auto-expand or auto-select — landing shows only L1 names so the
+      // admin can pick which one to drill into.
       setLoading(false);
     })();
   }, []);
+
+  function toggleL1(id: string) {
+    setExpandedL1s((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setSelectedId(id);
+  }
+
+  function pickL2(id: string, parentId: string | null) {
+    setSelectedId(id);
+    if (parentId) {
+      setExpandedL1s((prev) => {
+        if (prev.has(parentId)) return prev;
+        const next = new Set(prev);
+        next.add(parentId);
+        return next;
+      });
+    }
+  }
 
   useEffect(() => {
     if (!selectedId) {
@@ -87,13 +110,14 @@ export default function CategoriesAdminPage() {
             <p className="text-sm text-neutral-500">Loading…</p>
           ) : (
             <ul className="space-y-0.5 text-sm">
-              {tree.map((node) => (
-                <CategoryNodeRow
-                  key={node.id}
-                  node={node}
-                  depth={0}
+              {tree.map((l1) => (
+                <CategoryAccordion
+                  key={l1.id}
+                  l1={l1}
+                  expanded={expandedL1s.has(l1.id)}
                   selectedId={selectedId}
-                  onSelect={setSelectedId}
+                  onToggle={() => toggleL1(l1.id)}
+                  onPickChild={(childId) => pickL2(childId, l1.id)}
                 />
               ))}
             </ul>
@@ -215,47 +239,104 @@ function buildTree(items: CategoryNode[]): Tree[] {
   return roots;
 }
 
-function CategoryNodeRow({
-  node,
-  depth,
+function CategoryAccordion({
+  l1,
+  expanded,
   selectedId,
-  onSelect,
+  onToggle,
+  onPickChild,
 }: {
-  node: Tree;
-  depth: number;
+  l1: Tree;
+  expanded: boolean;
   selectedId: string | null;
-  onSelect: (id: string) => void;
+  onToggle: () => void;
+  onPickChild: (id: string) => void;
 }) {
+  const isL1Selected = selectedId === l1.id;
+  const hasChildren = l1.children.length > 0;
+
   return (
-    <>
-      <li>
-        <button
-          onClick={() => onSelect(node.id)}
-          className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left ${
-            selectedId === node.id
-              ? 'bg-neutral-900 text-white'
-              : 'hover:bg-neutral-100'
-          }`}
-          style={{ paddingLeft: 8 + depth * 14 }}
-        >
-          <span>{node.name}</span>
-          {node._count && node._count.attributeSchemas > 0 && (
-            <span className="ml-2 text-[10px] uppercase opacity-60">
-              {node._count.attributeSchemas}
+    <li>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={hasChildren ? expanded : undefined}
+        aria-controls={hasChildren ? `cat-children-${l1.id}` : undefined}
+        className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left transition ${
+          isL1Selected
+            ? 'bg-neutral-900 text-white'
+            : 'hover:bg-neutral-100'
+        }`}
+      >
+        <span className="font-medium">{l1.name}</span>
+        <span className="ml-2 flex items-center gap-2">
+          {l1._count && l1._count.attributeSchemas > 0 && (
+            <span className="text-[10px] uppercase opacity-60">
+              {l1._count.attributeSchemas}
             </span>
           )}
-        </button>
-      </li>
-      {node.children.map((c) => (
-        <CategoryNodeRow
-          key={c.id}
-          node={c}
-          depth={depth + 1}
-          selectedId={selectedId}
-          onSelect={onSelect}
-        />
-      ))}
-    </>
+          {hasChildren && <Chevron expanded={expanded} />}
+        </span>
+      </button>
+      {hasChildren && (
+        <div
+          id={`cat-children-${l1.id}`}
+          // grid-rows-[0fr→1fr] gives a smooth collapse without measuring height
+          className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+            expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          }`}
+        >
+          <ul className="ml-3 mt-0.5 space-y-0.5 overflow-hidden border-l border-neutral-200 pl-2">
+            {l1.children.map((l2) => {
+              const isL2Selected = selectedId === l2.id;
+              return (
+                <li key={l2.id}>
+                  <button
+                    type="button"
+                    onClick={() => onPickChild(l2.id)}
+                    className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm transition ${
+                      isL2Selected
+                        ? 'bg-neutral-900 text-white'
+                        : 'text-neutral-700 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <span>{l2.name}</span>
+                    {l2._count && l2._count.attributeSchemas > 0 && (
+                      <span className="ml-2 text-[10px] uppercase opacity-60">
+                        {l2._count.attributeSchemas}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </li>
+  );
+}
+
+function Chevron({ expanded }: { expanded: boolean }) {
+  return (
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      aria-hidden
+      className={`transition-transform duration-200 ${
+        expanded ? 'rotate-180' : ''
+      }`}
+    >
+      <path
+        d="M2 4 L6 8 L10 4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 

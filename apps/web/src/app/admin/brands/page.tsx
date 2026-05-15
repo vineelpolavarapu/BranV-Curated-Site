@@ -91,7 +91,6 @@ export default function BrandsAdminPage() {
             <thead>
               <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
                 <th className="px-2 pb-3 font-medium">Brand</th>
-                <th className="px-2 pb-3 font-medium">Country</th>
                 <th className="px-2 pb-3 font-medium">Products</th>
                 <th className="px-2 pb-3 font-medium">Status</th>
                 <th className="px-2 pb-3 font-medium" />
@@ -125,7 +124,6 @@ export default function BrandsAdminPage() {
                       )}
                     </div>
                   </td>
-                  <td className="px-2 py-3 text-neutral-600">{b.country ?? '—'}</td>
                   <td className="px-2 py-3 text-neutral-600">
                     {b._count?.products ?? 0}
                   </td>
@@ -209,16 +207,73 @@ function BrandForm({
 }) {
   const [name, setName] = useState(brand?.name ?? '');
   const [slug, setSlug] = useState(brand?.slug ?? '');
-  const [country, setCountry] = useState(brand?.country ?? '');
-  const [foundedYear, setFoundedYear] = useState(
-    brand?.foundedYear ? String(brand.foundedYear) : '',
-  );
   const [description, setDescription] = useState(brand?.description ?? '');
   const [logoUrl, setLogoUrl] = useState(brand?.logoUrl ?? '');
   const [heroUrl, setHeroUrl] = useState(brand?.heroUrl ?? '');
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [heroUploading, setHeroUploading] = useState(false);
   const [isFeatured, setIsFeatured] = useState(brand?.isFeatured ?? false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function uploadImage(
+    file: File,
+    kind: 'brand-logo' | 'brand-hero',
+  ): Promise<string | null> {
+    const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
+      '/uploads/presign',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          contentType: file.type,
+          filename: file.name,
+          kind,
+        }),
+      },
+    );
+    if (!presign.ok || !presign.data) {
+      setError(presign.error ?? 'Could not get upload URL');
+      return null;
+    }
+    const put = await fetch(presign.data.uploadUrl, {
+      method: 'PUT',
+      body: file,
+      headers: { 'Content-Type': file.type },
+    });
+    if (!put.ok) {
+      setError(`Upload failed (${put.status})`);
+      return null;
+    }
+    return presign.data.publicUrl;
+  }
+
+  async function onPickLogo(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // reset so picking the same file again still fires onChange
+    if (!file) return;
+    setError(null);
+    setLogoUploading(true);
+    try {
+      const url = await uploadImage(file, 'brand-logo');
+      if (url) setLogoUrl(url);
+    } finally {
+      setLogoUploading(false);
+    }
+  }
+
+  async function onPickHero(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setError(null);
+    setHeroUploading(true);
+    try {
+      const url = await uploadImage(file, 'brand-hero');
+      if (url) setHeroUrl(url);
+    } finally {
+      setHeroUploading(false);
+    }
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -227,8 +282,6 @@ function BrandForm({
     const body = {
       name,
       slug: slug || undefined,
-      country: country || undefined,
-      foundedYear: foundedYear ? Number(foundedYear) : undefined,
       description: description || undefined,
       logoUrl: logoUrl || undefined,
       heroUrl: heroUrl || undefined,
@@ -276,59 +329,31 @@ function BrandForm({
               className={adminInput}
             />
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className={adminLabel}>Slug (optional)</label>
-              <input
-                value={slug}
-                onChange={(e) => setSlug(e.target.value)}
-                placeholder="auto-generated from name"
-                className={adminInput}
-              />
-            </div>
-            <div>
-              <label className={adminLabel}>Country</label>
-              <input
-                value={country}
-                onChange={(e) => setCountry(e.target.value)}
-                className={adminInput}
-              />
-            </div>
-          </div>
           <div>
-            <label className={adminLabel}>Founded year</label>
+            <label className={adminLabel}>Slug (optional)</label>
             <input
-              type="number"
-              min={1700}
-              max={2100}
-              value={foundedYear}
-              onChange={(e) => setFoundedYear(e.target.value)}
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              placeholder="auto-generated from name"
               className={adminInput}
             />
           </div>
-          <div>
-            <label className={adminLabel}>Logo URL</label>
-            <input
-              type="url"
-              value={logoUrl}
-              onChange={(e) => setLogoUrl(e.target.value)}
-              placeholder="https://…"
-              className={adminInput}
-            />
-            <p className="mt-1 text-xs text-neutral-500">
-              Upload via Quick Add modal in Phase 3, or paste a CDN URL here for now.
-            </p>
-          </div>
-          <div>
-            <label className={adminLabel}>Hero URL</label>
-            <input
-              type="url"
-              value={heroUrl}
-              onChange={(e) => setHeroUrl(e.target.value)}
-              placeholder="https://…"
-              className={adminInput}
-            />
-          </div>
+          <ImagePicker
+            label="Logo"
+            url={logoUrl}
+            uploading={logoUploading}
+            onPick={onPickLogo}
+            onClear={() => setLogoUrl('')}
+            previewClass="h-16 w-16 rounded object-cover"
+          />
+          <ImagePicker
+            label="Hero image"
+            url={heroUrl}
+            uploading={heroUploading}
+            onPick={onPickHero}
+            onClear={() => setHeroUrl('')}
+            previewClass="h-24 w-full rounded object-cover"
+          />
           <div>
             <label className={adminLabel}>Description</label>
             <textarea
@@ -365,6 +390,77 @@ function BrandForm({
           </div>
         </form>
       </div>
+    </div>
+  );
+}
+
+function ImagePicker({
+  label,
+  url,
+  uploading,
+  onPick,
+  onClear,
+  previewClass,
+}: {
+  label: string;
+  url: string;
+  uploading: boolean;
+  onPick: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
+  previewClass: string;
+}) {
+  return (
+    <div>
+      <label className={adminLabel}>{label}</label>
+      {url ? (
+        <div className="flex items-center gap-3">
+          <Image
+            src={url}
+            alt={label}
+            width={400}
+            height={400}
+            unoptimized
+            className={previewClass}
+          />
+          <div className="flex flex-col gap-1">
+            <label className="cursor-pointer text-sm font-medium text-neutral-700 hover:text-neutral-950">
+              Replace
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+                onChange={onPick}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={onClear}
+              className="text-left text-sm text-red-700 hover:text-red-900"
+            >
+              Remove
+            </button>
+          </div>
+          {uploading && (
+            <span className="text-xs text-neutral-500">Uploading…</span>
+          )}
+        </div>
+      ) : (
+        <label
+          className={`flex cursor-pointer items-center justify-center rounded-md border border-dashed border-neutral-300 px-3 py-4 text-sm text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 ${
+            uploading ? 'opacity-60' : ''
+          }`}
+        >
+          {uploading ? 'Uploading…' : `Choose ${label.toLowerCase()} image`}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/avif,image/gif"
+            onChange={onPick}
+            disabled={uploading}
+            className="hidden"
+          />
+        </label>
+      )}
     </div>
   );
 }

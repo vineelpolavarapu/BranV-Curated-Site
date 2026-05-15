@@ -41,7 +41,6 @@ export class HomeController {
           name: true,
           logoUrl: true,
           heroUrl: true,
-          country: true,
         },
         take: 12,
       }),

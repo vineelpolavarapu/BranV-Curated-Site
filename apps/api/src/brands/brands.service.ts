@@ -25,7 +25,6 @@ export class BrandsService {
           OR: [
             { name: { contains: search, mode: 'insensitive' } },
             { slug: { contains: search, mode: 'insensitive' } },
-            { country: { contains: search, mode: 'insensitive' } },
           ],
         }
       : {};
@@ -67,8 +66,6 @@ export class BrandsService {
         slug,
         logoUrl: dto.logoUrl,
         heroUrl: dto.heroUrl,
-        country: dto.country,
-        foundedYear: dto.foundedYear,
         description: dto.description,
         isFeatured: dto.isFeatured ?? false,
         status: dto.status ?? BrandStatus.ACTIVE,
@@ -110,8 +107,6 @@ export class BrandsService {
         slug: nextSlug,
         logoUrl: dto.logoUrl ?? undefined,
         heroUrl: dto.heroUrl ?? undefined,
-        country: dto.country ?? undefined,
-        foundedYear: dto.foundedYear ?? undefined,
         description: dto.description ?? undefined,
         isFeatured: dto.isFeatured ?? undefined,
         status: dto.status ?? undefined,

@@ -19,7 +19,6 @@ export class BrandsPublicController {
         name: true,
         logoUrl: true,
         heroUrl: true,
-        country: true,
         isFeatured: true,
         _count: { select: { products: { where: { status: 'ACTIVE' } } } },
       },

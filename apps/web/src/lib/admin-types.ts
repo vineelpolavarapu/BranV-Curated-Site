@@ -12,8 +12,6 @@ export interface Brand {
   name: string;
   logoUrl: string | null;
   heroUrl: string | null;
-  country: string | null;
-  foundedYear: number | null;
   description: string | null;
   isFeatured: boolean;
   status: BrandStatus;

@@ -16,6 +16,7 @@ const NAV = [
   { href: '/admin/lookbooks', label: 'Lookbooks' },
   { href: '/admin/edits', label: 'The Edit' },
   { href: '/admin/banners', label: 'Banners' },
+  { href: '/admin/reviews', label: 'Reviews' },
   { href: '/admin/avatars', label: 'Avatars' },
 ];
 

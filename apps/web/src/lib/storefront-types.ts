@@ -28,6 +28,8 @@ export interface ProductCardData {
   discountPct: number | null;
   currency: string;
   tags: string[];
+  avgRating: number | null;
+  reviewCount: number;
   createdAt: string;
   brand: { id: string; name: string; slug: string };
   category: { id: string; name: string; slug: string };
@@ -68,7 +70,6 @@ export interface BrandCard {
   name: string;
   logoUrl: string | null;
   heroUrl: string | null;
-  country: string | null;
   isFeatured: boolean;
   _count: { products: number };
 }
@@ -94,7 +95,6 @@ export interface HomePayload {
     name: string;
     logoUrl: string | null;
     heroUrl: string | null;
-    country: string | null;
   }>;
   newArrivals: ProductCardData[];
   newArrivalsCount: number;

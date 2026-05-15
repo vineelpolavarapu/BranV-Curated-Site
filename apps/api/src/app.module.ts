@@ -27,6 +27,13 @@ import { LookbooksModule } from './lookbooks/lookbooks.module';
 import { EditsModule } from './edits/edits.module';
 import { BannersModule } from './banners/banners.module';
 import { BrandStoriesModule } from './brand-stories/brand-stories.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { NewsletterModule } from './newsletter/newsletter.module';
+import { PriceSyncModule } from './price-sync/price-sync.module';
+import { ReconciliationModule } from './reconciliation/reconciliation.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { SettingsModule } from './settings/settings.module';
 import { CorrelationIdMiddleware } from './common/correlation-id.middleware';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import { TwoFactorGuard } from './common/guards/two-factor.guard';
@@ -80,6 +87,13 @@ import { TwoFactorGuard } from './common/guards/two-factor.guard';
     EditsModule,
     BannersModule,
     BrandStoriesModule,
+    NotificationsModule,
+    ReviewsModule,
+    NewsletterModule,
+    PriceSyncModule,
+    ReconciliationModule,
+    AnalyticsModule,
+    SettingsModule,
   ],
   providers: [
     // Global JWT auth — opt out per-route with @Public().

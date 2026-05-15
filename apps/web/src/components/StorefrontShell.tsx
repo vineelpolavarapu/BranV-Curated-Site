@@ -4,6 +4,8 @@ import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
+import { NotificationsBell } from './notifications/NotificationsBell';
+import { NewsletterSignup } from './newsletter/NewsletterSignup';
 
 const SHOP_CATEGORIES = [
   { name: 'Clothing', slug: 'clothing' },
@@ -44,8 +46,9 @@ function SiteHeader() {
           <Link href="/new" className="hover:text-neutral-950">New</Link>
           <Link href="/sale" className="hover:text-neutral-950">Sale</Link>
         </nav>
-        <div className="ml-auto flex flex-1 items-center justify-end gap-3 md:flex-none">
+        <div className="ml-auto flex flex-1 items-center justify-end gap-2 md:flex-none">
           <SearchBox />
+          <NotificationsBell />
           <Link
             href="/account"
             className="hidden text-sm font-medium text-neutral-700 hover:text-neutral-950 md:inline"
@@ -95,17 +98,28 @@ function ShopMegaMenu() {
 function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-neutral-200 bg-neutral-50">
-      <div className="mx-auto max-w-7xl px-6 py-10 text-sm text-neutral-600">
-        <p className="mb-3 font-medium text-neutral-900">BranV</p>
-        <p className="max-w-2xl text-xs leading-relaxed">
-          BranV is a curated affiliate platform. We never hold inventory, never
-          process payments, never fulfill orders. When you click Buy Now, you
-          are redirected to the retailer&apos;s site to complete your purchase.{' '}
-          <strong>We earn a small commission on qualifying sales — at no extra cost to you.</strong>
-        </p>
-        <p className="mt-6 text-xs text-neutral-400">
-          © {new Date().getFullYear()} BranV. All rights reserved.
-        </p>
+      <div className="mx-auto max-w-7xl gap-10 px-6 py-10 text-sm text-neutral-600 md:grid md:grid-cols-[1.5fr_1fr]">
+        <div>
+          <p className="mb-3 font-medium text-neutral-900">BranV</p>
+          <p className="max-w-2xl text-xs leading-relaxed">
+            BranV is a curated affiliate platform. We never hold inventory, never
+            process payments, never fulfill orders. When you click Buy Now, you
+            are redirected to the retailer&apos;s site to complete your purchase.{' '}
+            <strong>We earn a small commission on qualifying sales — at no extra cost to you.</strong>
+          </p>
+          <p className="mt-6 text-xs text-neutral-400">
+            © {new Date().getFullYear()} BranV. All rights reserved.
+          </p>
+        </div>
+        <div className="mt-8 md:mt-0">
+          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700">
+            Newsletter
+          </p>
+          <p className="mb-3 text-xs text-neutral-600">
+            Weekly digest of new arrivals, upcoming drops, and articles.
+          </p>
+          <NewsletterSignup source="footer" />
+        </div>
       </div>
     </footer>
   );
