@@ -7,6 +7,8 @@ import { BannersService } from '../banners/banners.service';
 import { EditsService } from '../edits/edits.service';
 
 const NEW_ARRIVAL_DAYS = 30;
+const CATEGORY_SECTION_SIZE = 5;
+const CATEGORY_SECTION_COUNT = 7;
 
 @Controller('home')
 export class HomeController {
@@ -31,6 +33,7 @@ export class HomeController {
       featuredEdit,
       activeDrops,
       latestArticles,
+      categorySections,
     ] = await Promise.all([
       this.prisma.brand.findMany({
         where: { status: BrandStatus.ACTIVE, isFeatured: true },
@@ -79,6 +82,7 @@ export class HomeController {
           readingMinutes: true,
         },
       }),
+      this.buildCategorySections(),
     ]);
 
     return {
@@ -89,7 +93,59 @@ export class HomeController {
       featuredEdit,
       activeDrops,
       latestArticles,
+      categorySections,
       _newArrivalCutoff: newCutoff,
     };
+  }
+
+  /**
+   * Per-category preview buckets for the home page. Takes the top-N L1
+   * categories by displayOrder and, for each, returns up to 5 ACTIVE products
+   * ordered featured-first (most-recently-featured first), then by createdAt
+   * desc — so the latest admin-added product surfaces immediately and any
+   * currently-featured product floats to the top of its row.
+   */
+  private async buildCategorySections() {
+    const categories = await this.prisma.category.findMany({
+      where: { parentId: null },
+      orderBy: { displayOrder: 'asc' },
+      take: CATEGORY_SECTION_COUNT,
+      select: { id: true, slug: true, name: true },
+    });
+
+    const now = new Date();
+    const buckets = await Promise.all(
+      categories.map(async (cat) => {
+        const result = await this.products.list({
+          page: 1,
+          pageSize: CATEGORY_SECTION_SIZE,
+          category: cat.slug,
+        } as never);
+        // products.list uses a single orderBy (newest). Re-sort here so that
+        // any product with an active featuredUntil sits at the front. Keeps
+        // the existing service signature unchanged.
+        const sorted = [...(result.data as Array<{
+          isFeatured: boolean;
+          featuredUntil: Date | null;
+          createdAt: Date | string;
+        }>)].sort((a, b) => {
+          const aFeat = !!a.featuredUntil && new Date(a.featuredUntil) > now;
+          const bFeat = !!b.featuredUntil && new Date(b.featuredUntil) > now;
+          if (aFeat !== bFeat) return aFeat ? -1 : 1;
+          if (aFeat && bFeat) {
+            return new Date(b.featuredUntil!).getTime() - new Date(a.featuredUntil!).getTime();
+          }
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+        return {
+          category: cat,
+          products: sorted.slice(0, CATEGORY_SECTION_SIZE),
+        };
+      }),
+    );
+
+    // Hide sections that have no published products — matches the storefront's
+    // "hide empty" requirement so admin doesn't surface a blank row.
+    return buckets.filter((b) => b.products.length > 0);
   }
 }

@@ -249,6 +249,10 @@ model Product {
   /// create / moderate so storefront sort + filter stay cheap.
   avgRating          Decimal?      @db.Decimal(3, 2)
   reviewCount        Int           @default(0)
+  /// When set and > now(), the product is "featured" — sorted to the front
+  /// of its category section on the home page and shown with a Featured
+  /// badge. Cleared (or simply ignored) once the timestamp has passed.
+  featuredUntil      DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
@@ -268,6 +272,7 @@ model Product {
   @@index([brandId])
   @@index([categoryId])
   @@index([createdAt])
+  @@index([featuredUntil])
   @@map("products")
 }
 

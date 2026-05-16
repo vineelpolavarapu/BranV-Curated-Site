@@ -267,6 +267,7 @@ export class ProductsService {
     const variants = this.normalizeVariants(dto.variants);
     const images = this.normalizeImages(dto.images);
     const listings = this.normalizeListings(dto.retailerListings);
+    const featuredUntil = this.computeFeaturedUntil(dto.featureDays);
 
     const product = await this.prisma.product.create({
       data: {
@@ -284,6 +285,7 @@ export class ProductsService {
         metaTitle: dto.metaTitle,
         metaDescription: dto.metaDescription,
         tags: dto.tags ?? [],
+        featuredUntil,
         createdByAdminId: actorId,
         variants: variants.length ? { create: variants } : undefined,
         images: images.length ? { create: images } : undefined,
@@ -322,6 +324,13 @@ export class ProductsService {
     const mrp = dto.mrp === undefined ? existing.mrp : dto.mrp;
     const discountPct = this.computeDiscount(price, mrp ? Number(mrp) : null);
 
+    // Only touch featuredUntil when admin sent featureDays in this payload.
+    // `undefined` = no change; null or 0 = clear; >0 = set N days ahead.
+    const featuredUntilData =
+      dto.featureDays === undefined
+        ? undefined
+        : this.computeFeaturedUntil(dto.featureDays);
+
     const product = await this.prisma.product.update({
       where: { id },
       data: {
@@ -339,6 +348,7 @@ export class ProductsService {
         metaTitle: dto.metaTitle ?? undefined,
         metaDescription: dto.metaDescription ?? undefined,
         tags: dto.tags ?? undefined,
+        featuredUntil: featuredUntilData,
       },
       include: productInclude,
     });
@@ -541,6 +551,13 @@ export class ProductsService {
   ): number | null {
     if (!mrp || mrp <= 0 || price >= mrp) return null;
     return Number(((1 - price / mrp) * 100).toFixed(2));
+  }
+
+  private computeFeaturedUntil(
+    days: number | null | undefined,
+  ): Date | null {
+    if (!days || days <= 0) return null;
+    return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
   }
 
   private normalizeVariants(input?: VariantInput[]) {

@@ -14,6 +14,7 @@
     "db:studio": "dotenv -e ../../.env -- prisma studio",
     "seed:admin": "ts-node -r tsconfig-paths/register scripts/seed-admin.ts",
     "seed:catalog": "ts-node -r tsconfig-paths/register scripts/seed-catalog.ts",
+    "seed:samples": "ts-node -r tsconfig-paths/register scripts/seed-sample-products.ts",
     "setup:search": "ts-node -r tsconfig-paths/register scripts/setup-search.ts"
   },
   "dependencies": {

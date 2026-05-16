@@ -24,6 +24,7 @@ interface ProductDetail {
   mrp: string | null;
   status: ProductStatus;
   tags: string[];
+  featuredUntil: string | null;
   brand: { id: string; name: string; slug: string };
   category: { id: string; name: string; slug: string };
   subcategory: { id: string; name: string; slug: string } | null;
@@ -113,12 +114,26 @@ function BasicsForm({
   product: ProductDetail;
   onSaved: () => void;
 }) {
+  const featuredActive =
+    !!product.featuredUntil && new Date(product.featuredUntil) > new Date();
+  const remainingDays = featuredActive
+    ? Math.max(
+        1,
+        Math.ceil(
+          (new Date(product.featuredUntil!).getTime() - Date.now()) /
+            (24 * 60 * 60 * 1000),
+        ),
+      )
+    : 7;
+
   const [title, setTitle] = useState(product.title);
   const [price, setPrice] = useState(product.price);
   const [mrp, setMrp] = useState(product.mrp ?? '');
   const [status, setStatus] = useState<ProductStatus>(product.status);
   const [description, setDescription] = useState(product.description ?? '');
   const [tags, setTags] = useState(product.tags.join(', '));
+  const [feature, setFeature] = useState(featuredActive);
+  const [featureDays, setFeatureDays] = useState<number>(remainingDays);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -135,6 +150,8 @@ function BasicsForm({
       tags: tags
         ? tags.split(',').map((t) => t.trim()).filter(Boolean)
         : [],
+      // 0 clears the feature window; >0 sets featuredUntil = now + N days.
+      featureDays: feature ? Math.max(1, Math.min(365, featureDays)) : 0,
     };
     const result = await apiFetch(`/admin/products/${product.id}`, {
       method: 'PATCH',
@@ -213,6 +230,35 @@ function BasicsForm({
           onChange={(e) => setDescription(e.target.value)}
           className={adminInput}
         />
+      </div>
+      <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3">
+        <label className="flex items-center gap-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={feature}
+            onChange={(e) => setFeature(e.target.checked)}
+          />
+          Feature this product on the home page
+        </label>
+        {feature && (
+          <div className="mt-3 flex items-center gap-3 text-sm">
+            <label className={adminLabel}>For</label>
+            <input
+              type="number"
+              min={1}
+              max={365}
+              value={featureDays}
+              onChange={(e) => setFeatureDays(Number(e.target.value))}
+              className={`${adminInput} w-20`}
+            />
+            <span className="text-neutral-600">days from now</span>
+            {featuredActive && (
+              <span className="ml-auto text-xs text-neutral-500">
+                Currently featured until {new Date(product.featuredUntil!).toLocaleString()}
+              </span>
+            )}
+          </div>
+        )}
       </div>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div className="flex justify-end">

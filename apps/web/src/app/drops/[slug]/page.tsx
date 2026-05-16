@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import { apiServer } from '@/lib/api-server';
 import { DropDetail, DropDetailProduct } from '@/lib/phase7-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { formatINR } from '@/components/ProductCard';
+import { formatINR } from '@/lib/format';
 import { Countdown } from '@/components/drops/Countdown';
 import { NotifyMeForm } from '@/components/drops/NotifyMeForm';
 import { EmbeddedProductCard } from '@/components/article/EmbeddedProductCard';

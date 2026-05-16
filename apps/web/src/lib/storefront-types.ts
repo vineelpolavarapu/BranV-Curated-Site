@@ -31,6 +31,8 @@ export interface ProductCardData {
   avgRating: number | null;
   reviewCount: number;
   createdAt: string;
+  isFeatured: boolean;
+  featuredUntil: string | null;
   brand: { id: string; name: string; slug: string };
   category: { id: string; name: string; slug: string };
   subcategory: { id: string; name: string; slug: string } | null;
@@ -122,5 +124,9 @@ export interface HomePayload {
     heroUrl: string | null;
     publishedAt: string | null;
     readingMinutes: number | null;
+  }>;
+  categorySections: Array<{
+    category: { id: string; slug: string; name: string };
+    products: ProductCardData[];
   }>;
 }

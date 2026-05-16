@@ -6,7 +6,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { AutocompleteResult } from '@/lib/storefront-types';
 
-export function SearchBox() {
+export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
   const router = useRouter();
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
@@ -49,21 +49,39 @@ export function SearchBox() {
     hits &&
     (hits.products.length > 0 || hits.brands.length > 0 || hits.categories.length > 0);
 
+  const inputClasses = overlay
+    ? 'w-full rounded-full border border-white/40 bg-white/10 py-2 pl-10 pr-3 text-sm text-white outline-none placeholder:text-white/70 backdrop-blur focus:border-white focus:bg-white/20 focus:ring-1 focus:ring-white/60'
+    : 'w-full rounded-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+  const iconClasses = overlay
+    ? 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/80'
+    : 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400';
+
   return (
-    <div ref={wrapperRef} className="relative w-full max-w-xs md:w-72">
-      <form onSubmit={onSubmit}>
+    <div ref={wrapperRef} className="relative w-full max-w-2xl">
+      <form onSubmit={onSubmit} className="relative">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden
+          className={iconClasses}
+        >
+          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
         <input
           ref={inputRef}
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => setOpen(true)}
-          placeholder="Search…"
-          className="w-full rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+          placeholder="Search products, brands, categories…"
+          className={inputClasses}
         />
       </form>
       {open && q.trim() && (
-        <div className="absolute right-0 top-full mt-1 w-[22rem] max-w-[90vw] overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
+        <div className="absolute left-0 right-0 top-full z-40 mt-1 overflow-hidden rounded-lg border border-neutral-200 bg-white text-neutral-900 shadow-xl">
           {!hasHits ? (
             <p className="px-4 py-3 text-sm text-neutral-500">No matches.</p>
           ) : (

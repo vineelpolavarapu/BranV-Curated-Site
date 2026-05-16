@@ -4,7 +4,6 @@ import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
-import { NotificationsBell } from './notifications/NotificationsBell';
 import { NewsletterSignup } from './newsletter/NewsletterSignup';
 
 const SHOP_CATEGORIES = [
@@ -17,12 +16,18 @@ const SHOP_CATEGORIES = [
   { name: 'Grooming', slug: 'grooming' },
 ];
 
-export function StorefrontShell({ children }: { children: ReactNode }) {
+export function StorefrontShell({
+  children,
+  heroOverlay = false,
+}: {
+  children: ReactNode;
+  heroOverlay?: boolean;
+}) {
   return (
     <WishlistProvider>
       <ClickReturnProvider>
         <div className="min-h-screen pb-16 md:pb-0">
-          <SiteHeader />
+          <SiteHeader overlay={heroOverlay} />
           {children}
           <SiteFooter />
           <MobileBottomNav />
@@ -32,39 +37,61 @@ export function StorefrontShell({ children }: { children: ReactNode }) {
   );
 }
 
-function SiteHeader() {
+function SiteHeader({ overlay = false }: { overlay?: boolean }) {
+  const headerClasses = overlay
+    ? 'absolute inset-x-0 top-0 z-30 text-white'
+    : 'sticky top-0 z-30 border-b border-neutral-200 bg-white/95 text-neutral-700 backdrop-blur';
+  const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
+  const accountIconClasses = overlay
+    ? 'border-white/50 text-white hover:bg-white/10'
+    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100';
   return (
-    <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 md:px-6">
+    <header className={headerClasses}>
+      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 pr-10 md:px-6 md:pr-20">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           BranV
         </Link>
-        <nav className="hidden flex-1 items-center gap-6 text-sm font-medium text-neutral-700 md:flex">
-          <ShopMegaMenu />
-          <Link href="/brands" className="hover:text-neutral-950">Brands</Link>
-          <Link href="/articles" className="hover:text-neutral-950">Articles</Link>
-          <Link href="/new" className="hover:text-neutral-950">New</Link>
-          <Link href="/sale" className="hover:text-neutral-950">Sale</Link>
+        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+          <ShopMegaMenu overlay={overlay} />
+          <Link href="/brands" className={linkHoverClass}>Brands</Link>
+          <Link href="/articles" className={linkHoverClass}>Articles</Link>
+          <Link href="/new" className={linkHoverClass}>New</Link>
+          <Link href="/sale" className={linkHoverClass}>Sale</Link>
         </nav>
-        <div className="ml-auto flex flex-1 items-center justify-end gap-2 md:flex-none">
-          <SearchBox />
-          <NotificationsBell />
-          <Link
-            href="/account"
-            className="hidden text-sm font-medium text-neutral-700 hover:text-neutral-950 md:inline"
-          >
-            Account
-          </Link>
+        <div className="ml-auto flex flex-1 items-center justify-end gap-2">
+          <SearchBox overlay={overlay} />
         </div>
       </div>
+      <Link
+        href="/account"
+        aria-label="Account"
+        className={`absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border transition md:flex ${accountIconClasses}`}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
+          <path
+            d="M4.5 20c.8-3.5 4-5.5 7.5-5.5s6.7 2 7.5 5.5"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
+      </Link>
     </header>
   );
 }
 
-function ShopMegaMenu() {
+function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
+  const hoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
+  const panelClasses = overlay
+    ? 'w-max rounded-xl border border-white/40 bg-transparent p-2'
+    : 'w-max rounded-xl border border-neutral-200 bg-white p-2 shadow-xl';
+  const itemClasses = overlay
+    ? 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm text-white hover:bg-white/10'
+    : 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm hover:bg-neutral-100';
   return (
     <div className="group relative">
-      <button className="flex items-center gap-1 hover:text-neutral-950">
+      <button className={`flex items-center gap-1 ${hoverClass}`}>
         Shop
         <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden>
           <path
@@ -76,14 +103,11 @@ function ShopMegaMenu() {
         </svg>
       </button>
       <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
-        <div className="w-56 rounded-xl border border-neutral-200 bg-white p-3 shadow-xl">
+        <div className={panelClasses}>
           <ul className="space-y-1">
             {SHOP_CATEGORIES.map((c) => (
               <li key={c.slug}>
-                <Link
-                  href={`/category/${c.slug}`}
-                  className="block rounded-md px-3 py-1.5 text-sm hover:bg-neutral-100"
-                >
+                <Link href={`/category/${c.slug}`} className={itemClasses}>
                   {c.name}
                 </Link>
               </li>

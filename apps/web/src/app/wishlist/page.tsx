@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { formatINR } from '@/components/ProductCard';
+import { formatINR } from '@/lib/format';
 
 interface WishlistItem {
   id: string;

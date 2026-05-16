@@ -9,15 +9,20 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { UserRole } from '@prisma/client';
 import {
   CurrentUser,
   AuthenticatedUser,
 } from '../common/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { tryReadUserId } from '../common/utils/optional-auth';
 import { AddWishlistDto, UpdateWishlistDto } from './dto/wishlist.dto';
 import { WishlistService } from './wishlist.service';
 
@@ -25,7 +30,10 @@ import { WishlistService } from './wishlist.service';
 @UseGuards(RolesGuard)
 @Roles(UserRole.MEMBER, UserRole.ADMIN)
 export class WishlistController {
-  constructor(private readonly wishlist: WishlistService) {}
+  constructor(
+    private readonly wishlist: WishlistService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get('me/wishlist')
   list(
@@ -40,10 +48,17 @@ export class WishlistController {
     );
   }
 
-  /** Light endpoint used by the web to seed heart icons across product cards. */
+  /**
+   * Called by WishlistProvider on every storefront page to seed heart icons
+   * across product cards. Public so anonymous visitors get `[]` instead of a
+   * 401 on every shell mount. Signed-in users still get their real wishlist IDs.
+   */
+  @Public()
   @Get('me/wishlist/ids')
-  ids(@CurrentUser() user: AuthenticatedUser) {
-    return this.wishlist.listIdsForUser(user.id);
+  async ids(@Req() req: Request) {
+    const userId = tryReadUserId(req, this.config);
+    if (!userId) return [];
+    return this.wishlist.listIdsForUser(userId);
   }
 
   @Post('wishlist/items')

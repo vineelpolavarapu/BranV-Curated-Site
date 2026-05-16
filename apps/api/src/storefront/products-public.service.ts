@@ -287,6 +287,9 @@ export class ProductsPublicService {
       avgRating: p.avgRating ? Number(p.avgRating) : null,
       reviewCount: p.reviewCount,
       createdAt: p.createdAt,
+      // Featured window — boolean derived server-side so client doesn't compare dates.
+      isFeatured: !!p.featuredUntil && p.featuredUntil.getTime() > Date.now(),
+      featuredUntil: p.featuredUntil,
       brand: p.brand,
       category: p.category,
       subcategory: p.subcategory,

@@ -8,15 +8,20 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { UserRole } from '@prisma/client';
 import {
   AuthenticatedUser,
   CurrentUser,
 } from '../common/decorators/current-user.decorator';
+import { Public } from '../common/decorators/public.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { tryReadUserId } from '../common/utils/optional-auth';
 import { NotificationsService } from './notifications.service';
 import {
   NotificationsListQueryDto,
@@ -27,7 +32,10 @@ import {
 @UseGuards(RolesGuard)
 @Roles(UserRole.MEMBER, UserRole.ADMIN)
 export class NotificationsController {
-  constructor(private readonly notifications: NotificationsService) {}
+  constructor(
+    private readonly notifications: NotificationsService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Get('notifications')
   list(
@@ -42,9 +50,18 @@ export class NotificationsController {
     );
   }
 
+  /**
+   * Polled by the NotificationsBell on every storefront page. Public so
+   * anonymous visitors get `{ count: 0 }` rather than a 401, which would
+   * spam the browser console + API logs on every poll for signed-out users.
+   * Signed-in users still get their real unread count.
+   */
+  @Public()
   @Get('notifications/unread-count')
-  async unread(@CurrentUser() user: AuthenticatedUser) {
-    const count = await this.notifications.unreadCount(user.id);
+  async unread(@Req() req: Request) {
+    const userId = tryReadUserId(req, this.config);
+    if (!userId) return { count: 0 };
+    const count = await this.notifications.unreadCount(userId);
     return { count };
   }
 

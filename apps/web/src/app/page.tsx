@@ -4,6 +4,8 @@ import { apiServer } from '@/lib/api-server';
 import { HomePayload } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard } from '@/components/ProductCard';
+import { HeroCarousel } from '@/components/HeroCarousel';
+import { CategoryShowcase } from '@/components/CategoryShowcase';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,11 +13,18 @@ export default async function HomePage() {
   const home = await apiServer<HomePayload>('/home');
 
   return (
-    <StorefrontShell>
-      {home && home.banners.length > 0 ? (
+    <StorefrontShell heroOverlay>
+      <HeroCarousel />
+      {home?.categorySections?.map((section) => (
+        <CategoryShowcase
+          key={section.category.slug}
+          title={section.category.name}
+          slug={section.category.slug}
+          products={section.products}
+        />
+      ))}
+      {home && home.banners.length > 0 && (
         <BannerStrip banners={home.banners} />
-      ) : (
-        <Hero />
       )}
       {home && home.featuredEdit && <FeaturedEdit edit={home.featuredEdit} />}
       {home && home.activeDrops.length > 0 && (
@@ -103,72 +112,6 @@ function BannerHero({
         </div>
       )}
     </Link>
-  );
-}
-
-function Hero() {
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-12 md:py-20">
-      <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-16">
-        <div>
-          <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
-            Curated · Affiliate · Editorial
-          </p>
-          <h1 className="mb-6 text-5xl font-semibold tracking-tight text-neutral-950 md:text-6xl lg:text-7xl">
-            Menswear,
-            <br />
-            with an eye.
-          </h1>
-          <p className="mb-8 max-w-md text-lg leading-relaxed text-neutral-600 md:text-xl">
-            Outfits and accessories sourced from Flipkart, Amazon, Myntra and
-            more — styled, curated, and one tap from your cart.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/new"
-              className="rounded-md bg-neutral-900 px-6 py-3 text-base font-medium text-white transition hover:bg-neutral-800"
-            >
-              Shop new arrivals
-            </Link>
-            <Link
-              href="/brands"
-              className="rounded-md border border-neutral-300 px-6 py-3 text-base font-medium text-neutral-900 transition hover:bg-neutral-50"
-            >
-              Browse brands
-            </Link>
-          </div>
-          <p className="mt-6 text-xs text-neutral-500">
-            We earn a small commission when you buy through our links — at no
-            extra cost to you.
-          </p>
-        </div>
-        <HeroImagePlaceholder />
-      </div>
-    </section>
-  );
-}
-
-function HeroImagePlaceholder() {
-  return (
-    <div
-      role="img"
-      aria-label="Hero image placeholder"
-      className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-dashed border-neutral-300 bg-neutral-100"
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-50"
-        style={{
-          backgroundImage:
-            'linear-gradient(to right, #e5e5e5 1px, transparent 1px), linear-gradient(to bottom, #e5e5e5 1px, transparent 1px)',
-          backgroundSize: '32px 32px',
-        }}
-      />
-      <div className="relative flex h-full w-full flex-col items-center justify-center text-center">
-        <p className="text-sm font-medium text-neutral-500">Hero image</p>
-        <p className="mt-1 text-xs text-neutral-400">4:5 · place asset here</p>
-      </div>
-    </div>
   );
 }
 

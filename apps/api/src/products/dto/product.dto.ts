@@ -69,6 +69,16 @@ export class CreateProductDto {
   @IsOptional() @IsString() @MaxLength(200) metaTitle?: string;
   @IsOptional() @IsString() @MaxLength(500) metaDescription?: string;
 
+  /// Days from now that this product should remain "Featured" on the
+  /// home page. When > 0, the server computes featuredUntil = now + N days.
+  /// 0 or null clears the feature flag.
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(365)
+  featureDays?: number | null;
+
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(20)
@@ -111,6 +121,14 @@ export class UpdateProductDto {
   @IsOptional() @IsEnum(ProductStatus) status?: ProductStatus;
   @IsOptional() @IsString() @MaxLength(200) metaTitle?: string | null;
   @IsOptional() @IsString() @MaxLength(500) metaDescription?: string | null;
+
+  /// See CreateProductDto.featureDays. 0 or null clears the feature flag.
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Max(365)
+  featureDays?: number | null;
 
   @IsOptional()
   @IsArray()

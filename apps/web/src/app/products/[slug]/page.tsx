@@ -6,7 +6,8 @@ import { apiServer } from '@/lib/api-server';
 import { resolveBuyNowHref } from '@/lib/click-tracking';
 import { ProductCardData } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { ProductCard, BuyNowButton, formatINR } from '@/components/ProductCard';
+import { ProductCard, BuyNowButton } from '@/components/ProductCard';
+import { formatINR } from '@/lib/format';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 
 export const dynamic = 'force-dynamic';

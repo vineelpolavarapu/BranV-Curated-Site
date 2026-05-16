@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { LookbookPublicImage } from '@/lib/phase7-types';
-import { formatINR } from '@/components/ProductCard';
+import { formatINR } from '@/lib/format';
 import { resolveBuyNowHref } from '@/lib/click-tracking';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
 

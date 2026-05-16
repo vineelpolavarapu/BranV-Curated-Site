@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { EmbeddedProduct } from '@/lib/article-types';
 import { resolveBuyNowHref } from '@/lib/click-tracking';
-import { formatINR } from '@/components/ProductCard';
+import { formatINR } from '@/lib/format';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
 
 const retailerLabel: Record<string, string> = {

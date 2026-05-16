@@ -27,6 +27,8 @@ export default function NewProductPage() {
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProductStatus>('DRAFT');
+  const [feature, setFeature] = useState(false);
+  const [featureDays, setFeatureDays] = useState<number>(7);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +63,7 @@ export default function NewProductPage() {
         ? tags.split(',').map((t) => t.trim()).filter(Boolean)
         : undefined,
       status,
+      featureDays: feature ? Math.max(1, Math.min(365, featureDays)) : 0,
     };
     const result = await apiFetch<{ id: string }>('/admin/products', {
       method: 'POST',
@@ -194,6 +197,30 @@ export default function NewProductPage() {
             onChange={(e) => setDescription(e.target.value)}
             className={adminInput}
           />
+        </div>
+        <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={feature}
+              onChange={(e) => setFeature(e.target.checked)}
+            />
+            Feature this product on the home page
+          </label>
+          {feature && (
+            <div className="mt-3 flex items-center gap-3 text-sm">
+              <label className={adminLabel}>For</label>
+              <input
+                type="number"
+                min={1}
+                max={365}
+                value={featureDays}
+                onChange={(e) => setFeatureDays(Number(e.target.value))}
+                className={`${adminInput} w-20`}
+              />
+              <span className="text-neutral-600">days from now</span>
+            </div>
+          )}
         </div>
         {error && <p className="text-sm text-red-600">{error}</p>}
         <div className="flex justify-end gap-2">

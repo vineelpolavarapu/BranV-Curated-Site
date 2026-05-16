@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
 import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { formatINR } from '@/lib/format';
 import { useClickReturn } from './click-return/ClickReturnProvider';
 import { useWishlist } from './wishlist/WishlistProvider';
 
@@ -59,11 +60,23 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {/* AI-rendered disclosure badge */}
         {shownImage?.isAiGenerated && <AiBadge />}
 
-        {/* Discount badge */}
-        {product.discountPct && product.discountPct > 0 && (
-          <span className="absolute left-2 top-2 rounded bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
-            -{Math.round(product.discountPct)}%
-          </span>
+        {/* Top-left badge stack: Featured (when active) above Discount. */}
+        {(product.isFeatured || (product.discountPct && product.discountPct > 0)) && (
+          <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
+            {product.isFeatured && (
+              <span className="inline-flex items-center gap-1 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white shadow-sm">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                  <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
+                </svg>
+                Featured
+              </span>
+            )}
+            {product.discountPct && product.discountPct > 0 && (
+              <span className="rounded bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                -{Math.round(product.discountPct)}%
+              </span>
+            )}
+          </div>
         )}
 
         {/* Wishlist heart — wired to Phase 5 wishlist API. */}
@@ -182,8 +195,3 @@ function AiBadge() {
   );
 }
 
-export function formatINR(n: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    maximumFractionDigits: 0,
-  }).format(n);
-}

@@ -6,8 +6,11 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Request } from 'express';
 import { UserRole } from '@prisma/client';
 import { Public } from '../common/decorators/public.decorator';
 import {
@@ -16,6 +19,7 @@ import {
 } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { tryReadUserId } from '../common/utils/optional-auth';
 import { ReviewsService } from './reviews.service';
 import {
   AdminReviewsListQueryDto,
@@ -26,7 +30,10 @@ import {
 
 @Controller('products/:productId/reviews')
 export class ReviewsPublicController {
-  constructor(private readonly reviews: ReviewsService) {}
+  constructor(
+    private readonly reviews: ReviewsService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Public()
   @Get()
@@ -37,15 +44,24 @@ export class ReviewsPublicController {
     return this.reviews.listForProduct(productId, q);
   }
 
-  /** Lets the frontend show the right CTA: "Leave a review", "Already reviewed", "Buy to review". */
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.MEMBER, UserRole.ADMIN)
+  /**
+   * Lets the frontend show the right CTA: "Leave a review", "Already reviewed",
+   * "Buy to review", or "Sign in to review". Public on purpose — when there's
+   * no auth cookie we return an "anonymous" shape (canReview: false) rather
+   * than throwing 401, since every storefront product page mounts this and a
+   * 401 here just clutters logs / the browser console for signed-out visitors.
+   */
+  @Public()
   @Get('me')
   async getMine(
     @Param('productId') productId: string,
-    @CurrentUser() user: AuthenticatedUser,
+    @Req() req: Request,
   ) {
-    return this.reviews.getReviewability(productId, user.id);
+    const userId = tryReadUserId(req, this.config);
+    if (!userId) {
+      return { canReview: false, hasWardrobeItem: false, ownReview: null };
+    }
+    return this.reviews.getReviewability(productId, userId);
   }
 
   @UseGuards(RolesGuard)

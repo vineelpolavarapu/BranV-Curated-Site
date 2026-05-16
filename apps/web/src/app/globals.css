@@ -24,3 +24,47 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Make native <select> dropdown highlight match the black theme
+   instead of the browser default blue. */
+:root {
+  accent-color: #000000;
+}
+
+select {
+  accent-color: #000000;
+}
+
+select option {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background: #000000 linear-gradient(0deg, #000000 0%, #000000 100%);
+  color: #ffffff;
+  box-shadow: 0 0 10px 100px #000000 inset;
+}
+
+/* Hero carousel grab cursor — open hand on hover, closed fist when the
+   user presses the mouse button (:active fires on mousedown and clears on
+   mouseup). Falls back to the OS-native grab/grabbing cursors if the .cur
+   assets fail to load. Hotspot (10,10) matches the value baked into both
+   .cur files so the click-point is identical across browsers.
+
+   The cursor is also forced onto every non-interactive descendant inside
+   .hero-grab so it shows over the slide image and gradient overlay — those
+   elements otherwise break cursor inheritance and fall back to the OS-native
+   cursor. <a> and <button> are excluded so the CTA + dots keep `pointer`. */
+.hero-grab,
+.hero-grab *:not(a):not(button) {
+  cursor: url('/cursors/grab.cur') 10 10, grab;
+}
+
+.hero-grab:active,
+.hero-grab:active *:not(a):not(button) {
+  cursor: url('/cursors/grabbing.cur') 10 10, grabbing;
+}
