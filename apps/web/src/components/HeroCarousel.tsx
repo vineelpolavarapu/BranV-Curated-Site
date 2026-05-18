@@ -109,6 +109,7 @@ export function HeroCarousel() {
   // animation has been kicked off).
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const touchStartX = useRef<number | null>(null);
+  const touchMoved = useRef(false);
   const pointerStartX = useRef<number | null>(null);
   const pointerMoved = useRef(false);
   const trackRef = useRef<HTMLDivElement | null>(null);
@@ -165,10 +166,8 @@ export function HeroCarousel() {
     return () => cancelAnimationFrame(id);
   }, [withTransition]);
 
-  // On release: always commit to the adjacent slide in the drag direction
-  // (no snap-back, no minimum distance). dx is already past DRAG_THRESHOLD
-  // by the time this runs, so any release after a real drag advances or
-  // rewinds by one slide.
+  // On release: commit to the adjacent slide in the drag direction and
+  // animate from the current dragged position to the target slide.
   const finishDrag = (dx: number) => {
     setWithTransition(true);
     if (dx < 0) next();
@@ -179,15 +178,17 @@ export function HeroCarousel() {
 
   const onTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchMoved.current = false;
   };
   const onTouchMove = (e: React.TouchEvent) => {
     if (touchStartX.current == null) return;
     const dx = e.touches[0].clientX - touchStartX.current;
     if (Math.abs(dx) < DRAG_THRESHOLD) return;
-    // First time crossing threshold: kill the transition so the track tracks
-    // the finger 1:1 instead of easing toward each new offset.
-    setIsDragging(true);
-    setWithTransition(false);
+    if (!touchMoved.current) {
+      touchMoved.current = true;
+      setIsDragging(true);
+      setWithTransition(false);
+    }
     setDragOffsetX(dx);
   };
   const onTouchEnd = (e: React.TouchEvent) => {
@@ -199,6 +200,7 @@ export function HeroCarousel() {
     } else {
       setIsDragging(false);
     }
+    touchMoved.current = false;
   };
 
   // Mouse drag for desktop — pointer events so we still get release notifications
