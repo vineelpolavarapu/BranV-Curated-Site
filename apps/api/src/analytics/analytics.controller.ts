@@ -25,11 +25,6 @@ export class AnalyticsController {
     return this.analytics.content();
   }
 
-  @Get('drops')
-  drops() {
-    return this.analytics.drops();
-  }
-
   @Get('members')
   members() {
     return this.analytics.members();

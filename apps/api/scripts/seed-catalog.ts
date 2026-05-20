@@ -59,20 +59,10 @@ const TAXONOMY: Array<{ name: string; subcategories: string[] }> = [
     subcategories: ['Analog', 'Digital', 'Smartwatches', 'Luxury', 'Chronographs'],
   },
   {
-    name: 'Eyewear',
-    subcategories: ['Sunglasses', 'Optical Frames', 'Blue-Light Glasses'],
-  },
-  {
     name: 'Accessories',
     subcategories: [
       'Belts', 'Wallets', 'Bags & Backpacks', 'Cufflinks', 'Caps & Hats',
       'Scarves & Stoles', 'Jewelry', 'Keychains',
-    ],
-  },
-  {
-    name: 'Grooming',
-    subcategories: [
-      'Fragrances', 'Beard Care', 'Hair Care', 'Skincare', 'Shaving', 'Gift Sets',
     ],
   },
 ];
@@ -144,32 +134,11 @@ const ATTRIBUTES: Record<string, AttrSchema[]> = {
       optionsJson: ['30m', '50m', '100m', '200m', '300m+'] },
     { attributeKey: 'caseSize', displayName: 'Case size (mm)', filterType: FilterType.RANGE },
   ],
-  Eyewear: [
-    { attributeKey: 'frameShape', displayName: 'Frame shape', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Round', 'Square', 'Rectangle', 'Aviator', 'Cat-eye', 'Wayfarer'] },
-    { attributeKey: 'frameMaterial', displayName: 'Frame material', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Metal', 'Acetate', 'TR90', 'Titanium', 'Wood'] },
-    { attributeKey: 'lensType', displayName: 'Lens type', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Polarized', 'UV400', 'Photochromic', 'Mirrored', 'Gradient'] },
-    { attributeKey: 'frameColor', displayName: 'Frame color', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Black', 'Tortoise', 'Gold', 'Silver', 'Brown', 'Clear'] },
-  ],
   Accessories: [
     { attributeKey: 'material', displayName: 'Material', filterType: FilterType.MULTI_SELECT,
       optionsJson: ['Leather', 'Fabric', 'Metal', 'Synthetic'] },
     { attributeKey: 'color', displayName: 'Color', filterType: FilterType.MULTI_SELECT,
       optionsJson: ['Black', 'Brown', 'Tan', 'White', 'Navy', 'Grey'] },
-  ],
-  Grooming: [
-    { attributeKey: 'scentFamily', displayName: 'Scent family', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Woody', 'Citrus', 'Aromatic', 'Oriental', 'Fresh', 'Floral'] },
-    { attributeKey: 'concentration', displayName: 'Concentration', filterType: FilterType.SELECT,
-      optionsJson: ['EDP', 'EDT', 'Parfum', 'Cologne'] },
-    { attributeKey: 'volumeMl', displayName: 'Volume (ml)', filterType: FilterType.RANGE },
-    { attributeKey: 'productType', displayName: 'Product type', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Beard oil', 'Shampoo', 'Moisturizer', 'Razor', 'Aftershave'] },
-    { attributeKey: 'skinHairType', displayName: 'Skin/hair type', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Oily', 'Dry', 'Combination', 'Sensitive', 'Coarse', 'Fine'] },
   ],
 };
 

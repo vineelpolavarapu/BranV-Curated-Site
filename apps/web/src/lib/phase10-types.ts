@@ -27,7 +27,6 @@ export interface DashboardPayload {
     apiP95Ms: number | null;
     errorRatePct: number | null;
   };
-  liveDropCount: number;
   lowConversionProducts: Array<{
     productId: string;
     slug: string;

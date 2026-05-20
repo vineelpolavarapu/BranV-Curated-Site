@@ -15,7 +15,8 @@
     "seed:admin": "ts-node -r tsconfig-paths/register scripts/seed-admin.ts",
     "seed:catalog": "ts-node -r tsconfig-paths/register scripts/seed-catalog.ts",
     "seed:samples": "ts-node -r tsconfig-paths/register scripts/seed-sample-products.ts",
-    "setup:search": "ts-node -r tsconfig-paths/register scripts/setup-search.ts"
+    "setup:search": "ts-node -r tsconfig-paths/register scripts/setup-search.ts",
+    "remove:categories": "ts-node -r tsconfig-paths/register scripts/remove-categories.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.645.0",

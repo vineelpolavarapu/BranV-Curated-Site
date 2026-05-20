@@ -108,14 +108,6 @@ export interface HomePayload {
     description: string | null;
     productCount: number;
   } | null;
-  activeDrops: Array<{
-    id: string;
-    slug: string;
-    name: string;
-    heroUrl: string | null;
-    launchAt: string;
-    endsAt: string | null;
-  }>;
   latestArticles: Array<{
     id: string;
     slug: string;

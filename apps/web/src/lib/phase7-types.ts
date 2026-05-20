@@ -1,4 +1,3 @@
-export type DropStatus = 'SCHEDULED' | 'LIVE' | 'ENDED' | 'ARCHIVED';
 export type LookbookStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type EditStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type HomeBannerStatus = 'ACTIVE' | 'HIDDEN';
@@ -18,37 +17,7 @@ export interface ProductPickerOption {
   thumbnail: string | null;
 }
 
-// ── Drops ───────────────────────────────────────────────────────────────
-
-export interface DropAdmin {
-  id: string;
-  slug: string;
-  name: string;
-  heroUrl: string | null;
-  description: string | null;
-  launchAt: string;
-  endsAt: string | null;
-  status: DropStatus;
-  publishedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-  dropProducts?: Array<{ id: string; productId: string; position: number; product: ProductLite }>;
-  _count?: { dropProducts: number; notifySignups: number };
-}
-
-export interface DropSummary {
-  id: string;
-  slug: string;
-  name: string;
-  heroUrl: string | null;
-  description: string | null;
-  launchAt: string;
-  endsAt: string | null;
-  status: DropStatus;
-  publishedAt: string | null;
-}
-
-export interface DropDetailProduct {
+export interface ProductDetail {
   slug: string;
   title: string;
   brand: { id: string; name: string; slug: string };
@@ -64,16 +33,6 @@ export interface DropDetailProduct {
     pending: boolean;
     trackingId: string | null;
   } | null;
-}
-
-export interface DropDetail extends DropSummary {
-  products: DropDetailProduct[];
-}
-
-export interface DropCalendar {
-  live: DropSummary[];
-  scheduled: DropSummary[];
-  ended: DropSummary[];
 }
 
 // ── Lookbooks ───────────────────────────────────────────────────────────
@@ -109,7 +68,7 @@ export interface LookbookPublicTag {
   id: string;
   xPercent: number;
   yPercent: number;
-  product: DropDetailProduct;
+  product: ProductDetail;
 }
 
 export interface LookbookPublicImage {
@@ -156,7 +115,7 @@ export interface EditSummary {
 }
 
 export interface EditDetail extends EditSummary {
-  products: DropDetailProduct[];
+  products: ProductDetail[];
 }
 
 // ── Banners ─────────────────────────────────────────────────────────────

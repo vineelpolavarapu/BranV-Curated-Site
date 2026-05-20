@@ -69,7 +69,6 @@ export class UploadsService {
       case UploadKind.PRODUCT_AVATAR: return 'products/avatars';
       case UploadKind.AVATAR_REFERENCE: return 'avatars/references';
       case UploadKind.ARTICLE_HERO: return 'articles/heroes';
-      case UploadKind.DROP_HERO: return 'drops/heroes';
       case UploadKind.LOOKBOOK_IMAGE: return 'lookbooks';
       case UploadKind.BANNER: return 'banners';
     }

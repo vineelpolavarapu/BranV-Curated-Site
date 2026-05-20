@@ -14,8 +14,6 @@ import { StorefrontShell } from '@/components/StorefrontShell';
 const TYPES: Array<{ key: NotificationType; label: string }> = [
   { key: 'WELCOME', label: 'Welcome & onboarding' },
   { key: 'WISHLIST_PRICE_DROP', label: 'Price drops on wishlist items' },
-  { key: 'DROP_LAUNCHING_SOON', label: 'Drops launching soon (heads-up)' },
-  { key: 'DROP_LIVE', label: 'Drops you signed up to be notified about' },
   { key: 'NEW_ARTICLE', label: 'New articles' },
   { key: 'REVIEW_HIDDEN', label: 'Review moderation updates' },
   { key: 'GENERIC', label: 'Other notifications' },

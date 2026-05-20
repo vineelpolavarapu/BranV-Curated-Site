@@ -7,7 +7,6 @@ export enum UploadKind {
   PRODUCT_AVATAR = 'product-avatar', // AI-rendered, per PRD §8
   AVATAR_REFERENCE = 'avatar-reference',
   ARTICLE_HERO = 'article-hero',
-  DROP_HERO = 'drop-hero',
   LOOKBOOK_IMAGE = 'lookbook-image',
   BANNER = 'banner',
 }

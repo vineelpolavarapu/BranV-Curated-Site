@@ -2,15 +2,11 @@ import type { MetadataRoute } from 'next';
 import { apiServer } from '@/lib/api-server';
 import { ArticleSummary } from '@/lib/article-types';
 import { BrandCard } from '@/lib/storefront-types';
-import {
-  DropCalendar,
-  DropSummary,
-  EditSummary,
-} from '@/lib/phase7-types';
+import { EditSummary } from '@/lib/phase7-types';
 
 /**
  * Dynamic sitemap. Articles get refreshed every time the scheduler publishes
- * one; brands + categories + drops + edits + lookbooks track the catalog.
+ * one; brands + categories + edits + lookbooks track the catalog.
  * Phase 11 will add per-product URLs (large set, needs an index) and ISR-style
  * caching.
  */
@@ -26,9 +22,7 @@ const CATEGORY_SLUGS = [
   'suits-and-formal',
   'footwear',
   'watches',
-  'eyewear',
   'accessories',
-  'grooming',
 ];
 
 interface LookbookListItem {
@@ -37,10 +31,9 @@ interface LookbookListItem {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, brands, drops, edits, lookbooks] = await Promise.all([
+  const [articles, brands, edits, lookbooks] = await Promise.all([
     apiServer<{ data: ArticleSummary[] }>('/articles?pageSize=60'),
     apiServer<BrandCard[]>('/brands'),
-    apiServer<DropCalendar>('/drops'),
     apiServer<EditSummary[]>('/edits'),
     apiServer<LookbookListItem[]>('/lookbooks'),
   ]);
@@ -51,7 +44,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/`, lastModified: now, changeFrequency: 'daily', priority: 1.0 },
     { url: `${BASE}/articles`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE}/brands`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE}/drops`, lastModified: now, changeFrequency: 'daily', priority: 0.7 },
     { url: `${BASE}/new`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
     { url: `${BASE}/sale`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
   ];
@@ -77,18 +69,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const liveAndPast = [
-    ...(drops?.live ?? []),
-    ...(drops?.scheduled ?? []),
-    ...(drops?.ended ?? []),
-  ];
-  const dropEntries: MetadataRoute.Sitemap = liveAndPast.map((d: DropSummary) => ({
-    url: `${BASE}/drops/${d.slug}`,
-    lastModified: d.publishedAt ? new Date(d.publishedAt) : now,
-    changeFrequency: 'daily',
-    priority: 0.6,
-  }));
-
   const editEntries: MetadataRoute.Sitemap = (edits ?? []).map((e) => ({
     url: `${BASE}/edits/${e.slug}`,
     lastModified: e.publishedAt ? new Date(e.publishedAt) : now,
@@ -108,7 +88,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...categoryEntries,
     ...brandEntries,
     ...articleEntries,
-    ...dropEntries,
     ...editEntries,
     ...lookbookEntries,
   ];

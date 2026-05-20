@@ -47,7 +47,6 @@ model User {
   auditLogs           AuditLog[]          @relation("ActorAuditLogs")
   createdProducts     Product[]           @relation("ProductCreatedBy")
   authoredArticles    Article[]           @relation("ArticleAuthor")
-  dropNotifySignups   DropNotifySignup[]
   clickEvents             ClickEvent[]             @relation("UserClicks")
   selfReportedConversions SelfReportedConversion[] @relation("UserConversions")
   wardrobeItems           WardrobeItem[]           @relation("UserWardrobe")
@@ -263,7 +262,6 @@ model Product {
   wardrobeItems    WardrobeItem[]
   wishlistItems    WishlistItem[]
   articleEmbeds    ArticleProduct[]
-  dropProducts     DropProduct[]
   editProducts     EditProduct[]
   lookbookTags     LookbookTag[]
   reviews          Review[]
@@ -509,65 +507,7 @@ model ArticleProduct {
   @@map("article_products")
 }
 
-// ───────── PHASE 7 — DROPS / LOOKBOOKS / EDITS / BANNERS / BRAND STORIES ─────────
-
-enum DropStatus {
-  SCHEDULED
-  LIVE
-  ENDED
-  ARCHIVED
-}
-
-model Drop {
-  id          String     @id @default(cuid())
-  slug        String     @unique
-  name        String
-  heroUrl     String?
-  description String?
-  launchAt    DateTime
-  endsAt      DateTime?
-  status      DropStatus @default(SCHEDULED)
-  /// Stamped when the scheduler flips status → LIVE.
-  publishedAt DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  dropProducts  DropProduct[]
-  notifySignups DropNotifySignup[]
-
-  @@index([status, launchAt])
-  @@index([launchAt])
-  @@map("drops")
-}
-
-model DropProduct {
-  id        String  @id @default(cuid())
-  dropId    String
-  drop      Drop    @relation(fields: [dropId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  position  Int     @default(0)
-  createdAt DateTime @default(now())
-
-  @@unique([dropId, productId])
-  @@index([dropId])
-  @@map("drop_products")
-}
-
-model DropNotifySignup {
-  id         String    @id @default(cuid())
-  dropId     String
-  drop       Drop      @relation(fields: [dropId], references: [id], onDelete: Cascade)
-  userId     String?
-  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  email      String
-  notifiedAt DateTime?
-  createdAt  DateTime  @default(now())
-
-  @@unique([dropId, email])
-  @@index([dropId, notifiedAt])
-  @@map("drop_notify_signups")
-}
+// ───────── PHASE 7 — LOOKBOOKS / EDITS / BANNERS / BRAND STORIES ─────────
 
 enum LookbookStatus {
   DRAFT

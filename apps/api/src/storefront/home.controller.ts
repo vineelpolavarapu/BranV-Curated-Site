@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ArticleStatus, BrandStatus, DropStatus } from '@prisma/client';
+import { ArticleStatus, BrandStatus } from '@prisma/client';
 import { Public } from '../common/decorators/public.decorator';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProductsPublicService } from './products-public.service';
@@ -31,7 +31,6 @@ export class HomeController {
       newArrivals,
       banners,
       featuredEdit,
-      activeDrops,
       latestArticles,
       categorySections,
     ] = await Promise.all([
@@ -55,19 +54,6 @@ export class HomeController {
       } as never),
       this.banners.listActiveForHome(),
       this.edits.getFeaturedForHome(),
-      this.prisma.drop.findMany({
-        where: { status: DropStatus.LIVE },
-        orderBy: { launchAt: 'desc' },
-        take: 6,
-        select: {
-          id: true,
-          slug: true,
-          name: true,
-          heroUrl: true,
-          launchAt: true,
-          endsAt: true,
-        },
-      }),
       this.prisma.article.findMany({
         where: { status: ArticleStatus.PUBLISHED },
         orderBy: { publishedAt: 'desc' },
@@ -91,7 +77,6 @@ export class HomeController {
       newArrivals: newArrivals.data,
       newArrivalsCount: newArrivals.total,
       featuredEdit,
-      activeDrops,
       latestArticles,
       categorySections,
       _newArrivalCutoff: newCutoff,

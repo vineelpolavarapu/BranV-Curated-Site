@@ -61,26 +61,12 @@ const SAMPLES: Record<
     { title: 'Smartwatch Series 7', price: 18990, mrp: 22990, imageUrl: 'https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Luxury Gold Dial', price: 24990, mrp: 28990, imageUrl: 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?auto=format&fit=crop&w=1000&q=80' },
   ],
-  eyewear: [
-    { title: 'Aviator Sunglasses', price: 2990, mrp: 3490, imageUrl: 'https://images.unsplash.com/photo-1572635196237-14b3f281503f?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Wayfarer Sunglasses', price: 2790, mrp: 3290, imageUrl: 'https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Round Optical Frames', price: 1990, mrp: 2490, imageUrl: 'https://images.unsplash.com/photo-1577803645773-f96470509666?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Blue-Light Tortoise Frames', price: 2290, mrp: 2790, imageUrl: 'https://images.unsplash.com/photo-1574258495973-f010dfbb5371?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Polarized Square Sunnies', price: 3290, mrp: 3990, imageUrl: 'https://images.unsplash.com/photo-1511499767150-a48a237f0083?auto=format&fit=crop&w=1000&q=80' },
-  ],
   accessories: [
     { title: 'Leather Bifold Wallet', price: 1990, mrp: 2490, imageUrl: 'https://images.unsplash.com/photo-1517254797898-04edd251bfb3?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Reversible Leather Belt', price: 1690, mrp: 1990, imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Canvas Backpack', price: 3490, mrp: 3990, imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Silver Cufflinks Set', price: 1290, mrp: 1690, imageUrl: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Wool Beanie', price: 890, mrp: 1190, imageUrl: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80' },
-  ],
-  grooming: [
-    { title: 'Eau de Parfum 100ml', price: 3990, mrp: 4490, imageUrl: 'https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Beard Oil & Comb Kit', price: 1490, mrp: 1890, imageUrl: 'https://images.unsplash.com/photo-1583241800698-9c2e51e1d6cd?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Daily Face Moisturizer', price: 1190, mrp: 1490, imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Safety Razor — Chrome', price: 2290, mrp: 2790, imageUrl: 'https://images.unsplash.com/photo-1521223890158-f9f7c3d5d504?auto=format&fit=crop&w=1000&q=80' },
-    { title: 'Hair Pomade — Matte', price: 990, mrp: 1290, imageUrl: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&w=1000&q=80' },
   ],
 };
 

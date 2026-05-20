@@ -34,17 +34,8 @@ export default function AdminDashboardPage() {
 
   return (
     <AdminShell title="Dashboard">
-      {/* Live drops + alert chips */}
+      {/* Alert chips */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {data.liveDropCount > 0 && (
-          <Link
-            href="/admin/drops"
-            className="inline-flex items-center gap-2 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {data.liveDropCount} live drop{data.liveDropCount === 1 ? '' : 's'}
-          </Link>
-        )}
         {data.system.syncFailureCount > 0 && (
           <Link
             href="/admin/products"

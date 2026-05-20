@@ -20,7 +20,7 @@ interface Props {
 }
 
 /**
- * Ordered product picker used by drops + edits. Search opens a chooser modal,
+ * Ordered product picker used by edits. Search opens a chooser modal,
  * confirmed picks land at the end of the list, and each row has move-up /
  * move-down / remove controls.
  */

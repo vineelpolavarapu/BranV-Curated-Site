@@ -22,7 +22,6 @@ import { ClicksModule } from './clicks/clicks.module';
 import { WardrobeModule } from './wardrobe/wardrobe.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { ArticlesModule } from './articles/articles.module';
-import { DropsModule } from './drops/drops.module';
 import { LookbooksModule } from './lookbooks/lookbooks.module';
 import { EditsModule } from './edits/edits.module';
 import { BannersModule } from './banners/banners.module';
@@ -82,7 +81,6 @@ import { TwoFactorGuard } from './common/guards/two-factor.guard';
     WardrobeModule,
     WishlistModule,
     ArticlesModule,
-    DropsModule,
     LookbooksModule,
     EditsModule,
     BannersModule,

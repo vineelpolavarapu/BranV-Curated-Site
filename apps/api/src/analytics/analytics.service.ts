@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import {
   AffiliatePayoutItemStatus,
   ClickReportOutcome,
-  DropStatus,
   OutboxStatus,
   ProductStatus,
   ReviewStatus,
@@ -330,7 +329,7 @@ export class AnalyticsService {
 
   /** Today's content perf computed live from raw tables, filtered by surface. */
   private async contentTodayRaw(
-    surface: 'article' | 'drop',
+    surface: 'article',
     today: Date,
   ): Promise<Array<{ slug: string; clicks: number; reconciled: number }>> {
     const pattern = `%/${surface}s/%`;
@@ -352,82 +351,6 @@ export class AnalyticsService {
       clicks: Number(r.clicks),
       reconciled: Number(r.reconciled),
     }));
-  }
-
-  // ────────────────────────── DROPS ──────────────────────────
-
-  async drops() {
-    const drops = await this.prisma.drop.findMany({
-      where: { status: { in: [DropStatus.LIVE, DropStatus.ENDED] } },
-      orderBy: { launchAt: 'desc' },
-      take: 30,
-      select: {
-        id: true,
-        slug: true,
-        name: true,
-        status: true,
-        launchAt: true,
-      },
-    });
-    if (drops.length === 0) return { drops: [] };
-
-    const slugList = drops.map((d) => d.slug);
-    const today = startOfUtcDay(new Date());
-    const earliest = drops.reduce(
-      (min, d) => (d.launchAt && d.launchAt < min ? d.launchAt : min),
-      today,
-    );
-    const rollupStart = startOfUtcDay(earliest);
-
-    const [historic, todayRaw] = await Promise.all([
-      this.prisma.analyticsContentPerf.groupBy({
-        by: ['surfaceSlug'],
-        where: {
-          surfaceType: 'drop',
-          surfaceSlug: { in: slugList },
-          day: { gte: rollupStart, lt: today },
-        },
-        _sum: {
-          clicks: true,
-          selfReportedConversions: true,
-          reconciledCommissionInr: true,
-        },
-      }),
-      this.contentTodayRaw('drop', today),
-    ]);
-
-    type Stats = { clicks: number; conv: number; revenue: number };
-    const stats = new Map<string, Stats>();
-    for (const row of historic) {
-      stats.set(row.surfaceSlug, {
-        clicks: row._sum.clicks ?? 0,
-        conv: row._sum.selfReportedConversions ?? 0,
-        revenue: Number(row._sum.reconciledCommissionInr ?? 0),
-      });
-    }
-    for (const row of todayRaw) {
-      const prev = stats.get(row.slug) ?? { clicks: 0, conv: 0, revenue: 0 };
-      stats.set(row.slug, {
-        clicks: prev.clicks + row.clicks,
-        conv: prev.conv,
-        revenue: prev.revenue + row.reconciled,
-      });
-    }
-
-    return {
-      drops: drops.map((d) => {
-        const s = stats.get(d.slug);
-        return {
-          slug: d.slug,
-          name: d.name,
-          status: d.status,
-          launchAt: d.launchAt,
-          clicks: s?.clicks ?? 0,
-          conversions: s?.conv ?? 0,
-          reconciledCommissionInr: round2(s?.revenue ?? 0),
-        };
-      }),
-    };
   }
 
   // ────────────────────────── MEMBERS ──────────────────────────
@@ -532,12 +455,11 @@ export class AnalyticsService {
     const today = startOfUtcDay(new Date());
     const start30 = addDays(today, -29);
 
-    const [overview, clicks, system, liveDropCount, lowConversion] =
+    const [overview, clicks, system, lowConversion] =
       await Promise.all([
         this.overview(),
         this.clicks(),
         this.system(),
-        this.prisma.drop.count({ where: { status: DropStatus.LIVE } }),
         this.lowConversionLast30Days(start30, today),
       ]);
 
@@ -546,7 +468,6 @@ export class AnalyticsService {
       trend: clicks.trend,
       topProducts: clicks.topProducts,
       system,
-      liveDropCount,
       lowConversionProducts: lowConversion,
     };
   }

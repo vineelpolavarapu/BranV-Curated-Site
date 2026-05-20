@@ -27,9 +27,6 @@ export default async function HomePage() {
         <BannerStrip banners={home.banners} />
       )}
       {home && home.featuredEdit && <FeaturedEdit edit={home.featuredEdit} />}
-      {home && home.activeDrops.length > 0 && (
-        <ActiveDrops drops={home.activeDrops} />
-      )}
       {home && home.newArrivals.length > 0 && (
         <NewArrivals products={home.newArrivals} />
       )}
@@ -151,64 +148,6 @@ function FeaturedEdit({ edit }: { edit: NonNullable<HomePayload['featuredEdit']>
           </div>
         </div>
       </Link>
-    </section>
-  );
-}
-
-function ActiveDrops({ drops }: { drops: HomePayload['activeDrops'] }) {
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-12">
-      <div className="mb-5 flex items-end justify-between">
-        <div>
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
-            Live now
-          </p>
-          <h2 className="mt-1 text-2xl font-semibold tracking-tight">
-            Active drops
-          </h2>
-        </div>
-        <Link
-          href="/drops"
-          className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
-        >
-          All drops →
-        </Link>
-      </div>
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {drops.map((d) => (
-          <li key={d.id}>
-            <Link
-              href={`/drops/${d.slug}`}
-              className="relative block aspect-[16/10] overflow-hidden rounded-xl bg-neutral-100"
-            >
-              {d.heroUrl && (
-                <Image
-                  src={d.heroUrl}
-                  alt={d.name}
-                  fill
-                  unoptimized
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                  className="object-cover"
-                />
-              )}
-              <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
-                <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                Live
-              </span>
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                <p className="font-medium">{d.name}</p>
-                {d.endsAt && (
-                  <p className="text-xs opacity-80">
-                    Ends {new Date(d.endsAt).toLocaleString(undefined, {
-                      dateStyle: 'medium',
-                    })}
-                  </p>
-                )}
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

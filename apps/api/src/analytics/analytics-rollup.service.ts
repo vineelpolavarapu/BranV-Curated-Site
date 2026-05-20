@@ -242,7 +242,6 @@ export class AnalyticsRollupService {
         SELECT
           CASE
             WHEN ce."sourcePageUrl" LIKE '%/articles/%'  THEN 'article'
-            WHEN ce."sourcePageUrl" LIKE '%/drops/%'     THEN 'drop'
             WHEN ce."sourcePageUrl" LIKE '%/edits/%'     THEN 'edit'
             WHEN ce."sourcePageUrl" LIKE '%/lookbooks/%' THEN 'lookbook'
             WHEN ce."sourcePageUrl" LIKE '%/products/%'  THEN 'product'
@@ -251,7 +250,6 @@ export class AnalyticsRollupService {
           END AS surface_type,
           CASE
             WHEN ce."sourcePageUrl" LIKE '%/articles/%'  THEN regexp_replace(ce."sourcePageUrl", '^.*/articles/([^/?#]+).*$',  '\1')
-            WHEN ce."sourcePageUrl" LIKE '%/drops/%'     THEN regexp_replace(ce."sourcePageUrl", '^.*/drops/([^/?#]+).*$',     '\1')
             WHEN ce."sourcePageUrl" LIKE '%/edits/%'     THEN regexp_replace(ce."sourcePageUrl", '^.*/edits/([^/?#]+).*$',     '\1')
             WHEN ce."sourcePageUrl" LIKE '%/lookbooks/%' THEN regexp_replace(ce."sourcePageUrl", '^.*/lookbooks/([^/?#]+).*$', '\1')
             WHEN ce."sourcePageUrl" LIKE '%/products/%'  THEN regexp_replace(ce."sourcePageUrl", '^.*/products/([^/?#]+).*$',  '\1')

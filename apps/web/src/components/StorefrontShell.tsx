@@ -11,9 +11,7 @@ const SHOP_CATEGORIES = [
   { name: 'Suits & Formal', slug: 'suits-and-formal' },
   { name: 'Footwear', slug: 'footwear' },
   { name: 'Watches', slug: 'watches' },
-  { name: 'Eyewear', slug: 'eyewear' },
   { name: 'Accessories', slug: 'accessories' },
-  { name: 'Grooming', slug: 'grooming' },
 ];
 
 export function StorefrontShell({
@@ -140,7 +138,7 @@ function SiteFooter() {
             Newsletter
           </p>
           <p className="mb-3 text-xs text-neutral-600">
-            Weekly digest of new arrivals, upcoming drops, and articles.
+            Weekly digest of new arrivals and articles.
           </p>
           <NewsletterSignup source="footer" />
         </div>
