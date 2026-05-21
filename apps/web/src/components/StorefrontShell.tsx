@@ -5,6 +5,7 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
 import { NewsletterSignup } from './newsletter/NewsletterSignup';
+import { AccountPopup } from './AccountPopup';
 
 const SHOP_CATEGORIES = [
   { name: 'Clothing', slug: 'clothing' },
@@ -40,41 +41,27 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
     ? 'absolute inset-x-0 top-0 z-30 text-white'
     : 'sticky top-0 z-30 border-b border-neutral-200 bg-white/95 text-neutral-700 backdrop-blur';
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
-  const accountIconClasses = overlay
-    ? 'border-white/50 text-white hover:bg-white/10'
-    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100';
   return (
     <header className={headerClasses}>
-      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 pr-10 md:px-6 md:pr-20">
+      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 pr-14 md:px-6 md:pr-16">
         <Link href="/" className="text-xl font-semibold tracking-tight">
           BranV
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-          <ShopMegaMenu overlay={overlay} />
-          <Link href="/brands" className={linkHoverClass}>Brands</Link>
-          <Link href="/articles" className={linkHoverClass}>Articles</Link>
-          <Link href="/new" className={linkHoverClass}>New</Link>
-          <Link href="/sale" className={linkHoverClass}>Sale</Link>
-        </nav>
-        <div className="ml-auto flex flex-1 items-center justify-end gap-2">
+        {overlay && (
+          <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+            <ShopMegaMenu overlay={overlay} />
+            <Link href="/new" className={linkHoverClass}>New</Link>
+            <Link href="/brands" className={linkHoverClass}>Brands</Link>
+            <Link href="/articles" className={linkHoverClass}>Articles</Link>
+          </nav>
+        )}
+        <div className="ml-auto flex items-center gap-2">
           <SearchBox overlay={overlay} />
         </div>
       </div>
-      <Link
-        href="/account"
-        aria-label="Account"
-        className={`absolute right-3 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border transition md:flex ${accountIconClasses}`}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
-          <path
-            d="M4.5 20c.8-3.5 4-5.5 7.5-5.5s6.7 2 7.5 5.5"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-        </svg>
-      </Link>
+      <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 md:block">
+        <AccountPopup overlay={overlay} />
+      </div>
     </header>
   );
 }

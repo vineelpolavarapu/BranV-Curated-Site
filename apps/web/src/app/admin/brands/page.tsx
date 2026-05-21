@@ -138,7 +138,7 @@ export default function BrandsAdminPage() {
                       >
                         Story
                       </a>
-                      <button
+                      {/* <button
                         onClick={() => {
                           setEditing(b);
                           setShowForm(true);
@@ -146,7 +146,7 @@ export default function BrandsAdminPage() {
                         className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                       >
                         Edit
-                      </button>
+                      </button> */}
                       <button
                         onClick={() => onDelete(b.id)}
                         className={adminButtonDanger}

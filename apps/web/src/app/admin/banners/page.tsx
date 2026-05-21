@@ -124,7 +124,7 @@ export default function BannersAdminPage() {
                   </div>
                 </div>
                 <div className="mt-3 flex justify-end gap-2">
-                  <button
+                  {/* <button
                     onClick={() => {
                       setEditing(b);
                       setShowForm(true);
@@ -132,7 +132,7 @@ export default function BannersAdminPage() {
                     className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                   >
                     Edit
-                  </button>
+                  </button> */}
                   <button onClick={() => onDelete(b.id)} className={adminButtonDanger}>
                     Delete
                   </button>

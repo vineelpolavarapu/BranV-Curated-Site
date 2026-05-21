@@ -117,7 +117,7 @@ export default function AvatarsAdminPage() {
                     {copiedId === a.id ? '✓ Copied' : 'Copy Prompt'}
                   </button>
                   <div className="flex gap-2">
-                    <button
+                    {/* <button
                       onClick={() => {
                         setEditing(a);
                         setShowForm(true);
@@ -125,7 +125,7 @@ export default function AvatarsAdminPage() {
                       className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                     >
                       Edit
-                    </button>
+                    </button> */}
                     <button
                       onClick={() => onDelete(a.id)}
                       className={adminButtonDanger}

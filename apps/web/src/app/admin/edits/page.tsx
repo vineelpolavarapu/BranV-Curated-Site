@@ -132,12 +132,12 @@ export default function EditsAdminPage() {
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Link
+                      {/* <Link
                         href={`/admin/edits/${e.id}`}
                         className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                       >
                         Edit
-                      </Link>
+                      </Link> */}
                       {e.status === 'PUBLISHED' && (
                         <a
                           href={`/edits/${e.slug}`}

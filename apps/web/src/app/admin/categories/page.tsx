@@ -180,7 +180,7 @@ export default function CategoriesAdminPage() {
                         </td>
                         <td className="py-2 text-right">
                           <div className="flex justify-end gap-2">
-                            <button
+                            {/* <button
                               onClick={() => {
                                 setEditing(s);
                                 setShowForm(true);
@@ -188,7 +188,7 @@ export default function CategoriesAdminPage() {
                               className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                             >
                               Edit
-                            </button>
+                            </button> */}
                             <button
                               onClick={() => onDeleteSchema(s.attributeKey)}
                               className={adminButtonDanger}

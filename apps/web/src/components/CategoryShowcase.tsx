@@ -2,11 +2,20 @@ import Link from 'next/link';
 import { ProductCardData } from '@/lib/storefront-types';
 import { ProductCard } from './ProductCard';
 
-/**
- * One BSC-style home section: heading + "View all" pill + up to 5 product
- * cards. Rendering is suppressed entirely when there are no products in the
- * category — the home page hides empty sections per spec.
- */
+function PlaceholderProductCard() {
+  return (
+    <div className="flex flex-col">
+      <div className="aspect-[4/5] w-full rounded-lg bg-neutral-200" />
+      <div className="mt-3 flex flex-col gap-2">
+        <div className="h-2.5 w-16 rounded bg-neutral-200" />
+        <div className="h-3 w-full rounded bg-neutral-200" />
+        <div className="h-3 w-3/4 rounded bg-neutral-200" />
+        <div className="h-3 w-1/2 rounded bg-neutral-200" />
+      </div>
+    </div>
+  );
+}
+
 export function CategoryShowcase({
   title,
   slug,
@@ -16,8 +25,6 @@ export function CategoryShowcase({
   slug: string;
   products: ProductCardData[];
 }) {
-  if (products.length === 0) return null;
-
   return (
     <section className="w-full px-4 py-12 md:px-8 lg:px-12">
       <div className="mb-6 flex items-end justify-between gap-4">
@@ -32,11 +39,17 @@ export function CategoryShowcase({
         </Link>
       </div>
       <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-        {products.slice(0, 5).map((p) => (
-          <li key={p.id}>
-            <ProductCard product={p} />
-          </li>
-        ))}
+        {products.length > 0
+          ? products.slice(0, 5).map((p) => (
+              <li key={p.id}>
+                <ProductCard product={p} />
+              </li>
+            ))
+          : Array.from({ length: 5 }).map((_, i) => (
+              <li key={i}>
+                <PlaceholderProductCard />
+              </li>
+            ))}
       </ul>
     </section>
   );

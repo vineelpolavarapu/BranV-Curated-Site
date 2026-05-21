@@ -142,12 +142,12 @@ export default function ArticlesAdminPage() {
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Link
+                      {/* <Link
                         href={`/admin/articles/${a.id}`}
                         className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                       >
                         Edit
-                      </Link>
+                      </Link> */}
                       {a.status === 'PUBLISHED' && (
                         <a
                           href={`/articles/${a.slug}`}

@@ -123,12 +123,12 @@ export default function LookbooksAdminPage() {
                   <td className="px-2 py-3 text-neutral-600">{l._count?.images ?? 0}</td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">
-                      <Link
+                      {/* <Link
                         href={`/admin/lookbooks/${l.id}`}
                         className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
                       >
                         Edit
-                      </Link>
+                      </Link> */}
                       {l.status === 'PUBLISHED' && (
                         <a
                           href={`/lookbooks/${l.slug}`}
