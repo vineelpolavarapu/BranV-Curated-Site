@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { apiServer, buildQuery } from '@/lib/api-server';
 import { ArticleSummary } from '@/lib/article-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
+import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,16 +31,18 @@ export default async function ArticlesIndexPage(props: {
 
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-          Articles
-        </h1>
-        <p className="mt-1 text-sm text-neutral-600">
-          {tag
-            ? `Showing articles tagged "${tag}"`
-            : 'Editorial, opinionated, and AI-illustrated.'}
-        </p>
-      </section>
+      <AnimateOnScroll>
+        <section className="mx-auto max-w-7xl px-6 py-10">
+          <h1 className="bv-enter text-3xl font-semibold tracking-tight md:text-4xl">
+            Articles
+          </h1>
+          <p className="bv-enter-fade bv-delay-1 mt-1 text-sm text-neutral-600">
+            {tag
+              ? `Showing articles tagged "${tag}"`
+              : 'Editorial, opinionated, and AI-illustrated.'}
+          </p>
+        </section>
+      </AnimateOnScroll>
 
       <section className="mx-auto max-w-7xl px-6 pb-16">
         {!list || list.data.length === 0 ? (
@@ -47,13 +50,15 @@ export default async function ArticlesIndexPage(props: {
             No articles yet.
           </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {list.data.map((a) => (
-              <li key={a.id}>
-                <ArticleCard article={a} />
-              </li>
-            ))}
-          </ul>
+          <AnimateOnScroll>
+            <ul className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {list.data.map((a, i) => (
+                <li key={a.id} className={`bv-enter bv-delay-${(i % 3) + 1}`}>
+                  <ArticleCard article={a} />
+                </li>
+              ))}
+            </ul>
+          </AnimateOnScroll>
         )}
       </section>
     </StorefrontShell>
@@ -62,7 +67,7 @@ export default async function ArticlesIndexPage(props: {
 
 function ArticleCard({ article }: { article: ArticleSummary }) {
   return (
-    <article className="flex flex-col">
+    <article className="group flex flex-col transition-transform duration-200 hover:-translate-y-1">
       <Link
         href={`/articles/${article.slug}`}
         className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-100"
@@ -74,7 +79,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             unoptimized
-            className="object-cover"
+            className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-neutral-300">
@@ -98,7 +103,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
         )}
         <Link
           href={`/articles/${article.slug}`}
-          className="text-lg font-semibold leading-snug tracking-tight text-neutral-900 hover:underline"
+          className="text-lg font-semibold leading-snug tracking-tight text-neutral-900 underline-offset-2 transition-[text-decoration-color] duration-200 hover:underline"
         >
           {article.title}
         </Link>

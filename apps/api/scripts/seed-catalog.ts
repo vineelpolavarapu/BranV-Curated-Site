@@ -34,35 +34,41 @@ function slug(s: string): string {
 
 const TAXONOMY: Array<{ name: string; subcategories: string[] }> = [
   {
-    name: 'Clothing',
+    name: 'Shirts',
     subcategories: [
-      'T-Shirts', 'Shirts', 'Polos', 'Jeans', 'Trousers', 'Shorts',
-      'Jackets', 'Sweaters', 'Sweatshirts & Hoodies', 'Ethnic Wear',
+      'Half Sleeves', 'Full Sleeves', 'Checks', 'Printed', 'Formals',
     ],
   },
   {
-    name: 'Suits & Formal',
+    name: 'T-Shirts',
     subcategories: [
-      '2-Piece Suits', '3-Piece Suits', 'Blazers', 'Formal Trousers',
-      'Formal Shirts', 'Ties', 'Bow Ties', 'Pocket Squares', 'Suspenders',
+      'Polo T-Shirts', 'Full Neck T-Shirts', 'Collar T-Shirts',
+    ],
+  },
+  {
+    name: 'Jeans',
+    subcategories: [
+      'Baggy Jeans', 'Formal Jeans', 'Cotton Jeans', 'Slim Fit',
+    ],
+  },
+  {
+    name: 'Tracks',
+    subcategories: [
+      'Joggers', 'Slim Fit Tracks', 'Zipper Tracks', 'Cotton Tracks',
+      'Sports Tracks', 'Printed Tracks', 'Lounge Tracks',
     ],
   },
   {
     name: 'Footwear',
     subcategories: [
       'Sneakers', 'Loafers', 'Formal Shoes', 'Boots',
-      'Sandals & Slippers', 'Sports Shoes',
+      'Sandals & Slippers', 'Sports Shoes', 'Chappals',
     ],
   },
   {
     name: 'Watches',
-    subcategories: ['Analog', 'Digital', 'Smartwatches', 'Luxury', 'Chronographs'],
-  },
-  {
-    name: 'Accessories',
     subcategories: [
-      'Belts', 'Wallets', 'Bags & Backpacks', 'Cufflinks', 'Caps & Hats',
-      'Scarves & Stoles', 'Jewelry', 'Keychains',
+      'Digital', 'Analog', 'Classical', 'Strap Watches', 'Chained Watches',
     ],
   },
 ];
@@ -77,33 +83,57 @@ type AttrSchema = {
 };
 
 const ATTRIBUTES: Record<string, AttrSchema[]> = {
-  Clothing: [
+  Shirts: [
     { attributeKey: 'size', displayName: 'Size', filterType: FilterType.MULTI_SELECT,
       optionsJson: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'] },
     { attributeKey: 'fit', displayName: 'Fit', filterType: FilterType.MULTI_SELECT,
       optionsJson: ['Slim', 'Regular', 'Relaxed', 'Oversized'] },
     { attributeKey: 'material', displayName: 'Material', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Cotton', 'Linen', 'Polyester', 'Wool', 'Denim', 'Blend'] },
+      optionsJson: ['Cotton', 'Linen', 'Polyester', 'Blend'] },
     { attributeKey: 'sleeve', displayName: 'Sleeve', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Half', 'Full', 'Sleeveless', '3/4'] },
+      optionsJson: ['Half', 'Full', '3/4'] },
     { attributeKey: 'pattern', displayName: 'Pattern', filterType: FilterType.MULTI_SELECT,
       optionsJson: ['Solid', 'Striped', 'Checked', 'Printed', 'Graphic'] },
     { attributeKey: 'occasion', displayName: 'Occasion', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Casual', 'Work', 'Party', 'Beach', 'Wedding', 'Festive'] },
+      optionsJson: ['Casual', 'Work', 'Party', 'Wedding', 'Festive'] },
   ],
-  'Suits & Formal': [
+  'T-Shirts': [
     { attributeKey: 'size', displayName: 'Size', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['36', '38', '40', '42', '44', '46', '48'] },
+      optionsJson: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'] },
     { attributeKey: 'fit', displayName: 'Fit', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Slim', 'Tailored', 'Regular'] },
-    { attributeKey: 'fabric', displayName: 'Fabric', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Wool', 'Linen', 'Cotton', 'Polyester', 'Tweed'] },
+      optionsJson: ['Regular', 'Slim', 'Oversized'] },
+    { attributeKey: 'material', displayName: 'Material', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Cotton', 'Polyester', 'Blend', 'Jersey'] },
+    { attributeKey: 'neckType', displayName: 'Neck Type', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Round Neck', 'Polo', 'Collar', 'Henley', 'V-Neck'] },
     { attributeKey: 'pattern', displayName: 'Pattern', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Solid', 'Pinstripe', 'Checked', 'Glen Plaid', 'Houndstooth'] },
-    { attributeKey: 'pieceCount', displayName: 'Piece count', filterType: FilterType.SELECT,
-      optionsJson: ['2-piece', '3-piece'] },
+      optionsJson: ['Solid', 'Graphic', 'Printed', 'Striped'] },
+  ],
+  Jeans: [
+    { attributeKey: 'waistSize', displayName: 'Waist Size', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['28', '30', '32', '34', '36', '38', '40'] },
+    { attributeKey: 'length', displayName: 'Length', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['30', '32', '34', '36'] },
+    { attributeKey: 'fit', displayName: 'Fit', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Baggy', 'Slim', 'Regular', 'Skinny', 'Straight'] },
+    { attributeKey: 'rise', displayName: 'Rise', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['High Rise', 'Mid Rise', 'Low Rise'] },
+    { attributeKey: 'wash', displayName: 'Wash', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Raw', 'Light', 'Medium', 'Dark', 'Distressed'] },
+  ],
+  Tracks: [
+    { attributeKey: 'size', displayName: 'Size', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'] },
+    { attributeKey: 'fit', displayName: 'Fit', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Slim', 'Regular', 'Relaxed', 'Baggy'] },
+    { attributeKey: 'material', displayName: 'Material', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Cotton', 'Polyester', 'Blend', 'Terry', 'Fleece'] },
+    { attributeKey: 'closure', displayName: 'Closure', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Elastic', 'Drawstring', 'Zipper'] },
+    { attributeKey: 'pattern', displayName: 'Pattern', filterType: FilterType.MULTI_SELECT,
+      optionsJson: ['Solid', 'Printed', 'Striped', 'Colour Block'] },
     { attributeKey: 'occasion', displayName: 'Occasion', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Business', 'Wedding', 'Black tie', 'Cocktail'] },
+      optionsJson: ['Sports', 'Casual', 'Lounge', 'Gym'] },
   ],
   Footwear: [
     { attributeKey: 'sizeUk', displayName: 'Size (UK)', filterType: FilterType.MULTI_SELECT,
@@ -133,12 +163,6 @@ const ATTRIBUTES: Record<string, AttrSchema[]> = {
     { attributeKey: 'waterResistance', displayName: 'Water resistance', filterType: FilterType.SELECT,
       optionsJson: ['30m', '50m', '100m', '200m', '300m+'] },
     { attributeKey: 'caseSize', displayName: 'Case size (mm)', filterType: FilterType.RANGE },
-  ],
-  Accessories: [
-    { attributeKey: 'material', displayName: 'Material', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Leather', 'Fabric', 'Metal', 'Synthetic'] },
-    { attributeKey: 'color', displayName: 'Color', filterType: FilterType.MULTI_SELECT,
-      optionsJson: ['Black', 'Brown', 'Tan', 'White', 'Navy', 'Grey'] },
   ],
 };
 

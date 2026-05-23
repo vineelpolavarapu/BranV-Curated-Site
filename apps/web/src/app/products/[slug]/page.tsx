@@ -9,6 +9,7 @@ import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard, BuyNowButton } from '@/components/ProductCard';
 import { formatINR } from '@/lib/format';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
+import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 
 export const dynamic = 'force-dynamic';
 
@@ -57,12 +58,18 @@ export default async function ProductDetailPage(props: {
     <StorefrontShell>
       <Breadcrumbs product={product} />
       <ProductSchema product={product} />
-      <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
-        <div className="grid gap-8 md:grid-cols-2">
-          <Gallery product={product} />
-          <Summary product={product} />
-        </div>
-      </section>
+      <AnimateOnScroll>
+        <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
+          <div className="grid gap-8 md:grid-cols-2">
+            <div className="bv-enter">
+              <Gallery product={product} />
+            </div>
+            <div className="bv-enter bv-delay-2">
+              <Summary product={product} />
+            </div>
+          </div>
+        </section>
+      </AnimateOnScroll>
 
       <WhereToBuy product={product} />
 
@@ -73,16 +80,20 @@ export default async function ProductDetailPage(props: {
       />
 
       {related && related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-6 pb-14">
-          <h2 className="mb-5 text-xl font-semibold tracking-tight">
-            You may also like
-          </h2>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-            {related.slice(0, 8).map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
+        <AnimateOnScroll>
+          <section className="mx-auto max-w-7xl px-6 pb-14">
+            <h2 className="bv-enter mb-5 text-xl font-semibold tracking-tight">
+              You may also like
+            </h2>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+              {related.slice(0, 8).map((p, i) => (
+                <div key={p.id} className={`bv-enter bv-delay-${Math.min(i + 1, 7)}`}>
+                  <ProductCard product={p} />
+                </div>
+              ))}
+            </div>
+          </section>
+        </AnimateOnScroll>
       )}
     </StorefrontShell>
   );
@@ -90,29 +101,31 @@ export default async function ProductDetailPage(props: {
 
 function Breadcrumbs({ product }: { product: ProductCardData }) {
   return (
-    <nav className="mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
-      <Link href="/" className="hover:text-neutral-900">Home</Link>
-      <span className="mx-2">/</span>
-      <Link
-        href={`/category/${product.category.slug}`}
-        className="hover:text-neutral-900"
-      >
-        {product.category.name}
-      </Link>
-      {product.subcategory && (
-        <>
-          <span className="mx-2">/</span>
-          <Link
-            href={`/category/${product.subcategory.slug}`}
-            className="hover:text-neutral-900"
-          >
-            {product.subcategory.name}
-          </Link>
-        </>
-      )}
-      <span className="mx-2">/</span>
-      <span className="text-neutral-900">{product.title}</span>
-    </nav>
+    <AnimateOnScroll>
+      <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
+        <Link href="/" className="hover:text-neutral-900">Home</Link>
+        <span className="mx-2">/</span>
+        <Link
+          href={`/category/${product.category.slug}`}
+          className="hover:text-neutral-900"
+        >
+          {product.category.name}
+        </Link>
+        {product.subcategory && (
+          <>
+            <span className="mx-2">/</span>
+            <Link
+              href={`/category/${product.subcategory.slug}`}
+              className="hover:text-neutral-900"
+            >
+              {product.subcategory.name}
+            </Link>
+          </>
+        )}
+        <span className="mx-2">/</span>
+        <span className="text-neutral-900">{product.title}</span>
+      </nav>
+    </AnimateOnScroll>
   );
 }
 
@@ -180,7 +193,7 @@ function Gallery({ product }: { product: ProductCardData }) {
 
 function Summary({ product }: { product: ProductCardData }) {
   return (
-    <div>
+    <div className="flex flex-col gap-0">
       <Link
         href={`/brands/${product.brand.slug}`}
         className="text-xs font-medium uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
@@ -287,33 +300,37 @@ function DisplayList({ label, values }: { label: string; values: string[] }) {
   );
 }
 
+const RETAILER_STAGGER = ['bv-delay-1', 'bv-delay-2', 'bv-delay-3', 'bv-delay-4', 'bv-delay-5', 'bv-delay-6'];
+
 function WhereToBuy({ product }: { product: ProductCardData }) {
   if (product.retailers.length === 0) return null;
   return (
-    <section className="mx-auto max-w-7xl px-6 pb-12">
-      <h2 className="mb-4 text-xl font-semibold tracking-tight">Where to buy</h2>
-      <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        {product.retailers.map((r) => {
-          const label = retailerLabel[r.retailer] ?? r.retailer;
-          return (
-            <li
-              key={r.retailer}
-              className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3"
-            >
-              <div>
-                <p className="font-medium capitalize">{label}</p>
-                {r.rawPrice !== null && (
-                  <p className="text-sm text-neutral-600">
-                    ₹{formatINR(r.rawPrice)}
-                  </p>
-                )}
-              </div>
-              <BuyNowButton href={r.affiliateUrl} retailer={r.retailer} />
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    <AnimateOnScroll>
+      <section className="mx-auto max-w-7xl px-6 pb-12">
+        <h2 className="bv-enter mb-4 text-xl font-semibold tracking-tight">Where to buy</h2>
+        <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {product.retailers.map((r, i) => {
+            const label = retailerLabel[r.retailer] ?? r.retailer;
+            return (
+              <li
+                key={r.retailer}
+                className={`bv-enter ${RETAILER_STAGGER[i % RETAILER_STAGGER.length] ?? ''} flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-shadow duration-200 hover:shadow-md`}
+              >
+                <div>
+                  <p className="font-medium capitalize">{label}</p>
+                  {r.rawPrice !== null && (
+                    <p className="text-sm text-neutral-600">
+                      ₹{formatINR(r.rawPrice)}
+                    </p>
+                  )}
+                </div>
+                <BuyNowButton href={r.affiliateUrl} retailer={r.retailer} />
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </AnimateOnScroll>
   );
 }
 

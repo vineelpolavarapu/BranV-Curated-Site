@@ -138,9 +138,27 @@ export function HeroCarousel() {
   useEffect(() => {
     // Pause auto-rotate while the user is actively dragging; resume on release.
     if (isDragging) return;
-    const id = window.setInterval(() => next(), ROTATE_MS);
+    // Guard against tab-switch catchup: browsers throttle setInterval in background
+    // tabs, then fire all queued ticks at once when the tab regains focus. Skipping
+    // advances while the document is hidden prevents the carousel from jumping
+    // multiple slides at once on return.
+    const id = window.setInterval(() => {
+      if (!document.hidden) next();
+    }, ROTATE_MS);
     return () => window.clearInterval(id);
   }, [next, isDragging]);
+
+  // When the tab becomes visible again, bump imgKey to force React to remount the
+  // active slide's <Image> element. This rebuilds the GPU compositor layer that
+  // the browser discards for background tabs, preventing the blank-image bug.
+  const [imgKey, setImgKey] = useState(0);
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (!document.hidden) setImgKey((k) => k + 1);
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   // After landing on a clone, snap back to the matching real slide without animation.
   // Filter to the track's own transform transition so bubbling child transitions
@@ -165,6 +183,7 @@ export function HeroCarousel() {
     );
     return () => cancelAnimationFrame(id);
   }, [withTransition]);
+
 
   // On release: commit to the adjacent slide in the drag direction and
   // animate from the current dragged position to the target slide.
@@ -271,6 +290,7 @@ export function HeroCarousel() {
       >
         {trackSlides.map((slide, i) => {
           const isClone = i === 0 || i === trackSlides.length - 1;
+          const isActive = !isClone && i - 1 === realIndex;
           return (
             <div
               key={`${slide.key}-${i}`}
@@ -278,49 +298,49 @@ export function HeroCarousel() {
               aria-roledescription="slide"
               aria-label={`${i} of ${total}: ${slide.headline}`}
               aria-hidden={isClone || i - 1 !== realIndex}
-              className="relative h-full w-full shrink-0"
+              className="relative h-full w-full shrink-0 overflow-hidden"
             >
+              {/* Ken Burns — slow infinite scale on the background image.
+                  key includes imgKey so the active slide's Image remounts when
+                  the tab regains focus, rebuilding any evicted GPU layer. */}
               <Image
                 src={slide.imageUrl}
                 alt={slide.headline}
                 fill
-                // First real slide gets `priority` for LCP; every other slide
-                // gets `loading="eager"` so the whole carousel is fetched on
-                // initial paint instead of waiting for the slide to scroll
-                // into the viewport (which never happens for off-screen
-                // siblings in a transform-based track, so they'd stay blank
-                // until the page is refreshed).
+                key={isActive ? `${slide.key}-active-${imgKey}` : slide.key}
                 {...(i === 1
                   ? { priority: true }
                   : { loading: 'eager' as const })}
                 unoptimized
                 draggable={false}
                 sizes="100vw"
-                className="select-none object-cover"
+                className={`select-none object-cover ${isActive ? 'bv-kenburns-img' : ''}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
               <div className="absolute inset-x-0 bottom-0 px-6 pb-20 md:px-16 md:pb-28">
                 <div className="max-w-2xl text-white">
-                  {slide.eyebrow && (
-                    <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.22em] opacity-90">
-                      {slide.eyebrow}
-                    </p>
-                  )}
-                  <h2 className="text-4xl font-semibold tracking-tight md:text-6xl">
-                    {slide.headline}
-                  </h2>
-                  {slide.subtext && (
-                    <p className="mt-4 max-w-lg text-base leading-relaxed opacity-90 md:text-lg">
-                      {slide.subtext}
-                    </p>
-                  )}
-                  <Link
-                    href={slide.ctaHref}
-                    tabIndex={isClone ? -1 : 0}
-                    className="mt-8 inline-flex items-center justify-center rounded-full border border-white px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-neutral-900"
-                  >
-                    {slide.ctaLabel}
-                  </Link>
+                  <div className={`hero-slide-text ${isActive ? 'hero-slide-active' : ''}`}>
+                    {slide.eyebrow && (
+                      <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.22em] opacity-90">
+                        {slide.eyebrow}
+                      </p>
+                    )}
+                    <h2 className="text-4xl font-semibold tracking-tight md:text-6xl">
+                      {slide.headline}
+                    </h2>
+                    {slide.subtext && (
+                      <p className="mt-4 max-w-lg text-base leading-relaxed opacity-90 md:text-lg">
+                        {slide.subtext}
+                      </p>
+                    )}
+                    <Link
+                      href={slide.ctaHref}
+                      tabIndex={isClone ? -1 : 0}
+                      className="mt-8 inline-flex items-center justify-center rounded-full border border-white px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-neutral-900"
+                    >
+                      {slide.ctaLabel}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
