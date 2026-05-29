@@ -113,24 +113,23 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
   return (
     <header className={headerClasses}>
-      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 pr-14 md:px-6 md:pr-16">
-        <Link href="/" className="bv-nav-logo text-xl font-semibold tracking-tight">
-          BranV
+      <div className="flex w-full items-center pl-0 pr-4 py-4 md:pr-6">
+        <Link href="/" className="bv-nav-logo inline-flex items-center gap-2 text-xl font-semibold tracking-tight leading-none">
+          <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
+          <span>BranV</span>
         </Link>
         {overlay && (
-          <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium md:flex">
+          <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium md:flex ml-12">
             <ShopMegaMenu overlay={overlay} />
             <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New</Link>
             <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
             <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
           </nav>
         )}
-        <div className="bv-nav-actions ml-auto flex items-center gap-2">
+        <div className="bv-nav-actions ml-auto flex items-center gap-3">
           <SearchBox overlay={overlay} />
+          <AccountPopup overlay={overlay} />
         </div>
-      </div>
-      <div className="bv-nav-actions absolute right-3 top-1/2 hidden -translate-y-1/2 md:block">
-        <AccountPopup overlay={overlay} />
       </div>
     </header>
   );
