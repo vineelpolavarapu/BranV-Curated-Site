@@ -10,6 +10,7 @@ import { ProductCard, BuyNowButton } from '@/components/ProductCard';
 import { formatINR } from '@/lib/format';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
+import { categoryHrefL2 } from '@/lib/category-href';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,7 +116,7 @@ function Breadcrumbs({ product }: { product: ProductCardData }) {
           <>
             <span className="mx-2">/</span>
             <Link
-              href={`/category/${product.subcategory.slug}`}
+              href={categoryHrefL2(product.category.slug, product.subcategory.slug)}
               className="hover:text-neutral-900"
             >
               {product.subcategory.name}

@@ -34,6 +34,7 @@ export class CategoriesService {
     const category = await this.prisma.category.findUnique({
       where: { slug },
       include: {
+        parent: { select: { slug: true } },
         children: { orderBy: { displayOrder: 'asc' } },
         attributeSchemas: { orderBy: { displayOrder: 'asc' } },
       },

@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiServer, buildQuery } from '@/lib/api-server';
 import { ProductPage, BrandCard } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { Filters, SortPicker, FilterDefinition } from '@/components/Filters';
 import { CategoryHashFilter } from '@/components/CategoryHashFilter';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
+import { categoryHrefL2 } from '@/lib/category-href';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,7 @@ interface CategoryDetail {
   name: string;
   path: string;
   parentId: string | null;
+  parent: { slug: string } | null;
   attributeSchemas: FilterDefinition[];
   children: Array<{ slug: string; name: string }>;
 }
@@ -26,13 +28,20 @@ export default async function CategoryPage(props: {
   const { slug } = await props.params;
   const sp = await props.searchParams;
 
-  const [category, list, brands] = await Promise.all([
-    apiServer<CategoryDetail>(`/categories/${slug}`),
+  // Resolve the category first; if it's an L2, the canonical URL is the L1
+  // page with the L2 suffix as a hash fragment. Redirect before any extra
+  // fetches so direct visits to `/category/shirts-checks` (legacy links, SEO,
+  // hand-typed URLs) all settle on `/category/shirts#checks`.
+  const category = await apiServer<CategoryDetail>(`/categories/${slug}`);
+  if (!category) notFound();
+  if (category.parent?.slug) {
+    redirect(categoryHrefL2(category.parent.slug, category.slug));
+  }
+
+  const [list, brands] = await Promise.all([
     apiServer<ProductPage>(`/products${buildQuery({ ...sp, category: slug })}`),
     apiServer<BrandCard[]>('/brands'),
   ]);
-
-  if (!category) notFound();
 
   return (
     <StorefrontShell>
@@ -73,7 +82,7 @@ function CategoryHeader({
             {category.children.map((c, i) => (
               <li key={c.slug} className={`bv-enter bv-delay-${Math.min(i + 3, 7)}`}>
                 <Link
-                  href={`/category/${c.slug}`}
+                  href={categoryHrefL2(category.slug, c.slug)}
                   className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium transition-colors hover:bg-neutral-100"
                 >
                   {c.name}

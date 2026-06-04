@@ -2,88 +2,14 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
+import { MobileNavDrawer } from './MobileNavDrawer';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
 import { NewsletterSignup } from './newsletter/NewsletterSignup';
 import { AccountPopup } from './AccountPopup';
 import { AnimateOnScroll } from './AnimateOnScroll';
-
-type SubCategory = { name: string; slug: string };
-type ShopCategory = { name: string; slug: string; subcategories: SubCategory[] };
-
-const SHOP_CATEGORIES: ShopCategory[] = [
-  {
-    name: 'Shirts',
-    slug: 'shirts',
-    subcategories: [
-      { name: 'Half Sleeves', slug: 'shirts-half-sleeves' },
-      { name: 'Full Sleeves', slug: 'shirts-full-sleeves' },
-      { name: 'Checks', slug: 'shirts-checks' },
-      { name: 'Printed', slug: 'shirts-printed' },
-      { name: 'Formals', slug: 'shirts-formals' },
-    ],
-  },
-  {
-    name: 'T-Shirts',
-    slug: 't-shirts',
-    subcategories: [
-      { name: 'Polo T-Shirts', slug: 't-shirts-polo-t-shirts' },
-      { name: 'Full Neck T-Shirts', slug: 't-shirts-full-neck-t-shirts' },
-      { name: 'Collar T-Shirts', slug: 't-shirts-collar-t-shirts' },
-    ],
-  },
-  {
-    name: 'Jeans',
-    slug: 'jeans',
-    subcategories: [
-      { name: 'Baggy Jeans', slug: 'jeans-baggy-jeans' },
-      { name: 'Formal Jeans', slug: 'jeans-formal-jeans' },
-      { name: 'Cotton Jeans', slug: 'jeans-cotton-jeans' },
-      { name: 'Slim Fit', slug: 'jeans-slim-fit' },
-    ],
-  },
-  {
-    name: 'Footwear',
-    slug: 'footwear',
-    subcategories: [
-      { name: 'Sneakers', slug: 'footwear-sneakers' },
-      { name: 'Loafers', slug: 'footwear-loafers' },
-      { name: 'Formal Shoes', slug: 'footwear-formal-shoes' },
-      { name: 'Boots', slug: 'footwear-boots' },
-      { name: 'Sandals & Slippers', slug: 'footwear-sandals-and-slippers' },
-      { name: 'Sports Shoes', slug: 'footwear-sports-shoes' },
-      { name: 'Chappals', slug: 'footwear-chappals' },
-    ],
-  },
-  {
-    name: 'Tracks',
-    slug: 'tracks',
-    subcategories: [
-      { name: 'Joggers', slug: 'tracks-joggers' },
-      { name: 'Slim Fit Tracks', slug: 'tracks-slim-fit-tracks' },
-      { name: 'Zipper Tracks', slug: 'tracks-zipper-tracks' },
-      { name: 'Cotton Tracks', slug: 'tracks-cotton-tracks' },
-      { name: 'Sports Tracks', slug: 'tracks-sports-tracks' },
-      { name: 'Printed Tracks', slug: 'tracks-printed-tracks' },
-      { name: 'Lounge Tracks', slug: 'tracks-lounge-tracks' },
-    ],
-  },
-  {
-    name: 'Watches',
-    slug: 'watches',
-    subcategories: [
-      { name: 'Digital', slug: 'watches-digital' },
-      { name: 'Analog', slug: 'watches-analog' },
-      { name: 'Classical', slug: 'watches-classical' },
-      { name: 'Strap Watches', slug: 'watches-strap-watches' },
-      { name: 'Chained Watches', slug: 'watches-chained-watches' },
-    ],
-  },
-];
-
-function subHash(l1Slug: string, subSlug: string): string {
-  return subSlug.slice(l1Slug.length + 1);
-}
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { categoryHrefL2 } from '@/lib/category-href';
 
 export function StorefrontShell({
   children,
@@ -113,7 +39,8 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
   return (
     <header className={headerClasses}>
-      <div className="flex w-full items-center pl-0 pr-4 py-4 md:pr-6">
+      <div className="flex w-full items-center pl-2 pr-4 py-4 md:pl-0 md:pr-6">
+        <MobileNavDrawer overlay={overlay} />
         <Link href="/" className="bv-nav-logo inline-flex items-center gap-2 text-xl font-semibold tracking-tight leading-none">
           <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
           <span>BranV</span>
@@ -195,7 +122,7 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
                       </li>
                       {c.subcategories.map((sub) => (
                         <li key={sub.slug} className="bv-flyout-item">
-                          <Link href={`/category/${c.slug}#${subHash(c.slug, sub.slug)}`} className={subItemClasses}>
+                          <Link href={categoryHrefL2(c.slug, sub.slug)} className={subItemClasses}>
                             {sub.name}
                           </Link>
                         </li>

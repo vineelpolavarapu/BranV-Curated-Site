@@ -7,6 +7,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 type HeroSlide = {
   key: string;
   imageUrl: string;
+  /** Optional portrait-orientation variant for < md viewports.
+   *  Falls back to imageUrl when absent. Drop files next to their desktop
+   *  siblings in /hero, e.g. footwear.png → footwear-mobile.png. */
+  mobileImageUrl?: string;
   eyebrow?: string;
   headline: string;
   subtext?: string;
@@ -28,14 +32,14 @@ const SLIDES: HeroSlide[] = [
     ctaHref: '#',
   },
   {
-    key: 'suits',
+    key: 'footwear',
     imageUrl:
-      '/hero/suits.svg',
-    eyebrow: 'Occasion',
-    headline: 'The Suit Edit',
-    subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
+      '/hero/footwear.png',
+    eyebrow: 'Step Out',
+    headline: 'Footwear',
+    subtext: 'Sneakers, loafers, boots, and formal shoes for every occasion.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/category/footwear',
   },
   {
     key: 'trendy',
@@ -265,7 +269,7 @@ export function HeroCarousel() {
       aria-label="Featured collections"
       // `hero-grab` (defined in globals.css) swaps the cursor via the CSS
       // :active pseudo-class — open hand on hover, closed fist on mouse-down.
-      className="hero-grab relative h-screen min-h-[560px] w-full select-none overflow-hidden bg-neutral-900"
+      className="hero-grab relative h-svh min-h-[560px] w-full select-none overflow-hidden bg-neutral-900 md:h-screen"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -302,22 +306,40 @@ export function HeroCarousel() {
             >
               {/* Ken Burns — slow infinite scale on the background image.
                   key includes imgKey so the active slide's Image remounts when
-                  the tab regains focus, rebuilding any evicted GPU layer. */}
+                  the tab regains focus, rebuilding any evicted GPU layer.
+
+                  Art direction via two <Image>s — Next/Image doesn't support
+                  <picture> natively. Mobile variant is shown < md, desktop
+                  variant from md+. Mobile falls back to desktop URL when no
+                  portrait asset exists for the slide. */}
               <Image
                 src={slide.imageUrl}
                 alt={slide.headline}
                 fill
-                key={isActive ? `${slide.key}-active-${imgKey}` : slide.key}
+                key={isActive ? `${slide.key}-active-${imgKey}-d` : `${slide.key}-d`}
                 {...(i === 1
                   ? { priority: true }
                   : { loading: 'eager' as const })}
                 unoptimized
                 draggable={false}
                 sizes="100vw"
-                className={`select-none object-cover ${isActive ? 'bv-kenburns-img' : ''}`}
+                className={`hidden select-none object-cover md:block ${isActive ? 'bv-kenburns-img' : ''}`}
+              />
+              <Image
+                src={slide.mobileImageUrl ?? slide.imageUrl}
+                alt={slide.headline}
+                fill
+                key={isActive ? `${slide.key}-active-${imgKey}-m` : `${slide.key}-m`}
+                {...(i === 1
+                  ? { priority: true }
+                  : { loading: 'eager' as const })}
+                unoptimized
+                draggable={false}
+                sizes="100vw"
+                className={`select-none object-cover md:hidden ${isActive ? 'bv-kenburns-img' : ''}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
-              <div className="absolute inset-x-0 bottom-0 px-6 pb-20 md:px-16 md:pb-28">
+              <div className="absolute inset-x-0 bottom-0 px-6 pb-24 md:px-16 md:pb-28">
                 <div className="max-w-2xl text-white">
                   <div className={`hero-slide-text ${isActive ? 'hero-slide-active' : ''}`}>
                     {slide.eyebrow && (
@@ -325,7 +347,7 @@ export function HeroCarousel() {
                         {slide.eyebrow}
                       </p>
                     )}
-                    <h2 className="text-4xl font-semibold tracking-tight md:text-6xl">
+                    <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl md:text-6xl">
                       {slide.headline}
                     </h2>
                     {slide.subtext && (

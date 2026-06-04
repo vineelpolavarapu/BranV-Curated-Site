@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
+import { CustomSelect } from './CustomSelect';
 
 export interface FilterDefinition {
   attributeKey: string;
@@ -339,16 +340,16 @@ function CategoryFilter({ filter }: { filter: FilterDefinition }) {
     const current = search.get(paramName) ?? '';
     return (
       <Group title={filter.displayName}>
-        <select
+        <CustomSelect
           value={current}
-          onChange={(e) => set(paramName, e.target.value || undefined)}
-          className="w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
-        >
-          <option value="">Any</option>
-          {options.map((o) => (
-            <option key={o} value={o}>{o}</option>
-          ))}
-        </select>
+          onChange={(v) => set(paramName, v || undefined)}
+          options={[
+            { value: '', label: 'Any' },
+            ...options.map((o) => ({ value: o, label: o })),
+          ]}
+          className="w-full"
+          ariaLabel={filter.displayName}
+        />
       </Group>
     );
   }
@@ -410,17 +411,18 @@ export function SortPicker() {
   const { search, set } = useUrlParam();
   const value = search.get('sort') ?? 'relevance';
   return (
-    <select
+    <CustomSelect
       value={value}
-      onChange={(e) => set('sort', e.target.value)}
-      className="rounded-md border border-neutral-300 bg-white px-2 py-1.5 text-sm"
-    >
-      <option value="relevance">Relevance</option>
-      <option value="newest">Newest</option>
-      <option value="price_asc">Price: low → high</option>
-      <option value="price_desc">Price: high → low</option>
-      <option value="best_rated">Best rated</option>
-      <option value="popular">Most popular</option>
-    </select>
+      onChange={(v) => set('sort', v)}
+      ariaLabel="Sort by"
+      options={[
+        { value: 'relevance', label: 'Relevance' },
+        { value: 'newest', label: 'Newest' },
+        { value: 'price_asc', label: 'Price: low → high' },
+        { value: 'price_desc', label: 'Price: high → low' },
+        { value: 'best_rated', label: 'Best rated' },
+        { value: 'popular', label: 'Most popular' },
+      ]}
+    />
   );
 }
