@@ -68,3 +68,8 @@ select option:checked {
 .hero-grab:active *:not(a):not(button) {
   cursor: url('/cursors/grabbing.cur') 10 10, grabbing;
 }
+
+/* Mobile + desktop hero layouts now live in HeroCarouselMobile.tsx and
+   HeroCarouselDesktop.tsx respectively; each component owns its own aspect
+   ratio and image-fit rules. .hero-grab (above) is shared by the desktop
+   component for the open-hand / closed-fist drag cursor. */

@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Stop-Process -Id 10368 -Force -ErrorAction Stop; Start-Sleep -Milliseconds 500; $still = Get-NetTCPConnection -State Listen -LocalPort 3000 -ErrorAction SilentlyContinue; if \\($still\\) { Write-Output \"Port 3000 STILL bound \\(PID $\\($still.OwningProcess\\)\\)\" } else { Write-Output \"Port 3000 free\" })"
+    ]
+  }
+}
