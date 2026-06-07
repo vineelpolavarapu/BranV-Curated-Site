@@ -1,0 +1,22 @@
+# Dependencies — reinstalled inside the Docker build
+node_modules
+**/node_modules
+
+# Build outputs — recompiled inside Docker
+dist
+**/.next
+**/dist
+
+# Environment secrets — injected at runtime via Railway/Vercel
+.env
+.env.*
+!.env.example
+
+# Dev tooling
+.git
+.github
+*.md
+*.log
+
+# Local Docker compose data
+docker/

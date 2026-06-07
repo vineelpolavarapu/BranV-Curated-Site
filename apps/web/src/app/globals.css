@@ -25,28 +25,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Make native <select> dropdown highlight match the black theme
-   instead of the browser default blue. */
+/* Use black for native form accents (checkboxes, radios, range tracks)
+   so they match the site theme instead of the browser default blue. */
 :root {
   accent-color: #000000;
-}
-
-select {
-  accent-color: #000000;
-}
-
-select option {
-  background-color: #ffffff;
-  color: #000000;
-}
-
-select option:hover,
-select option:focus,
-select option:active,
-select option:checked {
-  background: #000000 linear-gradient(0deg, #000000 0%, #000000 100%);
-  color: #ffffff;
-  box-shadow: 0 0 10px 100px #000000 inset;
 }
 
 /* Hero carousel grab cursor — open hand on hover, closed fist when the
@@ -69,7 +51,240 @@ select option:checked {
   cursor: url('/cursors/grabbing.cur') 10 10, grabbing;
 }
 
+<<<<<<< HEAD
 /* Mobile + desktop hero layouts now live in HeroCarouselMobile.tsx and
    HeroCarouselDesktop.tsx respectively; each component owns its own aspect
    ratio and image-fit rules. .hero-grab (above) is shared by the desktop
    component for the open-hand / closed-fist drag cursor. */
+=======
+/* ─────────────────────────────────────────────────────────────────────────
+   BranV animation system
+   Rules:
+     • Compositor-only: only transform + opacity in every keyframe.
+     • Entrances default to paused; .in-view parent starts them.
+     • prefers-reduced-motion block at bottom disables everything.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@keyframes bv-fade-up {
+  from { opacity: 0; transform: translate3d(0, var(--rise, 12px), 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+@keyframes bv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bv-heart-pop {
+  0%   { transform: scale(1);   }
+  40%  { transform: scale(1.4); }
+  70%  { transform: scale(0.9); }
+  100% { transform: scale(1);   }
+}
+@keyframes bv-kenburns {
+  from { transform: scale(1.0) translate3d(0, 0, 0);   }
+  to   { transform: scale(1.04) translate3d(0, -8px, 0); }
+}
+
+/* ── Scroll-triggered entrance helpers ─────────────────────────────────── */
+
+.bv-enter {
+  opacity: 0;
+  animation: bv-fade-up 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused;
+}
+.bv-enter-fade {
+  opacity: 0;
+  animation: bv-fade-in 0.40s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused;
+}
+.in-view .bv-enter,
+.in-view .bv-enter-fade {
+  animation-play-state: running;
+}
+
+.bv-delay-1 { animation-delay:  60ms; }
+.bv-delay-2 { animation-delay: 120ms; }
+.bv-delay-3 { animation-delay: 180ms; }
+.bv-delay-4 { animation-delay: 240ms; }
+.bv-delay-5 { animation-delay: 300ms; }
+.bv-delay-6 { animation-delay: 360ms; }
+.bv-delay-7 { animation-delay: 420ms; }
+
+/* ── Hero slide text stagger ────────────────────────────────────────────── */
+
+.hero-slide-text > * {
+  opacity: 0;
+  animation-name: none;
+  animation-duration: 0.45s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+/* Changing animation-name from none → bv-fade-up is a native CSS restart —
+   fires exactly once each time the slide becomes active, during the slide. */
+.hero-slide-active.hero-slide-text > *:nth-child(1) { animation-name: bv-fade-up; animation-delay:   0ms; }
+.hero-slide-active.hero-slide-text > *:nth-child(2) { animation-name: bv-fade-up; animation-delay:  80ms; }
+.hero-slide-active.hero-slide-text > *:nth-child(3) { animation-name: bv-fade-up; animation-delay: 180ms; }
+.hero-slide-active.hero-slide-text > *:nth-child(4) { animation-name: bv-fade-up; animation-delay: 310ms; }
+
+/* ── Ken Burns on hero images ───────────────────────────────────────────── */
+
+.bv-kenburns-img {
+  animation: bv-kenburns 8s ease-in-out infinite alternate;
+  transform-origin: center center;
+}
+
+/* ── Wishlist pop ───────────────────────────────────────────────────────── */
+
+.bv-heart-popping {
+  animation: bv-heart-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Navbar entrance & link hover ───────────────────────────────────────── */
+
+@keyframes bv-nav-down {
+  from { opacity: 0; transform: translate3d(0, -8px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* Logo — first to appear */
+.bv-nav-logo {
+  opacity: 0;
+  animation: bv-nav-down 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0ms;
+}
+
+/* Nav items — stagger left to right, each direct child of the <nav> */
+.bv-nav-links > * {
+  opacity: 0;
+  animation: bv-nav-down 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.bv-nav-links > *:nth-child(1) { animation-delay:  80ms; }
+.bv-nav-links > *:nth-child(2) { animation-delay: 130ms; }
+.bv-nav-links > *:nth-child(3) { animation-delay: 180ms; }
+.bv-nav-links > *:nth-child(4) { animation-delay: 230ms; }
+
+/* Search + account — appear after nav */
+.bv-nav-actions {
+  opacity: 0;
+  animation: bv-nav-down 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 160ms;
+}
+
+/* Underline slides in from left on hover — uses currentColor so it works on
+   both the white overlay navbar and the dark sticky navbar automatically. */
+.bv-nav-link {
+  position: relative;
+}
+.bv-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bv-nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* ── Dropdown & flyout item stagger ─────────────────────────────────────── */
+
+/* L1 dropdown items
+   BASE  = exit state  (fast ease-in, short top-to-bottom stagger)
+   HOVER = enter state (slow ease-out, long top-to-bottom stagger)
+   Higher specificity of .group:hover rule overrides base on enter,
+   base reclaims on exit — giving independent enter/exit behaviour. */
+
+.bv-dropdown-item {
+  opacity: 0;
+  transform: translate3d(0, 5px, 0);
+  transition: opacity 0.18s ease-in, transform 0.18s ease-in;
+}
+/* Exit stagger: top item first, 15 ms apart — all done within ~190 ms */
+.bv-dropdown-item:nth-child(1) { transition-delay:  0ms; }
+.bv-dropdown-item:nth-child(2) { transition-delay: 15ms; }
+.bv-dropdown-item:nth-child(3) { transition-delay: 30ms; }
+.bv-dropdown-item:nth-child(4) { transition-delay: 45ms; }
+.bv-dropdown-item:nth-child(5) { transition-delay: 60ms; }
+.bv-dropdown-item:nth-child(6) { transition-delay: 75ms; }
+.bv-dropdown-item:nth-child(7) { transition-delay: 90ms; }
+
+/* Enter: slow smooth ease-out, 50 ms stagger, first item waits 80 ms */
+.group:hover .bv-dropdown-item {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.group:hover .bv-dropdown-item:nth-child(1) { transition-delay:  80ms; }
+.group:hover .bv-dropdown-item:nth-child(2) { transition-delay: 130ms; }
+.group:hover .bv-dropdown-item:nth-child(3) { transition-delay: 180ms; }
+.group:hover .bv-dropdown-item:nth-child(4) { transition-delay: 230ms; }
+.group:hover .bv-dropdown-item:nth-child(5) { transition-delay: 280ms; }
+.group:hover .bv-dropdown-item:nth-child(6) { transition-delay: 330ms; }
+.group:hover .bv-dropdown-item:nth-child(7) { transition-delay: 380ms; }
+
+/* L2 flyout items
+   BASE  = exit state  (fast ease-in, short stagger, slides back left)
+   HOVER = enter state (smooth ease-out, longer stagger, slides in from left) */
+
+.bv-flyout-item {
+  opacity: 0;
+  transform: translate3d(-8px, 0, 0);
+  transition: opacity 0.14s ease-in, transform 0.14s ease-in;
+}
+/* Exit stagger: top item first, 12 ms apart — all done within ~150 ms */
+.bv-flyout-item:nth-child(1) { transition-delay:  0ms; }
+.bv-flyout-item:nth-child(2) { transition-delay: 12ms; }
+.bv-flyout-item:nth-child(3) { transition-delay: 24ms; }
+.bv-flyout-item:nth-child(4) { transition-delay: 36ms; }
+.bv-flyout-item:nth-child(5) { transition-delay: 48ms; }
+.bv-flyout-item:nth-child(6) { transition-delay: 60ms; }
+.bv-flyout-item:nth-child(7) { transition-delay: 72ms; }
+.bv-flyout-item:nth-child(8) { transition-delay: 84ms; }
+
+/* Enter: smooth ease-out, 40 ms stagger, first item waits 65 ms */
+.group\/cat:hover .bv-flyout-item {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.30s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.group\/cat:hover .bv-flyout-item:nth-child(1) { transition-delay:  65ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(2) { transition-delay: 105ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(3) { transition-delay: 145ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(4) { transition-delay: 185ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(5) { transition-delay: 225ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(6) { transition-delay: 265ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(7) { transition-delay: 305ms; }
+.group\/cat:hover .bv-flyout-item:nth-child(8) { transition-delay: 345ms; }
+
+/* ── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .bv-enter,
+  .bv-enter-fade,
+  .hero-slide-text > *,
+  .bv-kenburns-img,
+  .bv-heart-popping,
+  .bv-nav-logo,
+  .bv-nav-links > *,
+  .bv-nav-actions {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .bv-dropdown-item,
+  .bv-flyout-item {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .bv-nav-link::after {
+    transition: none !important;
+  }
+}
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e

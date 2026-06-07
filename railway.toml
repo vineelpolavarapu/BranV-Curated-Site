@@ -1,0 +1,8 @@
+[build]
+# Dockerfile is inside apps/api but the build context is the repo root so
+# the monorepo layout (pnpm-workspace.yaml, packages/, apps/) is available.
+dockerfilePath = "apps/api/Dockerfile"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3

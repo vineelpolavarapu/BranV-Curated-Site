@@ -143,7 +143,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
       </button>
 
       {open && (
-        <div className={`absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl ${panelClasses}`}>
+        <div className={`absolute right-0 top-full z-50 mt-2 w-[min(16rem,calc(100vw-2rem))] overflow-hidden rounded-xl ${panelClasses}`}>
           {/* User info */}
           <div className="flex items-center gap-3 px-4 py-3.5">
             {initials ? (

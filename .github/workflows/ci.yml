@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [BranV-main]
+  pull_request:
+    branches: [BranV-main]
+
+jobs:
+  typecheck-and-lint:
+    name: Typecheck & Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build shared package
+        run: pnpm --filter @branv/shared build
+
+      # prisma generate writes TypeScript types to node_modules — required
+      # before the API can typecheck. No DB connection is made here.
+      - name: Generate Prisma client
+        run: pnpm --filter @branv/api exec prisma generate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Lint
+        run: pnpm -r lint

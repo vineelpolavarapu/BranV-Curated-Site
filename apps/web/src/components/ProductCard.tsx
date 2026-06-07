@@ -24,8 +24,19 @@ const retailerLabel: Record<string, string> = {
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
+  const [heartPopping, setHeartPopping] = useState(false);
   const { isInWishlist, toggle } = useWishlist();
   const liked = isInWishlist(product.id);
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!liked) {
+      setHeartPopping(true);
+      setTimeout(() => setHeartPopping(false), 400);
+    }
+    void toggle(product.id);
+  };
 
   const primary = product.primaryImage;
   const secondary = product.secondaryImage;
@@ -36,7 +47,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     <article
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="group flex flex-col"
+      className="group flex flex-col transition-transform duration-200 hover:-translate-y-1"
     >
       <Link
         href={`/products/${product.slug}`}
@@ -48,7 +59,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             alt={shownImage.altText ?? product.title}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-opacity duration-300"
+            className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
             unoptimized
           />
         ) : (
@@ -84,14 +95,16 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           type="button"
           aria-pressed={liked}
           aria-label={liked ? 'Remove from wishlist' : 'Save to wishlist'}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            void toggle(product.id);
-          }}
+          onClick={handleWishlistClick}
           className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-white/90 shadow-sm transition hover:scale-110"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden
+            className={heartPopping ? 'bv-heart-popping' : ''}
+          >
             <path
               d="M12 21s-7-4.5-9-9.5C1 6 6 3 9 6c1 1 3 2 3 2s2-1 3-2c3-3 8 0 6 5.5C19 16.5 12 21 12 21z"
               fill={liked ? '#dc2626' : 'none'}
@@ -135,12 +148,14 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         </div>
 
         {product.buyNow && (
-          <BuyNowButton
-            href={resolveBuyNowHref(product.buyNow)}
-            retailer={product.buyNow.retailer}
-            trackingId={product.buyNow.trackingId}
-            productTitle={product.title}
-          />
+          <div className="translate-y-1.5 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+            <BuyNowButton
+              href={resolveBuyNowHref(product.buyNow)}
+              retailer={product.buyNow.retailer}
+              trackingId={product.buyNow.trackingId}
+              productTitle={product.title}
+            />
+          </div>
         )}
       </div>
     </article>

@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { apiServer, buildQuery } from '@/lib/api-server';
 import { ProductPage, BrandCard } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { ProductCard } from '@/components/ProductCard';
 import { Filters, SortPicker, FilterDefinition } from '@/components/Filters';
+import { CategoryHashFilter } from '@/components/CategoryHashFilter';
+import { AnimateOnScroll } from '@/components/AnimateOnScroll';
+import { categoryHrefL2 } from '@/lib/category-href';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,6 +16,7 @@ interface CategoryDetail {
   name: string;
   path: string;
   parentId: string | null;
+  parent: { slug: string } | null;
   attributeSchemas: FilterDefinition[];
   children: Array<{ slug: string; name: string }>;
 }
@@ -25,13 +28,20 @@ export default async function CategoryPage(props: {
   const { slug } = await props.params;
   const sp = await props.searchParams;
 
-  const [category, list, brands] = await Promise.all([
-    apiServer<CategoryDetail>(`/categories/${slug}`),
+  // Resolve the category first; if it's an L2, the canonical URL is the L1
+  // page with the L2 suffix as a hash fragment. Redirect before any extra
+  // fetches so direct visits to `/category/shirts-checks` (legacy links, SEO,
+  // hand-typed URLs) all settle on `/category/shirts#checks`.
+  const category = await apiServer<CategoryDetail>(`/categories/${slug}`);
+  if (!category) notFound();
+  if (category.parent?.slug) {
+    redirect(categoryHrefL2(category.parent.slug, category.slug));
+  }
+
+  const [list, brands] = await Promise.all([
     apiServer<ProductPage>(`/products${buildQuery({ ...sp, category: slug })}`),
     apiServer<BrandCard[]>('/brands'),
   ]);
-
-  if (!category) notFound();
 
   return (
     <StorefrontShell>
@@ -40,6 +50,7 @@ export default async function CategoryPage(props: {
         filters={category.attributeSchemas}
         brands={brands ?? []}
         list={list}
+        categorySlug={slug}
       />
     </StorefrontShell>
   );
@@ -53,33 +64,35 @@ function CategoryHeader({
   total: number;
 }) {
   return (
-    <section className="mx-auto max-w-7xl px-6 pt-8">
-      <nav className="mb-2 text-xs text-neutral-500">
-        <Link href="/" className="hover:text-neutral-900">Home</Link>
-        <span className="mx-2">/</span>
-        <span className="text-neutral-900">{category.name}</span>
-      </nav>
-      <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-        {category.name}
-      </h1>
-      <p className="mt-1 text-sm text-neutral-600">
-        {total} {total === 1 ? 'product' : 'products'}
-      </p>
-      {category.children.length > 0 && (
-        <ul className="mt-4 flex flex-wrap gap-2">
-          {category.children.map((c) => (
-            <li key={c.slug}>
-              <Link
-                href={`/category/${c.slug}`}
-                className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium hover:bg-neutral-100"
-              >
-                {c.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
+    <AnimateOnScroll>
+      <section className="mx-auto max-w-7xl px-6 pt-8">
+        <nav className="bv-enter-fade mb-2 text-xs text-neutral-500">
+          <Link href="/" className="hover:text-neutral-900">Home</Link>
+          <span className="mx-2">/</span>
+          <span className="text-neutral-900">{category.name}</span>
+        </nav>
+        <h1 className="bv-enter bv-delay-1 text-3xl font-semibold tracking-tight md:text-4xl">
+          {category.name}
+        </h1>
+        <p className="bv-enter-fade bv-delay-2 mt-1 text-sm text-neutral-600">
+          {total} {total === 1 ? 'product' : 'products'}
+        </p>
+        {category.children.length > 0 && (
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {category.children.map((c, i) => (
+              <li key={c.slug} className={`bv-enter bv-delay-${Math.min(i + 3, 7)}`}>
+                <Link
+                  href={categoryHrefL2(category.slug, c.slug)}
+                  className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium transition-colors hover:bg-neutral-100"
+                >
+                  {c.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </AnimateOnScroll>
   );
 }
 
@@ -87,10 +100,12 @@ export function ListingShell({
   filters,
   brands,
   list,
+  categorySlug,
 }: {
   filters: FilterDefinition[];
   brands: Array<{ slug: string; name: string }>;
   list: ProductPage | null;
+  categorySlug: string;
 }) {
   const retailers = new Set<string>();
   for (const p of list?.data ?? []) {
@@ -99,13 +114,17 @@ export function ListingShell({
   return (
     <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
       <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-        <Filters
-          context={{
-            categoryFilters: filters,
-            brands,
-            retailers: Array.from(retailers),
-          }}
-        />
+        <AnimateOnScroll>
+          <div className="bv-enter">
+            <Filters
+              context={{
+                categoryFilters: filters,
+                brands,
+                retailers: Array.from(retailers),
+              }}
+            />
+          </div>
+        </AnimateOnScroll>
         <div>
           <div className="mb-4 flex items-center justify-between">
             <p className="text-sm text-neutral-500">
@@ -113,17 +132,10 @@ export function ListingShell({
             </p>
             <SortPicker />
           </div>
-          {!list || list.data.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
-              No products match these filters.
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-              {list.data.map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
-            </div>
-          )}
+          <CategoryHashFilter
+            categorySlug={categorySlug}
+            allProducts={list?.data ?? []}
+          />
         </div>
       </div>
     </section>

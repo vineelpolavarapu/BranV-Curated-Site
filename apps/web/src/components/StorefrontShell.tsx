@@ -2,10 +2,12 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
+import { MobileNavDrawer } from './MobileNavDrawer';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
 import { NewsletterSignup } from './newsletter/NewsletterSignup';
 import { AccountPopup } from './AccountPopup';
+<<<<<<< HEAD
 
 type SubCategory = { name: string; slug: string };
 type ShopCategory = { name: string; slug: string; subcategories: SubCategory[] };
@@ -79,6 +81,11 @@ const SHOP_CATEGORIES: ShopCategory[] = [
     ],
   },
 ];
+=======
+import { AnimateOnScroll } from './AnimateOnScroll';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { categoryHrefL2 } from '@/lib/category-href';
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
 
 function subHash(l1Slug: string, subSlug: string): string {
   return subSlug.slice(l1Slug.length + 1);
@@ -112,24 +119,24 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
   return (
     <header className={headerClasses}>
-      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-4 pr-14 md:px-6 md:pr-16">
-        <Link href="/" className="text-xl font-semibold tracking-tight">
-          BranV
+      <div className="flex w-full items-center pl-2 pr-4 py-4 md:pl-0 md:pr-6">
+        <MobileNavDrawer overlay={overlay} />
+        <Link href="/" className="bv-nav-logo inline-flex items-center gap-2 text-xl font-semibold tracking-tight leading-none">
+          <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
+          <span>BranV</span>
         </Link>
         {overlay && (
-          <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+          <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium md:flex ml-12">
             <ShopMegaMenu overlay={overlay} />
-            <Link href="/new" className={linkHoverClass}>New</Link>
-            <Link href="/brands" className={linkHoverClass}>Brands</Link>
-            <Link href="/articles" className={linkHoverClass}>Articles</Link>
+            <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New</Link>
+            <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
+            <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
           </nav>
         )}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="bv-nav-actions ml-auto flex items-center gap-3">
           <SearchBox overlay={overlay} />
+          <AccountPopup overlay={overlay} />
         </div>
-      </div>
-      <div className="absolute right-3 top-1/2 hidden -translate-y-1/2 md:block">
-        <AccountPopup overlay={overlay} />
       </div>
     </header>
   );
@@ -170,12 +177,20 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
         <ChevronDown />
       </button>
 
+<<<<<<< HEAD
       {/* L1 dropdown panel */}
+=======
+      {/* L1 dropdown panel — drops down from -6px on reveal */}
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
       <div className="invisible absolute left-0 top-full -translate-y-1.5 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
         <div className={panelClasses}>
           <ul className="space-y-0.5">
             {SHOP_CATEGORIES.map((c) => (
+<<<<<<< HEAD
               <li key={c.slug} className="group/cat relative">
+=======
+              <li key={c.slug} className="bv-dropdown-item group/cat relative">
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                 <Link href={`/category/${c.slug}`} className={`${itemClasses} transition-colors duration-150`}>
                   <span>{c.name}</span>
                   <span className="opacity-40">
@@ -183,21 +198,35 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
                   </span>
                 </Link>
 
+<<<<<<< HEAD
                 {/* L2 flyout — "All [Category]" first, then each subcategory */}
                 <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
                   <div className={`${panelClasses} w-48`}>
                     <ul className="space-y-0.5">
                       <li>
+=======
+                {/* L2 flyout — slides in from left by 6px, fixed w-48 for consistency */}
+                <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
+                  <div className={`${panelClasses} w-48`}>
+                    <ul className="space-y-0.5">
+                      {/* "All [Category]" always first */}
+                      <li className="bv-flyout-item">
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                         <Link href={`/category/${c.slug}`} className={subItemClasses}>
                           All {c.name}
                         </Link>
                       </li>
                       {c.subcategories.map((sub) => (
+<<<<<<< HEAD
                         <li key={sub.slug}>
                           <Link
                             href={`/category/${c.slug}#${subHash(c.slug, sub.slug)}`}
                             className={subItemClasses}
                           >
+=======
+                        <li key={sub.slug} className="bv-flyout-item">
+                          <Link href={categoryHrefL2(c.slug, sub.slug)} className={subItemClasses}>
+>>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                             {sub.name}
                           </Link>
                         </li>
@@ -216,30 +245,32 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
 
 function SiteFooter() {
   return (
-    <footer className="mt-20 border-t border-neutral-200 bg-neutral-50">
-      <div className="mx-auto max-w-7xl gap-10 px-6 py-10 text-sm text-neutral-600 md:grid md:grid-cols-[1.5fr_1fr]">
-        <div>
-          <p className="mb-3 font-medium text-neutral-900">BranV</p>
-          <p className="max-w-2xl text-xs leading-relaxed">
-            BranV is a curated affiliate platform. We never hold inventory, never
-            process payments, never fulfill orders. When you click Buy Now, you
-            are redirected to the retailer&apos;s site to complete your purchase.{' '}
-            <strong>We earn a small commission on qualifying sales — at no extra cost to you.</strong>
-          </p>
-          <p className="mt-6 text-xs text-neutral-400">
-            © {new Date().getFullYear()} BranV. All rights reserved.
-          </p>
+    <AnimateOnScroll>
+      <footer className="mt-20 border-t border-neutral-200 bg-neutral-50">
+        <div className="mx-auto max-w-7xl gap-10 px-6 py-10 text-sm text-neutral-600 md:grid md:grid-cols-[1.5fr_1fr]">
+          <div className="bv-enter">
+            <p className="mb-3 font-medium text-neutral-900">BranV</p>
+            <p className="max-w-2xl text-xs leading-relaxed">
+              BranV is a curated affiliate platform. We never hold inventory, never
+              process payments, never fulfill orders. When you click Buy Now, you
+              are redirected to the retailer&apos;s site to complete your purchase.{' '}
+              <strong>We earn a small commission on qualifying sales — at no extra cost to you.</strong>
+            </p>
+            <p className="mt-6 text-xs text-neutral-400">
+              © {new Date().getFullYear()} BranV. All rights reserved.
+            </p>
+          </div>
+          <div className="bv-enter bv-delay-2 mt-8 md:mt-0">
+            <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700">
+              Newsletter
+            </p>
+            <p className="mb-3 text-xs text-neutral-600">
+              Weekly digest of new arrivals and articles.
+            </p>
+            <NewsletterSignup source="footer" />
+          </div>
         </div>
-        <div className="mt-8 md:mt-0">
-          <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700">
-            Newsletter
-          </p>
-          <p className="mb-3 text-xs text-neutral-600">
-            Weekly digest of new arrivals and articles.
-          </p>
-          <NewsletterSignup source="footer" />
-        </div>
-      </div>
-    </footer>
+      </footer>
+    </AnimateOnScroll>
   );
 }

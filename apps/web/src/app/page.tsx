@@ -7,12 +7,12 @@ import { CategoryShowcase } from '@/components/CategoryShowcase';
 export const dynamic = 'force-dynamic';
 
 const STATIC_CATEGORIES = [
-  { title: 'Suits & Formals', slug: 'suits-formals' },
-  { title: 'Watches', slug: 'watches' },
+  { title: 'Shirts', slug: 'shirts' },
+  { title: 'T-Shirts', slug: 't-shirts' },
+  { title: 'Jeans', slug: 'jeans' },
+  { title: 'Tracks', slug: 'tracks' },
   { title: 'Footwear', slug: 'footwear' },
-  { title: 'Accessories', slug: 'accessories' },
-  { title: 'Casual Wear', slug: 'casual-wear' },
-  { title: 'Sports & Activewear', slug: 'sports-activewear' },
+  { title: 'Watches', slug: 'watches' },
 ];
 
 export default async function HomePage() {
