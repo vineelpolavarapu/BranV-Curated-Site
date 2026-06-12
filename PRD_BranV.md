@@ -8,7 +8,7 @@
 
 ## 1. Executive Summary
 
-**Brand by Vineel** is a curated men's fashion content platform that monetizes through **affiliate marketing**. Vineel sources outfits and accessories from major retailers (Flipkart, Amazon, Myntra, Ajio, Meesho, Nykaa Man, Snitch, Bewakoof, and others), styles them on **AI-generated avatar models created by Vineel**, and presents them as shoppable editorial content. When users click "Buy Now," they are redirected to the retailer's affiliate-tagged URL where the actual purchase happens — Vineel earns a commission per converted sale.
+**Brand by Vineel** is a curated men's fashion content platform that monetizes through **affiliate marketing**. Vineel sources outfits and watches from major retailers (Flipkart, Amazon, Myntra, Ajio, Meesho, Nykaa Man, Snitch, Bewakoof, and others), styles them on **AI-generated avatar models created by Vineel**, and presents them as shoppable editorial content. When users click "Buy Now," they are redirected to the retailer's affiliate-tagged URL where the actual purchase happens — Vineel earns a commission per converted sale.
 
 Vineel **never holds inventory**, **never processes payments**, **never fulfills orders**, and **never handles returns**. The retailer does all of that. Vineel provides curation, styling, content, and a destination.
 
@@ -132,7 +132,7 @@ One backend, one design system, shared auth, separate IA.
 | **Footwear** | Sneakers, Loafers, Formal Shoes, Boots, Sandals & Slippers, Sports Shoes |
 | **Watches** | Analog, Digital, Smartwatches, Luxury, Chronographs |
 | **Eyewear** | Sunglasses, Optical Frames, Blue-Light Glasses |
-| **Accessories** | Belts, Wallets, Bags & Backpacks, Cufflinks, Caps & Hats, Scarves & Stoles, Jewelry, Keychains |
+| **Watches** | Belts, Wallets, Bags & Backpacks, Cufflinks, Caps & Hats, Scarves & Stoles, Jewelry, Keychains |
 | **Grooming** | Fragrances, Beard Care, Hair Care, Skincare, Shaving, Gift Sets |
 
 Excluded: innerwear.
@@ -416,7 +416,7 @@ Price range, Brand (multi-select with logos), Color (swatches), Retailer (Flipka
 | **Footwear** | Size (UK/US/EU), Shoe type, Material, Sole, Closure |
 | **Watches** | Movement, Case material, Strap, Dial color, Water resistance, Case size |
 | **Eyewear** | Frame shape, Frame material, Lens type, Frame color |
-| **Accessories** | Sub-type-specific (belts, wallets, bags, jewelry, etc.) |
+| **Watches** | Sub-type-specific (belts, wallets, bags, jewelry, etc.) |
 | **Grooming** | Scent family, Concentration, Volume, Product type, Skin/hair type |
 
 ### 10.3 Implementation

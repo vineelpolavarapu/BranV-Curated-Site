@@ -51,12 +51,11 @@ body {
   cursor: url('/cursors/grabbing.cur') 10 10, grabbing;
 }
 
-<<<<<<< HEAD
 /* Mobile + desktop hero layouts now live in HeroCarouselMobile.tsx and
    HeroCarouselDesktop.tsx respectively; each component owns its own aspect
    ratio and image-fit rules. .hero-grab (above) is shared by the desktop
    component for the open-hand / closed-fist drag cursor. */
-=======
+
 /* ─────────────────────────────────────────────────────────────────────────
    BranV animation system
    Rules:
@@ -287,4 +286,3 @@ body {
     transition: none !important;
   }
 }
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e

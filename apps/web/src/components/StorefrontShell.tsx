@@ -7,89 +7,9 @@ import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
 import { NewsletterSignup } from './newsletter/NewsletterSignup';
 import { AccountPopup } from './AccountPopup';
-<<<<<<< HEAD
-
-type SubCategory = { name: string; slug: string };
-type ShopCategory = { name: string; slug: string; subcategories: SubCategory[] };
-
-const SHOP_CATEGORIES: ShopCategory[] = [
-  {
-    name: 'Shirts',
-    slug: 'shirts',
-    subcategories: [
-      { name: 'Half Sleeves', slug: 'shirts-half-sleeves' },
-      { name: 'Full Sleeves', slug: 'shirts-full-sleeves' },
-      { name: 'Checks', slug: 'shirts-checks' },
-      { name: 'Printed', slug: 'shirts-printed' },
-      { name: 'Formals', slug: 'shirts-formals' },
-    ],
-  },
-  {
-    name: 'T-Shirts',
-    slug: 't-shirts',
-    subcategories: [
-      { name: 'Polo T-Shirts', slug: 't-shirts-polo-t-shirts' },
-      { name: 'Full Neck T-Shirts', slug: 't-shirts-full-neck-t-shirts' },
-      { name: 'Collar T-Shirts', slug: 't-shirts-collar-t-shirts' },
-    ],
-  },
-  {
-    name: 'Jeans',
-    slug: 'jeans',
-    subcategories: [
-      { name: 'Baggy Jeans', slug: 'jeans-baggy-jeans' },
-      { name: 'Formal Jeans', slug: 'jeans-formal-jeans' },
-      { name: 'Cotton Jeans', slug: 'jeans-cotton-jeans' },
-      { name: 'Slim Fit', slug: 'jeans-slim-fit' },
-    ],
-  },
-  {
-    name: 'Footwear',
-    slug: 'footwear',
-    subcategories: [
-      { name: 'Sneakers', slug: 'footwear-sneakers' },
-      { name: 'Loafers', slug: 'footwear-loafers' },
-      { name: 'Formal Shoes', slug: 'footwear-formal-shoes' },
-      { name: 'Boots', slug: 'footwear-boots' },
-      { name: 'Sandals & Slippers', slug: 'footwear-sandals-and-slippers' },
-      { name: 'Sports Shoes', slug: 'footwear-sports-shoes' },
-      { name: 'Chappals', slug: 'footwear-chappals' },
-    ],
-  },
-  {
-    name: 'Tracks',
-    slug: 'tracks',
-    subcategories: [
-      { name: 'Joggers', slug: 'tracks-joggers' },
-      { name: 'Slim Fit Tracks', slug: 'tracks-slim-fit-tracks' },
-      { name: 'Zipper Tracks', slug: 'tracks-zipper-tracks' },
-      { name: 'Cotton Tracks', slug: 'tracks-cotton-tracks' },
-      { name: 'Sports Tracks', slug: 'tracks-sports-tracks' },
-      { name: 'Printed Tracks', slug: 'tracks-printed-tracks' },
-      { name: 'Lounge Tracks', slug: 'tracks-lounge-tracks' },
-    ],
-  },
-  {
-    name: 'Watches',
-    slug: 'watches',
-    subcategories: [
-      { name: 'Digital', slug: 'watches-digital' },
-      { name: 'Analog', slug: 'watches-analog' },
-      { name: 'Classical', slug: 'watches-classical' },
-      { name: 'Strap Watches', slug: 'watches-strap-watches' },
-      { name: 'Chained Watches', slug: 'watches-chained-watches' },
-    ],
-  },
-];
-=======
 import { AnimateOnScroll } from './AnimateOnScroll';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { categoryHrefL2 } from '@/lib/category-href';
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
-
-function subHash(l1Slug: string, subSlug: string): string {
-  return subSlug.slice(l1Slug.length + 1);
-}
 
 export function StorefrontShell({
   children,
@@ -177,20 +97,12 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
         <ChevronDown />
       </button>
 
-<<<<<<< HEAD
-      {/* L1 dropdown panel */}
-=======
       {/* L1 dropdown panel — drops down from -6px on reveal */}
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
       <div className="invisible absolute left-0 top-full -translate-y-1.5 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
         <div className={panelClasses}>
           <ul className="space-y-0.5">
             {SHOP_CATEGORIES.map((c) => (
-<<<<<<< HEAD
-              <li key={c.slug} className="group/cat relative">
-=======
               <li key={c.slug} className="bv-dropdown-item group/cat relative">
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                 <Link href={`/category/${c.slug}`} className={`${itemClasses} transition-colors duration-150`}>
                   <span>{c.name}</span>
                   <span className="opacity-40">
@@ -198,35 +110,19 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
                   </span>
                 </Link>
 
-<<<<<<< HEAD
-                {/* L2 flyout — "All [Category]" first, then each subcategory */}
-                <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
-                  <div className={`${panelClasses} w-48`}>
-                    <ul className="space-y-0.5">
-                      <li>
-=======
                 {/* L2 flyout — slides in from left by 6px, fixed w-48 for consistency */}
                 <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
                   <div className={`${panelClasses} w-48`}>
                     <ul className="space-y-0.5">
                       {/* "All [Category]" always first */}
                       <li className="bv-flyout-item">
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                         <Link href={`/category/${c.slug}`} className={subItemClasses}>
                           All {c.name}
                         </Link>
                       </li>
                       {c.subcategories.map((sub) => (
-<<<<<<< HEAD
-                        <li key={sub.slug}>
-                          <Link
-                            href={`/category/${c.slug}#${subHash(c.slug, sub.slug)}`}
-                            className={subItemClasses}
-                          >
-=======
                         <li key={sub.slug} className="bv-flyout-item">
                           <Link href={categoryHrefL2(c.slug, sub.slug)} className={subItemClasses}>
->>>>>>> e4cdc5566b839ae158df9f2810676ccbf796869e
                             {sub.name}
                           </Link>
                         </li>

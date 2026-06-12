@@ -60,8 +60,6 @@ const SAMPLES: Record<
     { title: 'Chronograph Sport', price: 8990, mrp: 10990, imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Smartwatch Series 7', price: 18990, mrp: 22990, imageUrl: 'https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Luxury Gold Dial', price: 24990, mrp: 28990, imageUrl: 'https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?auto=format&fit=crop&w=1000&q=80' },
-  ],
-  accessories: [
     { title: 'Leather Bifold Wallet', price: 1990, mrp: 2490, imageUrl: 'https://images.unsplash.com/photo-1517254797898-04edd251bfb3?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Reversible Leather Belt', price: 1690, mrp: 1990, imageUrl: 'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1000&q=80' },
     { title: 'Canvas Backpack', price: 3490, mrp: 3990, imageUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80' },

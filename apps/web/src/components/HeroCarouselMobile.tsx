@@ -29,11 +29,11 @@ const SLIDES: HeroSlide[] = [
     ctaHref: '#',
   },
   {
-    key: 'suits',
-    imageUrl: '/mobile-hero/mobile_suits.svg',
-    eyebrow: 'Occasion',
-    headline: 'The Suit Edit',
-    subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
+    key: 'classic',
+    imageUrl: '/mobile-hero/mobile_classic.png',
+    eyebrow: 'Timeless',
+    headline: 'Classic Essentials',
+    subtext: 'The wardrobe staples that never go out of style.',
     ctaLabel: 'Explore Collection',
     ctaHref: '#',
   },
@@ -47,20 +47,20 @@ const SLIDES: HeroSlide[] = [
     ctaHref: '#',
   },
   {
+    key: 'suits',
+    imageUrl: '/mobile-hero/mobile_suits.svg',
+    eyebrow: 'Occasion',
+    headline: 'Sports Wear',
+    subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
+    ctaLabel: 'Explore Collection',
+    ctaHref: '#',
+  },
+  {
     key: 'fashion',
     imageUrl: '/mobile-hero/mobile_fashion.png',
     eyebrow: 'Statement',
     headline: 'Fashion Forward',
     subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '#',
-  },
-  {
-    key: 'classic',
-    imageUrl: '/mobile-hero/mobile_classic.svg',
-    eyebrow: 'Timeless',
-    headline: 'Classic Essentials',
-    subtext: 'The wardrobe staples that never go out of style.',
     ctaLabel: 'Explore Collection',
     ctaHref: '#',
   },
@@ -83,10 +83,10 @@ const SLIDES: HeroSlide[] = [
     ctaHref: '/category/footwear',
   },
   {
-    key: 'accessories',
-    imageUrl: '/mobile-hero/mobile_accessories.svg',
+    key: 'watches',
+    imageUrl: '/mobile-hero/mobile_watches.png',
     eyebrow: 'Finishing Touch',
-    headline: 'Accessories',
+    headline: 'Watches',
     subtext: 'Watches, belts, bags — the details that complete a look.',
     ctaLabel: 'Explore Collection',
     ctaHref: '#',
@@ -245,7 +245,7 @@ export function HeroCarouselMobile() {
                 draggable={false}
                 loading="eager"
                 fetchPriority={i === 1 ? 'high' : 'auto'}
-                className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-105 object-[center_70%]' : ''}`}
+                className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-15 object-[center_110 %]' : ''}${slide.key === 'classic' ? ' scale-125 object-[center_115%]' : ''}`}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 px-5 pb-16">

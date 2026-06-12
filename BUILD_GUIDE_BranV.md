@@ -133,7 +133,7 @@ Migrate: `brands`, `categories`, `category_attribute_schemas`, `products`, `prod
 
 ### 2.2 Steps
 
-1. **Seed categories** matching PRD §6.1 (Clothing → 10 subs, Suits & Formal → 9 subs, Footwear → 6 subs, Watches → 5 subs, Eyewear → 3 subs, Accessories → 8 subs, Grooming → 6 subs).
+1. **Seed categories** matching PRD §6.1 (Clothing → 10 subs, Suits & Formal → 9 subs, Footwear → 6 subs, Watches → 5 subs, Eyewear → 3 subs, Watches → 8 subs, Grooming → 6 subs).
 
 2. **Seed `category_attribute_schemas`** with PRD §10.2 attributes per category (size for clothing, movement for watches, frame shape for eyewear, etc.).
 

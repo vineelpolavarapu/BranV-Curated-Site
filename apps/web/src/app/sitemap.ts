@@ -22,7 +22,6 @@ const CATEGORY_SLUGS = [
   'suits-and-formal',
   'footwear',
   'watches',
-  'accessories',
 ];
 
 interface LookbookListItem {
