@@ -2,7 +2,6 @@ import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import { PrismaService } from '../prisma/prisma.service';
-import { RedisService } from '../redis/redis.service';
 
 type CheckResult = { ok: boolean; latencyMs?: number; error?: string };
 
@@ -14,7 +13,6 @@ export class HealthService implements OnModuleDestroy {
   constructor(
     private readonly config: ConfigService,
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
   ) {
     this.bucket = this.config.get<string>('S3_BUCKET') ?? 'branv-dev';
     this.s3 = new S3Client({
@@ -34,12 +32,8 @@ export class HealthService implements OnModuleDestroy {
   }
 
   async checkAll(): Promise<Record<string, CheckResult>> {
-    const [db, cache, storage] = await Promise.all([
-      this.checkDb(),
-      this.checkRedis(),
-      this.checkS3(),
-    ]);
-    return { db, cache, storage };
+    const [db, storage] = await Promise.all([this.checkDb(), this.checkS3()]);
+    return { db, storage };
   }
 
   private async checkDb(): Promise<CheckResult> {
@@ -47,16 +41,6 @@ export class HealthService implements OnModuleDestroy {
     try {
       await this.prisma.$queryRaw`SELECT 1`;
       return { ok: true, latencyMs: Date.now() - started };
-    } catch (err) {
-      return { ok: false, error: (err as Error).message };
-    }
-  }
-
-  private async checkRedis(): Promise<CheckResult> {
-    const started = Date.now();
-    try {
-      const pong = await this.redis.client.ping();
-      return { ok: pong === 'PONG', latencyMs: Date.now() - started };
     } catch (err) {
       return { ok: false, error: (err as Error).message };
     }

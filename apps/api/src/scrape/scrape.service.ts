@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cheerio from 'cheerio';
-import { RedisService } from '../redis/redis.service';
 import {
   canonicalizeUrl,
   detectRetailer,
@@ -9,18 +8,22 @@ import {
   SupportedRetailer,
 } from './scrape.types';
 
-const CACHE_TTL_SECONDS = 60 * 60; // 1 hour per PRD §3 Phase 3.
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour per PRD §3 Phase 3.
+const CACHE_MAX_ENTRIES = 500; // Bound memory; admin scrape volume is low.
 
 @Injectable()
 export class ScrapeService {
   private readonly logger = new Logger(ScrapeService.name);
   private readonly mock: boolean;
   private readonly userAgent: string;
+  // In-process cache. Admin-triggered endpoint, single instance, so we
+  // don't need a shared store. Bounded with simple FIFO eviction.
+  private readonly cache = new Map<
+    string,
+    { value: ScrapeResult; expiresAt: number }
+  >();
 
-  constructor(
-    private readonly config: ConfigService,
-    private readonly redis: RedisService,
-  ) {
+  constructor(private readonly config: ConfigService) {
     this.mock =
       (this.config.get<string>('USE_MOCK_INTEGRATIONS') ?? 'true') === 'true';
     this.userAgent =
@@ -32,26 +35,24 @@ export class ScrapeService {
     const canonicalUrl = canonicalizeUrl(url);
     const retailer = detectRetailer(canonicalUrl);
 
-    const cacheKey = `scrape:${canonicalUrl}`;
-    const cached = await this.redis.client.get(cacheKey);
-    if (cached) {
-      try {
-        return JSON.parse(cached) as ScrapeResult;
-      } catch {
-        /* fallthrough and re-scrape */
-      }
+    const hit = this.cache.get(canonicalUrl);
+    if (hit && hit.expiresAt > Date.now()) {
+      return hit.value;
     }
+    if (hit) this.cache.delete(canonicalUrl);
 
     const result = this.mock
       ? this.mockScrape(canonicalUrl, retailer)
       : await this.realScrape(canonicalUrl, retailer);
 
-    await this.redis.client.set(
-      cacheKey,
-      JSON.stringify(result),
-      'EX',
-      CACHE_TTL_SECONDS,
-    );
+    if (this.cache.size >= CACHE_MAX_ENTRIES) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey !== undefined) this.cache.delete(oldestKey);
+    }
+    this.cache.set(canonicalUrl, {
+      value: result,
+      expiresAt: Date.now() + CACHE_TTL_MS,
+    });
     return result;
   }
 

@@ -4,10 +4,10 @@ import {
   NotFoundException,
   GoneException,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { nanoid } from 'nanoid';
 import { ClickReportOutcome, AffiliatePartner } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { RedisService } from '../redis/redis.service';
 import { WardrobeService } from '../wardrobe/wardrobe.service';
 
 interface TrackPayload {
@@ -34,14 +34,13 @@ export class ClicksService {
 
   constructor(
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
     private readonly wardrobe: WardrobeService,
   ) {}
 
   /**
    * Resolve the affiliate URL for a (productId, retailer) pair and stash a
-   * short-lived intent in Redis under a fresh trackingId. The /go endpoint
-   * later consumes the intent and writes the ClickEvent.
+   * short-lived intent under a fresh trackingId. The /go endpoint later
+   * consumes the intent and writes the ClickEvent.
    */
   async mintFromProduct(
     productId: string,
@@ -72,39 +71,45 @@ export class ClicksService {
 
   async mint(payload: TrackPayload): Promise<string> {
     const trackingId = nanoid(16);
-    await this.redis.client.set(
-      this.key(trackingId),
-      JSON.stringify(payload),
-      'EX',
-      TRACK_TTL_SECONDS,
-    );
+    await this.prisma.clickIntent.create({
+      data: {
+        trackingId,
+        productId: payload.productId,
+        retailer: payload.retailer,
+        partner: payload.partner,
+        partnerUrl: payload.partnerUrl,
+        sourcePageUrl: payload.sourcePageUrl ?? null,
+        expiresAt: new Date(Date.now() + TRACK_TTL_SECONDS * 1000),
+      },
+    });
     return trackingId;
   }
 
   /**
    * Consume a tracking intent: insert the ClickEvent row and return the
    * affiliate URL to 302 to. Tracking ID is single-use; we delete it to keep
-   * the row<->intent mapping clean.
+   * the intent table small.
    */
   async redirect(
     trackingId: string,
     ctx: RedirectContext,
   ): Promise<string> {
-    const raw = await this.redis.client.get(this.key(trackingId));
-    if (!raw) {
+    const intent = await this.prisma.clickIntent.findUnique({
+      where: { trackingId },
+    });
+    if (!intent || intent.expiresAt.getTime() < Date.now()) {
       throw new GoneException('Tracking link expired or invalid');
     }
-    const payload = JSON.parse(raw) as TrackPayload;
 
     try {
       await this.prisma.clickEvent.create({
         data: {
           trackingId,
-          productId: payload.productId,
-          retailer: payload.retailer,
-          partner: payload.partner,
-          partnerUrl: payload.partnerUrl,
-          sourcePageUrl: payload.sourcePageUrl ?? null,
+          productId: intent.productId,
+          retailer: intent.retailer,
+          partner: intent.partner,
+          partnerUrl: intent.partnerUrl,
+          sourcePageUrl: intent.sourcePageUrl,
           userId: ctx.userId ?? null,
           sessionId: ctx.sessionId ?? null,
           userAgent: ctx.userAgent ?? null,
@@ -117,8 +122,10 @@ export class ClicksService {
       this.logger.error(`ClickEvent insert failed for ${trackingId}`, err);
     }
 
-    await this.redis.client.del(this.key(trackingId));
-    return payload.partnerUrl;
+    await this.prisma.clickIntent
+      .delete({ where: { trackingId } })
+      .catch(() => undefined);
+    return intent.partnerUrl;
   }
 
   async report(
@@ -152,7 +159,15 @@ export class ClicksService {
     return conversion;
   }
 
-  private key(trackingId: string) {
-    return `click:track:${trackingId}`;
+  // Sweep stale intents so the table doesn't grow unbounded. Lazy expiry
+  // check in redirect() is the source of truth; this is just housekeeping.
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async cleanupExpiredIntents() {
+    const result = await this.prisma.clickIntent.deleteMany({
+      where: { expiresAt: { lt: new Date() } },
+    });
+    if (result.count > 0) {
+      this.logger.debug(`Pruned ${result.count} expired click intents`);
+    }
   }
 }

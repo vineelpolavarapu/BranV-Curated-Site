@@ -1,0 +1,141 @@
+# Production compose stack for the Oracle Cloud Always Free VM.
+#
+# Layout on the VM:
+#   /opt/branv/repo/          <- git clone of this repository
+#   /opt/branv/repo/deploy/   <- this folder; run `docker compose` from here
+#   /opt/branv/repo/deploy/.env  <- copy from .env.production.example, fill in
+#
+# First deploy:
+#   sudo mkdir -p /opt/branv && cd /opt/branv
+#   sudo git clone <repo-url> repo
+#   cd repo/deploy
+#   sudo cp .env.production.example .env  # then edit secrets
+#   sudo docker compose up -d --build
+#
+# Updates:
+#   cd /opt/branv/repo && git pull
+#   cd deploy && docker compose up -d --build
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+
+  api:
+    build:
+      # Build context = repo root so the existing Dockerfile's `COPY . .`
+      # sees the full monorepo and pnpm-lock.yaml.
+      context: ..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    expose:
+      - "4000"
+    environment:
+      NODE_ENV: production
+      API_PORT: "4000"
+      DATABASE_URL: postgresql://branv:${DB_PASSWORD}@postgres:5432/branv?schema=public
+      # Auth
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_ACCESS_TTL_SECONDS: "900"
+      JWT_REFRESH_TTL_SECONDS: "604800"
+      COOKIE_SECURE: "true"
+      COOKIE_DOMAIN: ${COOKIE_DOMAIN}
+      COOKIE_SAMESITE: "lax"
+      TOTP_ISSUER: "BranV"
+      WEB_ORIGIN: ${WEB_ORIGIN}
+      AUTH_LOCKOUT_MAX_ATTEMPTS: "5"
+      AUTH_LOCKOUT_WINDOW_MIN: "15"
+      AUTH_LOCKOUT_DURATION_MIN: "15"
+      AUTH_RATE_LIMIT_PER_MIN: "5"
+      # Object storage (Cloudflare R2 recommended in prod)
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_REGION: ${S3_REGION:-auto}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_FORCE_PATH_STYLE: "true"
+      # Integrations
+      USE_MOCK_INTEGRATIONS: "false"
+      CUELINKS_API_KEY: ${CUELINKS_API_KEY}
+      CUELINKS_API_BASE: "https://www.cuelinks.com/api/v2"
+      AMAZON_ASSOCIATES_TAG: ${AMAZON_ASSOCIATES_TAG}
+      AMAZON_ACCESS_KEY: ${AMAZON_ACCESS_KEY}
+      AMAZON_SECRET_KEY: ${AMAZON_SECRET_KEY}
+      AMAZON_REGION: "IN"
+      EARNKARO_API_KEY: ${EARNKARO_API_KEY}
+      MAIL_PROVIDER: "resend"
+      MAIL_API_KEY: ${MAIL_API_KEY}
+      MAIL_FROM: ${MAIL_FROM}
+      SCRAPER_USER_AGENT: "Mozilla/5.0 (compatible; BranVBot/1.0)"
+      BASE_CURRENCY: "INR"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: branv
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: branv
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U branv -d branv"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nightly pg_dump → Cloudflare R2 (10 GB free).
+  # Disable by commenting out if you'd rather use Oracle Object Storage or
+  # the host's own cron. Restic/borg would be heavier but more correct.
+  backup:
+    image: alpine:3.20
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: branv
+      PGPASSWORD: ${DB_PASSWORD}
+      PGDATABASE: branv
+      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
+      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
+      R2_SECRET_KEY: ${R2_SECRET_KEY}
+      R2_BUCKET: ${R2_BACKUP_BUCKET:-branv-pg-backups}
+      AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${R2_SECRET_KEY}
+      AWS_DEFAULT_REGION: auto
+    entrypoint:
+      - sh
+      - -c
+      - |
+        set -e
+        apk add --no-cache postgresql16-client aws-cli >/dev/null
+        while true; do
+          TS=$$(date -u +%Y%m%dT%H%M%SZ)
+          FILE=/tmp/branv-$$TS.sql.gz
+          echo "[backup] dumping at $$TS"
+          pg_dump | gzip > $$FILE
+          aws --endpoint-url https://$$R2_ACCOUNT_ID.r2.cloudflarestorage.com \
+              s3 cp $$FILE s3://$$R2_BUCKET/ && rm -f $$FILE
+          echo "[backup] uploaded; sleeping 24h"
+          sleep 86400
+        done
+
+volumes:
+  pg_data:
+  caddy_data:
+  caddy_config:

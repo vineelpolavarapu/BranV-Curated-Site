@@ -6,10 +6,8 @@ import {
   Injectable,
   SetMetadata,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { RedisService } from '../../redis/redis.service';
 
 export const RATE_LIMIT_KEY = 'rateLimit';
 
@@ -26,19 +24,28 @@ export interface RateLimitOptions {
 export const RateLimit = (opts: RateLimitOptions) =>
   SetMetadata(RATE_LIMIT_KEY, opts);
 
+interface Bucket {
+  count: number;
+  resetAt: number;
+}
+
 /**
- * Redis-backed sliding-window rate limiter, keyed by IP + route.
+ * In-process fixed-window rate limiter, keyed by IP + route. Suitable for the
+ * single-instance API deployment; per-IP buckets reset on the window edge.
+ * Cloudflare's WAF rate-limit rule in front of /auth/* gives the second layer
+ * of defense across instances (see deployment plan §Phase 5).
+ *
  * PRD §18.3: 5 req/min/IP on auth endpoints by default.
  */
 @Injectable()
 export class RateLimitGuard implements CanActivate {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly redis: RedisService,
-    private readonly config: ConfigService,
-  ) {}
+  private readonly buckets = new Map<string, Bucket>();
+  // Bound memory in case of high-cardinality keys (e.g. spoofed IPs).
+  private readonly MAX_BUCKETS = 10_000;
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  constructor(private readonly reflector: Reflector) {}
+
+  canActivate(context: ExecutionContext): boolean {
     const opts = this.reflector.getAllAndOverride<RateLimitOptions | undefined>(
       RATE_LIMIT_KEY,
       [context.getHandler(), context.getClass()],
@@ -51,25 +58,42 @@ export class RateLimitGuard implements CanActivate {
       '',
     );
     const route = `${req.method}:${req.baseUrl}${req.path}`;
-    const key = `ratelimit:${opts.prefix ?? 'global'}:${ip}:${route}`;
+    const key = `${opts.prefix ?? 'global'}:${ip}:${route}`;
 
-    const tx = this.redis.client.multi();
-    tx.incr(key);
-    tx.expire(key, opts.window, 'NX');
-    const results = await tx.exec();
-    const count = Number((results?.[0]?.[1] as number) ?? 0);
+    const now = Date.now();
+    const windowMs = opts.window * 1000;
+    let bucket = this.buckets.get(key);
 
-    if (count > opts.limit) {
-      const ttl = await this.redis.client.ttl(key);
+    if (!bucket || bucket.resetAt <= now) {
+      bucket = { count: 0, resetAt: now + windowMs };
+      this.buckets.set(key, bucket);
+      if (this.buckets.size > this.MAX_BUCKETS) {
+        this.evictExpired(now);
+      }
+    }
+
+    bucket.count += 1;
+
+    if (bucket.count > opts.limit) {
+      const retryAfterSeconds = Math.max(
+        1,
+        Math.ceil((bucket.resetAt - now) / 1000),
+      );
       throw new HttpException(
         {
           statusCode: HttpStatus.TOO_MANY_REQUESTS,
           message: 'Too many requests',
-          retryAfterSeconds: ttl > 0 ? ttl : opts.window,
+          retryAfterSeconds,
         },
         HttpStatus.TOO_MANY_REQUESTS,
       );
     }
     return true;
+  }
+
+  private evictExpired(now: number) {
+    for (const [k, b] of this.buckets) {
+      if (b.resetAt <= now) this.buckets.delete(k);
+    }
   }
 }

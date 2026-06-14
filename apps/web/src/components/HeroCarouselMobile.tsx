@@ -48,7 +48,7 @@ const SLIDES: HeroSlide[] = [
   },
   {
     key: 'suits',
-    imageUrl: '/mobile-hero/mobile_suits.svg',
+    imageUrl: '/mobile-hero/mobile_sports.png',
     eyebrow: 'Occasion',
     headline: 'Sports Wear',
     subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
@@ -247,7 +247,6 @@ export function HeroCarouselMobile() {
                 fetchPriority={i === 1 ? 'high' : 'auto'}
                 className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-15 object-[center_110 %]' : ''}${slide.key === 'classic' ? ' scale-125 object-[center_115%]' : ''}`}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 px-5 pb-16">
                 <div className="text-white">
                   {slide.eyebrow && (

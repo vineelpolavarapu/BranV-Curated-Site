@@ -48,7 +48,7 @@ const SLIDES: HeroSlide[] = [
   },
   {
     key: 'suits',
-    imageUrl: '/hero/suits.svg',
+    imageUrl: '/hero/sports.png',
     eyebrow: 'Occasion',
     headline: 'Sports Wear',
     subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
@@ -233,7 +233,6 @@ export function HeroCarouselDesktop() {
                 fetchPriority={i === 1 ? 'high' : 'auto'}
                 className="absolute inset-0 h-full w-full select-none object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
               <div className="absolute inset-x-0 bottom-0 px-16 pb-28">
                 <div className="max-w-2xl text-white">
                   {slide.eyebrow && (

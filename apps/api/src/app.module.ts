@@ -6,7 +6,6 @@ import { LoggerModule } from 'nestjs-pino';
 import { randomUUID } from 'node:crypto';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { AuditModule } from './audit/audit.module';
 import { MailModule } from './mail/mail.module';
@@ -64,7 +63,6 @@ import { TwoFactorGuard } from './common/guards/two-factor.guard';
     }),
     ScheduleModule.forRoot(),
     PrismaModule,
-    RedisModule,
     AuditModule,
     MailModule,
     HealthModule,

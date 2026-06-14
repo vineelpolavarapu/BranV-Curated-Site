@@ -1,0 +1,30 @@
+# Caddy reverse proxy in front of the NestJS API.
+#
+# - Terminates TLS with a real Let's Encrypt cert at the origin so Cloudflare
+#   can be set to "Full (strict)" SSL mode (recommended).
+# - The {$API_HOSTNAME} placeholder is filled from deploy/.env at compose time.
+#   Example value: api.branv.com
+# - The {$ACME_EMAIL} is the address Let's Encrypt uses for expiry notices.
+
+{
+    email {$ACME_EMAIL}
+}
+
+{$API_HOSTNAME} {
+    encode gzip zstd
+
+    # Standard security headers; Cloudflare also adds some of these.
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        -Server
+    }
+
+    reverse_proxy api:4000 {
+        # Forward the original client IP so the NestJS rate limiter and
+        # request logger see the real source, not Caddy's container IP.
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+    }
+}

@@ -363,6 +363,24 @@ enum ClickReportOutcome {
   NEEDS_HELP
 }
 
+/// Short-lived intent created when the storefront mints a tracking link;
+/// consumed by /go on redirect. Replaces the previous Redis-backed store so
+/// the API has no Redis dependency. Rows past `expiresAt` are ignored on
+/// read and swept by a periodic cleanup job.
+model ClickIntent {
+  trackingId    String            @id
+  productId     String
+  retailer      String
+  partner       AffiliatePartner?
+  partnerUrl    String
+  sourcePageUrl String?
+  expiresAt     DateTime
+  createdAt     DateTime          @default(now())
+
+  @@index([expiresAt])
+  @@map("click_intents")
+}
+
 model ClickEvent {
   id            String            @id @default(cuid())
   trackingId    String            @unique
@@ -846,7 +864,7 @@ model AffiliatePayoutItem {
 // ───────── PHASE 10 — PLATFORM SETTINGS ─────────
 
 /// Key-value store for runtime-tunable settings (sync thresholds, feature
-/// flags, default currency). Reads are cached in Redis for ~30s by
+/// flags, default currency). Reads are cached in-process for ~30s by
 /// SettingsService so the next request cycle picks up writes.
 model PlatformSetting {
   key           String   @id

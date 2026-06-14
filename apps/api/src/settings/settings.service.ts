@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { RedisService } from '../redis/redis.service';
 import { AuditService } from '../audit/audit.service';
 
 /**
@@ -18,37 +17,30 @@ export const SETTING_DEFAULTS: Record<string, unknown> = {
   SMS_ENABLED: false,
 };
 
-const CACHE_KEY = 'settings:platform';
-const CACHE_TTL_SECONDS = 30;
+const CACHE_TTL_MS = 30_000;
 
 @Injectable()
 export class SettingsService {
+  // Single-instance in-process cache. The API runs on one node, so there is
+  // no cross-instance invalidation to worry about; upsert() clears locally.
+  private cache: { value: Record<string, unknown>; expiresAt: number } | null =
+    null;
+
   constructor(
     private readonly prisma: PrismaService,
-    private readonly redis: RedisService,
     private readonly audit: AuditService,
   ) {}
 
   async listAll(): Promise<Record<string, unknown>> {
-    const cached = await this.redis.client.get(CACHE_KEY);
-    if (cached) {
-      try {
-        return JSON.parse(cached) as Record<string, unknown>;
-      } catch {
-        /* fallthrough to refresh */
-      }
+    if (this.cache && this.cache.expiresAt > Date.now()) {
+      return this.cache.value;
     }
 
     const rows = await this.prisma.platformSetting.findMany();
     const merged: Record<string, unknown> = { ...SETTING_DEFAULTS };
     for (const row of rows) merged[row.key] = row.valueJson;
 
-    await this.redis.client.set(
-      CACHE_KEY,
-      JSON.stringify(merged),
-      'EX',
-      CACHE_TTL_SECONDS,
-    );
+    this.cache = { value: merged, expiresAt: Date.now() + CACHE_TTL_MS };
     return merged;
   }
 
@@ -74,8 +66,8 @@ export class SettingsService {
         updatedById: actorId,
       },
     });
-    // Invalidate — the next request fetches fresh (TTL would otherwise be ≤30s).
-    await this.redis.client.del(CACHE_KEY);
+    // Invalidate — next read fetches fresh (TTL would otherwise be ≤30s).
+    this.cache = null;
 
     await this.audit.record({
       actorId,
