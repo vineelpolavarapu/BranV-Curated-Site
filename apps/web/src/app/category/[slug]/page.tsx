@@ -96,7 +96,7 @@ function CategoryHeader({
   );
 }
 
-export function ListingShell({
+function ListingShell({
   filters,
   brands,
   list,
