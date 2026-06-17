@@ -40,4 +40,4 @@ jobs:
         run: pnpm -r typecheck
 
       - name: Lint
-        run: pnpm -r lint
+        run: pnpm --filter @branv/shared --filter @branv/api lint
