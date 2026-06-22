@@ -10,6 +10,11 @@ jobs:
   typecheck-and-lint:
     name: Typecheck & Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Cancel superseded check runs on the same ref to save minutes.
+    concurrency:
+      group: ci-checks-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
@@ -41,3 +46,83 @@ jobs:
 
       - name: Lint
         run: pnpm --filter @branv/shared --filter @branv/api lint
+
+      # `tsc --noEmit` does not see .next/types/**/*.ts, so it cannot catch
+      # App Router contract violations (invalid Page/Layout/Route exports,
+      # bad PageProps shape, etc). Running `next build` here closes that gap
+      # so the deploy job never fails on something CI could have caught.
+      - name: Build web (validates Next.js App Router contracts)
+        run: pnpm --filter @branv/web build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000' }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_SITE_NAME: ${{ secrets.NEXT_PUBLIC_SITE_NAME || 'BranV' }}
+
+  deploy-web:
+    name: Deploy Web (Vercel)
+    needs: typecheck-and-lint
+    # Only deploy on push to BranV-main — never from PRs (forks have no secret access)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/BranV-main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Never cancel a deploy mid-upload; queue subsequent deploys instead.
+    concurrency:
+      group: deploy-web-prod
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      # vercel.json's installCommand handles `pnpm install` at build time,
+      # so we don't run it again here.
+      - name: Pull Vercel project config
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Verify required web env vars
+        env:
+          API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          test -n "$API_BASE_URL"
+          test -n "$SITE_URL"
+
+      - name: Build for production
+        run: vercel build --prod --token="$VERCEL_TOKEN"
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_SITE_NAME: ${{ secrets.NEXT_PUBLIC_SITE_NAME }}
+          WEB_ORIGIN: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Deploy pre-built output
+        id: deploy
+        run: |
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+          echo "Deployed to: $DEPLOY_URL"
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
