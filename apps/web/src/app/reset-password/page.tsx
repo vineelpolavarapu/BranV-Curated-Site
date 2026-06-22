@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, Suspense, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import {
   AuthShell,
@@ -12,6 +12,14 @@ import {
 } from '@/components/AuthShell';
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordPageInner />
+    </Suspense>
+  );
+}
+
+function ResetPasswordPageInner() {
   const search = useSearchParams();
   const token = search.get('token') ?? '';
   const [password, setPassword] = useState('');

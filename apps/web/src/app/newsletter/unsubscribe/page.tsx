@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { StorefrontShell } from '@/components/StorefrontShell';
 
 const API_BASE =
@@ -11,6 +11,14 @@ const API_BASE =
 type State = 'pending' | 'ok' | 'error';
 
 export default function NewsletterUnsubscribePage() {
+  return (
+    <Suspense fallback={null}>
+      <NewsletterUnsubscribePageInner />
+    </Suspense>
+  );
+}
+
+function NewsletterUnsubscribePageInner() {
   const search = useSearchParams();
   const token = search.get('token') ?? '';
   const [state, setState] = useState<State>('pending');

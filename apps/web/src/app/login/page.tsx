@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { FormEvent, Suspense, useState } from 'react';
 import { apiFetch, AuthSummary } from '@/lib/api';
 import {
   AuthShell,
@@ -12,6 +12,14 @@ import {
 } from '@/components/AuthShell';
 
 export default function MemberLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <MemberLoginPageInner />
+    </Suspense>
+  );
+}
+
+function MemberLoginPageInner() {
   const router = useRouter();
   const search = useSearchParams();
   const next = search.get('next') || '/account';

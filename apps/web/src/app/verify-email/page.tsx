@@ -2,13 +2,21 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { AuthShell } from '@/components/AuthShell';
 
 type Status = 'pending' | 'success' | 'error';
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={null}>
+      <VerifyEmailPageInner />
+    </Suspense>
+  );
+}
+
+function VerifyEmailPageInner() {
   const search = useSearchParams();
   const token = search.get('token') ?? '';
   const [status, setStatus] = useState<Status>('pending');
