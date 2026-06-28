@@ -1,0 +1,33 @@
+{
+  "description": "POST /api/auth/register with bad payload returns 400",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/register",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "email": "not-an-email",
+      "password": "short"
+    }
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "message": [
+        "email must be an email",
+        "Password must be at least 8 characters"
+      ],
+      "error": "Bad Request",
+      "statusCode": 400
+    },
+    "setCookies": []
+  }
+}

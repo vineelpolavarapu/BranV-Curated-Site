@@ -255,13 +255,13 @@ Watch the logs:
 docker compose logs -f api
 ```
 
-You should see Prisma run `migrate deploy` and then NestJS start on port 4000.
+You should see Prisma run `migrate deploy` and then FastAPI start on port 5000.
 
 **Verify:**
 
 ```bash
 # From the VM
-curl -i http://localhost:4000/health   # 200 OK
+curl -i http://localhost:5000/health   # 200 OK
 docker compose exec postgres psql -U branv -d branv -c '\dt'   # lists tables incl. click_intents
 
 # From your laptop (still grey cloud, so direct hit)

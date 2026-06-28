@@ -1,0 +1,1072 @@
+{
+  "description": "GET /api/categories returns full tree",
+  "request": {
+    "method": "GET",
+    "path": "/api/categories",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": [
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "accessories",
+        "name": "Accessories",
+        "path": "accessories",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 2
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-bags-and-backpacks",
+        "name": "Bags & Backpacks",
+        "path": "accessories/bags-and-backpacks",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-belts",
+        "name": "Belts",
+        "path": "accessories/belts",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-caps-and-hats",
+        "name": "Caps & Hats",
+        "path": "accessories/caps-and-hats",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-cufflinks",
+        "name": "Cufflinks",
+        "path": "accessories/cufflinks",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-jewelry",
+        "name": "Jewelry",
+        "path": "accessories/jewelry",
+        "displayOrder": 6,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-keychains",
+        "name": "Keychains",
+        "path": "accessories/keychains",
+        "displayOrder": 7,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-scarves-and-stoles",
+        "name": "Scarves & Stoles",
+        "path": "accessories/scarves-and-stoles",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "accessories-wallets",
+        "name": "Wallets",
+        "path": "accessories/wallets",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "clothing",
+        "name": "Clothing",
+        "path": "clothing",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 6,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 6
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-ethnic-wear",
+        "name": "Ethnic Wear",
+        "path": "clothing/ethnic-wear",
+        "displayOrder": 9,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-jackets",
+        "name": "Jackets",
+        "path": "clothing/jackets",
+        "displayOrder": 6,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-jeans",
+        "name": "Jeans",
+        "path": "clothing/jeans",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 1,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-polos",
+        "name": "Polos",
+        "path": "clothing/polos",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-shirts",
+        "name": "Shirts",
+        "path": "clothing/shirts",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-shorts",
+        "name": "Shorts",
+        "path": "clothing/shorts",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-sweaters",
+        "name": "Sweaters",
+        "path": "clothing/sweaters",
+        "displayOrder": 7,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-sweatshirts-and-hoodies",
+        "name": "Sweatshirts & Hoodies",
+        "path": "clothing/sweatshirts-and-hoodies",
+        "displayOrder": 8,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-t-shirts",
+        "name": "T-Shirts",
+        "path": "clothing/t-shirts",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "clothing-trousers",
+        "name": "Trousers",
+        "path": "clothing/trousers",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "footwear",
+        "name": "Footwear",
+        "path": "footwear",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 5,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 7
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-boots",
+        "name": "Boots",
+        "path": "footwear/boots",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-chappals",
+        "name": "Chappals",
+        "path": "footwear/chappals",
+        "displayOrder": 6,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-formal-shoes",
+        "name": "Formal Shoes",
+        "path": "footwear/formal-shoes",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-loafers",
+        "name": "Loafers",
+        "path": "footwear/loafers",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-sandals-and-slippers",
+        "name": "Sandals & Slippers",
+        "path": "footwear/sandals-and-slippers",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-sneakers",
+        "name": "Sneakers",
+        "path": "footwear/sneakers",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "footwear-sports-shoes",
+        "name": "Sports Shoes",
+        "path": "footwear/sports-shoes",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "jeans",
+        "name": "Jeans",
+        "path": "jeans",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 5
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "jeans-baggy-jeans",
+        "name": "Baggy Jeans",
+        "path": "jeans/baggy-jeans",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "jeans-cotton-jeans",
+        "name": "Cotton Jeans",
+        "path": "jeans/cotton-jeans",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "jeans-formal-jeans",
+        "name": "Formal Jeans",
+        "path": "jeans/formal-jeans",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "jeans-slim-fit",
+        "name": "Slim Fit",
+        "path": "jeans/slim-fit",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "shirts",
+        "name": "Shirts",
+        "path": "shirts",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 6
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "shirts-checks",
+        "name": "Checks",
+        "path": "shirts/checks",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "shirts-formals",
+        "name": "Formals",
+        "path": "shirts/formals",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "shirts-full-sleeves",
+        "name": "Full Sleeves",
+        "path": "shirts/full-sleeves",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "shirts-half-sleeves",
+        "name": "Half Sleeves",
+        "path": "shirts/half-sleeves",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "shirts-printed",
+        "name": "Printed",
+        "path": "shirts/printed",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "suits-and-formal",
+        "name": "Suits & Formal",
+        "path": "suits-and-formal",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 5,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 6
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-2-piece-suits",
+        "name": "2-Piece Suits",
+        "path": "suits-and-formal/2-piece-suits",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-3-piece-suits",
+        "name": "3-Piece Suits",
+        "path": "suits-and-formal/3-piece-suits",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-blazers",
+        "name": "Blazers",
+        "path": "suits-and-formal/blazers",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-bow-ties",
+        "name": "Bow Ties",
+        "path": "suits-and-formal/bow-ties",
+        "displayOrder": 6,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-formal-shirts",
+        "name": "Formal Shirts",
+        "path": "suits-and-formal/formal-shirts",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-formal-trousers",
+        "name": "Formal Trousers",
+        "path": "suits-and-formal/formal-trousers",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-pocket-squares",
+        "name": "Pocket Squares",
+        "path": "suits-and-formal/pocket-squares",
+        "displayOrder": 7,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-suspenders",
+        "name": "Suspenders",
+        "path": "suits-and-formal/suspenders",
+        "displayOrder": 8,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "suits-and-formal-ties",
+        "name": "Ties",
+        "path": "suits-and-formal/ties",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "t-shirts",
+        "name": "T-Shirts",
+        "path": "t-shirts",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 5
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "t-shirts-collar-t-shirts",
+        "name": "Collar T-Shirts",
+        "path": "t-shirts/collar-t-shirts",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "t-shirts-full-neck-t-shirts",
+        "name": "Full Neck T-Shirts",
+        "path": "t-shirts/full-neck-t-shirts",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "t-shirts-polo-t-shirts",
+        "name": "Polo T-Shirts",
+        "path": "t-shirts/polo-t-shirts",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "tracks",
+        "name": "Tracks",
+        "path": "tracks",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 6
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-cotton-tracks",
+        "name": "Cotton Tracks",
+        "path": "tracks/cotton-tracks",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-joggers",
+        "name": "Joggers",
+        "path": "tracks/joggers",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-lounge-tracks",
+        "name": "Lounge Tracks",
+        "path": "tracks/lounge-tracks",
+        "displayOrder": 6,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-printed-tracks",
+        "name": "Printed Tracks",
+        "path": "tracks/printed-tracks",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-slim-fit-tracks",
+        "name": "Slim Fit Tracks",
+        "path": "tracks/slim-fit-tracks",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-sports-tracks",
+        "name": "Sports Tracks",
+        "path": "tracks/sports-tracks",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "tracks-zipper-tracks",
+        "name": "Zipper Tracks",
+        "path": "tracks/zipper-tracks",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": null,
+        "slug": "watches",
+        "name": "Watches",
+        "path": "watches",
+        "displayOrder": 5,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 10,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 6
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-analog",
+        "name": "Analog",
+        "path": "watches/analog",
+        "displayOrder": 1,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-chained-watches",
+        "name": "Chained Watches",
+        "path": "watches/chained-watches",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-chronographs",
+        "name": "Chronographs",
+        "path": "watches/chronographs",
+        "displayOrder": 4,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-classical",
+        "name": "Classical",
+        "path": "watches/classical",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-digital",
+        "name": "Digital",
+        "path": "watches/digital",
+        "displayOrder": 0,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-luxury",
+        "name": "Luxury",
+        "path": "watches/luxury",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-smartwatches",
+        "name": "Smartwatches",
+        "path": "watches/smartwatches",
+        "displayOrder": 2,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      },
+      {
+        "id": "<cuid>",
+        "parentId": "<cuid>",
+        "slug": "watches-strap-watches",
+        "name": "Strap Watches",
+        "path": "watches/strap-watches",
+        "displayOrder": 3,
+        "createdAt": "<iso-datetime>",
+        "updatedAt": "<iso-datetime>",
+        "_count": {
+          "productsAsCategory": 0,
+          "productsAsSubcategory": 0,
+          "attributeSchemas": 0
+        }
+      }
+    ],
+    "setCookies": []
+  }
+}

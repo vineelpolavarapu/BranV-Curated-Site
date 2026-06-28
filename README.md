@@ -56,8 +56,8 @@ Then:
 - Web: http://localhost:3000
 - Member auth: http://localhost:3000/login · /register
 - Admin sign in: http://localhost:3000/admin/login
-- API: http://localhost:4000/api/health
-- API readiness: http://localhost:4000/api/ready
+- API: http://localhost:5000/api/health
+- API readiness: http://localhost:5000/api/ready
 - MinIO console: http://localhost:9001 (branv / branv-secret)
 
 ### Trying the auth flow

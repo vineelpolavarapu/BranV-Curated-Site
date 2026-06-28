@@ -1,0 +1,30 @@
+{
+  "description": "GET /api/search/autocomplete?q=shirt",
+  "request": {
+    "method": "GET",
+    "path": "/api/search/autocomplete?q=shirt",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 500,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "connection": "keep-alive",
+      "content-length": "52",
+      "content-type": "application/json; charset=utf-8",
+      "date": "Sun, 28 Jun 2026 08:47:36 GMT",
+      "etag": "W/\"34-rlKccw1E+/fV8niQk4oFitDfPro\"",
+      "keep-alive": "timeout=5",
+      "vary": "Origin",
+      "x-powered-by": "Express",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "statusCode": 500,
+      "message": "Internal server error"
+    },
+    "setCookies": []
+  }
+}

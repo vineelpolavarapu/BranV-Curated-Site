@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s -i -X OPTIONS http://127.0.0.1:5000/api/auth/admin/login -H 'Origin: http://localhost:3000' -H 'Access-Control-Request-Method: POST' -H 'Access-Control-Request-Headers: content-type')",
+      "Read(//c/Users/Lenovo/AppData/Local/Temp/claude/c--vineel-BranV/5c88d6ff-d405-4d45-a911-bdbe46942094/tasks/**)",
+      "Bash(curl -s -X POST http://127.0.0.1:5000/api/auth/register -H 'content-type: application/json' -d '{\"email\":\"__TRACKED_VAR__\",\"password\":\"__TRACKED_VAR__\"}')",
+      "Bash(docker exec *)",
+      "Bash(apps/api/.venv/Scripts/python.exe -c \"import pyotp; print\\(pyotp.TOTP\\('JBSWY3DPEHPK3PXP'\\).now\\(\\)\\)\")",
+      "Bash(curl -s -c /tmp/cj.txt -X POST http://127.0.0.1:5000/api/auth/admin/login -H 'content-type: application/json' -d '{\"email\":\"__TRACKED_VAR__\",\"password\":\"__TRACKED_VAR__\",\"totpCode\":\"__TRACKED_VAR__\"}')",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"killed\")",
+      "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"done\")",
+      "PowerShell(cd C:\\\\vineel\\\\BranV\\\\apps\\\\api; & \"$env:USERPROFILE\\\\.local\\\\bin\\\\uv.exe\" run python -c \"from app.main import create_app; a = create_app\\(\\); print\\('routes:', len\\(a.routes\\)\\)\")"
+    ]
+  }
+}

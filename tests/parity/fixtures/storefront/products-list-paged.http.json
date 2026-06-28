@@ -1,0 +1,333 @@
+{
+  "description": "GET /api/products?page=1&pageSize=5",
+  "request": {
+    "method": "GET",
+    "path": "/api/products?page=1&pageSize=5",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "data": [
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-5",
+          "title": "Chelsea Boots — Black",
+          "description": null,
+          "price": 5990,
+          "mrp": 6990,
+          "discountPct": 14.31,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chelsea Boots — Black"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chelsea Boots — Black"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Chelsea Boots — Black",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-4",
+          "title": "Performance Running Shoes",
+          "description": null,
+          "price": 5490,
+          "mrp": 6490,
+          "discountPct": 15.41,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Performance Running Shoes"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Performance Running Shoes"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Performance Running Shoes",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-3",
+          "title": "Suede Penny Loafers",
+          "description": null,
+          "price": 4290,
+          "mrp": 4990,
+          "discountPct": 14.03,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Suede Penny Loafers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Suede Penny Loafers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Suede Penny Loafers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-2",
+          "title": "Minimal White Sneakers",
+          "description": null,
+          "price": 3490,
+          "mrp": 4290,
+          "discountPct": 18.65,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimal White Sneakers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimal White Sneakers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Minimal White Sneakers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-1",
+          "title": "Leather Derby Shoes",
+          "description": null,
+          "price": 4990,
+          "mrp": 5990,
+          "discountPct": 16.69,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Derby Shoes"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Derby Shoes"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Leather Derby Shoes",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        }
+      ],
+      "page": 1,
+      "pageSize": 5,
+      "total": 26,
+      "totalPages": 6
+    },
+    "setCookies": []
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "description": "POST /api/auth/login sets branv_access and branv_refresh cookies",
+  "request": {
+    "method": "POST",
+    "path": "/api/auth/login",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "email": "parity-member-fixture@branv.local",
+      "password": "parity-test-pw-1234"
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "id": "<cuid>",
+      "email": "parity-member-fixture@branv.local",
+      "role": "MEMBER",
+      "totpEnabled": false,
+      "emailVerified": false
+    },
+    "setCookies": [
+      {
+        "name": "branv_access",
+        "value": "<jwt>",
+        "attributes": {
+          "max-age": "900",
+          "path": "/",
+          "expires": "<http-date>",
+          "httponly": true,
+          "samesite": "Lax"
+        }
+      },
+      {
+        "name": "branv_refresh",
+        "value": "<opaque-refresh>",
+        "attributes": {
+          "max-age": "604800",
+          "path": "/",
+          "expires": "<http-date>",
+          "httponly": true,
+          "samesite": "Lax"
+        }
+      }
+    ]
+  }
+}

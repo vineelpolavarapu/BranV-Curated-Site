@@ -1,0 +1,26 @@
+{
+  "description": "GET /api/health returns 200",
+  "request": {
+    "method": "GET",
+    "path": "/api/health",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "status": "ok",
+      "uptime": "<volatile>",
+      "version": "0.1.0",
+      "timestamp": "<iso-datetime>"
+    },
+    "setCookies": []
+  }
+}

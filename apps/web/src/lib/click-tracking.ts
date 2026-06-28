@@ -4,7 +4,7 @@
  * back to the raw affiliate URL if the API didn't mint one.
  */
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/api';
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
 
 // Strip the trailing /api so we can serve /go/:trackingId at the root.
 const GO_BASE = API_BASE.replace(/\/api\/?$/, '');

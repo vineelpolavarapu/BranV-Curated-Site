@@ -6,7 +6,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { StorefrontShell } from '@/components/StorefrontShell';
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:4000/api';
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
 
 type State = 'pending' | 'ok' | 'error';
 

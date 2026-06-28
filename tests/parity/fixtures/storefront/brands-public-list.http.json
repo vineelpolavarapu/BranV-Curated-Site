@@ -1,0 +1,44 @@
+{
+  "description": "GET /api/brands returns featured-first list",
+  "request": {
+    "method": "GET",
+    "path": "/api/brands",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": [
+      {
+        "id": "<cuid>",
+        "slug": "branv-samples",
+        "name": "BranV Samples",
+        "logoUrl": null,
+        "heroUrl": null,
+        "isFeatured": false,
+        "_count": {
+          "products": 25
+        }
+      },
+      {
+        "id": "<cuid>",
+        "slug": "nike",
+        "name": "nike",
+        "logoUrl": null,
+        "heroUrl": null,
+        "isFeatured": false,
+        "_count": {
+          "products": 1
+        }
+      }
+    ],
+    "setCookies": []
+  }
+}

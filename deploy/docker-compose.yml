@@ -1,20 +1,28 @@
-# Production compose stack for the Oracle Cloud Always Free VM.
+# Production compose stack for the Oracle Cloud Always Free AMD VM (1 GB RAM).
 #
 # Layout on the VM:
-#   /opt/branv/repo/          <- git clone of this repository
-#   /opt/branv/repo/deploy/   <- this folder; run `docker compose` from here
-#   /opt/branv/repo/deploy/.env  <- copy from .env.production.example, fill in
+#   /opt/branv/deploy/                 <- this folder only (no source code)
+#   /opt/branv/deploy/docker-compose.yml
+#   /opt/branv/deploy/Caddyfile
+#   /opt/branv/deploy/.env             <- copy from .env.production.example, fill in
 #
-# First deploy:
-#   sudo mkdir -p /opt/branv && cd /opt/branv
-#   sudo git clone <repo-url> repo
-#   cd repo/deploy
-#   sudo cp .env.production.example .env  # then edit secrets
-#   sudo docker compose up -d --build
+# Pre-built API image is PULLED from GHCR — we never build on the VM because
+# `nest build` peaks ~1.2 GB and the VM has only 1 GB RAM.
+#
+# First deploy (from your laptop, in the repo root):
+#   docker build -t ghcr.io/vineelpolavarapu/branv-api:latest -f apps/api/Dockerfile .
+#   docker push ghcr.io/vineelpolavarapu/branv-api:latest
+#   scp -i ~/.ssh/branv-prod.key -r deploy ubuntu@<VM_IP>:/tmp/
+#   ssh ubuntu@<VM_IP>
+#     sudo mv /tmp/deploy /opt/branv && cd /opt/branv/deploy
+#     cp .env.production.example .env  # edit secrets
+#     docker login ghcr.io -u vineelpolavarapu  # use GHCR PAT
+#     docker compose pull
+#     docker compose up -d
 #
 # Updates:
-#   cd /opt/branv/repo && git pull
-#   cd deploy && docker compose up -d --build
+#   (laptop) docker build ... && docker push ...
+#   (VM)     cd /opt/branv/deploy && docker compose pull && docker compose up -d
 
 services:
   caddy:
@@ -27,15 +35,12 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
+    env_file: .env
     depends_on:
       - api
 
   api:
-    build:
-      # Build context = repo root so the existing Dockerfile's `COPY . .`
-      # sees the full monorepo and pnpm-lock.yaml.
-      context: ..
-      dockerfile: apps/api/Dockerfile
+    image: ghcr.io/vineelpolavarapu/branv-api:latest
     restart: unless-stopped
     expose:
       - "4000"
@@ -89,6 +94,22 @@ services:
       POSTGRES_USER: branv
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: branv
+    # Memory tuned for a 1 GB RAM host. Defaults (shared_buffers=128MB is fine
+    # but Postgres also wants ~25% of RAM for effective_cache_size, and the
+    # default work_mem can balloon with parallel sorts). Hard caps below keep
+    # the steady-state resident set under ~250 MB.
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+      - -c
+      - effective_cache_size=512MB
+      - -c
+      - max_connections=20
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
@@ -97,43 +118,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # Nightly pg_dump → Cloudflare R2 (10 GB free).
-  # Disable by commenting out if you'd rather use Oracle Object Storage or
-  # the host's own cron. Restic/borg would be heavier but more correct.
-  backup:
-    image: alpine:3.20
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      PGHOST: postgres
-      PGUSER: branv
-      PGPASSWORD: ${DB_PASSWORD}
-      PGDATABASE: branv
-      R2_ACCOUNT_ID: ${R2_ACCOUNT_ID}
-      R2_ACCESS_KEY: ${R2_ACCESS_KEY}
-      R2_SECRET_KEY: ${R2_SECRET_KEY}
-      R2_BUCKET: ${R2_BACKUP_BUCKET:-branv-pg-backups}
-      AWS_ACCESS_KEY_ID: ${R2_ACCESS_KEY}
-      AWS_SECRET_ACCESS_KEY: ${R2_SECRET_KEY}
-      AWS_DEFAULT_REGION: auto
-    entrypoint:
-      - sh
-      - -c
-      - |
-        set -e
-        apk add --no-cache postgresql16-client aws-cli >/dev/null
-        while true; do
-          TS=$$(date -u +%Y%m%dT%H%M%SZ)
-          FILE=/tmp/branv-$$TS.sql.gz
-          echo "[backup] dumping at $$TS"
-          pg_dump | gzip > $$FILE
-          aws --endpoint-url https://$$R2_ACCOUNT_ID.r2.cloudflarestorage.com \
-              s3 cp $$FILE s3://$$R2_BUCKET/ && rm -f $$FILE
-          echo "[backup] uploaded; sleeping 24h"
-          sleep 86400
-        done
+# NOTE: nightly pg_dump to R2 lives outside compose. See deploy/backup.sh and
+# the cron entry in deploy/install-backup-cron.sh. Running it in-container would
+# cost ~150 MB resident memory that this 1 GB VM cannot spare.
 
 volumes:
   pg_data:

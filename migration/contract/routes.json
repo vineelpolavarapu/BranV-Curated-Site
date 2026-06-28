@@ -1,0 +1,3484 @@
+{
+  "generatedAt": "<set-at-write-time>",
+  "generator": "apps/api/scripts/dump-routes.ts",
+  "globalPrefix": "/api",
+  "globalPrefixExclusions": [
+    {
+      "method": "GET",
+      "path": "/go/:trackingId"
+    }
+  ],
+  "cors": {
+    "originEnv": "WEB_ORIGIN",
+    "credentials": true,
+    "methods": [
+      "GET",
+      "POST",
+      "PATCH",
+      "PUT",
+      "DELETE",
+      "OPTIONS"
+    ]
+  },
+  "validationPipe": {
+    "whitelist": true,
+    "transform": true,
+    "forbidNonWhitelisted": true,
+    "enableImplicitConversion": true
+  },
+  "globalGuards": [
+    "JwtAuthGuard",
+    "TwoFactorGuard"
+  ],
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/admin/affiliate/convert-url",
+      "controller": "AffiliateController",
+      "handler": "convertUrl",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/affiliate/reconciliation",
+      "controller": "ReconciliationController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/affiliate/reconciliation",
+      "controller": "ReconciliationController",
+      "handler": "upload",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [
+        "<anonymous-interceptor>"
+      ],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "data": "notes",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "FILE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/affiliate/reconciliation/:id",
+      "controller": "ReconciliationController",
+      "handler": "detail",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/affiliate/reconciliation/variance",
+      "controller": "ReconciliationController",
+      "handler": "variance",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "data": "partner",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/clicks",
+      "controller": "AnalyticsController",
+      "handler": "clicks",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/content",
+      "controller": "AnalyticsController",
+      "handler": "content",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/dashboard",
+      "controller": "AnalyticsController",
+      "handler": "dashboard",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/members",
+      "controller": "AnalyticsController",
+      "handler": "members",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/overview",
+      "controller": "AnalyticsController",
+      "handler": "overview",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/analytics/system",
+      "controller": "AnalyticsController",
+      "handler": "system",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/articles",
+      "controller": "ArticlesAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/articles",
+      "controller": "ArticlesAdminController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/articles/:id",
+      "controller": "ArticlesAdminController",
+      "handler": "archive",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/articles/:id",
+      "controller": "ArticlesAdminController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/articles/:id",
+      "controller": "ArticlesAdminController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit",
+      "controller": "AuditAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/avatars",
+      "controller": "AvatarsController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/avatars",
+      "controller": "AvatarsController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/avatars/:id",
+      "controller": "AvatarsController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/avatars/:id",
+      "controller": "AvatarsController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/avatars/:id",
+      "controller": "AvatarsController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/banners",
+      "controller": "BannersAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/banners",
+      "controller": "BannersAdminController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/banners/:id",
+      "controller": "BannersAdminController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/banners/:id",
+      "controller": "BannersAdminController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/banners/:id",
+      "controller": "BannersAdminController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/brands",
+      "controller": "BrandsController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/brands",
+      "controller": "BrandsController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/brands/:brandId/story",
+      "controller": "BrandStoriesAdminController",
+      "handler": "get",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "brandId",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/brands/:brandId/story",
+      "controller": "BrandStoriesAdminController",
+      "handler": "upsert",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "brandId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/brands/:id",
+      "controller": "BrandsController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/brands/:id",
+      "controller": "BrandsController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/brands/:id",
+      "controller": "BrandsController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/categories",
+      "controller": "CategoriesAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/categories/:id/attribute-schemas",
+      "controller": "CategoriesAdminController",
+      "handler": "listSchemas",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/categories/:id/attribute-schemas",
+      "controller": "CategoriesAdminController",
+      "handler": "upsertSchema",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/categories/:id/attribute-schemas",
+      "controller": "CategoriesAdminController",
+      "handler": "bulkUpsertSchemas",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/categories/:id/attribute-schemas/:attributeKey",
+      "controller": "CategoriesAdminController",
+      "handler": "deleteSchema",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "attributeKey",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/edits",
+      "controller": "EditsAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/edits",
+      "controller": "EditsAdminController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/edits/:id",
+      "controller": "EditsAdminController",
+      "handler": "archive",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/edits/:id",
+      "controller": "EditsAdminController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/edits/:id",
+      "controller": "EditsAdminController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/lookbooks",
+      "controller": "LookbooksAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/lookbooks",
+      "controller": "LookbooksAdminController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/lookbooks/:id",
+      "controller": "LookbooksAdminController",
+      "handler": "archive",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/lookbooks/:id",
+      "controller": "LookbooksAdminController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/lookbooks/:id",
+      "controller": "LookbooksAdminController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/newsletter/subscribers",
+      "controller": "NewsletterAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "data": "page",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "QUERY",
+          "data": "pageSize",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/price-sync/run",
+      "controller": "PriceSyncController",
+      "handler": "run",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/products",
+      "controller": "ProductsAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products",
+      "controller": "ProductsAdminController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/products/:id",
+      "controller": "ProductsAdminController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/products/:id",
+      "controller": "ProductsAdminController",
+      "handler": "getOne",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/products/:id",
+      "controller": "ProductsAdminController",
+      "handler": "update",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products/:id/images",
+      "controller": "ProductsAdminController",
+      "handler": "addImage",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/products/:id/images/:imageId",
+      "controller": "ProductsAdminController",
+      "handler": "removeImage",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "imageId",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/products/:id/images/reorder",
+      "controller": "ProductsAdminController",
+      "handler": "reorderImages",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products/:id/retailer-listings",
+      "controller": "ProductsAdminController",
+      "handler": "addListing",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/products/:id/retailer-listings/:listingId",
+      "controller": "ProductsAdminController",
+      "handler": "removeListing",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "listingId",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products/:id/variants",
+      "controller": "ProductsAdminController",
+      "handler": "addVariant",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/products/:id/variants/:variantId",
+      "controller": "ProductsAdminController",
+      "handler": "removeVariant",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "variantId",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products/quick-add",
+      "controller": "ProductsAdminController",
+      "handler": "quickAdd",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/admin/products/scrape-url",
+      "controller": "ProductsAdminController",
+      "handler": "scrapeUrl",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/reviews",
+      "controller": "ReviewsAdminController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/admin/reviews/:id",
+      "controller": "ReviewsAdminController",
+      "handler": "moderate",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/admin/settings",
+      "controller": "SettingsController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "PUT",
+      "path": "/admin/settings",
+      "controller": "SettingsController",
+      "handler": "upsert",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/articles",
+      "controller": "ArticlesPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/articles/:slug",
+      "controller": "ArticlesPublicController",
+      "handler": "detail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/articles/:slug/related",
+      "controller": "ArticlesPublicController",
+      "handler": "related",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/2fa/disable",
+      "controller": "AuthController",
+      "handler": "disable2fa",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "JwtAuthGuard",
+        "RateLimitGuard",
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/2fa/setup",
+      "controller": "AuthController",
+      "handler": "setup2fa",
+      "authMode": "authenticated",
+      "roles": [],
+      "skipTwoFactor": true,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "JwtAuthGuard",
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/2fa/verify",
+      "controller": "AuthController",
+      "handler": "verify2fa",
+      "authMode": "authenticated",
+      "roles": [],
+      "skipTwoFactor": true,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "JwtAuthGuard",
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/admin/login",
+      "controller": "AuthController",
+      "handler": "adminLogin",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": {
+        "limit": 5,
+        "window": 60,
+        "prefix": "auth-admin-login"
+      },
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/forgot-password",
+      "controller": "AuthController",
+      "handler": "forgotPassword",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": {
+        "limit": 3,
+        "window": 60,
+        "prefix": "auth-forgot"
+      },
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/login",
+      "controller": "AuthController",
+      "handler": "login",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": {
+        "limit": 5,
+        "window": 60,
+        "prefix": "auth-login"
+      },
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/logout",
+      "controller": "AuthController",
+      "handler": "logout",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "REQUEST",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/auth/me",
+      "controller": "AuthController",
+      "handler": "me",
+      "authMode": "authenticated",
+      "roles": [],
+      "skipTwoFactor": true,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "JwtAuthGuard",
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/refresh",
+      "controller": "AuthController",
+      "handler": "refresh",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "REQUEST",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "controller": "AuthController",
+      "handler": "register",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": {
+        "limit": 5,
+        "window": 60,
+        "prefix": "auth-register"
+      },
+      "httpCode": null,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/resend-verification",
+      "controller": "AuthController",
+      "handler": "resendVerification",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": {
+        "limit": 3,
+        "window": 60,
+        "prefix": "auth-resend"
+      },
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/reset-password",
+      "controller": "AuthController",
+      "handler": "resetPassword",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/auth/verify-email",
+      "controller": "AuthController",
+      "handler": "verifyEmail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [
+        "RateLimitGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/brands",
+      "controller": "BrandsPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/brands/:slug",
+      "controller": "BrandsPublicController",
+      "handler": "detail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/brands/:slug/story",
+      "controller": "BrandStoriesPublicController",
+      "handler": "story",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/categories",
+      "controller": "CategoriesPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/categories/:slug",
+      "controller": "CategoriesPublicController",
+      "handler": "getOne",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/categories/:slug/filters",
+      "controller": "CategoriesPublicController",
+      "handler": "getFilters",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/clicks/:trackingId/report",
+      "controller": "ClicksController",
+      "handler": "report",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "trackingId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/clicks/track",
+      "controller": "ClicksController",
+      "handler": "track",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/edits",
+      "controller": "EditsPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/edits/:slug",
+      "controller": "EditsPublicController",
+      "handler": "detail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/go/:trackingId",
+      "controller": "ClicksController",
+      "handler": "redirect",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "trackingId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "controller": "HealthController",
+      "handler": "liveness",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/home",
+      "controller": "HomeController",
+      "handler": "overview",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/lookbooks",
+      "controller": "LookbooksPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/lookbooks/:slug",
+      "controller": "LookbooksPublicController",
+      "handler": "detail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/me/wardrobe",
+      "controller": "WardrobeController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "QUERY",
+          "data": "page",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "QUERY",
+          "data": "pageSize",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/me/wishlist",
+      "controller": "WishlistController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "QUERY",
+          "data": "page",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "QUERY",
+          "data": "pageSize",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/me/wishlist/ids",
+      "controller": "WishlistController",
+      "handler": "ids",
+      "authMode": "public",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter/confirm",
+      "controller": "NewsletterController",
+      "handler": "confirm",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter/subscribe",
+      "controller": "NewsletterController",
+      "handler": "subscribe",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/newsletter/unsubscribe",
+      "controller": "NewsletterController",
+      "handler": "unsubscribe",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 200,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/notification-preferences",
+      "controller": "NotificationsController",
+      "handler": "preferences",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/notification-preferences",
+      "controller": "NotificationsController",
+      "handler": "upsertPreference",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/notifications",
+      "controller": "NotificationsController",
+      "handler": "list",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/:id/read",
+      "controller": "NotificationsController",
+      "handler": "markRead",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/notifications/read-all",
+      "controller": "NotificationsController",
+      "handler": "markAllRead",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/notifications/unread-count",
+      "controller": "NotificationsController",
+      "handler": "unread",
+      "authMode": "public",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/products",
+      "controller": "ProductsPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/products/:productId/reviews",
+      "controller": "ReviewsPublicController",
+      "handler": "list",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "productId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/products/:productId/reviews",
+      "controller": "ReviewsPublicController",
+      "handler": "create",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "productId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "CUSTOM",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/products/:productId/reviews/me",
+      "controller": "ReviewsPublicController",
+      "handler": "getMine",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "productId",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "REQUEST",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/products/:slug",
+      "controller": "ProductsPublicController",
+      "handler": "detail",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/products/:slug/related",
+      "controller": "ProductsPublicController",
+      "handler": "related",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "PARAM",
+          "data": "slug",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/ready",
+      "controller": "HealthController",
+      "handler": "readiness",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "RESPONSE",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "GET",
+      "path": "/search/autocomplete",
+      "controller": "SearchController",
+      "handler": "autocomplete",
+      "authMode": "public",
+      "roles": [],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "QUERY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/uploads/presign",
+      "controller": "UploadsController",
+      "handler": "presign",
+      "authMode": "authenticated",
+      "roles": [
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/wardrobe/items/:id",
+      "controller": "WardrobeController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "id",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "POST",
+      "path": "/wishlist/items",
+      "controller": "WishlistController",
+      "handler": "add",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "DELETE",
+      "path": "/wishlist/items/:productId",
+      "controller": "WishlistController",
+      "handler": "remove",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": 204,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "productId",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    },
+    {
+      "method": "PATCH",
+      "path": "/wishlist/items/:productId",
+      "controller": "WishlistController",
+      "handler": "setNotify",
+      "authMode": "authenticated",
+      "roles": [
+        "MEMBER",
+        "ADMIN"
+      ],
+      "skipTwoFactor": false,
+      "rateLimit": null,
+      "httpCode": null,
+      "guards": [
+        "RolesGuard"
+      ],
+      "interceptors": [],
+      "paramDecorators": [
+        {
+          "index": 0,
+          "type": "CUSTOM",
+          "dtoClass": null
+        },
+        {
+          "index": 1,
+          "type": "PARAM",
+          "data": "productId",
+          "dtoClass": null
+        },
+        {
+          "index": 2,
+          "type": "BODY",
+          "dtoClass": null
+        }
+      ],
+      "sourceFile": null
+    }
+  ]
+}

@@ -1,0 +1,1492 @@
+{
+  "description": "GET /api/products with default pagination",
+  "request": {
+    "method": "GET",
+    "path": "/api/products",
+    "headers": {},
+    "body": null
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-origin": "http://localhost:3000",
+      "content-type": "application/json; charset=utf-8",
+      "vary": "Origin",
+      "x-request-id": "<uuid>"
+    },
+    "body": {
+      "data": [
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-5",
+          "title": "Chelsea Boots — Black",
+          "description": null,
+          "price": 5990,
+          "mrp": 6990,
+          "discountPct": 14.31,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chelsea Boots — Black"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chelsea Boots — Black"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Chelsea Boots — Black",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-4",
+          "title": "Performance Running Shoes",
+          "description": null,
+          "price": 5490,
+          "mrp": 6490,
+          "discountPct": 15.41,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Performance Running Shoes"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Performance Running Shoes"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1542219550-37153d387c27?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Performance Running Shoes",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-3",
+          "title": "Suede Penny Loafers",
+          "description": null,
+          "price": 4290,
+          "mrp": 4990,
+          "discountPct": 14.03,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Suede Penny Loafers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Suede Penny Loafers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1614252369475-531eba835eb1?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Suede Penny Loafers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-2",
+          "title": "Minimal White Sneakers",
+          "description": null,
+          "price": 3490,
+          "mrp": 4290,
+          "discountPct": 18.65,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimal White Sneakers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimal White Sneakers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Minimal White Sneakers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-footwear-1",
+          "title": "Leather Derby Shoes",
+          "description": null,
+          "price": 4990,
+          "mrp": 5990,
+          "discountPct": 16.69,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Footwear",
+            "slug": "footwear"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Derby Shoes"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Derby Shoes"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1533867617858-e7b97e060509?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Leather Derby Shoes",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-10",
+          "title": "Wool Beanie",
+          "description": null,
+          "price": 890,
+          "mrp": 1190,
+          "discountPct": 25.21,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Wool Beanie"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Wool Beanie"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Wool Beanie",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-9",
+          "title": "Silver Cufflinks Set",
+          "description": null,
+          "price": 1290,
+          "mrp": 1690,
+          "discountPct": 23.67,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Silver Cufflinks Set"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Silver Cufflinks Set"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Silver Cufflinks Set",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-8",
+          "title": "Canvas Backpack",
+          "description": null,
+          "price": 3490,
+          "mrp": 3990,
+          "discountPct": 12.53,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Canvas Backpack"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Canvas Backpack"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Canvas Backpack",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-7",
+          "title": "Reversible Leather Belt",
+          "description": null,
+          "price": 1690,
+          "mrp": 1990,
+          "discountPct": 15.08,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Reversible Leather Belt"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Reversible Leather Belt"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Reversible Leather Belt",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-6",
+          "title": "Leather Bifold Wallet",
+          "description": null,
+          "price": 1990,
+          "mrp": 2490,
+          "discountPct": 20.08,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1517254797898-04edd251bfb3?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Bifold Wallet"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1517254797898-04edd251bfb3?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Leather Bifold Wallet"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1517254797898-04edd251bfb3?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Leather Bifold Wallet",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-5",
+          "title": "Luxury Gold Dial",
+          "description": null,
+          "price": 24990,
+          "mrp": 28990,
+          "discountPct": 13.8,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Luxury Gold Dial"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Luxury Gold Dial"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1509048191080-d2984bad6ae5?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Luxury Gold Dial",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-4",
+          "title": "Smartwatch Series 7",
+          "description": null,
+          "price": 18990,
+          "mrp": 22990,
+          "discountPct": 17.4,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Smartwatch Series 7"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Smartwatch Series 7"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Smartwatch Series 7",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-3",
+          "title": "Chronograph Sport",
+          "description": null,
+          "price": 8990,
+          "mrp": 10990,
+          "discountPct": 18.2,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chronograph Sport"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Chronograph Sport"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Chronograph Sport",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-2",
+          "title": "Minimalist Quartz",
+          "description": null,
+          "price": 4990,
+          "mrp": 5990,
+          "discountPct": 16.69,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimalist Quartz"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Minimalist Quartz"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Minimalist Quartz",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-watches-1",
+          "title": "Automatic Skeleton Watch",
+          "description": null,
+          "price": 12490,
+          "mrp": 14990,
+          "discountPct": 16.68,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Watches",
+            "slug": "watches"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Automatic Skeleton Watch"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Automatic Skeleton Watch"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1524592094714-0f0654e20314?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Automatic Skeleton Watch",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-suits-and-formal-5",
+          "title": "Pleated Formal Trousers",
+          "description": null,
+          "price": 2490,
+          "mrp": 2990,
+          "discountPct": 16.72,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Suits & Formal",
+            "slug": "suits-and-formal"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Pleated Formal Trousers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Pleated Formal Trousers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Pleated Formal Trousers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-suits-and-formal-4",
+          "title": "Silk Necktie — Solid",
+          "description": null,
+          "price": 1290,
+          "mrp": 1690,
+          "discountPct": 23.67,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Suits & Formal",
+            "slug": "suits-and-formal"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Silk Necktie — Solid"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Silk Necktie — Solid"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Silk Necktie — Solid",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-suits-and-formal-3",
+          "title": "Formal Cotton Shirt",
+          "description": null,
+          "price": 1790,
+          "mrp": 2290,
+          "discountPct": 21.83,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Suits & Formal",
+            "slug": "suits-and-formal"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Formal Cotton Shirt"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Formal Cotton Shirt"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1620012253295-c15cc3e65df4?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Formal Cotton Shirt",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-suits-and-formal-2",
+          "title": "Tailored Navy Blazer",
+          "description": null,
+          "price": 6990,
+          "mrp": 8490,
+          "discountPct": 17.67,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Suits & Formal",
+            "slug": "suits-and-formal"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Tailored Navy Blazer"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Tailored Navy Blazer"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Tailored Navy Blazer",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-suits-and-formal-1",
+          "title": "Two-Piece Wool Suit",
+          "description": null,
+          "price": 12990,
+          "mrp": 15990,
+          "discountPct": 18.76,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Suits & Formal",
+            "slug": "suits-and-formal"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Two-Piece Wool Suit"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Two-Piece Wool Suit"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Two-Piece Wool Suit",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-clothing-5",
+          "title": "Heavyweight Hoodie",
+          "description": null,
+          "price": 2990,
+          "mrp": 3490,
+          "discountPct": 14.33,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Clothing",
+            "slug": "clothing"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Heavyweight Hoodie"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Heavyweight Hoodie"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Heavyweight Hoodie",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-clothing-4",
+          "title": "Lightweight Bomber Jacket",
+          "description": null,
+          "price": 4490,
+          "mrp": 5490,
+          "discountPct": 18.21,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Clothing",
+            "slug": "clothing"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Lightweight Bomber Jacket"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Lightweight Bomber Jacket"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Lightweight Bomber Jacket",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-clothing-3",
+          "title": "Slim Fit Chino Trousers",
+          "description": null,
+          "price": 2790,
+          "mrp": 3290,
+          "discountPct": 15.2,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Clothing",
+            "slug": "clothing"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Slim Fit Chino Trousers"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Slim Fit Chino Trousers"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Slim Fit Chino Trousers",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        },
+        {
+          "id": "<cuid>",
+          "slug": "sample-clothing-2",
+          "title": "Linen Camp-Collar Shirt",
+          "description": null,
+          "price": 2490,
+          "mrp": 2990,
+          "discountPct": 16.72,
+          "currency": "INR",
+          "tags": [
+            "sample"
+          ],
+          "avgRating": null,
+          "reviewCount": 0,
+          "createdAt": "<iso-datetime>",
+          "isFeatured": false,
+          "featuredUntil": null,
+          "brand": {
+            "id": "<cuid>",
+            "name": "BranV Samples",
+            "slug": "branv-samples"
+          },
+          "category": {
+            "id": "<cuid>",
+            "name": "Clothing",
+            "slug": "clothing"
+          },
+          "subcategory": null,
+          "primaryImage": {
+            "url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Linen Camp-Collar Shirt"
+          },
+          "secondaryImage": {
+            "url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=80",
+            "isAiGenerated": false,
+            "altText": "Linen Camp-Collar Shirt"
+          },
+          "gallery": [
+            {
+              "url": "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=1000&q=80",
+              "altText": "Linen Camp-Collar Shirt",
+              "isAiGenerated": false,
+              "isPrimary": true,
+              "position": 0
+            }
+          ],
+          "aiImageCount": 0,
+          "variants": [
+            {
+              "id": "<cuid>",
+              "color": null,
+              "size": null,
+              "attributes": {}
+            }
+          ],
+          "sizes": [],
+          "colors": [],
+          "retailers": [],
+          "buyNow": null
+        }
+      ],
+      "page": 1,
+      "pageSize": 24,
+      "total": 26,
+      "totalPages": 2
+    },
+    "setCookies": []
+  }
+}
