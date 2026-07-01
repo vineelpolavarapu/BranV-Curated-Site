@@ -1,27 +1,39 @@
 # Production compose stack for the Oracle Cloud Always Free AMD VM (1 GB RAM).
+# API = FastAPI (Python 3.12). NestJS code is no longer deployed.
 #
 # Layout on the VM:
 #   /opt/branv/deploy/                 <- this folder only (no source code)
 #   /opt/branv/deploy/docker-compose.yml
 #   /opt/branv/deploy/Caddyfile
-#   /opt/branv/deploy/.env             <- copy from .env.production.example, fill in
+#   /opt/branv/deploy/.env             <- copy from .env.production.example, fill
+#   /opt/branv/deploy/prisma/          <- Prisma schema + migrations (read-only)
+#                                         used by the one-shot `migrate` service
 #
-# Pre-built API image is PULLED from GHCR — we never build on the VM because
-# `nest build` peaks ~1.2 GB and the VM has only 1 GB RAM.
+# The FastAPI image is PULLED from GHCR — we never build on the VM because the
+# 1 GB RAM ceiling is too tight even for the Python build.
 #
 # First deploy (from your laptop, in the repo root):
-#   docker build -t ghcr.io/vineelpolavarapu/branv-api:latest -f apps/api/Dockerfile .
+#   # 1. Build the FastAPI image — context MUST be apps/api/ (where pyproject.toml lives)
+#   docker build -t ghcr.io/vineelpolavarapu/branv-api:latest apps/api
 #   docker push ghcr.io/vineelpolavarapu/branv-api:latest
-#   scp -i ~/.ssh/branv-prod.key -r deploy ubuntu@<VM_IP>:/tmp/
-#   ssh ubuntu@<VM_IP>
-#     sudo mv /tmp/deploy /opt/branv && cd /opt/branv/deploy
+#
+#   # 2. Copy Prisma schema + migrations into deploy/ so the migrate service can mount it
+#   #    (prisma/ lives at the repo ROOT after the FastAPI migration, not under apps/api/)
+#   Copy-Item -Recurse -Force prisma deploy\prisma
+#
+#   # 3. Send deploy/ to the VM
+#   scp -i C:\Users\Lenovo\.ssh\branv-prod.key -r deploy ubuntu@<VM_IP>:/tmp/branv-deploy
+#   ssh -i C:\Users\Lenovo\.ssh\branv-prod.key ubuntu@<VM_IP>
+#     sudo mv /tmp/branv-deploy /opt/branv && cd /opt/branv/deploy
 #     cp .env.production.example .env  # edit secrets
-#     docker login ghcr.io -u vineelpolavarapu  # use GHCR PAT
+#     docker login ghcr.io -u vineelpolavarapu  # paste GHCR PAT
 #     docker compose pull
 #     docker compose up -d
+#     docker compose logs -f api
 #
 # Updates:
-#   (laptop) docker build ... && docker push ...
+#   (laptop) docker build -t ghcr.io/vineelpolavarapu/branv-api:latest apps/api
+#            docker push  ghcr.io/vineelpolavarapu/branv-api:latest
 #   (VM)     cd /opt/branv/deploy && docker compose pull && docker compose up -d
 
 services:
@@ -39,16 +51,42 @@ services:
     depends_on:
       - api
 
+  # One-shot Prisma migrator. Runs `prisma migrate deploy` against the live
+  # Postgres, then exits. Mounts the prisma/ folder shipped in deploy/.
+  # The FastAPI app does not own the schema — Prisma still owns it (the Python
+  # SQLAlchemy models are read-only auto-generated views of the Prisma schema).
+  migrate:
+    image: node:20-alpine
+    restart: "no"
+    volumes:
+      - ./prisma:/prisma:ro
+    environment:
+      DATABASE_URL: postgresql://branv:${DB_PASSWORD}@postgres:5432/branv?schema=public
+    working_dir: /prisma
+    entrypoint:
+      - sh
+      - -c
+      - |
+        npx --yes prisma@5 migrate deploy --schema=/prisma/schema.prisma
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   api:
     image: ghcr.io/vineelpolavarapu/branv-api:latest
     restart: unless-stopped
     expose:
-      - "4000"
+      - "5000"
     environment:
-      NODE_ENV: production
-      API_PORT: "4000"
+      # ── Core ──────────────────────────────────────────────────────────────
       DATABASE_URL: postgresql://branv:${DB_PASSWORD}@postgres:5432/branv?schema=public
-      # Auth
+      WEB_ORIGIN: ${WEB_ORIGIN}
+      BASE_CURRENCY: "INR"
+      # FastAPI-specific
+      SCHEDULER_OWNER: "fastapi"
+      PY_LOG_LEVEL: "info"
+      USE_MOCK_INTEGRATIONS: "false"
+      # ── Auth ──────────────────────────────────────────────────────────────
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       JWT_ACCESS_TTL_SECONDS: "900"
@@ -57,20 +95,18 @@ services:
       COOKIE_DOMAIN: ${COOKIE_DOMAIN}
       COOKIE_SAMESITE: "lax"
       TOTP_ISSUER: "BranV"
-      WEB_ORIGIN: ${WEB_ORIGIN}
       AUTH_LOCKOUT_MAX_ATTEMPTS: "5"
       AUTH_LOCKOUT_WINDOW_MIN: "15"
       AUTH_LOCKOUT_DURATION_MIN: "15"
       AUTH_RATE_LIMIT_PER_MIN: "5"
-      # Object storage (Cloudflare R2 recommended in prod)
+      # ── Object storage (Cloudflare R2) ────────────────────────────────────
       S3_ENDPOINT: ${S3_ENDPOINT}
       S3_REGION: ${S3_REGION:-auto}
       S3_BUCKET: ${S3_BUCKET}
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
       S3_FORCE_PATH_STYLE: "true"
-      # Integrations
-      USE_MOCK_INTEGRATIONS: "false"
+      # ── Affiliate integrations ────────────────────────────────────────────
       CUELINKS_API_KEY: ${CUELINKS_API_KEY}
       CUELINKS_API_BASE: "https://www.cuelinks.com/api/v2"
       AMAZON_ASSOCIATES_TAG: ${AMAZON_ASSOCIATES_TAG}
@@ -78,12 +114,15 @@ services:
       AMAZON_SECRET_KEY: ${AMAZON_SECRET_KEY}
       AMAZON_REGION: "IN"
       EARNKARO_API_KEY: ${EARNKARO_API_KEY}
+      # ── Email (Resend) ────────────────────────────────────────────────────
       MAIL_PROVIDER: "resend"
       MAIL_API_KEY: ${MAIL_API_KEY}
       MAIL_FROM: ${MAIL_FROM}
+      # ── Scraper ───────────────────────────────────────────────────────────
       SCRAPER_USER_AGENT: "Mozilla/5.0 (compatible; BranVBot/1.0)"
-      BASE_CURRENCY: "INR"
     depends_on:
+      migrate:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
 

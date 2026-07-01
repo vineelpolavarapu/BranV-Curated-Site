@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.pagination import make_page
 from ..db.models import (
+    AffiliateLink,
     Brand,
     Category,
     Product,
@@ -70,19 +71,40 @@ async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
         )
     )).scalars().all()
 
+    # Load affiliate links for listings
+    links = (await db.execute(
+        select(AffiliateLink).where(AffiliateLink.productRetailerListingId.in_([l.id_ for l in listings]))
+    )).scalars().all() if listings else []
+    link_map = {link.productRetailerListingId: link for link in links}
+
+    ai_images = [i for i in images if i.isAiGenerated]
+    retailer_images = [i for i in images if not i.isAiGenerated]
+    primary = next((i for i in images if i.isPrimary), None) or (images[0] if images else None)
+    secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
+
+    sorted_listings = sorted(
+        listings,
+        key=lambda x: float(x.rawPrice) if x.rawPrice is not None else float(p.price)
+    )
+    best_listing = sorted_listings[0] if sorted_listings else None
+    best_affiliate = link_map.get(best_listing.id_) if best_listing else None
+
+    sizes = sorted(list(set(v.size for v in variants if v.size)))
+    colors = sorted(list(set(v.color for v in variants if v.color)))
+
     return {
         "id": p.id_,
         "slug": p.slug,
         "title": p.title,
         "description": p.description,
-        "price": _dec(p.price),
-        "mrp": _dec(p.mrp),
-        "discountPct": _dec(p.discountPct),
+        "price": float(p.price) if p.price is not None else None,
+        "mrp": float(p.mrp) if p.mrp is not None else None,
+        "discountPct": float(p.discountPct) if p.discountPct is not None else None,
         "currency": p.currency,
         "primaryRetailer": p.primaryRetailer,
         "status": p.status,
         "tags": p.tags or [],
-        "avgRating": _dec(p.avgRating),
+        "avgRating": float(p.avgRating) if p.avgRating is not None else None,
         "reviewCount": p.reviewCount,
         "featuredUntil": _iso_ms(p.featuredUntil),
         "createdAt": _iso_ms(p.createdAt),
@@ -92,17 +114,27 @@ async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
         "subcategory": (
             {"id": subcategory[0], "name": subcategory[1], "slug": subcategory[2]} if subcategory else None
         ),
-        "images": [
+        "primaryImage": {
+            "url": primary.url,
+            "isAiGenerated": primary.isAiGenerated,
+            "altText": primary.altText,
+        } if primary else None,
+        "secondaryImage": {
+            "url": secondary.url,
+            "isAiGenerated": secondary.isAiGenerated,
+            "altText": secondary.altText,
+        } if secondary else None,
+        "gallery": [
             {
-                "id": i.id_,
                 "url": i.url,
                 "altText": i.altText,
-                "isPrimary": i.isPrimary,
                 "isAiGenerated": i.isAiGenerated,
+                "isPrimary": i.isPrimary,
                 "position": i.position,
             }
             for i in images
         ],
+        "aiImageCount": len(ai_images),
         "variants": [
             {
                 "id": v.id_,
@@ -114,17 +146,26 @@ async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
             }
             for v in variants
         ],
-        "retailerListings": [
+        "sizes": sizes,
+        "colors": colors,
+        "retailers": [
             {
-                "id": l.id_,
                 "retailer": l.retailer,
-                "retailerProductUrl": l.retailerProductUrl,
-                "retailerImageUrl": l.retailerImageUrl,
-                "rawPrice": _dec(l.rawPrice),
+                "rawPrice": float(l.rawPrice) if l.rawPrice is not None else None,
                 "availabilityStatus": l.availabilityStatus,
+                "affiliateUrl": link_map.get(l.id_).convertedUrl if link_map.get(l.id_) else l.retailerProductUrl,
+                "affiliatePartner": link_map.get(l.id_).partner if link_map.get(l.id_) else None,
+                "pending": link_map.get(l.id_).pendingConversion if link_map.get(l.id_) else True,
             }
             for l in listings
         ],
+        "buyNow": {
+            "retailer": best_listing.retailer,
+            "url": best_affiliate.convertedUrl if best_affiliate else best_listing.retailerProductUrl,
+            "partner": best_affiliate.partner if best_affiliate else None,
+            "pending": best_affiliate.pendingConversion if best_affiliate else True,
+            "trackingId": best_affiliate.partnerLinkId if best_affiliate else None,
+        } if best_listing else None,
     }
 
 
@@ -314,24 +355,37 @@ async def _category_sections(db: AsyncSession) -> list[dict[str, Any]]:
 
 
 async def autocomplete(db: AsyncSession, query: str) -> dict[str, Any]:
-    """Lightweight search across product titles + brand names. Returns suggestions."""
-    if not query:
-        return {"query": "", "suggestions": []}
-    pattern = f"%{query.lower()}%"
-    titles = (await db.execute(
-        select(Product.title, Product.slug)
-        .where(func.lower(Product.title).like(pattern), Product.status == "ACTIVE")
+    term = query.strip() if query else ""
+    if not term:
+        return {"products": [], "brands": [], "categories": []}
+
+    pattern = f"%{term.lower()}%"
+
+    # Query products (include brand name)
+    products_rows = (await db.execute(
+        select(Product.slug, Product.title, Brand.name)
+        .join(Brand, Brand.id_ == Product.brandId)
+        .where(Product.status == "ACTIVE", func.lower(Product.title).like(pattern))
         .limit(5)
     )).all()
-    brands = (await db.execute(
-        select(Brand.name, Brand.slug)
-        .where(func.lower(Brand.name).like(pattern), Brand.status == "ACTIVE")
+
+    # Query brands
+    brands_rows = (await db.execute(
+        select(Brand.slug, Brand.name)
+        .where(Brand.status == "ACTIVE", func.lower(Brand.name).like(pattern))
         .limit(5)
     )).all()
+
+    # Query categories
+    categories_rows = (await db.execute(
+        select(Category.slug, Category.name, Category.path)
+        .where(or_(func.lower(Category.name).like(pattern), func.lower(Category.slug).like(pattern)))
+        .order_by(Category.displayOrder.asc())
+        .limit(5)
+    )).all()
+
     return {
-        "query": query,
-        "suggestions": (
-            [{"kind": "product", "label": t[0], "slug": t[1]} for t in titles]
-            + [{"kind": "brand", "label": b[0], "slug": b[1]} for b in brands]
-        ),
+        "products": [{"slug": r[0], "title": r[1], "brand": r[2]} for r in products_rows],
+        "brands": [{"slug": r[0], "name": r[1]} for r in brands_rows],
+        "categories": [{"slug": r[0], "name": r[1], "path": r[2]} for r in categories_rows],
     }

@@ -21,7 +21,7 @@
         -Server
     }
 
-    reverse_proxy api:4000 {
+    reverse_proxy api:5000 {
         # Forward the original client IP so the NestJS rate limiter and
         # request logger see the real source, not Caddy's container IP.
         header_up X-Real-IP {remote_host}

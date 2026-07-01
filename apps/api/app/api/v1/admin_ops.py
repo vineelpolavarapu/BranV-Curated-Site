@@ -261,18 +261,56 @@ async def recon_get(payout_id: str, db: DbDep) -> dict[str, Any]:
         select(AffiliatePayoutItem).where(AffiliatePayoutItem.payoutId == payout_id)
         .order_by(AffiliatePayoutItem.createdAt.asc())
     )).scalars().all()
+
+    # Hydrate matched click events and products
+    click_ids = [it.matchedClickEventId for it in items if it.matchedClickEventId]
+    clicks = (await db.execute(
+        select(ClickEvent).where(ClickEvent.id_.in_(click_ids))
+    )).scalars().all() if click_ids else []
+    click_map = {c.id_: c for c in clicks}
+
+    prod_ids = [c.productId for c in clicks if c.productId]
+    products = (await db.execute(
+        select(Product.id_, Product.title, Product.slug).where(Product.id_.in_(prod_ids))
+    )).all() if prod_ids else []
+    prod_map = {p_row[0]: {"title": p_row[1], "slug": p_row[2]} for p_row in products}
+
+    shaped_items = []
+    for it in items:
+        matched_click_event = None
+        if it.matchedClickEventId:
+            c = click_map.get(it.matchedClickEventId)
+            if c:
+                p_info = prod_map.get(c.productId)
+                matched_click_event = {
+                    "id": c.id_,
+                    "product": {
+                        "title": p_info["title"],
+                        "slug": p_info["slug"],
+                    } if p_info else None
+                }
+
+        shaped_items.append({
+            "id": it.id_,
+            "status": it.status,
+            "retailerOrderId": it.retailerOrderId,
+            "amountInr": str(it.amountInr) if it.amountInr else None,
+            "commissionInr": str(it.commissionInr) if it.commissionInr else None,
+            "occurredAt": _iso(it.occurredAt),
+            "matchedClickEvent": matched_click_event,
+        })
+
     return {
-        "id": p.id_, "partner": p.partner, "csvFilename": p.csvFilename, "rowCount": p.rowCount,
-        "items": [
-            {
-                "id": it.id_, "status": it.status,
-                "retailerOrderId": it.retailerOrderId,
-                "amountInr": str(it.amountInr) if it.amountInr else None,
-                "commissionInr": str(it.commissionInr) if it.commissionInr else None,
-                "occurredAt": _iso(it.occurredAt),
-            }
-            for it in items
-        ],
+        "id": p.id_,
+        "partner": p.partner,
+        "csvFilename": p.csvFilename,
+        "rowCount": p.rowCount,
+        "matchedCount": p.matchedCount,
+        "unmatchedCount": p.unmatchedCount,
+        "ambiguousCount": p.ambiguousCount,
+        "notes": p.notes,
+        "createdAt": _iso(p.createdAt),
+        "items": shaped_items,
     }
 
 

@@ -38,9 +38,12 @@ from ...core.auth_deps import (
 from ...core.pagination import make_page
 from ...core.pydantic_config import ApiModel
 from ...db.models import (
+    Brand,
     NewsletterSubscriber,
     Notification,
     NotificationPreference,
+    Product,
+    ProductImage,
     Review,
     WardrobeItem,
     WishlistItem,
@@ -109,16 +112,61 @@ async def wishlist_list(
         .offset((page - 1) * pageSize)
         .limit(pageSize)
     )).scalars().all()
-    data = [
-        {
+
+    product_ids = [w.productId for w in rows]
+    products = (await db.execute(
+        select(Product).where(Product.id_.in_(product_ids))
+    )).scalars().all() if product_ids else []
+    product_map = {p.id_: p for p in products}
+
+    brand_ids = [p.brandId for p in products if p.brandId]
+    brands = (await db.execute(
+        select(Brand).where(Brand.id_.in_(brand_ids))
+    )).scalars().all() if brand_ids else []
+    brand_map = {b.id_: b for b in brands}
+
+    images = (await db.execute(
+        select(ProductImage).where(ProductImage.productId.in_(product_ids), ProductImage.isPrimary == True)
+    )).scalars().all() if product_ids else []
+    image_map = {img.productId: img for img in images}
+
+    items = []
+    for w in rows:
+        p = product_map.get(w.productId)
+        if not p:
+            continue
+        b = brand_map.get(p.brandId)
+        img = image_map.get(p.id_)
+        items.append({
             "id": w.id_,
             "productId": w.productId,
             "notifyOnPriceDrop": w.notifyOnPriceDrop,
             "createdAt": _iso_ms(w.createdAt),
-        }
-        for w in rows
-    ]
-    return make_page(data, total, page, pageSize)
+            "product": {
+                "id": p.id_,
+                "slug": p.slug,
+                "title": p.title,
+                "price": float(p.price) if p.price is not None else None,
+                "mrp": float(p.mrp) if p.mrp is not None else None,
+                "discountPct": float(p.discountPct) if p.discountPct is not None else None,
+                "currency": p.currency,
+                "brand": {"id": b.id_, "name": b.name, "slug": b.slug} if b else None,
+                "primaryImage": {
+                    "url": img.url,
+                    "altText": img.altText,
+                    "isAiGenerated": img.isAiGenerated,
+                } if img else None,
+            }
+        })
+
+    import math
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "pageSize": pageSize,
+        "totalPages": math.ceil(total / pageSize) or 1,
+    }
 
 
 @wishlist_router.post("/wishlist/items", status_code=201)
@@ -200,29 +248,108 @@ async def wardrobe_list(
     pageSize: Annotated[int, Query(ge=1, le=100)] = 24,
 ) -> dict[str, Any]:
     total = (await db.execute(
-        select(func.count(WardrobeItem.id_)).where(WardrobeItem.userId == user.id)
+        select(func.count(WardrobeItem.id_))
+        .where(WardrobeItem.userId == user.id, WardrobeItem.removedAt.is_(None))
     )).scalar_one()
     rows = (await db.execute(
         select(WardrobeItem)
-        .where(WardrobeItem.userId == user.id)
+        .where(WardrobeItem.userId == user.id, WardrobeItem.removedAt.is_(None))
         .order_by(desc(WardrobeItem.createdAt))
         .offset((page - 1) * pageSize)
         .limit(pageSize)
     )).scalars().all()
-    data = [
-        {
+
+    product_ids = [w.productId for w in rows]
+    products = (await db.execute(
+        select(Product).where(Product.id_.in_(product_ids))
+    )).scalars().all() if product_ids else []
+    product_map = {p.id_: p for p in products}
+
+    brand_ids = [p.brandId for p in products if p.brandId]
+    brands = (await db.execute(
+        select(Brand).where(Brand.id_.in_(brand_ids))
+    )).scalars().all() if brand_ids else []
+    brand_map = {b.id_: b for b in brands}
+
+    images = (await db.execute(
+        select(ProductImage).where(ProductImage.productId.in_(product_ids), ProductImage.isPrimary == True)
+    )).scalars().all() if product_ids else []
+    image_map = {img.productId: img for img in images}
+
+    items = []
+    for w in rows:
+        p = product_map.get(w.productId)
+        if not p:
+            continue
+        b = brand_map.get(p.brandId)
+        img = image_map.get(p.id_)
+        items.append({
             "id": w.id_,
-            "productId": w.productId,
             "retailer": w.retailer,
-            "selfReportedPrice": str(w.selfReportedPrice) if w.selfReportedPrice else None,
+            "selfReportedPrice": float(w.selfReportedPrice) if w.selfReportedPrice else None,
             "selfReportedDate": _iso_ms(w.selfReportedDate),
             "notes": w.notes,
             "tags": w.tags or [],
             "createdAt": _iso_ms(w.createdAt),
+            "product": {
+                "id": p.id_,
+                "slug": p.slug,
+                "title": p.title,
+                "price": float(p.price) if p.price is not None else None,
+                "currency": p.currency,
+                "brand": {"id": b.id_, "name": b.name, "slug": b.slug} if b else None,
+                "primaryImage": {
+                    "url": img.url,
+                    "altText": img.altText,
+                    "isAiGenerated": img.isAiGenerated,
+                } if img else None,
+            }
+        })
+
+    # Stats for all active wardrobe items
+    all_items = (await db.execute(
+        select(WardrobeItem)
+        .where(WardrobeItem.userId == user.id, WardrobeItem.removedAt.is_(None))
+    )).scalars().all()
+    all_prod_ids = [w.productId for w in all_items]
+    all_products = (await db.execute(
+        select(Product.id_, Product.price, Brand.name, Brand.slug)
+        .join(Brand, Brand.id_ == Product.brandId)
+        .where(Product.id_.in_(all_prod_ids))
+    )).all() if all_prod_ids else []
+    prod_price_brand_map = {p[0]: {"price": p[1], "brand_name": p[2], "brand_slug": p[3]} for p in all_products}
+
+    total_spend = 0.0
+    brand_counts = {}
+    for w in all_items:
+        p_info = prod_price_brand_map.get(w.productId)
+        if not p_info:
+            continue
+        price = float(w.selfReportedPrice) if w.selfReportedPrice else float(p_info["price"])
+        total_spend += price
+        b_slug = p_info["brand_slug"]
+        b_name = p_info["brand_name"]
+        if b_slug not in brand_counts:
+            brand_counts[b_slug] = {"name": b_name, "slug": b_slug, "count": 0}
+        brand_counts[b_slug]["count"] += 1
+
+    fav_brand = None
+    if brand_counts:
+        fav_brand = sorted(brand_counts.values(), key=lambda x: x["count"], reverse=True)[0]
+
+    import math
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "pageSize": pageSize,
+        "totalPages": math.ceil(total / pageSize) or 1,
+        "stats": {
+            "totalItems": len(all_items),
+            "totalSpend": total_spend,
+            "favoriteBrand": fav_brand,
         }
-        for w in rows
-    ]
-    return make_page(data, total, page, pageSize)
+    }
 
 
 @wardrobe_router.delete(
@@ -250,7 +377,7 @@ reviews_router = APIRouter(prefix="/products/{product_id}/reviews", tags=["revie
 class CreateReviewRequest(ApiModel):
     rating: int = Field(ge=1, le=5)
     title: str | None = Field(default=None, max_length=140)
-    body: str = Field(min_length=1, max_length=4000)
+    body: str | None = Field(default=None, max_length=4000)
     imageUrls: list[str] | None = Field(default=None, max_length=6)
 
 
@@ -380,7 +507,14 @@ async def notifications_list(
         }
         for n in rows
     ]
-    return make_page(data, total, page, pageSize)
+    unread_count = (await db.execute(
+        select(func.count(Notification.id_)).where(
+            Notification.userId == user.id, Notification.readAt.is_(None)
+        )
+    )).scalar_one()
+    res = make_page(data, total, page, pageSize)
+    res["unread"] = unread_count
+    return res
 
 
 @notifications_router.get("/notifications/unread-count")

@@ -31,6 +31,8 @@ from ...core.pagination import make_page
 from ...core.pydantic_config import ApiModel
 from ...core.slug import ensure_unique_slug, slugify
 from ...db.models import (
+    Brand,
+    Category,
     Product,
     ProductImage,
     ProductRetailerListing,
@@ -161,6 +163,95 @@ def _serialize_product(p: Product) -> dict[str, Any]:
     }
 
 
+async def _serialize_admin_products(db: AsyncSession, products: list[Product]) -> list[dict[str, Any]]:
+    if not products:
+        return []
+
+    product_ids = [p.id_ for p in products]
+
+    # Batch query brands
+    brand_ids = list({p.brandId for p in products if p.brandId})
+    brands = (await db.execute(
+        select(Brand.id_, Brand.name, Brand.slug).where(Brand.id_.in_(brand_ids))
+    )).all() if brand_ids else []
+    brand_map = {b[0]: {"id": b[0], "name": b[1], "slug": b[2]} for b in brands}
+
+    # Batch query categories
+    cat_ids = list({p.categoryId for p in products if p.categoryId} | {p.subcategoryId for p in products if p.subcategoryId})
+    categories = (await db.execute(
+        select(Category.id_, Category.name, Category.slug).where(Category.id_.in_(cat_ids))
+    )).all() if cat_ids else []
+    cat_map = {c[0]: {"id": c[0], "name": c[1], "slug": c[2]} for c in categories}
+
+    # Batch query images
+    images = (await db.execute(
+        select(ProductImage).where(ProductImage.productId.in_(product_ids)).order_by(ProductImage.position.asc())
+    )).scalars().all() if product_ids else []
+
+    images_by_prod = {}
+    for img in images:
+        if img.productId not in images_by_prod:
+            images_by_prod[img.productId] = []
+        images_by_prod[img.productId].append({
+            "id": img.id_,
+            "url": img.url,
+            "altText": img.altText,
+            "isPrimary": img.isPrimary,
+            "isAiGenerated": img.isAiGenerated,
+            "position": img.position,
+        })
+
+    # Batch query variants count
+    variants_counts = (await db.execute(
+        select(ProductVariant.productId, func.count(ProductVariant.id_))
+        .where(ProductVariant.productId.in_(product_ids))
+        .group_by(ProductVariant.productId)
+    )).all() if product_ids else []
+    variants_count_map = {v[0]: v[1] for v in variants_counts}
+
+    # Batch query listings count
+    listings_counts = (await db.execute(
+        select(ProductRetailerListing.productId, func.count(ProductRetailerListing.id_))
+        .where(ProductRetailerListing.productId.in_(product_ids))
+        .group_by(ProductRetailerListing.productId)
+    )).all() if product_ids else []
+    listings_count_map = {l[0]: l[1] for l in listings_counts}
+
+    out = []
+    for p in products:
+        p_imgs = images_by_prod.get(p.id_) or []
+        out.append({
+            "id": p.id_,
+            "slug": p.slug,
+            "title": p.title,
+            "brandId": p.brandId,
+            "categoryId": p.categoryId,
+            "subcategoryId": p.subcategoryId,
+            "description": p.description,
+            "price": _dec(p.price),
+            "mrp": _dec(p.mrp),
+            "discountPct": _dec(p.discountPct),
+            "currency": p.currency,
+            "primaryRetailer": p.primaryRetailer,
+            "status": p.status,
+            "metaTitle": p.metaTitle,
+            "metaDescription": p.metaDescription,
+            "tags": p.tags or [],
+            "featuredUntil": _iso(p.featuredUntil),
+            "createdAt": _iso(p.createdAt),
+            "updatedAt": _iso(p.updatedAt),
+            "brand": brand_map.get(p.brandId) if p.brandId else None,
+            "category": cat_map.get(p.categoryId) if p.categoryId else None,
+            "subcategory": cat_map.get(p.subcategoryId) if p.subcategoryId else None,
+            "images": p_imgs,
+            "_count": {
+                "variants": variants_count_map.get(p.id_) or 0,
+                "retailerListings": listings_count_map.get(p.id_) or 0,
+            }
+        })
+    return out
+
+
 async def _unique_product_slug(db: AsyncSession, base: str, exclude_id: str | None = None) -> str:
     async def taken(cand: str) -> bool:
         row = (await db.execute(select(Product.id_).where(Product.slug == cand))).scalar_one_or_none()
@@ -207,6 +298,7 @@ class QuickAddRequest(ApiModel):
     rawUrl: str = Field(min_length=1, max_length=2048)
     retailer: str = Field(min_length=1, max_length=40)
     categoryId: str
+    subcategoryId: str | None = None
     price: float
     brandId: str | None = None
     newBrandName: str | None = Field(default=None, max_length=120)
@@ -266,6 +358,7 @@ async def quick_add(
         id_=pid,
         brandId=brand_id,
         categoryId=payload.categoryId,
+        subcategoryId=payload.subcategoryId,
         slug=p_slug,
         title=payload.title,
         description=payload.description,
@@ -342,10 +435,17 @@ async def quick_add(
         metadata={"retailer": payload.retailer, "brandId": brand_id},
     )
     fresh = (await db.execute(select(Product).where(Product.id_ == pid))).scalar_one()
-    out = _serialize_product(fresh)
-    out["affiliateUrl"] = converted_url
-    out["affiliatePending"] = pending
-    return out
+    return {
+        "product": {
+            "id": fresh.id_,
+            "slug": fresh.slug,
+            "title": fresh.title,
+        },
+        "affiliate": {
+            "pendingConversion": pending,
+            "partner": partner,
+        }
+    }
 
 
 @router.get("", dependencies=AdminDeps)
@@ -374,7 +474,8 @@ async def admin_list(
         select(Product).where(where).order_by(desc(Product.createdAt))
         .offset((page - 1) * pageSize).limit(pageSize)
     )).scalars().all()
-    return make_page([_serialize_product(p) for p in rows], total, page, pageSize)
+    serialized_rows = await _serialize_admin_products(db, rows)
+    return make_page(serialized_rows, total, page, pageSize)
 
 
 @router.get("/{product_id}", dependencies=AdminDeps)
@@ -382,19 +483,13 @@ async def admin_get(product_id: str, db: DbDep) -> dict[str, Any]:
     p = (await db.execute(select(Product).where(Product.id_ == product_id))).scalar_one_or_none()
     if not p:
         raise HTTPException(404, "Product not found")
-    out = _serialize_product(p)
-    out["images"] = [
-        {"id": i.id_, "url": i.url, "altText": i.altText, "isPrimary": i.isPrimary,
-         "isAiGenerated": i.isAiGenerated, "position": i.position}
-        for i in (await db.execute(
-            select(ProductImage).where(ProductImage.productId == product_id).order_by(ProductImage.position.asc())
-        )).scalars().all()
-    ]
+    out_list = await _serialize_admin_products(db, [p])
+    out = out_list[0]
     out["variants"] = [
         {"id": v.id_, "sku": v.sku, "attributes": v.attributes, "color": v.color,
          "size": v.size, "isDefault": v.isDefault}
         for v in (await db.execute(
-            select(ProductVariant).where(ProductVariant.productId == product_id)
+            select(ProductVariant).where(ProductVariant.productId == product_id).order_by(ProductVariant.createdAt.asc())
         )).scalars().all()
     ]
     out["retailerListings"] = [
