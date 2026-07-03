@@ -9,7 +9,8 @@
       "Bash(curl -s -c /tmp/cj.txt -X POST http://127.0.0.1:5000/api/auth/admin/login -H 'content-type: application/json' -d '{\"email\":\"__TRACKED_VAR__\",\"password\":\"__TRACKED_VAR__\",\"totpCode\":\"__TRACKED_VAR__\"}')",
       "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"killed\")",
       "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"done\")",
-      "PowerShell(cd C:\\\\vineel\\\\BranV\\\\apps\\\\api; & \"$env:USERPROFILE\\\\.local\\\\bin\\\\uv.exe\" run python -c \"from app.main import create_app; a = create_app\\(\\); print\\('routes:', len\\(a.routes\\)\\)\")"
+      "PowerShell(cd C:\\\\vineel\\\\BranV\\\\apps\\\\api; & \"$env:USERPROFILE\\\\.local\\\\bin\\\\uv.exe\" run python -c \"from app.main import create_app; a = create_app\\(\\); print\\('routes:', len\\(a.routes\\)\\)\")",
+      "Bash(pnpm --filter web exec tsc --noEmit)"
     ]
   }
 }

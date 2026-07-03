@@ -20,19 +20,18 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-# Repo-root .env. File layout (parents from this file):
-#   parents[0] = app/core/
-#   parents[1] = app/
-#   parents[2] = api/
-#   parents[3] = apps/
-#   parents[4] = <repo root>          ← .env lives here
-_REPO_ROOT = Path(__file__).resolve().parents[4]
-_ENV_PATH = _REPO_ROOT / ".env"
+# Repo-root .env for local dev. In the monorepo layout, this file lives at
+# apps/api/app/core/settings.py so parents[4] is the repo root. In the Docker
+# container it lives at /app/app/core/settings.py — fewer parents — and env vars
+# come from Compose's `environment:` block instead, so falling back to no .env
+# file is the correct behavior there.
+_parents = Path(__file__).resolve().parents
+_ENV_PATH: Path | None = _parents[4] / ".env" if len(_parents) > 4 else None
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=str(_ENV_PATH) if _ENV_PATH.exists() else None,
+        env_file=str(_ENV_PATH) if _ENV_PATH and _ENV_PATH.exists() else None,
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",  # silently ignore Nest-only or future vars

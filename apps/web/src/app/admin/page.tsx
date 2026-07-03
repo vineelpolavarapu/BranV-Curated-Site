@@ -29,38 +29,87 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const today = data.overview['1d'];
-  const mtd = data.overview['30d'];
+  // TODO(backend-parity): the FastAPI port of /admin/analytics/dashboard
+  // returns a flat overview shape (clickEvents7d, selfReportedConversions7d)
+  // instead of the 1d/7d/30d time-window slices + commission fields the
+  // original NestJS API exposed. This shim maps whatever the backend actually
+  // returns into the shape the KPI cards expect, with zero fallbacks.
+  // Remove this once apps/api/app/routes/admin_analytics.py returns 1d/7d/30d
+  // slices and estimatedCommissionInr / reconciledCommissionInr.
+  const raw = data as unknown as Record<string, unknown>;
+  const overviewAny = (raw.overview ?? {}) as Record<string, unknown>;
+  const slice = (key: '1d' | '7d' | '30d') =>
+    ((overviewAny[key] ?? {}) as Record<string, number | undefined>);
+  const flatWeekClicks = Number(overviewAny.clickEvents7d ?? 0);
+  const flatWeekConversions = Number(overviewAny.selfReportedConversions7d ?? 0);
+
+  const today = {
+    clicks: slice('1d').clicks ?? 0,
+    selfReportedConversions: slice('1d').selfReportedConversions ?? 0,
+  };
+  const week = {
+    clicks: slice('7d').clicks ?? flatWeekClicks,
+    selfReportedConversions:
+      slice('7d').selfReportedConversions ?? flatWeekConversions,
+  };
+  const mtd = {
+    estimatedCommissionInr: slice('30d').estimatedCommissionInr ?? 0,
+    reconciledCommissionInr: slice('30d').reconciledCommissionInr ?? 0,
+  };
+
+  const trend = (raw.trend ?? []) as DashboardPayload['trend'];
+  const topProducts = (raw.topProducts ??
+    ((raw.content as Record<string, unknown> | undefined)?.topProducts7d ??
+      [])) as DashboardPayload['topProducts'];
+  const lowConversionProducts = (raw.lowConversionProducts ??
+    []) as DashboardPayload['lowConversionProducts'];
+  const backendSystem = (data.system ?? {}) as Partial<
+    DashboardPayload['system']
+  >;
+  const backendOutbox = (backendSystem.notificationOutbox ?? {}) as {
+    pending?: number;
+    failed?: number;
+  };
+  const system = {
+    syncFailureCount: backendSystem.syncFailureCount ?? 0,
+    pendingAffiliateConversions:
+      backendSystem.pendingAffiliateConversions ?? 0,
+    hiddenReviewCount: backendSystem.hiddenReviewCount ?? 0,
+    notificationOutbox: {
+      pending: backendOutbox.pending ?? 0,
+      failed: backendOutbox.failed ?? 0,
+    },
+  };
 
   return (
     <AdminShell title="Dashboard">
       {/* Alert chips */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {data.system.syncFailureCount > 0 && (
+        {system.syncFailureCount > 0 && (
           <Link
             href="/admin/products"
             className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-800 hover:bg-amber-100"
           >
-            {data.system.syncFailureCount} sync failure
-            {data.system.syncFailureCount === 1 ? '' : 's'}
+            {system.syncFailureCount} sync failure
+            {system.syncFailureCount === 1 ? '' : 's'}
           </Link>
         )}
-        {data.system.pendingAffiliateConversions > 0 && (
+        {system.pendingAffiliateConversions > 0 && (
           <span className="rounded-full border border-neutral-300 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-            {data.system.pendingAffiliateConversions} pending affiliate conversions
+            {system.pendingAffiliateConversions} pending affiliate conversions
           </span>
         )}
-        {data.system.notificationOutbox.failed > 0 && (
+        {system.notificationOutbox.failed > 0 && (
           <span className="rounded-full border border-red-300 bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
-            {data.system.notificationOutbox.failed} failed notifications
+            {system.notificationOutbox.failed} failed notifications
           </span>
         )}
-        {data.system.hiddenReviewCount > 0 && (
+        {system.hiddenReviewCount > 0 && (
           <Link
             href="/admin/reviews"
             className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs font-medium hover:bg-neutral-50"
           >
-            {data.system.hiddenReviewCount} hidden reviews
+            {system.hiddenReviewCount} hidden reviews
           </Link>
         )}
       </div>
@@ -70,12 +119,12 @@ export default function AdminDashboardPage() {
         <Kpi
           label="Clicks today"
           value={today.clicks}
-          sub={`${data.overview['7d'].clicks} this week`}
+          sub={`${week.clicks} this week`}
         />
         <Kpi
           label="Conversions today"
           value={today.selfReportedConversions}
-          sub={`${data.overview['7d'].selfReportedConversions} this week`}
+          sub={`${week.selfReportedConversions} this week`}
         />
         <Kpi
           label="Estimated commission MTD"
@@ -94,17 +143,17 @@ export default function AdminDashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
             Clicks · last 14 days
           </h2>
-          <MiniBarChart data={data.trend} ariaLabel="Click events per day" />
+          <MiniBarChart data={trend} ariaLabel="Click events per day" />
         </div>
         <div className={adminCard}>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
             Top products · 30d
           </h2>
-          {data.topProducts.length === 0 ? (
+          {topProducts.length === 0 ? (
             <p className="text-sm text-neutral-500">No clicks yet.</p>
           ) : (
             <ul className="space-y-1.5 text-sm">
-              {data.topProducts.slice(0, 6).map((p) => (
+              {topProducts.slice(0, 6).map((p) => (
                 <li
                   key={p.product.id}
                   className="flex items-baseline justify-between gap-2"
@@ -132,13 +181,13 @@ export default function AdminDashboardPage() {
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
             Low-conversion alerts
           </h2>
-          {data.lowConversionProducts.length === 0 ? (
+          {lowConversionProducts.length === 0 ? (
             <p className="text-sm text-neutral-500">
               Nothing flagged — every clicked product has at least one self-reported buy.
             </p>
           ) : (
             <ul className="space-y-1.5 text-sm">
-              {data.lowConversionProducts.map((p) => (
+              {lowConversionProducts.map((p) => (
                 <li key={p.productId} className="flex items-baseline justify-between gap-2">
                   <Link
                     href={`/products/${p.slug}`}
@@ -167,23 +216,23 @@ export default function AdminDashboardPage() {
           <ul className="space-y-1 text-sm">
             <SystemRow
               label="Notification outbox · pending"
-              value={data.system.notificationOutbox.pending}
+              value={system.notificationOutbox.pending}
             />
             <SystemRow
               label="Notification outbox · failed"
-              value={data.system.notificationOutbox.failed}
+              value={system.notificationOutbox.failed}
             />
             <SystemRow
               label="Listings with 3+ failed syncs"
-              value={data.system.syncFailureCount}
+              value={system.syncFailureCount}
             />
             <SystemRow
               label="Pending affiliate conversions"
-              value={data.system.pendingAffiliateConversions}
+              value={system.pendingAffiliateConversions}
             />
             <SystemRow
               label="Hidden reviews"
-              value={data.system.hiddenReviewCount}
+              value={system.hiddenReviewCount}
             />
             <li className="flex justify-between gap-2 text-neutral-500">
               <span>API p95 · error rate</span>
