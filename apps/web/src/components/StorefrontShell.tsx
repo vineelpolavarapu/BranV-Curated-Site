@@ -21,7 +21,7 @@ export function StorefrontShell({
   return (
     <WishlistProvider>
       <ClickReturnProvider>
-        <div className="min-h-screen pb-16 md:pb-0">
+        <div className="min-h-screen pb-16 lg:pb-0">
           <SiteHeader overlay={heroOverlay} />
           {children}
           <SiteFooter />
@@ -39,20 +39,18 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
   return (
     <header className={headerClasses}>
-      <div className="flex w-full items-center pl-2 pr-4 py-4 md:pl-0 md:pr-6">
+      <div className="flex w-full items-center pl-2 pr-4 py-4 lg:pl-0 lg:pr-6">
         <MobileNavDrawer overlay={overlay} />
         <Link href="/" className="bv-nav-logo inline-flex items-center gap-2 text-xl font-semibold tracking-tight leading-none">
           <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
           <span>BranV</span>
         </Link>
-        {overlay && (
-          <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium md:flex ml-12">
-            <ShopMegaMenu overlay={overlay} />
-            <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New</Link>
-            <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
-            <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
-          </nav>
-        )}
+        <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium lg:flex ml-12">
+          <ShopMegaMenu overlay={overlay} />
+          <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New</Link>
+          <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
+          <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
+        </nav>
         <div className="bv-nav-actions ml-auto flex items-center gap-3">
           <SearchBox overlay={overlay} />
           <AccountPopup overlay={overlay} />

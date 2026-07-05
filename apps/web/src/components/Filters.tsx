@@ -43,10 +43,10 @@ export function Filters({ context }: { context: FilterContext }) {
 
   return (
     <>
-      {/* Mobile trigger */}
+      {/* Mobile + tablet trigger */}
       <button
         onClick={() => setOpenMobile(true)}
-        className="md:hidden flex items-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium"
+        className="lg:hidden flex items-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium"
       >
         Filters
         {activeCount > 0 && (
@@ -57,14 +57,14 @@ export function Filters({ context }: { context: FilterContext }) {
       </button>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:block">
+      <aside className="hidden lg:block">
         <FilterBody context={context} />
       </aside>
 
       {/* Mobile sheet */}
       {openMobile && (
         <div
-          className="fixed inset-0 z-40 flex md:hidden"
+          className="fixed inset-0 z-40 flex lg:hidden"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpenMobile(false);
           }}
@@ -116,7 +116,7 @@ function FilterBody({
       <ToggleFilter param="onSale" label="On sale only" />
       <ToggleFilter param="inStock" label="In stock at retailer" />
       <ToggleFilter param="isNew" label="New arrivals" />
-      <div className="md:hidden pt-2">
+      <div className="lg:hidden pt-2">
         <button
           onClick={onApply}
           className="w-full rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"

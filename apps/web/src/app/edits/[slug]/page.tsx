@@ -50,7 +50,7 @@ export default async function EditDetailPage(props: {
               src={edit.heroUrl}
               alt={edit.title}
               fill
-              sizes="(max-width: 768px) 100vw, 1200px"
+              sizes="(max-width: 1023px) 100vw, 1200px"
               unoptimized
               priority
               className="object-cover"

@@ -10,7 +10,10 @@
       "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"killed\")",
       "PowerShell(Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; \"done\")",
       "PowerShell(cd C:\\\\vineel\\\\BranV\\\\apps\\\\api; & \"$env:USERPROFILE\\\\.local\\\\bin\\\\uv.exe\" run python -c \"from app.main import create_app; a = create_app\\(\\); print\\('routes:', len\\(a.routes\\)\\)\")",
-      "Bash(pnpm --filter web exec tsc --noEmit)"
+      "Bash(pnpm --filter web exec tsc --noEmit)",
+      "Bash(Get-ChildItem -Path \"c:\\\\vineel\\\\BranV\" -Directory)",
+      "Bash(Select-Object Name)",
+      "WebSearch"
     ]
   }
 }

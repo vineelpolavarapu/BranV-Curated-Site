@@ -78,7 +78,7 @@ export function CategoryShowcase({
           </Link>
         </div>
 
-        {/* Mobile: horizontal scroll, 5 cards + trailing view-all card */}
+        {/* Phone (<768px): horizontal scroll strip + trailing view-all card */}
         <ul
           className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden"
         >
@@ -104,8 +104,23 @@ export function CategoryShowcase({
           </li>
         </ul>
 
-        {/* Desktop: existing 5-column grid */}
-        <ul className="hidden gap-4 sm:grid-cols-3 md:grid md:grid-cols-4 lg:grid-cols-5">
+        {/* Tablet (768–1023px): 3-column grid */}
+        <ul className="hidden md:grid lg:hidden grid-cols-3 gap-4">
+          {hasProducts
+            ? items.slice(0, 5).map((p, i) => (
+                <li key={p.id} className={`bv-enter ${STAGGER[i] ?? ''}`}>
+                  <ProductCard product={p} />
+                </li>
+              ))
+            : Array.from({ length: 5 }).map((_, i) => (
+                <li key={i} className={`bv-enter ${STAGGER[i] ?? ''}`}>
+                  <PlaceholderProductCard />
+                </li>
+              ))}
+        </ul>
+
+        {/* Desktop (1024px+): 4–5 column grid */}
+        <ul className="hidden lg:grid grid-cols-4 xl:grid-cols-5 gap-4">
           {hasProducts
             ? items.map((p, i) => (
                 <li key={p.id} className={`bv-enter ${STAGGER[i] ?? ''}`}>

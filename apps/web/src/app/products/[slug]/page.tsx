@@ -61,7 +61,7 @@ export default async function ProductDetailPage(props: {
       <ProductSchema product={product} />
       <AnimateOnScroll>
         <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
-          <div className="grid gap-8 md:grid-cols-2">
+          <div className="grid gap-8 lg:grid-cols-2">
             <div className="bv-enter">
               <Gallery product={product} />
             </div>
@@ -144,7 +144,7 @@ function Gallery({ product }: { product: ProductCardData }) {
               src={hero.url}
               alt={hero.altText ?? product.title}
               fill
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 1023px) 100vw, 50vw"
               className="object-cover"
               unoptimized
               priority

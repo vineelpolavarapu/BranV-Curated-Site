@@ -1,6 +1,12 @@
 import type { Config } from 'tailwindcss';
 import typography from '@tailwindcss/typography';
 
+// Breakpoint semantics:
+//   base          → phone (0–639px)
+//   sm: 640px     → large phone / phablet
+//   md: 768px     → tablet  (tablet-specific tweaks only)
+//   lg: 1024px    → desktop (primary layout split point)
+//   xl: 1280px    → wide desktop
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {

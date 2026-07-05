@@ -207,7 +207,7 @@ export function HeroCarouselMobile() {
       // touch-pan-y tells the browser: vertical scroll is yours, horizontal
       // drag is mine. Without it, the browser may swallow horizontal pointer
       // moves to interpret as a page scroll, and onPointerMove never fires.
-      className="relative aspect-[9/16] max-h-screen w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
+      className="relative aspect-[9/16] max-h-[80vh] w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}
@@ -245,7 +245,7 @@ export function HeroCarouselMobile() {
                 draggable={false}
                 loading="eager"
                 fetchPriority={i === 1 ? 'high' : 'auto'}
-                className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-15 object-[center_110 %]' : ''}${slide.key === 'classic' ? ' scale-125 object-[center_115%]' : ''}`}
+                className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-[1.15] object-[center_110%]' : ''}${slide.key === 'classic' ? ' scale-[1.25] object-[center_115%]' : ''}`}
               />
               <div className="absolute inset-x-0 bottom-0 px-5 pb-16">
                 <div className="text-white">
@@ -254,11 +254,11 @@ export function HeroCarouselMobile() {
                       {slide.eyebrow}
                     </p>
                   )}
-                  <h2 className="text-3xl font-semibold tracking-tight">
+                  <h2 className="text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
                     {slide.headline}
                   </h2>
                   {slide.subtext && (
-                    <p className="mt-3 text-sm leading-relaxed opacity-90">
+                    <p className="mt-3 text-sm leading-relaxed opacity-90 md:text-base md:max-w-lg">
                       {slide.subtext}
                     </p>
                   )}

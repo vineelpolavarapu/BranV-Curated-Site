@@ -22,7 +22,7 @@ export default async function SearchPage(props: {
   return (
     <StorefrontShell>
       <section className="mx-auto max-w-7xl px-6 pt-8">
-        <h1 className="text-3xl font-semibold tracking-tight">
+        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
           Search {q && (
             <span className="text-neutral-500">
               for &ldquo;{q}&rdquo;

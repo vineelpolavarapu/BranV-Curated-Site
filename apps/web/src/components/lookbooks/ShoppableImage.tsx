@@ -28,7 +28,7 @@ export function ShoppableImage({ image }: Props) {
         width={1600}
         height={2000}
         unoptimized
-        sizes="(max-width: 768px) 100vw, 800px"
+        sizes="(max-width: 1023px) 100vw, 800px"
         className="w-full object-cover"
       />
       {image.tags.map((t, idx) => (

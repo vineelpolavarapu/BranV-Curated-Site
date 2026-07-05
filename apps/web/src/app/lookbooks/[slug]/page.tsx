@@ -48,7 +48,7 @@ export default async function LookbookDetailPage(props: {
               src={lb.heroUrl}
               alt={lb.title}
               fill
-              sizes="(max-width: 768px) 100vw, 1200px"
+              sizes="(max-width: 1023px) 100vw, 1200px"
               unoptimized
               priority
               className="object-cover"

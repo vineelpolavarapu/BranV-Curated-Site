@@ -113,7 +113,7 @@ function ListingShell({
   }
   return (
     <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
-      <div className="grid gap-6 md:grid-cols-[220px_1fr]">
+      <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
         <AnimateOnScroll>
           <div className="bv-enter">
             <Filters

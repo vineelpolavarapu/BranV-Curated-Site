@@ -74,7 +74,7 @@ export default function WardrobePage() {
   return (
     <StorefrontShell>
       <section className="mx-auto max-w-7xl px-6 py-8">
-        <h1 className="text-3xl font-semibold tracking-tight">My Wardrobe</h1>
+        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">My Wardrobe</h1>
 
         {loading && (
           <div className="mt-6 h-2 w-32 animate-pulse rounded bg-neutral-200" />

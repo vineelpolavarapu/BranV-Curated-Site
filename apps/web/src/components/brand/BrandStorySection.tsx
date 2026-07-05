@@ -25,7 +25,7 @@ export function BrandStorySection({ story }: { story: BrandStoryPublic }) {
             alt=""
             fill
             unoptimized
-            sizes="(max-width: 768px) 100vw, 768px"
+            sizes="(max-width: 1023px) 100vw, 768px"
             className="object-cover"
           />
         </div>

@@ -60,7 +60,7 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
             className="absolute inset-0 bg-black/40"
             onClick={() => setOpen(false)}
           />
-          <aside className="absolute inset-y-0 left-0 flex w-[82vw] max-w-sm flex-col bg-white shadow-xl">
+          <aside className="absolute inset-y-0 left-0 flex w-[82vw] max-w-sm md:max-w-md flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
               <Link
                 href="/"

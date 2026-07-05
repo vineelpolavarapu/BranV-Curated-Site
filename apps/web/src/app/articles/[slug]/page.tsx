@@ -65,7 +65,7 @@ export default async function ArticleDetailPage(props: {
               src={article.heroUrl}
               alt={article.title}
               fill
-              sizes="(max-width: 768px) 100vw, 768px"
+              sizes="(max-width: 1023px) 100vw, 768px"
               unoptimized
               priority
               className="object-cover"
