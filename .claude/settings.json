@@ -13,7 +13,9 @@
       "Bash(pnpm --filter web exec tsc --noEmit)",
       "Bash(Get-ChildItem -Path \"c:\\\\vineel\\\\BranV\" -Directory)",
       "Bash(Select-Object Name)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(Get-ChildItem -Path \"c:\\\\vineel\\\\BranV\" -Force)",
+      "Bash(Select-Object Name, Mode)"
     ]
   }
 }
