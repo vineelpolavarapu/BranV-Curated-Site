@@ -62,7 +62,7 @@ export default async function ProductDetailPage(props: {
       <AnimateOnScroll>
         <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
           <div className="grid gap-8 lg:grid-cols-2">
-            <div className="bv-enter">
+            <div>
               <Gallery product={product} />
             </div>
             <div className="bv-enter bv-delay-2">
@@ -137,7 +137,7 @@ function Gallery({ product }: { product: ProductCardData }) {
 
   return (
     <div>
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100">
+      <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100">
         {hero && 'url' in hero ? (
           <>
             <Image
@@ -169,7 +169,8 @@ function Gallery({ product }: { product: ProductCardData }) {
           {rest.map((img, idx) => (
             <li
               key={idx}
-              className="relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-100"
+              style={{ animationDelay: `${40 + idx * 40}ms` }}
+              className="bv-enter-fade relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-100"
             >
               <Image
                 src={img.url}

@@ -159,7 +159,7 @@ function WardrobeCard({
             src={img.url}
             alt={img.altText ?? item.product.title}
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
             className="object-cover"
             unoptimized
           />

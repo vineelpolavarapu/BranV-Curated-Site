@@ -58,7 +58,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             src={shownImage.url}
             alt={shownImage.altText ?? product.title}
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
             className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
             unoptimized
           />
@@ -83,7 +83,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               </span>
             )}
             {product.discountPct && product.discountPct > 0 && (
-              <span className="rounded bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+              <span className="rounded bg-neutral-900 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white animate-pop-badge">
                 -{Math.round(product.discountPct)}%
               </span>
             )}

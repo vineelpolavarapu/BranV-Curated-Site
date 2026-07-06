@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Desktop-only hero carousel. Renders at >=768px (parent gates via
-// `hidden md:block`). All image references point at /hero/ (landscape art).
+// Desktop-only hero carousel. Renders at >=1080px (parent gates via matchMedia).
+// All image references point at /hero/ (landscape art).
 // Mobile lives in HeroCarouselMobile.tsx — keep them physically separate so
 // neither component has to deal with the other's image set or layout rules.
 
@@ -113,13 +113,19 @@ export function HeroCarouselDesktop() {
   const realIndex = ((trackIndex - 1) % total + total) % total;
 
   const next = useCallback(() => {
-    setWithTransition(true);
-    setTrackIndex((i) => i + 1);
-  }, []);
+    setTrackIndex((i) => {
+      if (i > total) return i;
+      setWithTransition(true);
+      return i + 1;
+    });
+  }, [total]);
 
   const prev = useCallback(() => {
-    setWithTransition(true);
-    setTrackIndex((i) => i - 1);
+    setTrackIndex((i) => {
+      if (i < 1) return i;
+      setWithTransition(true);
+      return i - 1;
+    });
   }, []);
 
   const goTo = useCallback((i: number) => {
@@ -129,9 +135,49 @@ export function HeroCarouselDesktop() {
 
   useEffect(() => {
     if (isDragging) return;
-    const id = window.setInterval(() => next(), ROTATE_MS);
-    return () => window.clearInterval(id);
-  }, [next, isDragging]);
+    
+    let intervalId: number | null = null;
+
+    const startInterval = () => {
+      if (!intervalId) {
+        intervalId = window.setInterval(() => next(), ROTATE_MS);
+      }
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        setTrackIndex((current) => {
+          if (current > total + 1 || current < 0) {
+            setWithTransition(false);
+            const correctedRealIndex = ((current - 1) % total + total) % total;
+            return correctedRealIndex + 1;
+          }
+          return current;
+        });
+        startInterval();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    if (!document.hidden) {
+      startInterval();
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopInterval();
+    };
+  }, [next, isDragging, total]);
 
   const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     if (e.target !== trackRef.current) return;
@@ -234,7 +280,9 @@ export function HeroCarouselDesktop() {
                 className="absolute inset-0 h-full w-full select-none object-cover"
               />
               <div className="absolute inset-x-0 bottom-0 px-16 pb-28">
-                <div className="max-w-2xl text-white">
+                <div className={`max-w-2xl text-white hero-slide-text ${
+                  i - 1 === realIndex ? 'hero-slide-active' : ''
+                }`}>
                   {slide.eyebrow && (
                     <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.22em] opacity-90">
                       {slide.eyebrow}

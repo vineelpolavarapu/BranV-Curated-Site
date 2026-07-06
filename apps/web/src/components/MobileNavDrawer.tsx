@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { categoryHrefL2 } from '@/lib/category-href';
 
@@ -47,14 +48,14 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
         aria-label="Open menu"
         aria-expanded={open}
         onClick={() => setOpen(true)}
-        className="md:hidden -ml-1 mr-2 inline-flex h-10 w-10 items-center justify-center rounded-md"
+        className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md"
       >
         <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
           <path d="M3 6h16M3 11h16M3 16h16" className={triggerStroke} strokeWidth="1.75" strokeLinecap="round" />
         </svg>
       </button>
 
-      {open && (
+      {open && createPortal(
         <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-modal="true">
           <div
             className="absolute inset-0 bg-black/40"
@@ -65,12 +66,12 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
               <Link
                 href="/"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-2 text-lg font-semibold tracking-tight"
+                className="bv-nav-logo inline-flex items-center gap-0 text-l font-semibold tracking-tight leading-none"
               >
                 <img
                   src="/hero/logo.png"
-                  alt="BranV"
-                  className="h-8 w-8 object-contain"
+                  
+                  className="h-10 w-10 object-contain translate-y-1"
                 />
                 <span>BranV</span>
               </Link>
@@ -165,7 +166,8 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
               </ul>
             </nav>
           </aside>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -20,7 +20,7 @@ export function HeroCarousel() {
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)');
+    const mq = window.matchMedia('(min-width: 1080px)');
     setIsDesktop(mq.matches);
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mq.addEventListener('change', handler);
@@ -31,7 +31,7 @@ export function HeroCarousel() {
   // JS hydrates and the dynamic import resolves.
   if (isDesktop === null) {
     return (
-      <div className="aspect-[9/16] max-h-[80vh] w-full bg-neutral-900 lg:aspect-video lg:max-h-screen" />
+      <div className="h-[100svh] w-full bg-neutral-900" />
     );
   }
 

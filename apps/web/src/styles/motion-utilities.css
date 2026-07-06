@@ -1,0 +1,103 @@
+/* Card Lift Utility */
+.hover-lift {
+  transition: transform var(--motion-fast) var(--ease-standard),
+              box-shadow var(--motion-fast) var(--ease-standard);
+  will-change: transform;
+}
+.hover-lift:hover {
+  transform: translate3d(0, -4px, 0);
+  box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.08);
+}
+
+/* Image Zoom Utility */
+.hover-zoom-container {
+  overflow: hidden;
+}
+.hover-zoom-img {
+  transition: transform var(--motion-slow) var(--ease-standard);
+  will-change: transform;
+}
+.hover-zoom-container:hover .hover-zoom-img {
+  transform: scale(1.04);
+}
+
+/* CTA Slide-Up Utility */
+.hover-slide-cta-btn {
+  transform: translate3d(0, 100%, 0);
+  opacity: 0;
+  transition: transform var(--motion-fast) var(--ease-decelerate),
+              opacity var(--motion-fast) var(--ease-standard);
+}
+.hover-slide-cta-trigger:hover .hover-slide-cta-btn {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+/* Arrow Icon Nudge on Hover */
+.hover-arrow-trigger .arrow-icon {
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.hover-arrow-trigger:hover .arrow-icon {
+  transform: translate3d(var(--distance-micro), 0, 0);
+}
+
+/* Transitions helper */
+.transition-all-fast {
+  transition: all var(--motion-fast) var(--ease-standard);
+}
+.transition-all-medium {
+  transition: all var(--motion-medium) var(--ease-standard);
+}
+
+/* One-shot Badge Pop Animation */
+@keyframes bv-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pop-badge {
+  animation: bv-pop 350ms var(--ease-emphasized) both;
+  animation-delay: 300ms;
+}
+
+/* Success Pop Animation */
+@keyframes success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-success-pop {
+  animation: success-pop 300ms var(--ease-emphasized) both;
+}
+
+/* Error Fade Animation */
+@keyframes error-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-error-fade {
+  animation: error-fade 300ms var(--ease-standard) both;
+}
+
+

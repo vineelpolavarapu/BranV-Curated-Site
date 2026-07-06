@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Mobile-only hero carousel. Renders at <768px (parent gates via `md:hidden`).
+// Mobile-only hero carousel. Renders at <1080px (parent gates via matchMedia).
 // All image references point at /mobile-hero/mobile_*.svg — 9:16 portrait art.
 // This component has NO knowledge of /hero/ or desktop layout. Changing
-// the 768px breakpoint or desktop visuals will not affect this file.
+// the 1080px breakpoint or desktop visuals will not affect this file.
 
 type HeroSlide = {
   key: string;
@@ -107,19 +107,35 @@ export function HeroCarouselMobile() {
   const pointerStartX = useRef<number | null>(null);
   const pointerMoved = useRef(false);
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const [viewportHeight, setViewportHeight] = useState<string>('100vh');
+
+  useEffect(() => {
+    const updateHeight = () => {
+      setViewportHeight(`${window.innerHeight}px`);
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
 
   const DRAG_THRESHOLD = 5;
 
   const realIndex = ((trackIndex - 1) % total + total) % total;
 
   const next = useCallback(() => {
-    setWithTransition(true);
-    setTrackIndex((i) => i + 1);
-  }, []);
+    setTrackIndex((i) => {
+      if (i > total) return i;
+      setWithTransition(true);
+      return i + 1;
+    });
+  }, [total]);
 
   const prev = useCallback(() => {
-    setWithTransition(true);
-    setTrackIndex((i) => i - 1);
+    setTrackIndex((i) => {
+      if (i < 1) return i;
+      setWithTransition(true);
+      return i - 1;
+    });
   }, []);
 
   const goTo = useCallback((i: number) => {
@@ -129,9 +145,49 @@ export function HeroCarouselMobile() {
 
   useEffect(() => {
     if (isDragging) return;
-    const id = window.setInterval(() => next(), ROTATE_MS);
-    return () => window.clearInterval(id);
-  }, [next, isDragging]);
+    
+    let intervalId: number | null = null;
+
+    const startInterval = () => {
+      if (!intervalId) {
+        intervalId = window.setInterval(() => next(), ROTATE_MS);
+      }
+    };
+
+    const stopInterval = () => {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        stopInterval();
+      } else {
+        setTrackIndex((current) => {
+          if (current > total + 1 || current < 0) {
+            setWithTransition(false);
+            const correctedRealIndex = ((current - 1) % total + total) % total;
+            return correctedRealIndex + 1;
+          }
+          return current;
+        });
+        startInterval();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    if (!document.hidden) {
+      startInterval();
+    }
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      stopInterval();
+    };
+  }, [next, isDragging, total]);
 
   const handleTransitionEnd = (e: React.TransitionEvent<HTMLDivElement>) => {
     if (e.target !== trackRef.current) return;
@@ -201,13 +257,8 @@ export function HeroCarouselMobile() {
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      // 9:16 aspect locks the section to the portrait art so object-cover
-      // (below) cannot crop. max-h-screen prevents overflow on landscape
-      // phones where 100vw × 16/9 would exceed the viewport.
-      // touch-pan-y tells the browser: vertical scroll is yours, horizontal
-      // drag is mine. Without it, the browser may swallow horizontal pointer
-      // moves to interpret as a page scroll, and onPointerMove never fires.
-      className="relative aspect-[9/16] max-h-[80vh] w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
+      className="relative w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
+      style={{ height: viewportHeight }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}
@@ -240,15 +291,17 @@ export function HeroCarouselMobile() {
                   Switch to object-contain if you ever ship art that isn't
                   exactly 9:16. */}
               <img
-                src={slide.imageUrl}
-                alt={slide.headline}
+                alt="category"
                 draggable={false}
                 loading="eager"
                 fetchPriority={i === 1 ? 'high' : 'auto'}
-                className={`absolute inset-0 h-full w-full select-none object-cover${slide.key === 'fashion' ? ' scale-[1.15] object-[center_110%]' : ''}${slide.key === 'classic' ? ' scale-[1.25] object-[center_115%]' : ''}`}
+                className="absolute inset-0 h-full w-full select-none object-cover"
+                src={slide.imageUrl}
               />
               <div className="absolute inset-x-0 bottom-0 px-5 pb-16">
-                <div className="text-white">
+                <div className={`text-white hero-slide-text ${
+                  i - 1 === realIndex ? 'hero-slide-active' : ''
+                }`}>
                   {slide.eyebrow && (
                     <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] opacity-90">
                       {slide.eyebrow}

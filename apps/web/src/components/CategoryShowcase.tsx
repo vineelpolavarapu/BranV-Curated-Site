@@ -72,9 +72,9 @@ export function CategoryShowcase({
           </h2>
           <Link
             href={href}
-            className="bv-enter bv-delay-1 hidden shrink-0 rounded-full bg-neutral-900 px-6 py-2.5 text-xs font-medium uppercase tracking-[0.18em] text-white transition-[background-color,transform] duration-200 hover:scale-[1.03] hover:bg-neutral-800 md:inline-flex"
+            className="bv-enter bv-delay-1 group hidden shrink-0 rounded-full bg-neutral-900 px-6 py-2.5 text-xs font-medium uppercase tracking-[0.18em] text-white transition-[background-color,transform] duration-200 hover:scale-[1.03] hover:bg-neutral-800 md:inline-flex items-center gap-1"
           >
-            View all →
+            View all <span className="transition-transform duration-180 ease-in-out group-hover:translate-x-0.5">→</span>
           </Link>
         </div>
 
@@ -119,7 +119,7 @@ export function CategoryShowcase({
               ))}
         </ul>
 
-        {/* Desktop (1024px+): 4–5 column grid */}
+        {/* Desktop (1080px+): 4–5 column grid */}
         <ul className="hidden lg:grid grid-cols-4 xl:grid-cols-5 gap-4">
           {hasProducts
             ? items.map((p, i) => (

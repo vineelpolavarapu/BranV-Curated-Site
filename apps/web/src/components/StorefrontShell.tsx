@@ -1,5 +1,7 @@
+'use client';
+
 import Link from 'next/link';
-import type { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { SearchBox } from './SearchBox';
 import { MobileBottomNav } from './MobileBottomNav';
 import { MobileNavDrawer } from './MobileNavDrawer';
@@ -33,15 +35,45 @@ export function StorefrontShell({
 }
 
 function SiteHeader({ overlay = false }: { overlay?: boolean }) {
-  const headerClasses = overlay
-    ? 'absolute inset-x-0 top-0 z-30 text-white'
-    : 'sticky top-0 z-30 border-b border-neutral-200 bg-white/95 text-neutral-700 backdrop-blur';
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // Keep header visible at the top
+      if (currentScrollY <= 80) {
+        setVisible(true);
+      } else {
+        // Hide if scrolling down, show if scrolling up
+        if (currentScrollY > lastScrollY) {
+          setVisible(false);
+        } else {
+          setVisible(true);
+        }
+      }
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  const headerBaseClasses = overlay
+    ? 'fixed inset-x-0 top-0 z-30 text-white transition-all duration-300 ease-out'
+    : 'sticky top-0 z-30 border-b border-neutral-200 bg-white/95 text-neutral-700 backdrop-blur transition-all duration-300 ease-out';
+
+  const visibilityClasses = visible
+    ? 'translate-y-0 opacity-100'
+    : '-translate-y-full opacity-0 pointer-events-none';
+
   const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
+
   return (
-    <header className={headerClasses}>
-      <div className="flex w-full items-center pl-2 pr-4 py-4 lg:pl-0 lg:pr-6">
-        <MobileNavDrawer overlay={overlay} />
-        <Link href="/" className="bv-nav-logo inline-flex items-center gap-2 text-xl font-semibold tracking-tight leading-none">
+    <header className={`${headerBaseClasses} ${visibilityClasses}`}>
+      <div className="flex w-full items-center px-4 py-4 lg:pl-0 lg:pr-6">
+        <Link href="/" className="bv-nav-logo inline-flex items-center gap-0 text-l font-semibold tracking-tight leading-none">
           <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
           <span>BranV</span>
         </Link>
@@ -53,7 +85,10 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         </nav>
         <div className="bv-nav-actions ml-auto flex items-center gap-3">
           <SearchBox overlay={overlay} />
-          <AccountPopup overlay={overlay} />
+          <div className="hidden lg:block">
+            <AccountPopup overlay={overlay} />
+          </div>
+          <MobileNavDrawer overlay={overlay} />
         </div>
       </div>
     </header>

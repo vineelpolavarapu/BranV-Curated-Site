@@ -67,19 +67,19 @@ export default async function ArticlesIndexPage(props: {
 
 function ArticleCard({ article }: { article: ArticleSummary }) {
   return (
-    <article className="group flex flex-col transition-transform duration-200 hover:-translate-y-1">
+    <article className="group flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.08)] rounded-xl p-3 bg-white border border-transparent hover:border-neutral-100">
       <Link
         href={`/articles/${article.slug}`}
-        className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-100"
+        className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-neutral-100"
       >
         {article.heroUrl ? (
           <Image
             src={article.heroUrl}
             alt={article.title}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1080px) 50vw, 33vw"
             unoptimized
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+            className="object-cover transition-transform duration-400 ease-in-out group-hover:scale-[1.05]"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-neutral-300">
@@ -103,7 +103,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
         )}
         <Link
           href={`/articles/${article.slug}`}
-          className="text-lg font-semibold leading-snug tracking-tight text-neutral-900 underline-offset-2 transition-[text-decoration-color] duration-200 hover:underline"
+          className="text-lg font-semibold leading-snug tracking-tight text-neutral-900 underline decoration-transparent hover:decoration-neutral-900 underline-offset-4 transition-[text-decoration-color] duration-200"
         >
           {article.title}
         </Link>
@@ -112,13 +112,13 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
             {article.excerpt}
           </p>
         )}
-        <p className="mt-3 text-xs text-neutral-500">
+        <p className="mt-3 text-xs text-neutral-500 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
           {article.publishedAt &&
             new Date(article.publishedAt).toLocaleDateString(undefined, {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
-            })}
+              })}
           {article.readingMinutes !== null && (
             <span> · {article.readingMinutes} min read</span>
           )}

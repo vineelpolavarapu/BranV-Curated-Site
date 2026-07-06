@@ -8,6 +8,8 @@ import { CategoryHashFilter } from '@/components/CategoryHashFilter';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { categoryHrefL2 } from '@/lib/category-href';
 
+import { SubcategoryChips } from '@/components/SubcategoryChips';
+
 export const dynamic = 'force-dynamic';
 
 interface CategoryDetail {
@@ -78,18 +80,9 @@ function CategoryHeader({
           {total} {total === 1 ? 'product' : 'products'}
         </p>
         {category.children.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {category.children.map((c, i) => (
-              <li key={c.slug} className={`bv-enter bv-delay-${Math.min(i + 3, 7)}`}>
-                <Link
-                  href={categoryHrefL2(category.slug, c.slug)}
-                  className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium transition-colors hover:bg-neutral-100"
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <SubcategoryChips categorySlug={category.slug}>
+            {category.children}
+          </SubcategoryChips>
         )}
       </section>
     </AnimateOnScroll>

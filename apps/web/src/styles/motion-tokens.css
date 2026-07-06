@@ -1,0 +1,27 @@
+:root {
+  /* Durations */
+  --motion-instant: 100ms;
+  --motion-fast: 200ms;
+  --motion-medium: 350ms;
+  --motion-slow: 500ms;
+  --motion-page: 200ms;
+
+  /* Easings */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-quart */
+  --ease-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15); /* ease-in */
+  --ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1); /* ease-out-back */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Distances */
+  --distance-micro: 2px;
+  --distance-sm: 4px;
+  --distance-md: 12px;
+  --distance-lg: 24px;
+
+  /* Opacity states */
+  --opacity-enter-start: 0;
+  --opacity-enter-end: 1;
+  --opacity-exit-start: 1;
+  --opacity-exit-end: 0;
+}
