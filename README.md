@@ -1,10 +1,8 @@
 # BranV
+**BranV is a curated men's fashion discovery platform that turns scattered affiliate shopping links into a single, trustworthy storefront — and doubles as a production-grade, full-stack engineering showcase.**
 
-Curated men's affiliate fashion platform. See `PRD_BranV.md` and `BUILD_GUIDE_BranV.md` for the full spec.
 
 ## What This Project Is
-
-**BranV is a curated men's fashion discovery platform that turns scattered affiliate shopping links into a single, trustworthy storefront — and doubles as a production-grade, full-stack engineering showcase.**
 
 Usually Men shopping online for fashion face two problems: product recommendations are scattered across influencer posts, marketplaces, and affiliate links with no quality filter, and there's no single trusted place that curates "what's actually good" instead of "what pays the most commission."
 
