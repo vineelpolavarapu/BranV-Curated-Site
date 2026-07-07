@@ -27,11 +27,11 @@ A live, publicly deployed product at **www.branv.in** that gives shoppers one tr
 
 ### Infrastructure
 - **Frontend hosting:** Vercel (free tier)
-- **Backend hosting:** Oracle Cloud VM — Ubuntu 22.04, VM.Standard.E2.1.Micro (AMD x86, 1 GB RAM, Always Free)
+- **Backend hosting:** Oracle Cloud VM, Ubuntu 22.04, VM.Standard.E2.1.Micro (AMD x86, 1 GB RAM, Always Free)
 - **Reverse proxy / TLS:** Caddy 2 (auto Let's Encrypt)
 - **DNS / CDN / WAF:** Cloudflare (free tier)
 - **Object storage:** Cloudflare R2 (S3-compatible) for product images + database backups
-- **Container registry:** GitHub Container Registry (GHCR) — private
+- **Container registry:** GitHub Container Registry (GHCR), private
 - **Orchestration:** Docker + Docker Compose v2
 - **CI/CD:** GitHub Actions
 - **Uptime monitoring:** UptimeRobot (planned)
@@ -63,7 +63,7 @@ pnpm docker:up
 # 4. Run database migrations (creates auth + catalog tables)
 pnpm db:migrate
 
-# 5. Seed your first admin (CLI-only — admins cannot self-register)
+# 5. Seed your first admin (CLI-only, admins cannot self-register)
 pnpm seed:admin you@example.com "a-strong-password-here"
 
 # 6. Seed the catalog taxonomy (categories + attribute schemas)
@@ -94,7 +94,7 @@ Then:
 ### Trying the auth flow
 
 1. Register at `/register` with any email/password (≥8 chars).
-2. **Mock mailer** — the verification link is logged to the API console
+2. **Mock mailer**: the verification link is logged to the API console
    (`pnpm dev` window). Copy the link and open it.
 3. Sign in at `/login` → lands on `/account`.
 4. Sign in as admin at `/admin/login` → prompted to set up TOTP 2FA → scan QR
