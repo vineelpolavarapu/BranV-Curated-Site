@@ -17,6 +17,7 @@ env:
   IMAGE_NAME: vineelpolavarapu/branv-api
 
 jobs:
+
   check-ci-status:
     name: Check backend-relevant CI status
     runs-on: ubuntu-latest
