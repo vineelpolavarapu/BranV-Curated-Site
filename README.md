@@ -103,22 +103,7 @@ branv/
 └── BUILD_GUIDE_BranV.md
 ```
 
-## Phase status
 
-- [x] **Phase 0 — Foundations:** scaffold + health endpoints + Docker infra
-- [x] **Phase 1 — Identity:** member & admin auth, JWT + refresh rotation, TOTP 2FA, rate limiting, lockout, audit log
-- [x] **Phase 2 — Brand & Catalog Core + Avatar Library:** brands, categories with attribute schemas, products with variants/images/retailer-listings, avatar library, S3 presigned uploads
-- [x] **Phase 3 — Quick Add Workflow:** scrape-url autofill, Cuelinks/Amazon affiliate conversion, clipboard-paste image upload, bulk mode, localStorage draft, `N` shortcut, pending-conversion retry worker
-- [x] **Phase 4 — Storefront Browse, Filters, Search:** public catalog with faceted filters (universal + category-specific), pg_trgm + tsvector search, autocomplete, product detail w/ schema.org, home + brand pages, mobile bottom nav, AI-rendered disclosure badge
-- [x] **Phase 5 — Click-Out Flow + Nice Pick + Wardrobe:** `/go/:trackingId` redirect, Did-you-buy bottom sheet, Nice Pick confetti modal, member wardrobe + wishlist
-- [x] **Phase 6 — Articles & Content Management:** markdown editor with product-embed slash command, schedule → publish worker, schema.org `Article` JSON-LD, dynamic sitemap + robots
-- [x] **Phase 7 — Drops, Lookbooks, Edits, Home Banners:** drop scheduler with notify-me emails + countdown UI, shoppable lookbook hotspots, The Edit collections, scheduled banners, XSS-safe brand stories
-- [x] **Phase 8 — Reviews, Newsletter, Notifications:** wardrobe-gated reviews + admin moderation, double-opt-in newsletter, outbox-pattern notification engine with bell icon + member preferences
-- [x] **Phase 9 — Affiliate Sync + Reconciliation:** nightly price/availability sync with wishlist price-drop notifications, CSV-upload reconciliation (Cuelinks/Amazon/EarnKaro auto-detect), idempotent by file hash, admin variance dashboard
-- [x] **Phase 10 — Admin Analytics & Audit:** dashboard KPIs + 14-day chart + low-conversion alerts, six analytics endpoints, filterable audit-log viewer, in-process platform-settings cache
-- [x] **Phase 11 — Hardening:** dropped Redis (in-process caches + Postgres `click_intent` table), FastAPI migration from NestJS, low-memory Postgres tuning, JWT secret rotation strategy
-- [ ] **Phase 12 — Testing & CI/CD**
-- [x] **Phase 13 — Deployment (in progress):** frontend live on Vercel at [www.branv.in](https://www.branv.in); backend deploying to Oracle Cloud VM at `api.branv.in` behind Caddy + Cloudflare
 
 ## Deployment
 
