@@ -6,15 +6,15 @@
 
 Usually Men shopping online for fashion face two problems: product recommendations are scattered across influencer posts, marketplaces, and affiliate links with no quality filter, and there's no single trusted place that curates "what's actually good" instead of "what pays the most commission."
 
-SO I Build a platform that curates men's fashion products from multiple affiliate networks (Amazon Associates, EarnKaro) into one clean, searchable storefront — with an admin behind the scenes vetting what gets listed — while keeping infrastructure costs near zero and the system genuinely production-ready, not a prototype.
+SO I Build a platform that curates men's fashion products from multiple affiliate networks (Amazon Associates, EarnKaro) into one clean, searchable storefront, with an admin behind the scenes vetting what gets listed, while keeping infrastructure costs near zero and the system genuinely production-ready, not a prototype.
 
 I Designed and built the full system end-to-end:
-- A modern storefront (Next.js + React) that shoppers browse, backed by a Python API (FastAPI) that does all the real work behind the scenes — managing the product catalog, validating and routing affiliate links to the right network, powering the admin curation workflows, and serving fast, reliable endpoints for the frontend — all on top of a PostgreSQL database.
+- A modern storefront (Next.js + React) that shoppers browse, backed by a Python API (FastAPI) that does all the real work behind the scenes: managing the product catalog, validating and routing affiliate links to the right network, powering the admin curation workflows, and serving fast, reliable endpoints for the frontend, all on top of a PostgreSQL database.
 - Secure member accounts and a separate admin dashboard protected by two-factor authentication, so only I can curate the catalog.
 - Full-text and typo-tolerant product search, so shoppers find what they want fast.
-- Automated deployment pipelines (CI/CD via GitHub Actions) and containerized infrastructure (Docker) hosted across free-tier cloud services (Oracle Cloud, Cloudflare, Vercel) with nightly automated database backups — enterprise-grade reliability on a startup budget.
+- Automated deployment pipelines (CI/CD via GitHub Actions) and containerized infrastructure (Docker) hosted across free-tier cloud services (Oracle Cloud, Cloudflare, Vercel) with nightly automated database backups, giving enterprise-grade reliability on a startup budget.
 
-A live, publicly deployed product at **www.branv.in** that gives shoppers one trustworthy place to discover curated men's fashion, and gives the business a monetization engine through affiliate commissions. Beyond the product itself, the build demonstrates hands-on ownership of the full engineering lifecycle: architecture design, secure authentication, database modeling, DevOps/CI-CD, cloud deployment, and cost-conscious infrastructure decisions — the kind of end-to-end responsibility expected of a production engineer, not just a coder.
+A live, publicly deployed product at **www.branv.in** that gives shoppers one trustworthy place to discover curated men's fashion, and gives the business a monetization engine through affiliate commissions. Beyond the product itself, the build demonstrates hands-on ownership of the full engineering lifecycle: architecture design, secure authentication, database modeling, DevOps/CI-CD, cloud deployment, and cost-conscious infrastructure decisions, the kind of end-to-end responsibility expected of a production engineer, not just a coder.
 
 ## Stack
 
