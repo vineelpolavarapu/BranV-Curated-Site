@@ -17,10 +17,47 @@ env:
   IMAGE_NAME: vineelpolavarapu/branv-api
 
 jobs:
+  check-ci-status:
+    name: Check backend-relevant CI status
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_run'
+    permissions:
+      actions: read
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+    steps:
+      # The CI workflow bundles an unrelated frontend job (Deploy Web (Vercel))
+      # together with the backend checks (Typecheck & Lint) under one workflow.
+      # If the frontend deploy fails, the whole "CI" run's conclusion becomes
+      # "failure", which previously caused this backend image build to be
+      # skipped even when the backend code itself was fine. Instead, look up
+      # the actual conclusion of the "Typecheck & Lint" job (which runs prisma
+      # generate / typecheck / lint for the API) and gate the backend deploy on
+      # that job alone, so an unrelated frontend deploy failure can no longer
+      # block backend deployments.
+      - name: Evaluate Typecheck & Lint job result
+        id: check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            const job = data.jobs.find((j) => j.name === 'Typecheck & Lint');
+            const success = !!job && job.conclusion === 'success';
+            core.info(`Typecheck & Lint conclusion: ${job ? job.conclusion : 'not found'}`);
+            core.setOutput('should_deploy', success ? 'true' : 'false');
+
   build-and-push:
     name: Build and push API image
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    needs: [check-ci-status]
+    if: >-
+      always() &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event_name == 'workflow_run' && needs.check-ci-status.outputs.should_deploy == 'true'))
     permissions:
       contents: read
       packages: write
