@@ -122,11 +122,11 @@ branv/
 ## Deployment
 
 Production deployment lives in [`deploy/`](deploy/). Full step-by-step runbook and current progress log:
-- [deploy/DEPLOYMENT_PROGRESS.md](deploy/DEPLOYMENT_PROGRESS.md) — source-of-truth runbook (phases 1–11 done, steps 12–22 tracked)
-- [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md) — original generic runbook
-- [deploy/docker-compose.yml](deploy/docker-compose.yml) — production compose (Caddy + FastAPI + Postgres + one-shot migrate)
-- [deploy/Caddyfile](deploy/Caddyfile) — reverse-proxy + TLS config
-- [deploy/backup.sh](deploy/backup.sh) — nightly `pg_dump` → Cloudflare R2
+- [deploy/DEPLOYMENT_PROGRESS.md](deploy/DEPLOYMENT_PROGRESS.md): source-of-truth runbook (phases 1–11 done, steps 12–22 tracked)
+- [deploy/DEPLOYMENT.md](deploy/DEPLOYMENT.md): original generic runbook
+- [deploy/docker-compose.yml](deploy/docker-compose.yml): production compose (Caddy + FastAPI + Postgres + one-shot migrate)
+- [deploy/Caddyfile](deploy/Caddyfile): reverse-proxy + TLS config
+- [deploy/backup.sh](deploy/backup.sh): nightly `pg_dump` → Cloudflare R2
 
 ### Live URLs
 - **Storefront:** https://www.branv.in
