@@ -85,6 +85,28 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      # Every later step in this job (`vercel pull`, `vercel build`, `vercel
+      # deploy`) relies on these three being set. A missing or
+      # environment-scoped secret does NOT fail here with an auth error —
+      # GitHub Actions silently substitutes an empty string, so the actual
+      # failure only shows up several steps later as a cryptic Vercel CLI
+      # error (e.g. "You defined "--token", but it's missing a value").
+      # Fail fast here instead, with a message that names the secret.
+      - name: Verify required Vercel deploy secrets
+        env:
+          TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          missing=()
+          [ -z "$TOKEN" ] && missing+=("VERCEL_TOKEN")
+          [ -z "$ORG_ID" ] && missing+=("VERCEL_ORG_ID")
+          [ -z "$PROJECT_ID" ] && missing+=("VERCEL_PROJECT_ID")
+          if [ ${#missing[@]} -ne 0 ]; then
+            echo "::error::Missing required repository secret(s): ${missing[*]}. Set them under Settings > Secrets and variables > Actions > Repository secrets (not Environment secrets, since this job has no 'environment:')."
+            exit 1
+          fi
+
       # vercel.json's installCommand handles `pnpm install` at build time,
       # so we don't run it again here.
       - name: Pull Vercel project config
