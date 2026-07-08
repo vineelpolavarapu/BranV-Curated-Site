@@ -117,13 +117,22 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      # Same silent-empty-string pitfall as the Vercel secrets check above:
+      # a missing or environment-scoped secret does not error here, it just
+      # becomes "". Name the missing secret explicitly instead of letting
+      # `vercel build` fail later with an unrelated-looking error.
       - name: Verify required web env vars
         env:
           API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
           SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
         run: |
-          test -n "$API_BASE_URL"
-          test -n "$SITE_URL"
+          missing=()
+          [ -z "$API_BASE_URL" ] && missing+=("NEXT_PUBLIC_API_BASE_URL")
+          [ -z "$SITE_URL" ] && missing+=("NEXT_PUBLIC_SITE_URL")
+          if [ ${#missing[@]} -ne 0 ]; then
+            echo "::error::Missing required repository secret(s): ${missing[*]}. Set them under Settings > Secrets and variables > Actions > Repository secrets (not Environment secrets, since this job has no 'environment:')."
+            exit 1
+          fi
 
       - name: Build for production
         run: vercel build --prod --token="$VERCEL_TOKEN"
