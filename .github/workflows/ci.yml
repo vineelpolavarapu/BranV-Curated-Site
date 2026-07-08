@@ -109,9 +109,15 @@ jobs:
 
       # vercel.json's installCommand handles `pnpm install` at build time,
       # so we don't run it again here.
+      #
+      # Run every vercel CLI step from the repo root, never `cd apps/web`
+      # first: the Vercel project's Root Directory setting (apps/web) is
+      # what tells the CLI where the project lives. Combining that setting
+      # with a manual `working-directory: apps/web` here makes Vercel
+      # resolve the project path twice (apps/web/apps/web), which is the
+      # "File does not exist" / path-not-found class of failure seen before.
       - name: Pull Vercel project config
         run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-        working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -136,7 +142,6 @@ jobs:
 
       - name: Build for production
         run: vercel build --prod --token="$VERCEL_TOKEN"
-        working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
@@ -152,7 +157,6 @@ jobs:
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN")
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
           echo "Deployed to: $DEPLOY_URL"
-        working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
