@@ -19,7 +19,8 @@
       "Bash(python *)",
       "Bash(.venv/Scripts/python.exe -c ' *)",
       "Bash(.venv/Scripts/python.exe)",
-      "PowerShell(git *)"
+      "PowerShell(git *)",
+      "PowerShell(gh run list --repo vineelpolavarapu/BranV-Curated-Site --limit 10 --json status,conclusion,name,headBranch,createdAt,url 2>&1)"
     ]
   }
 }

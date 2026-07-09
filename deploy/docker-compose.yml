@@ -77,7 +77,12 @@ services:
     restart: unless-stopped
     expose:
       - "5000"
+    volumes:
+      # Inherit host clock so TOTP codes stay accurate even if the VM drifts.
+      - /etc/localtime:/etc/localtime:ro
     environment:
+      # Keep container in UTC so TOTP aligns with the authenticator app.
+      TZ: UTC
       # ── Core ──────────────────────────────────────────────────────────────
       DATABASE_URL: postgresql://branv:${DB_PASSWORD}@postgres:5432/branv?schema=public
       WEB_ORIGIN: ${WEB_ORIGIN}
