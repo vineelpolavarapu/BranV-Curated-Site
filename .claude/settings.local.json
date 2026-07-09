@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "PowerShell(Stop-Process -Id 10368 -Force -ErrorAction Stop; Start-Sleep -Milliseconds 500; $still = Get-NetTCPConnection -State Listen -LocalPort 3000 -ErrorAction SilentlyContinue; if \\($still\\) { Write-Output \"Port 3000 STILL bound \\(PID $\\($still.OwningProcess\\)\\)\" } else { Write-Output \"Port 3000 free\" })",
-      "PowerShell(head *)"
+      "PowerShell(head *)",
+      "Skill(run)",
+      "Bash(cat apps/web/.env.local)",
+      "Bash(cat apps/web/.env)",
+      "Bash(pnpm --filter web dev)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Skill(claude-in-chrome)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(curl -s http://localhost:3000/admin/login)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5000/api/auth/me)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8000/api/auth/me)",
+      "Bash(curl *)",
+      "Bash(psql *)",
+      "PowerShell(cd C:\\\\vineel\\\\BranV; $env:PGPASSWORD=\"branv\"; & \"C:\\\\Program Files\\\\PostgreSQL\\\\16\\\\bin\\\\psql.exe\" -U branv -h localhost -d branv_dev -c \"SELECT email, role, status, `\"failedLoginCount`\", `\"lockedUntil`\", `\"totpEnabled`\" FROM users WHERE role='ADMIN';\" 2>&1)",
+      "Bash(python *)",
+      "Bash(.venv/Scripts/python.exe -c ' *)",
+      "Bash(.venv/Scripts/python.exe)"
     ]
   }
 }

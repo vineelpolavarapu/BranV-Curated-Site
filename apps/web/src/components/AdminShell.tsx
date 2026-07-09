@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { apiFetch, CurrentUser } from '@/lib/api';
 import { QuickAddModal } from './QuickAddModal';
 
@@ -19,6 +20,138 @@ const NAV = [
   { href: '/admin/avatars', label: 'Avatars' },
 ];
 
+function NavLinks({
+  pathname,
+  onNavigate,
+}: {
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <nav className="space-y-1">
+      {NAV.map((item) => {
+        const active =
+          pathname === item.href ||
+          (item.href !== '/admin' && pathname.startsWith(item.href));
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={onNavigate}
+            className={`block rounded-md px-3 py-2 text-sm font-medium ${
+              active
+                ? 'bg-neutral-900 text-white'
+                : 'text-neutral-700 hover:bg-neutral-100'
+            }`}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileDrawer({
+  open,
+  onClose,
+  pathname,
+  email,
+  onLogout,
+}: {
+  open: boolean;
+  onClose: () => void;
+  pathname: string;
+  email: string;
+  onLogout: () => void;
+}) {
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40"
+        onClick={onClose}
+      />
+      {/* Drawer panel */}
+      <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl">
+        {/* Drawer header */}
+        <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+              BranV Admin
+            </p>
+            <Link
+              href="/admin"
+              onClick={onClose}
+              className="text-base font-semibold tracking-tight text-neutral-900"
+            >
+              Console
+            </Link>
+          </div>
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={onClose}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden fill="none">
+              <path
+                d="M3 3l12 12M15 3L3 15"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+
+        {/* Nav links */}
+        <div className="flex-1 overflow-y-auto px-3 py-4">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            Navigation
+          </p>
+          <NavLinks pathname={pathname} onNavigate={onClose} />
+        </div>
+
+        {/* Account section at bottom */}
+        <div className="border-t border-neutral-200 px-4 py-4">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+            Account
+          </p>
+          <p className="mb-3 truncate text-sm text-neutral-700">{email}</p>
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              onLogout();
+            }}
+            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-100"
+          >
+            Sign out
+          </button>
+        </div>
+      </aside>
+    </div>,
+    document.body,
+  );
+}
+
 export function AdminShell({
   title,
   actions,
@@ -33,8 +166,9 @@ export function AdminShell({
   const [me, setMe] = useState<CurrentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  // ── Keyboard shortcut: `N` opens Quick Add (when not typing in a field) ──
+  // Keyboard shortcut: N opens Quick Add
   useEffect(() => {
     function handler(e: KeyboardEvent) {
       if (e.key !== 'n' && e.key !== 'N') return;
@@ -52,14 +186,17 @@ export function AdminShell({
     return () => window.removeEventListener('keydown', handler);
   }, [quickAddOpen]);
 
-  // ── Page-level buttons can dispatch `branv:quickadd:open` to open the modal ──
+  // Page-level buttons can dispatch `branv:quickadd:open`
   useEffect(() => {
-    function onOpen() {
-      setQuickAddOpen(true);
-    }
+    function onOpen() { setQuickAddOpen(true); }
     window.addEventListener('branv:quickadd:open', onOpen);
     return () => window.removeEventListener('branv:quickadd:open', onOpen);
   }, []);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,9 +218,7 @@ export function AdminShell({
       }
       setMe(result.data);
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [router]);
 
   async function onLogout() {
@@ -95,7 +230,7 @@ export function AdminShell({
   if (error) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="mb-2 text-2xl font-semibold">403 — Forbidden</h1>
+        <h1 className="mb-2 text-2xl font-semibold text-neutral-900">403 — Forbidden</h1>
         <p className="text-neutral-600">{error}</p>
       </main>
     );
@@ -111,62 +246,77 @@ export function AdminShell({
 
   return (
     <div className="min-h-screen bg-neutral-50">
+      {/* ── Top header ─────────────────────────────────────────────────── */}
       <header className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
+          {/* Left: title */}
           <div>
             <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
               BranV Admin
             </p>
-            <Link href="/admin" className="text-lg font-semibold tracking-tight">
+            <Link href="/admin" className="text-lg font-semibold tracking-tight text-neutral-900">
               Console
             </Link>
           </div>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-neutral-600">{me.email}</span>
+
+          {/* Right: hamburger on mobile, nothing on desktop (sign-out is in sidebar) */}
+          <button
+            type="button"
+            aria-label="Open admin menu"
+            aria-expanded={drawerOpen}
+            onClick={() => setDrawerOpen(true)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-neutral-700 hover:bg-neutral-100 md:hidden"
+          >
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
+              <path
+                d="M3 6h16M3 11h16M3 16h16"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      {/* ── Body: sidebar + content ─────────────────────────────────────── */}
+      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-8 md:px-6">
+        {/* Desktop sidebar — hidden on mobile */}
+        <aside className="hidden w-56 shrink-0 md:flex md:flex-col md:gap-4">
+          <NavLinks pathname={pathname} />
+          {/* Account section at bottom of desktop sidebar */}
+          <div className="mt-auto border-t border-neutral-200 pt-4">
+            <p className="mb-2 truncate text-xs text-neutral-500">{me.email}</p>
             <button
+              type="button"
               onClick={onLogout}
-              className="rounded-md border border-neutral-300 px-3 py-1.5 font-medium hover:bg-neutral-100"
+              className="w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-900 hover:bg-neutral-100"
             >
               Sign out
             </button>
           </div>
-        </div>
-      </header>
-
-      <div className="mx-auto flex max-w-7xl gap-6 px-6 py-8">
-        <aside className="hidden w-56 shrink-0 md:block">
-          <nav className="space-y-1">
-            {NAV.map((item) => {
-              const active =
-                pathname === item.href ||
-                (item.href !== '/admin' && pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block rounded-md px-3 py-2 text-sm font-medium ${
-                    active
-                      ? 'bg-neutral-900 text-white'
-                      : 'text-neutral-700 hover:bg-neutral-100'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
         </aside>
 
-        <main className="flex-1">
+        {/* Page content */}
+        <main className="min-w-0 flex-1">
           <div className="mb-6 flex items-end justify-between">
-            <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{title}</h1>
             <div className="flex gap-2">{actions}</div>
           </div>
           {children}
         </main>
       </div>
 
-      {/* Floating "+" button — Quick Add (or press N) */}
+      {/* ── Mobile drawer ───────────────────────────────────────────────── */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        pathname={pathname}
+        email={me.email}
+        onLogout={onLogout}
+      />
+
+      {/* ── Floating Quick Add button ───────────────────────────────────── */}
       <button
         type="button"
         onClick={() => setQuickAddOpen(true)}
@@ -180,9 +330,7 @@ export function AdminShell({
       <QuickAddModal
         open={quickAddOpen}
         onClose={() => setQuickAddOpen(false)}
-        onCreated={() => {
-          router.refresh();
-        }}
+        onCreated={() => { router.refresh(); }}
       />
     </div>
   );
