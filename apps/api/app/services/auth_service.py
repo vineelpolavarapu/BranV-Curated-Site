@@ -186,7 +186,6 @@ async def login(
     userAgent: str | None,
     background: BackgroundTasks,
 ) -> tuple[User, str, str]:
-    s = get_settings()
     normalized = _normalize_email(email)
     user = (await db.execute(
         select(User).where(User.email == normalized)
@@ -226,17 +225,6 @@ async def login(
             userAgent=userAgent,
         )
         raise AuthError(403, "Wrong sign-in portal for this account")
-
-    # 2FA enforcement — admin login is email+password only; TOTP stays opt-in
-    # for members via /2fa/setup.
-    if user.totpEnabled and user.role != "ADMIN":
-        if not totpCode:
-            raise AuthError(401, "2FA code required", {"requires2fa": True})
-        if not security.verify_totp(totpCode, user.totpSecret or ""):
-            await _record_failed_attempt(
-                db, user, ip=ip, userAgent=userAgent, background=background
-            )
-            raise AuthError(401, "Invalid 2FA code")
 
     # Success — reset counters, stamp last login.
     now = _utcnow_naive()
