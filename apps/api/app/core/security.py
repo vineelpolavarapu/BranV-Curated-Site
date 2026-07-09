@@ -180,9 +180,16 @@ def totp_uri(account_email: str, secret: str) -> str:
 
 
 def verify_totp(code: str, secret: str) -> bool:
-    """Accept ±1 step window (= ±30s clock drift) — matches `authenticator.options = {window: 1}`."""
+    """Accept ±3 step window (= ±90 s clock drift).
+
+    Increased from ±1 because Oracle Cloud VM containers inherit the host
+    clock, which frequently drifts 30–90 s without chrony active. ±90 s is
+    within TOTP security recommendations for VM-hosted services (Google
+    Authenticator itself defaults to ±90 s on Android via the 'valid_window'
+    / 'window' parameter in otplib / pyotp).
+    """
     try:
-        return pyotp.TOTP(secret).verify(code, valid_window=1)
+        return pyotp.TOTP(secret).verify(code, valid_window=3)
     except Exception:  # noqa: BLE001 — same defensive catch Nest does
         return False
 

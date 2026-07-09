@@ -84,8 +84,15 @@ services:
       S3_ENDPOINT: http://minio:9000
       API_INTERNAL_PORT: "5000"
       SCHEDULER_OWNER: "fastapi"
+      # Keep the container in UTC so TOTP (time-based OTP) aligns with the
+      # authenticator app. Oracle Cloud VMs can drift; the host localtime is
+      # mounted read-only so the container's clock tracks the host exactly.
+      TZ: UTC
     ports:
       - "5000:5000"
+    volumes:
+      # Inherit host clock — critical for TOTP correctness on VM deployments.
+      - /etc/localtime:/etc/localtime:ro
 
 volumes:
   postgres_data:
