@@ -87,78 +87,86 @@ export default function BrandsAdminPage() {
             No brands yet. Click <strong>+ New brand</strong> to add one.
           </p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
-                <th className="px-2 pb-3 font-medium">Brand</th>
-                <th className="px-2 pb-3 font-medium">Products</th>
-                <th className="px-2 pb-3 font-medium">Status</th>
-                <th className="px-2 pb-3 font-medium" />
-              </tr>
-            </thead>
-            <tbody>
-              {brands.map((b) => (
-                <tr key={b.id} className="border-b border-neutral-100">
-                  <td className="px-2 py-3">
-                    <div className="flex items-center gap-3">
-                      {b.logoUrl ? (
-                        <Image
-                          src={b.logoUrl}
-                          alt=""
-                          width={32}
-                          height={32}
-                          unoptimized
-                          className="h-8 w-8 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 rounded bg-neutral-200" />
-                      )}
-                      <div>
-                        <p className="font-medium">{b.name}</p>
-                        <p className="text-xs text-neutral-500">{b.slug}</p>
-                      </div>
-                      {b.isFeatured && (
-                        <span className="ml-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
-                          Featured
-                        </span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-2 py-3 text-neutral-600">
-                    {b._count?.products ?? 0}
-                  </td>
-                  <td className="px-2 py-3">
-                    <StatusPill status={b.status} />
-                  </td>
-                  <td className="px-2 py-3 text-right">
-                    <div className="flex justify-end gap-2">
-                      <a
-                        href={`/admin/brands/${b.id}/story`}
-                        className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
-                      >
-                        Story
-                      </a>
-                      {/* <button
-                        onClick={() => {
-                          setEditing(b);
-                          setShowForm(true);
-                        }}
-                        className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
-                      >
-                        Edit
-                      </button> */}
-                      <button
-                        onClick={() => onDelete(b.id)}
-                        className={adminButtonDanger}
-                      >
-                        Archive
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[480px] text-sm">
+              <thead>
+                <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                  <th className="px-2 pb-3 font-medium">Brand</th>
+                  <th className="px-2 pb-3 font-medium">Products</th>
+                  <th className="px-2 pb-3 font-medium">Status</th>
+                  <th className="px-2 pb-3 font-medium" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {brands.map((b) => (
+                  <tr key={b.id} className="border-b border-neutral-100">
+                    <td className="px-2 py-3">
+                      <div className="flex items-center gap-3">
+                        {b.logoUrl ? (
+                          <Image
+                            src={b.logoUrl}
+                            alt=""
+                            width={32}
+                            height={32}
+                            unoptimized
+                            className="h-8 w-8 shrink-0 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-8 w-8 shrink-0 rounded bg-neutral-200" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">{b.name}</p>
+                          <p className="truncate text-xs text-neutral-500">{b.slug}</p>
+                        </div>
+                        {b.isFeatured && (
+                          <span className="ml-1 shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-2 py-3 text-neutral-600">
+                      {b._count?.products ?? 0}
+                    </td>
+                    <td className="px-2 py-3">
+                      <StatusPill status={b.status} />
+                    </td>
+                    <td className="px-2 py-3 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <a
+                          href={`/admin/brands/${b.id}/story`}
+                          aria-label="Brand story"
+                          title="Story"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
+                        >
+                          <svg width="14" height="14" viewBox="0 0 4 16" fill="currentColor" aria-hidden>
+                            <circle cx="2" cy="2" r="1.5" />
+                            <circle cx="2" cy="8" r="1.5" />
+                            <circle cx="2" cy="14" r="1.5" />
+                          </svg>
+                        </a>
+                        {/* <button
+                          onClick={() => {
+                            setEditing(b);
+                            setShowForm(true);
+                          }}
+                          className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                        >
+                          Edit
+                        </button> */}
+                        <button
+                          onClick={() => onDelete(b.id)}
+                          className={adminButtonDanger}
+                        >
+                          Archive
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

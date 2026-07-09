@@ -26,20 +26,25 @@ function ResetPasswordPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [doneMessage, setDoneMessage] = useState<string | null>(null);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const result = await apiFetch('/auth/reset-password', {
-      method: 'POST',
-      body: JSON.stringify({ token, newPassword: password }),
-    });
+    const result = await apiFetch<{ status: string; message?: string }>(
+      '/auth/reset-password',
+      {
+        method: 'POST',
+        body: JSON.stringify({ token, newPassword: password }),
+      },
+    );
     setSubmitting(false);
     if (!result.ok) {
       setError(result.error ?? 'Reset failed');
       return;
     }
+    setDoneMessage(result.data?.message ?? null);
     setDone(true);
   }
 
@@ -65,6 +70,9 @@ function ResetPasswordPageInner() {
         <p className="text-sm text-neutral-600">
           For your security, all existing sessions have been signed out.
         </p>
+        {doneMessage && (
+          <p className="mt-2 text-sm text-neutral-600">{doneMessage}</p>
+        )}
       </AuthShell>
     );
   }

@@ -291,7 +291,7 @@ async def reset_password(
 ) -> StatusOk:
     ip, ua = _client_ip_and_ua(request)
     try:
-        await auth_service.reset_password(
+        totp_reset = await auth_service.reset_password(
             db,
             token=payload.token,
             newPassword=payload.newPassword,
@@ -301,6 +301,11 @@ async def reset_password(
         )
     except AuthError as e:
         _raise_auth_error(e)
+    if totp_reset:
+        return StatusOk(
+            status="ok",
+            message="Two-factor authentication was also turned off — re-enroll after signing in.",
+        )
     return StatusOk(status="ok")
 
 

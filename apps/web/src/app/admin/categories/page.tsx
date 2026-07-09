@@ -102,14 +102,14 @@ export default function CategoriesAdminPage() {
         Edit attribute schemas here — they drive the storefront filter UI in Phase 4.
       </p>
       <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-        <div className={adminCard}>
+        <div className={`${adminCard} overflow-hidden`}>
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
             Taxonomy
           </h2>
           {loading ? (
             <p className="text-sm text-neutral-500">Loading…</p>
           ) : (
-            <ul className="space-y-0.5 text-sm">
+            <ul className="space-y-0.5 overflow-hidden text-sm">
               {tree.map((l1) => (
                 <CategoryAccordion
                   key={l1.id}
@@ -256,20 +256,20 @@ function CategoryAccordion({
   const hasChildren = l1.children.length > 0;
 
   return (
-    <li>
+    <li className="min-w-0">
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={hasChildren ? expanded : undefined}
         aria-controls={hasChildren ? `cat-children-${l1.id}` : undefined}
-        className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left transition ${
+        className={`flex w-full min-w-0 items-center justify-between rounded px-2 py-1.5 text-left transition ${
           isL1Selected
             ? 'bg-neutral-900 text-white'
             : 'hover:bg-neutral-100'
         }`}
       >
-        <span className="font-medium">{l1.name}</span>
-        <span className="ml-2 flex items-center gap-2">
+        <span className="min-w-0 truncate font-medium">{l1.name}</span>
+        <span className="ml-2 flex shrink-0 items-center gap-2">
           {l1._count && l1._count.attributeSchemas > 0 && (
             <span className="text-[10px] uppercase opacity-60">
               {l1._count.attributeSchemas}
@@ -290,19 +290,19 @@ function CategoryAccordion({
             {l1.children.map((l2) => {
               const isL2Selected = selectedId === l2.id;
               return (
-                <li key={l2.id}>
+                <li key={l2.id} className="min-w-0">
                   <button
                     type="button"
                     onClick={() => onPickChild(l2.id)}
-                    className={`flex w-full items-center justify-between rounded px-2 py-1.5 text-left text-sm transition ${
+                    className={`flex w-full min-w-0 items-center justify-between rounded px-2 py-1.5 text-left text-sm transition ${
                       isL2Selected
                         ? 'bg-neutral-900 text-white'
                         : 'text-neutral-700 hover:bg-neutral-100'
                     }`}
                   >
-                    <span>{l2.name}</span>
+                    <span className="min-w-0 truncate">{l2.name}</span>
                     {l2._count && l2._count.attributeSchemas > 0 && (
-                      <span className="ml-2 text-[10px] uppercase opacity-60">
+                      <span className="ml-2 shrink-0 text-[10px] uppercase opacity-60">
                         {l2._count.attributeSchemas}
                       </span>
                     )}

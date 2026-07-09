@@ -227,8 +227,9 @@ async def login(
         )
         raise AuthError(403, "Wrong sign-in portal for this account")
 
-    # 2FA enforcement.
-    if user.totpEnabled:
+    # 2FA enforcement — admin login is email+password only; TOTP stays opt-in
+    # for members via /2fa/setup.
+    if user.totpEnabled and user.role != "ADMIN":
         if not totpCode:
             raise AuthError(401, "2FA code required", {"requires2fa": True})
         if not security.verify_totp(totpCode, user.totpSecret or ""):
@@ -404,7 +405,7 @@ async def forgot_password(
     )
     await db.flush()
     link = f"{s.WEB_ORIGIN}/reset-password?token={raw}"
-    await get_mail_service().send_password_reset(user.email, link)
+    await get_mail_service().send_password_reset(user.email, link, totp_will_reset=user.totpEnabled)
     await db.commit()
     background.add_task(
         audit_service.record,
@@ -423,13 +424,17 @@ async def reset_password(
     ip: str | None,
     userAgent: str | None,
     background: BackgroundTasks,
-) -> None:
+) -> bool:
+    """Returns True if this reset also cleared an active TOTP enrollment."""
     token_hash = _sha256(token)
     row = (await db.execute(
         select(PasswordReset).where(PasswordReset.tokenHash == token_hash)
     )).scalar_one_or_none()
     if row is None or row.usedAt is not None or row.expiresAt < _utcnow_naive():
         raise AuthError(400, "Invalid or expired reset token")
+
+    user = (await db.execute(select(User).where(User.id_ == row.userId))).scalar_one()
+    had_totp = user.totpEnabled
 
     new_hash = security.hash_password(newPassword)
     now = _utcnow_naive()
@@ -439,7 +444,18 @@ async def reset_password(
     await db.execute(
         update(User)
         .where(User.id_ == row.userId)
-        .values(passwordHash=new_hash, failedLoginCount=0, lockedUntil=None, updatedAt=now)
+        .values(
+            passwordHash=new_hash,
+            failedLoginCount=0,
+            lockedUntil=None,
+            # Proving email ownership is also our TOTP-recovery path: an admin who
+            # lost their authenticator can't reach /2fa/setup without first logging
+            # in, and login requires the (now-missing) code. Clearing it here lets
+            # them log in and re-enroll via /admin/setup-2fa.
+            totpEnabled=False,
+            totpSecret=None,
+            updatedAt=now,
+        )
     )
     # Invalidate all sessions.
     await db.execute(
@@ -454,7 +470,9 @@ async def reset_password(
         action="auth.password.reset",
         ip=ip,
         userAgent=userAgent,
+        metadata={"totpReset": had_totp},
     )
+    return had_totp
 
 
 # ───────────── 2FA ───────────────────────────────────────────────────────────
@@ -462,7 +480,10 @@ async def reset_password(
 
 async def begin_two_factor_setup(db: AsyncSession, *, user_id: str) -> tuple[str, str]:
     """Returns (otpauthUrl, qrCodeDataUrl). Stores unconfirmed secret on the user row."""
-    import qrcode  # noqa: PLC0415
+    try:
+        import qrcode  # type: ignore[import]
+    except ImportError as exc:
+        raise RuntimeError("The qrcode package is required for 2FA setup") from exc
     import io
     import base64
 

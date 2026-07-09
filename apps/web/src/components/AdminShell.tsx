@@ -212,10 +212,6 @@ export function AdminShell({
         setTimeout(() => router.replace('/account'), 1500);
         return;
       }
-      if (!result.data.totpEnabled) {
-        router.replace('/admin/setup-2fa');
-        return;
-      }
       setMe(result.data);
     })();
     return () => { cancelled = true; };
