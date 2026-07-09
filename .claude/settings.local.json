@@ -20,7 +20,16 @@
       "Bash(.venv/Scripts/python.exe -c ' *)",
       "Bash(.venv/Scripts/python.exe)",
       "PowerShell(git *)",
-      "PowerShell(gh run list --repo vineelpolavarapu/BranV-Curated-Site --limit 10 --json status,conclusion,name,headBranch,createdAt,url 2>&1)"
+      "PowerShell(gh run list --repo vineelpolavarapu/BranV-Curated-Site --limit 10 --json status,conclusion,name,headBranch,createdAt,url 2>&1)",
+      "PowerShell(scp *)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"sudo chronyc makestep; cd /opt/branv && docker compose pull api && docker compose up -d --no-deps api && sleep 5 && docker compose ps api\" 2>&1)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"sudo apt-get install -y -q chrony 2>/dev/null; sudo chronyc makestep; sudo timedatectl set-ntp true; timedatectl status; sleep 8 && docker compose -f /opt/branv/docker-compose.yml ps api\" 2>&1)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"curl -s http://localhost:5000/api/health; echo; docker inspect branv-api-1 --format '{{.Config.Env}}' | tr ',' '\\\\n' | grep -E 'TZ|valid'; docker inspect branv-api-1 --format '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{println}}{{end}}'\" 2>&1)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"curl -sv http://localhost:5000/api/health 2>&1 | tail -20\" 2>&1)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker compose -f /opt/branv/docker-compose.yml ps; docker exec branv-api-1 curl -s http://localhost:5000/api/health\" 2>&1)",
+      "PowerShell(Invoke-WebRequest -Uri \"https://api.branv.in/api/health\" -UseBasicParsing 2>&1 | Select-Object StatusCode, Content)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker exec branv-api-1 python -c 'import pyotp; t = pyotp.TOTP.__init__.__doc__; from app.core.security import verify_totp; import inspect; print\\(inspect.getsource\\(verify_totp\\)\\)'\" 2>&1)",
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker exec branv-api-1 grep -n 'valid_window' /app/app/core/security.py\" 2>&1)"
     ]
   }
 }
