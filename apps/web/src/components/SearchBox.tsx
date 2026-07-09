@@ -50,8 +50,8 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
     (hits.products.length > 0 || hits.brands.length > 0 || hits.categories.length > 0);
 
   const inputClasses = overlay
-    ? 'w-full rounded-full border border-white/40 bg-white/10 py-2 pl-10 pr-3 text-sm text-white outline-none placeholder:text-white/70 backdrop-blur focus:border-white focus:bg-white/20 focus:ring-1 focus:ring-white/60'
-    : 'w-full rounded-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+    ? 'w-full rounded-full border border-white/40 bg-white/10 py-2 pl-10 pr-3 text-[16px] text-white outline-none placeholder:text-white/70 backdrop-blur focus:border-white focus:bg-white/20 focus:ring-1 focus:ring-white/60'
+    : 'w-full rounded-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
   const iconClasses = overlay
     ? 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/80'
     : 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400';

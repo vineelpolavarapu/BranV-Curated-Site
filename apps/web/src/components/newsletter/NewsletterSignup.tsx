@@ -74,7 +74,7 @@ export function NewsletterSignup({ source = 'footer', variant = 'footer' }: Prop
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"
-          className="flex-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+          className="flex-1 rounded-md border border-neutral-300 bg-white px-3 py-2 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
         />
         <button
           type="submit"

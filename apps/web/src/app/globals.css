@@ -5,13 +5,10 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #fafafa;
-  }
+  /* Force light mode — the site has no dark-mode design.
+     Without this, mobile devices in dark mode flip --foreground to white,
+     making text invisible on white backgrounds. */
+  color-scheme: light;
 }
 
 html,
@@ -29,6 +26,14 @@ body {
    so they match the site theme instead of the browser default blue. */
 :root {
   accent-color: #000000;
+}
+
+/* Prevent iOS Safari from zooming when an input receives focus.
+   Safari zooms any input with font-size < 16px; clamp to 16px minimum. */
+input:not([type='range']),
+select,
+textarea {
+  font-size: max(16px, 1em);
 }
 
 /* Hero carousel grab cursor — open hand on hover, closed fist when the

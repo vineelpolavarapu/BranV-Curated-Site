@@ -13,8 +13,8 @@ export function AuthShell({
   footer?: ReactNode;
 }) {
   return (
-    <main className="min-h-screen bg-neutral-50">
-      <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-12">
+    <main className="flex min-h-[100dvh] items-center justify-center bg-neutral-50 px-6 py-12">
+      <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link
             href="/"
@@ -24,7 +24,7 @@ export function AuthShell({
           </Link>
         </div>
         <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <h1 className="mb-1 text-2xl font-semibold tracking-tight">
+          <h1 className="mb-1 text-2xl font-semibold tracking-tight text-neutral-900">
             {title}
           </h1>
           {subtitle && (
@@ -39,7 +39,7 @@ export function AuthShell({
 }
 
 export const inputClass =
-  'w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+  'w-full rounded-md border border-neutral-300 px-3 py-2 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
 
 export const labelClass =
   'mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-700';

@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 
 interface PageTransitionShellProps {
   children: ReactNode;
@@ -12,21 +12,27 @@ export function PageTransitionShell({ children }: PageTransitionShellProps) {
   const [displayChildren, setDisplayChildren] = useState(children);
   const [transitionStage, setTransitionStage] = useState<'idle' | 'animating'>('idle');
 
+  // Always keep a ref to the latest children so the timeout callback
+  // can read them without being listed as an effect dependency.
+  // Listing `children` in the deps causes a new React object reference
+  // on every render (React 19 concurrent mode), which resets the timer
+  // before it ever completes and leaves displayChildren stuck on the
+  // initial page — breaking browser back-button navigation.
+  const latestChildren = useRef(children);
+  latestChildren.current = children;
+
   useEffect(() => {
-    // When children (page route) change, trigger a quick transition
     setTransitionStage('animating');
     const timer = setTimeout(() => {
-      setDisplayChildren(children);
+      setDisplayChildren(latestChildren.current);
       setTransitionStage('idle');
-      // Scroll to top smoothly when page changes
-      window.scrollTo({ top: 0 });
-    }, 200); // Quick fade duration to avoid delay
+    }, 150);
     return () => clearTimeout(timer);
-  }, [pathname, children]);
+  }, [pathname]); // pathname only — intentionally excludes children
 
   return (
     <div
-      className={`transition-opacity duration-200 ease-in-out ${
+      className={`transition-opacity duration-150 ease-in-out ${
         transitionStage === 'idle' ? 'opacity-100' : 'opacity-0'
       }`}
     >
