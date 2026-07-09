@@ -18,7 +18,8 @@
       "PowerShell(cd C:\\\\vineel\\\\BranV; $env:PGPASSWORD=\"branv\"; & \"C:\\\\Program Files\\\\PostgreSQL\\\\16\\\\bin\\\\psql.exe\" -U branv -h localhost -d branv_dev -c \"SELECT email, role, status, `\"failedLoginCount`\", `\"lockedUntil`\", `\"totpEnabled`\" FROM users WHERE role='ADMIN';\" 2>&1)",
       "Bash(python *)",
       "Bash(.venv/Scripts/python.exe -c ' *)",
-      "Bash(.venv/Scripts/python.exe)"
+      "Bash(.venv/Scripts/python.exe)",
+      "PowerShell(git *)"
     ]
   }
 }
