@@ -123,9 +123,7 @@ function MobileDrawer({
 
         {/* Nav links */}
         <div className="flex-1 overflow-y-auto px-3 py-4">
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
-            Navigation
-          </p>
+          
           <NavLinks pathname={pathname} onNavigate={onClose} />
         </div>
 

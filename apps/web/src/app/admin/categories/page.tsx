@@ -99,13 +99,11 @@ export default function CategoriesAdminPage() {
     <AdminShell title="Categories & filters">
       <p className="mb-4 text-sm text-neutral-600">
         L1/L2 categories are seeded via <code className="rounded bg-neutral-100 px-1 py-0.5 text-xs">pnpm seed:catalog</code>.
-        Edit attribute schemas here — they drive the storefront filter UI in Phase 4.
+        Edit attribute schemas here they drive the storefront filter UI in Phase 4.
       </p>
-      <div className="grid gap-6 lg:grid-cols-[300px_1fr]">
-        <div className={`${adminCard} overflow-hidden`}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
-            Taxonomy
-          </h2>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
+        <div className={`${adminCard} min-w-0 overflow-hidden`}>
+          
           {loading ? (
             <p className="text-sm text-neutral-500">Loading…</p>
           ) : (
@@ -124,29 +122,29 @@ export default function CategoriesAdminPage() {
           )}
         </div>
 
-        <div>
+        <div className="min-w-0">
           {!selected ? (
             <div className={adminCard}>
               <p className="text-sm text-neutral-500">Select a category.</p>
             </div>
           ) : (
-            <div className={adminCard}>
-              <div className="mb-5 flex items-end justify-between">
-                <div>
+            <div className={`${adminCard} min-w-0`}>
+              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0">
                   <p className="text-xs uppercase tracking-wider text-neutral-500">
                     Attribute schemas for
                   </p>
-                  <h2 className="text-xl font-semibold tracking-tight">
+                  <h2 className="truncate text-xl font-semibold tracking-tight">
                     {selected.name}
                   </h2>
-                  <p className="text-xs text-neutral-500">{selected.path}</p>
+                  <p className="truncate text-xs text-neutral-500">{selected.path}</p>
                 </div>
                 <button
                   onClick={() => {
                     setEditing(null);
                     setShowForm(true);
                   }}
-                  className={adminButtonPrimary}
+                  className={`${adminButtonPrimary} shrink-0 self-start sm:self-auto`}
                 >
                   + Add attribute
                 </button>
@@ -157,50 +155,81 @@ export default function CategoriesAdminPage() {
                   No attributes for this category yet.
                 </p>
               ) : (
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
-                      <th className="pb-2 font-medium">Key</th>
-                      <th className="pb-2 font-medium">Display</th>
-                      <th className="pb-2 font-medium">Type</th>
-                      <th className="pb-2 font-medium">Options</th>
-                      <th className="pb-2 font-medium" />
-                    </tr>
-                  </thead>
-                  <tbody>
+                <>
+                  {/* Mobile: stacked cards — no horizontal overflow */}
+                  <ul className="space-y-3 sm:hidden">
                     {schemas.map((s) => (
-                      <tr key={s.id} className="border-b border-neutral-100">
-                        <td className="py-2 font-mono text-xs">{s.attributeKey}</td>
-                        <td className="py-2">{s.displayName}</td>
-                        <td className="py-2 text-neutral-600">{s.filterType}</td>
-                        <td className="max-w-xs truncate py-2 text-xs text-neutral-500">
-                          {Array.isArray(s.optionsJson)
-                            ? (s.optionsJson as string[]).join(', ')
-                            : '—'}
-                        </td>
-                        <td className="py-2 text-right">
-                          <div className="flex justify-end gap-2">
-                            {/* <button
-                              onClick={() => {
-                                setEditing(s);
-                                setShowForm(true);
-                              }}
-                              className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
-                            >
-                              Edit
-                            </button> */}
-                            <button
-                              onClick={() => onDeleteSchema(s.attributeKey)}
-                              className={adminButtonDanger}
-                            >
-                              Delete
-                            </button>
+                      <li
+                        key={s.id}
+                        className="min-w-0 rounded-xl border border-neutral-200 p-3"
+                      >
+                        <div className="mb-2 flex min-w-0 items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium">{s.displayName}</p>
+                            <p className="truncate font-mono text-xs text-neutral-500">
+                              {s.attributeKey}
+                            </p>
                           </div>
-                        </td>
-                      </tr>
+                          <button
+                            onClick={() => onDeleteSchema(s.attributeKey)}
+                            className={`${adminButtonDanger} shrink-0`}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                        <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
+                          <dt className="text-neutral-500">Type</dt>
+                          <dd className="min-w-0 truncate text-neutral-700">{s.filterType}</dd>
+                          <dt className="text-neutral-500">Options</dt>
+                          <dd className="min-w-0 truncate text-neutral-500">
+                            {Array.isArray(s.optionsJson)
+                              ? (s.optionsJson as string[]).join(', ')
+                              : '—'}
+                          </dd>
+                        </dl>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
+                  </ul>
+
+                  {/* Tablet/desktop: table */}
+                  <div className="hidden sm:block">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                          <th className="pb-2 font-medium">Key</th>
+                          <th className="pb-2 font-medium">Display</th>
+                          <th className="pb-2 font-medium">Type</th>
+                          <th className="pb-2 font-medium">Options</th>
+                          <th className="pb-2 font-medium" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {schemas.map((s) => (
+                          <tr key={s.id} className="border-b border-neutral-100">
+                            <td className="py-2 font-mono text-xs">{s.attributeKey}</td>
+                            <td className="py-2">{s.displayName}</td>
+                            <td className="py-2 text-neutral-600">{s.filterType}</td>
+                            <td className="max-w-xs truncate py-2 text-xs text-neutral-500">
+                              {Array.isArray(s.optionsJson)
+                                ? (s.optionsJson as string[]).join(', ')
+                                : '—'}
+                            </td>
+                            <td className="py-2 text-right">
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  onClick={() => onDeleteSchema(s.attributeKey)}
+                                  className={adminButtonDanger}
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -396,15 +425,15 @@ function AttributeForm({
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-start justify-between">
-          <h2 className="text-lg font-semibold">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:p-6">
+        <div className="mb-4 flex items-start justify-between gap-2">
+          <h2 className="min-w-0 truncate text-lg font-semibold">
             {schema ? 'Edit attribute' : 'New attribute'}
           </h2>
-          <button onClick={onClose} className="text-neutral-400">✕</button>
+          <button onClick={onClose} className="shrink-0 text-neutral-400">✕</button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className={adminLabel}>Key</label>
               <input

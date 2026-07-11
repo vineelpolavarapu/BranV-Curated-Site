@@ -122,41 +122,93 @@ jobs:
           cache-to: type=gha,mode=max
 
   check-deploy-secrets:
-    name: Check VM deploy secrets
+    name: Check VM deploy secrets and variables
     runs-on: ubuntu-latest
     needs: [build-and-push]
     if: always() && needs.build-and-push.result == 'success'
-    outputs:
-      has_ssh_host: ${{ steps.check.outputs.has_ssh_host }}
     steps:
-      # secrets can't be referenced directly in a job-level `if:`, so check
-      # it here (secrets ARE allowed in step env) and expose it as an output.
-      - name: Check OCI_SSH_HOST secret
-        id: check
+      # A missing or environment-scoped secret does NOT fail here with an
+      # auth error — GitHub Actions silently substitutes an empty string, so
+      # the deploy-to-vm job below used to just silently show as "skipped"
+      # with no indication why (the image built and pushed fine, but nobody
+      # noticed the VM never actually got updated). Fail loudly here instead,
+      # naming exactly which secret/variable is missing, so a bad/missing
+      # value is a visible red X, not a quiet no-op or a silent deploy to the
+      # wrong path (OCI_DEPLOY_PATH previously had a fallback default that
+      # didn't match the VM's real deploy folder — now it's required).
+      - name: Verify required VM deploy secrets and variables
         env:
           OCI_SSH_HOST: ${{ secrets.OCI_SSH_HOST }}
+          OCI_SSH_USER: ${{ secrets.OCI_SSH_USER }}
+          OCI_SSH_KEY: ${{ secrets.OCI_SSH_KEY }}
+          OCI_DEPLOY_PATH: ${{ vars.OCI_DEPLOY_PATH }}
         shell: bash
         run: |
-          if [ -n "$OCI_SSH_HOST" ]; then
-            echo "has_ssh_host=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_ssh_host=false" >> "$GITHUB_OUTPUT"
+          missing=()
+          [ -z "$OCI_SSH_HOST" ] && missing+=("OCI_SSH_HOST (repository secret)")
+          [ -z "$OCI_SSH_USER" ] && missing+=("OCI_SSH_USER (repository secret)")
+          [ -z "$OCI_SSH_KEY" ] && missing+=("OCI_SSH_KEY (repository secret)")
+          [ -z "$OCI_DEPLOY_PATH" ] && missing+=("OCI_DEPLOY_PATH (repository VARIABLE, e.g. /opt/branv)")
+          if [ ${#missing[@]} -ne 0 ]; then
+            echo "::error::Missing required repository secret(s)/variable(s): ${missing[*]}. Secrets go under Settings > Secrets and variables > Actions > Secrets tab (not Environment secrets, since these jobs have no 'environment:'). OCI_DEPLOY_PATH goes under the Variables tab of the same page — it's the absolute path to the deploy folder on the VM, plain text, not sensitive. The API image built and pushed to GHCR fine — only the VM deploy steps are blocked on these."
+            exit 1
           fi
+
+  sync-deploy-config:
+    name: Sync deploy config to VM
+    runs-on: ubuntu-latest
+    needs: [build-and-push, check-deploy-secrets]
+    steps:
+      - name: Set checkout ref
+        id: vars
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "checkout_ref=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            ref="${{ inputs.git_ref }}"
+            echo "checkout_ref=${ref:-BranV-main}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.vars.outputs.checkout_ref }}
+
+      # Ships docker-compose.yml, Caddyfile, and the Prisma schema/migrations
+      # from git straight to the VM on every deploy, so the running stack can
+      # never silently drift from what's committed (previously these were
+      # scp'd by hand once and never touched again). The VM's own .env (real
+      # secrets) lives outside this repo and is never written by this step.
+      - name: Copy docker-compose.yml + Caddyfile to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          source: "deploy/docker-compose.yml,deploy/Caddyfile"
+          target: ${{ vars.OCI_DEPLOY_PATH }}
+          strip_components: 1
+
+      - name: Copy Prisma schema + migrations to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          source: "prisma"
+          target: ${{ vars.OCI_DEPLOY_PATH }}
 
   deploy-to-vm:
     name: Deploy to Oracle Cloud VM
     runs-on: ubuntu-latest
-    needs: [build-and-push, check-deploy-secrets]
-    if: >-
-      always() &&
-      needs.build-and-push.result == 'success' &&
-      needs.check-deploy-secrets.outputs.has_ssh_host == 'true'
+    needs: [build-and-push, check-deploy-secrets, sync-deploy-config]
     concurrency:
       group: deploy-vm-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
       cancel-in-progress: false
 
     steps:
-      - name: Deploy image + sync NTP on VM
+      - name: Deploy image + migrate + health-check on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.OCI_SSH_HOST }}
@@ -164,6 +216,8 @@ jobs:
           key: ${{ secrets.OCI_SSH_KEY }}
           script: |
             set -e
+            DEPLOY_PATH="${{ vars.OCI_DEPLOY_PATH }}"
+            cd "$DEPLOY_PATH"
 
             # ── 1. Fix clock drift (root cause of TOTP "Invalid 2FA code") ──
             if command -v chronyc &>/dev/null; then
@@ -175,14 +229,71 @@ jobs:
               sudo timedatectl set-ntp true
             fi
 
-            # ── 2. Pull latest image and restart the API container ───────────
-            # OCI_DEPLOY_PATH defaults to ~/branv — set it as a repository
-            # variable (Settings → Variables → Actions) if your path differs.
-            DEPLOY_PATH="${OCI_DEPLOY_PATH:-$HOME/branv}"
-            cd "$DEPLOY_PATH"
-            docker compose pull api
-            docker compose up -d --no-deps api
+            # ── 2. Record the currently-running api image so we can roll back ──
+            PREV_IMAGE=""
+            RUNNING_ID=$(docker compose ps -q api || true)
+            if [ -n "$RUNNING_ID" ]; then
+              PREV_IMAGE=$(docker inspect --format='{{.Image}}' "$RUNNING_ID" || true)
+            fi
 
-            # ── 3. Confirm the container came up ─────────────────────────────
-            sleep 5
-            docker compose ps api
+            # ── 3. Pull latest images and apply pending Prisma migrations ──────
+            # Previously this ran `docker compose up -d --no-deps api`, which
+            # skips the migrate service entirely — new migrations committed to
+            # git were never applied automatically. Run migrate explicitly and
+            # wait for it to actually finish (`up -d` alone only starts it, it
+            # doesn't block until the one-shot container exits).
+            docker compose pull api migrate
+            docker compose up -d migrate
+            for i in $(seq 1 30); do
+              MIGRATE_ID=$(docker compose ps -a -q migrate)
+              STATUS=$(docker inspect --format='{{.State.Status}}' "$MIGRATE_ID")
+              [ "$STATUS" = "exited" ] && break
+              sleep 2
+            done
+            MIGRATE_EXIT=$(docker inspect --format='{{.State.ExitCode}}' "$MIGRATE_ID")
+            if [ "$MIGRATE_EXIT" != "0" ]; then
+              echo "::error::Prisma migration failed (exit $MIGRATE_EXIT) — aborting before touching the api container."
+              docker compose logs migrate --tail 100
+              exit 1
+            fi
+
+            # ── 4. Restart the API container ────────────────────────────────
+            docker compose up -d --no-deps --force-recreate api
+
+            # ── 5. Health-check gate — a Restarting container used to still
+            # report success here (`docker compose ps` never fails the job).
+            # The api service only `expose`s port 5000 to the internal Docker
+            # network (no `ports:` mapping to the host), so a plain
+            # `curl localhost:5000` from the VM's own shell always gets
+            # connection refused — it has to be checked through Docker itself.
+            # Poll the container's own HEALTHCHECK status (see
+            # deploy/docker-compose.yml) instead. Retry with backoff, then
+            # fail loudly and roll back on failure.
+            HEALTHY=false
+            for i in $(seq 1 20); do
+              API_ID=$(docker compose ps -q api)
+              STATUS=$(docker inspect --format='{{.State.Health.Status}}' "$API_ID" 2>/dev/null || echo "unknown")
+              if [ "$STATUS" = "healthy" ]; then
+                HEALTHY=true
+                break
+              fi
+              sleep 3
+            done
+
+            if [ "$HEALTHY" = "true" ]; then
+              echo "API is healthy."
+              docker compose ps
+            else
+              echo "::error::API failed health check after deploy. Recent logs:"
+              docker compose logs api --tail 100
+              if [ -n "$PREV_IMAGE" ]; then
+                echo "::warning::Rolling back api to previous image $PREV_IMAGE"
+                docker tag "$PREV_IMAGE" ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+                docker compose up -d --no-deps --force-recreate api
+                sleep 5
+                docker compose ps api
+              else
+                echo "::error::No previous image was recorded — cannot auto-rollback. Manual intervention required on the VM."
+              fi
+              exit 1
+            fi

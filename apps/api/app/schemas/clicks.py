@@ -16,4 +16,4 @@ class TrackClickRequest(ApiModel):
 
 
 class ReportClickRequest(ApiModel):
-    outcome: Literal["PURCHASED", "BROWSING", "HELP_NEEDED"]
+    outcome: Literal["PURCHASED", "BROWSING", "NEEDS_HELP"]

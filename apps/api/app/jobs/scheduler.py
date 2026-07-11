@@ -220,7 +220,7 @@ async def analytics_rollup() -> None:
               ce."productId" AS product_id,
               count(*) FILTER (WHERE src.outcome = 'PURCHASED'),
               count(*) FILTER (WHERE src.outcome = 'BROWSING'),
-              count(*) FILTER (WHERE src.outcome = 'HELP_NEEDED'),
+              count(*) FILTER (WHERE src.outcome = 'NEEDS_HELP'),
               0::numeric,
               0::numeric,
               now()

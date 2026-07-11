@@ -9,8 +9,9 @@ export async function apiServer<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T | null> {
+  const url = `${BASE}${path}`;
   try {
-    const res = await fetch(`${BASE}${path}`, {
+    const res = await fetch(url, {
       ...init,
       headers: {
         'Content-Type': 'application/json',
@@ -19,9 +20,16 @@ export async function apiServer<T>(
       // Storefront pages are dynamic in dev; ISR added in Phase 11.
       cache: 'no-store',
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // A non-2xx here is indistinguishable from "not found" to callers
+      // (they treat null as notFound()), so log it — otherwise a backend
+      // outage looks identical to a missing row with zero server-side trace.
+      console.error(`[apiServer] ${url} -> HTTP ${res.status}`);
+      return null;
+    }
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    console.error(`[apiServer] ${url} -> fetch failed:`, err);
     return null;
   }
 }

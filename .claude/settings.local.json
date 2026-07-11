@@ -29,7 +29,19 @@
       "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker compose -f /opt/branv/docker-compose.yml ps; docker exec branv-api-1 curl -s http://localhost:5000/api/health\" 2>&1)",
       "PowerShell(Invoke-WebRequest -Uri \"https://api.branv.in/api/health\" -UseBasicParsing 2>&1 | Select-Object StatusCode, Content)",
       "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker exec branv-api-1 python -c 'import pyotp; t = pyotp.TOTP.__init__.__doc__; from app.core.security import verify_totp; import inspect; print\\(inspect.getsource\\(verify_totp\\)\\)'\" 2>&1)",
-      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker exec branv-api-1 grep -n 'valid_window' /app/app/core/security.py\" 2>&1)"
+      "PowerShell(ssh -i \"C:\\\\Users\\\\Lenovo\\\\.ssh\\\\branv-prod.key\" -o StrictHostKeyChecking=no ubuntu@68.233.118.28 \"docker exec branv-api-1 grep -n 'valid_window' /app/app/core/security.py\" 2>&1)",
+      "Bash(python -c \"import yaml,sys; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('deploy-api.yml OK'\\)\")",
+      "Bash(python -c \"import yaml,sys; yaml.safe_load\\(open\\('deploy/docker-compose.yml'\\)\\); print\\('docker-compose.yml OK'\\)\")",
+      "Bash(pnpm --filter @branv/web typecheck)",
+      "Bash(curl -sS -m 15 -i https://api.branv.in/api/health)",
+      "Bash(echo \"---EXIT:$?---\")",
+      "Bash(curl -sS -m 15 -i \"https://www.branv.in/category/shirts\")",
+      "Bash(curl -sS -m 15 -i \"https://api.branv.in/api/categories/shirts\")",
+      "Bash(curl -sS -m 15 \"https://api.branv.in/api/categories\")",
+      "Bash(curl -sS -m 15 \"https://api.branv.in/api/health\")",
+      "Bash(awk -v m=\"20260512181814_phase5_click_events\" '$0>=m')",
+      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('deploy-api.yml OK'\\)\")",
+      "Bash(python -m py_compile apps/api/app/schemas/clicks.py apps/api/app/jobs/scheduler.py)"
     ]
   }
 }
