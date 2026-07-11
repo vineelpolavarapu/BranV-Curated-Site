@@ -53,15 +53,17 @@ function ViewAllCard({ href, title }: { href: string; title: string }) {
 export function CategoryShowcase({
   title,
   slug,
+  href: hrefOverride,
   products,
 }: {
   title: string;
   slug: string;
+  href?: string;
   products: ProductCardData[];
 }) {
   const items = products.slice(0, 5);
   const hasProducts = items.length > 0;
-  const href = `/category/${slug}`;
+  const href = hrefOverride ?? `/category/${slug}`;
 
   return (
     <AnimateOnScroll>

@@ -27,6 +27,7 @@ export default async function HomePage() {
       <CategoryShowcase
         title="New Arrivals"
         slug="new"
+        href="/new"
         products={home?.newArrivals ?? []}
       />
       {/* API-driven category sections (e.g. Clothing once seeded) */}
