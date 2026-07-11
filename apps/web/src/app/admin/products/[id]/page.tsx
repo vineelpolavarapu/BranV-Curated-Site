@@ -101,7 +101,7 @@ export default function EditProductPage() {
         <EditsPanel product={product} onChanged={reload} />
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <ImagesPanel product={product} onChanged={reload} />
         <VariantsPanel product={product} onChanged={reload} />
       </div>
@@ -185,7 +185,7 @@ function BasicsForm({
           className={adminInput}
         />
       </div>
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
           <label className={adminLabel}>Price (₹)</label>
           <input
@@ -545,9 +545,9 @@ function VariantsPanel({
           {product.variants.map((v) => (
             <li
               key={v.id}
-              className="flex items-center justify-between rounded border border-neutral-200 px-3 py-2 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 text-sm"
             >
-              <span>
+              <span className="min-w-0 break-words">
                 <strong>{v.color || '—'}</strong>
                 {v.size && ` · ${v.size}`}
                 {v.sku && (
@@ -563,7 +563,7 @@ function VariantsPanel({
               </span>
               <button
                 onClick={() => onDelete(v.id)}
-                className={adminButtonDanger}
+                className={`${adminButtonDanger} shrink-0`}
               >
                 Remove
               </button>
@@ -572,7 +572,7 @@ function VariantsPanel({
         </ul>
       )}
       <form onSubmit={onAdd} className="space-y-3 border-t border-neutral-200 pt-4">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div>
             <label className={adminLabel}>Color</label>
             <input
@@ -673,9 +673,9 @@ function RetailerListingsPanel({
           {product.retailerListings.map((l) => (
             <li
               key={l.id}
-              className="flex items-center justify-between rounded border border-neutral-200 px-3 py-2 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 text-sm"
             >
-              <div>
+              <div className="min-w-0 break-words">
                 <strong className="capitalize">{l.retailer}</strong>
                 {l.rawPrice && <span className="ml-2">₹{l.rawPrice}</span>}
                 <span className="ml-2 text-xs text-neutral-500">
@@ -692,7 +692,7 @@ function RetailerListingsPanel({
               </div>
               <button
                 onClick={() => onDelete(l.id)}
-                className={adminButtonDanger}
+                className={`${adminButtonDanger} shrink-0`}
               >
                 Remove
               </button>

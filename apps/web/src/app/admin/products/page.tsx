@@ -82,7 +82,7 @@ export default function ProductsAdminPage() {
             onKeyDown={(e) => {
               if (e.key === 'Enter') void refresh();
             }}
-            className={`${adminInput} max-w-xs`}
+            className={`${adminInput} w-full max-w-xs`}
           />
           <select
             value={brandId}
@@ -114,87 +114,153 @@ export default function ProductsAdminPage() {
         </div>
       </div>
 
-      <div className={adminCard}>
+      <div className={`${adminCard} min-w-0`}>
         {loading ? (
           <p className="text-sm text-neutral-500">Loading…</p>
         ) : products.length === 0 ? (
           <p className="text-sm text-neutral-500">No products match.</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
-                <th className="px-2 pb-3 font-medium">Product</th>
-                <th className="px-2 pb-3 font-medium">Brand</th>
-                <th className="px-2 pb-3 font-medium">Category</th>
-                <th className="px-2 pb-3 font-medium">Price</th>
-                <th className="px-2 pb-3 font-medium">Status</th>
-                <th className="px-2 pb-3 font-medium" />
-              </tr>
-            </thead>
-            <tbody>
+          <>
+            {/* Mobile: stacked cards — no horizontal overflow */}
+            <ul className="space-y-3 sm:hidden">
               {products.map((p) => {
                 const primaryImage = p.images?.[0];
                 return (
-                  <tr key={p.id} className="border-b border-neutral-100">
-                    <td className="px-2 py-3">
-                      <div className="flex items-center gap-3">
-                        {primaryImage ? (
-                          <Image
-                            src={primaryImage.url}
-                            alt=""
-                            width={40}
-                            height={50}
-                            unoptimized
-                            className="h-12 w-10 rounded object-cover"
-                          />
-                        ) : (
-                          <div className="h-12 w-10 rounded bg-neutral-200" />
-                        )}
-                        <div>
-                          <p className="font-medium">{p.title}</p>
-                          <p className="text-xs text-neutral-500">
-                            {p._count.variants} variants · {p._count.retailerListings} retailers
-                            {primaryImage?.isAiGenerated && ' · AI hero'}
+                  <li key={p.id} className="min-w-0 rounded-xl border border-neutral-200 p-3">
+                    <div className="flex min-w-0 items-start gap-3">
+                      {primaryImage ? (
+                        <Image
+                          src={primaryImage.url}
+                          alt=""
+                          width={40}
+                          height={50}
+                          unoptimized
+                          className="h-12 w-10 shrink-0 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-10 shrink-0 rounded bg-neutral-200" />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <Link
+                            href={`/admin/products/${p.id}`}
+                            className="min-w-0 truncate font-medium hover:underline"
+                          >
+                            {p.title}
+                          </Link>
+                          <StatusPill status={p.status} />
+                        </div>
+                        <p className="truncate text-xs text-neutral-500">
+                          {p.brand.name} · {p.category.name}
+                        </p>
+                        <p className="truncate text-xs text-neutral-500">
+                          {p._count.variants} variants · {p._count.retailerListings} retailers
+                          {primaryImage?.isAiGenerated && ' · AI hero'}
+                        </p>
+                        <div className="mt-1 flex items-center justify-between gap-2">
+                          <p>
+                            <span className="font-medium">₹{p.price}</span>
+                            {p.mrp && (
+                              <span className="ml-2 text-xs text-neutral-400 line-through">
+                                ₹{p.mrp}
+                              </span>
+                            )}
                           </p>
+                          {p.status !== 'ARCHIVED' && (
+                            <button
+                              onClick={() => onArchive(p.id)}
+                              className={`${adminButtonDanger} shrink-0`}
+                            >
+                              Archive
+                            </button>
+                          )}
                         </div>
                       </div>
-                    </td>
-                    <td className="px-2 py-3 text-neutral-600">{p.brand.name}</td>
-                    <td className="px-2 py-3 text-neutral-600">{p.category.name}</td>
-                    <td className="px-2 py-3">
-                      <span className="font-medium">₹{p.price}</span>
-                      {p.mrp && (
-                        <span className="ml-2 text-xs text-neutral-400 line-through">
-                          ₹{p.mrp}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-2 py-3">
-                      <StatusPill status={p.status} />
-                    </td>
-                    <td className="px-2 py-3 text-right">
-                      <div className="flex justify-end gap-2">
-                        {/* <Link
-                          href={`/admin/products/${p.id}`}
-                          className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
-                        >
-                          Edit
-                        </Link> */}
-                        {p.status !== 'ARCHIVED' && (
-                          <button
-                            onClick={() => onArchive(p.id)}
-                            className={adminButtonDanger}
-                          >
-                            Archive
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </li>
                 );
               })}
-            </tbody>
-          </table>
+            </ul>
+
+            {/* Tablet/desktop: table */}
+            <div className="hidden sm:block">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                    <th className="px-2 pb-3 font-medium">Product</th>
+                    <th className="px-2 pb-3 font-medium">Brand</th>
+                    <th className="px-2 pb-3 font-medium">Category</th>
+                    <th className="px-2 pb-3 font-medium">Price</th>
+                    <th className="px-2 pb-3 font-medium">Status</th>
+                    <th className="px-2 pb-3 font-medium" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((p) => {
+                    const primaryImage = p.images?.[0];
+                    return (
+                      <tr key={p.id} className="border-b border-neutral-100">
+                        <td className="px-2 py-3">
+                          <div className="flex min-w-0 items-center gap-3">
+                            {primaryImage ? (
+                              <Image
+                                src={primaryImage.url}
+                                alt=""
+                                width={40}
+                                height={50}
+                                unoptimized
+                                className="h-12 w-10 shrink-0 rounded object-cover"
+                              />
+                            ) : (
+                              <div className="h-12 w-10 shrink-0 rounded bg-neutral-200" />
+                            )}
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">{p.title}</p>
+                              <p className="truncate text-xs text-neutral-500">
+                                {p._count.variants} variants · {p._count.retailerListings} retailers
+                                {primaryImage?.isAiGenerated && ' · AI hero'}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-2 py-3 text-neutral-600">{p.brand.name}</td>
+                        <td className="px-2 py-3 text-neutral-600">{p.category.name}</td>
+                        <td className="px-2 py-3">
+                          <span className="font-medium">₹{p.price}</span>
+                          {p.mrp && (
+                            <span className="ml-2 text-xs text-neutral-400 line-through">
+                              ₹{p.mrp}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-2 py-3">
+                          <StatusPill status={p.status} />
+                        </td>
+                        <td className="px-2 py-3 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Link
+                              href={`/admin/products/${p.id}`}
+                              className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                            >
+                              Edit
+                            </Link>
+                            {p.status !== 'ARCHIVED' && (
+                              <button
+                                onClick={() => onArchive(p.id)}
+                                className={adminButtonDanger}
+                              >
+                                Archive
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </AdminShell>

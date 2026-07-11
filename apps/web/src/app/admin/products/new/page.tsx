@@ -101,7 +101,7 @@ export default function NewProductPage() {
             className={adminInput}
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className={adminLabel}>Brand</label>
             <select
@@ -130,7 +130,7 @@ export default function NewProductPage() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className={adminLabel}>Category</label>
             <select
@@ -192,7 +192,7 @@ export default function NewProductPage() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <label className={adminLabel}>Price (₹)</label>
             <input
