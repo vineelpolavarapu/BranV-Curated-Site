@@ -158,6 +158,12 @@ jobs:
     name: Sync deploy config to VM
     runs-on: ubuntu-latest
     needs: [build-and-push, check-deploy-secrets]
+    # check-ci-status only runs for workflow_run events (it skips itself for
+    # workflow_dispatch) — that "skipped" status cascades to every downstream
+    # job by default unless each one explicitly opts out with always(), same
+    # as build-and-push and check-deploy-secrets already do above. Without
+    # this, manual workflow_dispatch runs silently skip this job entirely.
+    if: always() && needs.build-and-push.result == 'success' && needs.check-deploy-secrets.result == 'success'
     steps:
       - name: Set checkout ref
         id: vars
@@ -203,6 +209,11 @@ jobs:
     name: Deploy to Oracle Cloud VM
     runs-on: ubuntu-latest
     needs: [build-and-push, check-deploy-secrets, sync-deploy-config]
+    # Same skip-cascade guard as sync-deploy-config above — without this,
+    # workflow_dispatch runs skip this job too (this was latent even before
+    # sync-deploy-config existed, just never noticed since manual dispatch
+    # was rarely used to test the VM deploy path).
+    if: always() && needs.build-and-push.result == 'success' && needs.check-deploy-secrets.result == 'success' && needs.sync-deploy-config.result == 'success'
     concurrency:
       group: deploy-vm-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || github.ref_name }}
       cancel-in-progress: false
