@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { EditSummary } from '@/lib/phase7-types';
 
 // Mobile-only hero carousel. Renders at <1080px (parent gates via matchMedia).
 // All image references point at /mobile-hero/mobile_*.svg — 9:16 portrait art.
@@ -18,7 +19,19 @@ type HeroSlide = {
   ctaHref: string;
 };
 
-const SLIDES: HeroSlide[] = [
+// Maps a slide's `key` to the slug of the "Edit" (curated collection, managed
+// under /admin/edits) whose products it should link to. A slide falls back to
+// its hardcoded ctaHref until an Edit with that slug exists and is published.
+const EDIT_SLUG_BY_KEY: Record<string, string> = {
+  formals: 'sharp-formals',
+  classic: 'classic-essentials',
+  trendy: 'trendy-wear',
+  suits: 'sports-wear',
+  fashion: 'fashion-forward',
+  casual: 'easy-casuals',
+};
+
+const BASE_SLIDES: HeroSlide[] = [
   {
     key: 'formals',
     imageUrl: '/mobile-hero/mobile_formals.png',
@@ -96,7 +109,18 @@ const SLIDES: HeroSlide[] = [
 const ROTATE_MS = 3000;
 const TRANSITION_MS = 700;
 
-export function HeroCarouselMobile() {
+export function HeroCarouselMobile({ edits = [] }: { edits?: EditSummary[] }) {
+  const editSlugs = useMemo(() => new Set(edits.map((e) => e.slug)), [edits]);
+  const SLIDES = useMemo(
+    () =>
+      BASE_SLIDES.map((slide) => {
+        const editSlug = EDIT_SLUG_BY_KEY[slide.key];
+        return editSlug && editSlugs.has(editSlug)
+          ? { ...slide, ctaHref: `/edits/${editSlug}` }
+          : slide;
+      }),
+    [editSlugs],
+  );
   const total = SLIDES.length;
   const trackSlides = [SLIDES[total - 1], ...SLIDES, SLIDES[0]];
 

@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { EditSummary } from '@/lib/phase7-types';
 
 // Load only the carousel variant that matches the current viewport.
 // Previously both carousels rendered simultaneously (one CSS-hidden) causing
@@ -16,7 +17,7 @@ const HeroCarouselDesktop = dynamic(
   { ssr: false },
 );
 
-export function HeroCarousel() {
+export function HeroCarousel({ edits = [] }: { edits?: EditSummary[] }) {
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -35,5 +36,9 @@ export function HeroCarousel() {
     );
   }
 
-  return isDesktop ? <HeroCarouselDesktop /> : <HeroCarouselMobile />;
+  return isDesktop ? (
+    <HeroCarouselDesktop edits={edits} />
+  ) : (
+    <HeroCarouselMobile edits={edits} />
+  );
 }

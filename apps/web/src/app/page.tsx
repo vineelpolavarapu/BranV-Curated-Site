@@ -1,5 +1,6 @@
 import { apiServer } from '@/lib/api-server';
 import { HomePayload } from '@/lib/storefront-types';
+import { EditSummary } from '@/lib/phase7-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { HeroCarousel } from '@/components/HeroCarousel';
 import { CategoryShowcase } from '@/components/CategoryShowcase';
@@ -16,13 +17,16 @@ const STATIC_CATEGORIES = [
 ];
 
 export default async function HomePage() {
-  const home = await apiServer<HomePayload>('/home');
+  const [home, edits] = await Promise.all([
+    apiServer<HomePayload>('/home'),
+    apiServer<EditSummary[]>('/edits'),
+  ]);
 
   const apiSlugs = new Set((home?.categorySections ?? []).map((s) => s.category.slug));
 
   return (
     <StorefrontShell heroOverlay>
-      <HeroCarousel />
+      <HeroCarousel edits={edits ?? []} />
       {/* New Arrivals always first */}
       <CategoryShowcase
         title="New Arrivals"

@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactLenis } from 'lenis/react';
+import { usePathname } from 'next/navigation';
 import { ReactNode } from 'react';
 
 interface LenisProviderProps {
@@ -8,6 +9,17 @@ interface LenisProviderProps {
 }
 
 export function LenisProvider({ children }: LenisProviderProps) {
+  const pathname = usePathname();
+
+  // Admin is a data-entry console, not a marketing page — smooth-scroll
+  // easing there only hurts usability, and Lenis's cached scroll-height can
+  // go stale when async-loaded form content (dropdowns, checkbox lists)
+  // changes page height after mount, making the page feel "stuck" before
+  // reaching the real bottom. Skip Lenis for /admin and use native scroll.
+  if (pathname?.startsWith('/admin')) {
+    return <>{children}</>;
+  }
+
   return (
     <ReactLenis
       root

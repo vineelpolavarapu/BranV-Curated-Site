@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
+import { EditAdmin } from '@/lib/phase7-types';
 import {
   AdminShell,
   adminButtonPrimary,
@@ -17,6 +18,7 @@ export default function NewProductPage() {
   const router = useRouter();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<CategoryNode[]>([]);
+  const [edits, setEdits] = useState<EditAdmin[]>([]);
 
   const [title, setTitle] = useState('');
   const [brandId, setBrandId] = useState('');
@@ -29,20 +31,29 @@ export default function NewProductPage() {
   const [status, setStatus] = useState<ProductStatus>('DRAFT');
   const [feature, setFeature] = useState(false);
   const [featureDays, setFeatureDays] = useState<number>(7);
+  const [editIds, setEditIds] = useState<string[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
-      const [b, c] = await Promise.all([
+      const [b, c, e] = await Promise.all([
         apiFetch<Page<Brand>>('/admin/brands?pageSize=200'),
         apiFetch<CategoryNode[]>('/admin/categories'),
+        apiFetch<Page<EditAdmin>>('/admin/edits?pageSize=100'),
       ]);
       if (b.ok && b.data) setBrands(b.data.data);
       if (c.ok && c.data) setCategories(c.data);
+      if (e.ok && e.data) setEdits(e.data.data.filter((edit) => edit.status !== 'ARCHIVED'));
     })();
   }, []);
+
+  function toggleEditId(id: string) {
+    setEditIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
 
   const l1 = categories.filter((c) => !c.parentId);
   const l2 = categories.filter((c) => c.parentId === categoryId);
@@ -64,6 +75,7 @@ export default function NewProductPage() {
         : undefined,
       status,
       featureDays: feature ? Math.max(1, Math.min(365, featureDays)) : 0,
+      editIds: editIds.length ? editIds : undefined,
     };
     const result = await apiFetch<{ id: string }>('/admin/products', {
       method: 'POST',
@@ -154,6 +166,31 @@ export default function NewProductPage() {
               ))}
             </select>
           </div>
+        </div>
+        <div>
+          <label className={adminLabel}>Also show in these collections</label>
+          {edits.length === 0 ? (
+            <p className="text-xs text-neutral-500">
+              No collections yet — create one under{' '}
+              <a href="/admin/edits/new" className="underline">
+                The Edit
+              </a>
+              .
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-3">
+              {edits.map((edit) => (
+                <label key={edit.id} className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={editIds.includes(edit.id)}
+                    onChange={() => toggleEditId(edit.id)}
+                  />
+                  {edit.title}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>

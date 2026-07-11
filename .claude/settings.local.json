@@ -49,7 +49,10 @@
       "Bash(git push *)",
       "Bash(env)",
       "Bash(git credential *)",
-      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('YAML OK'\\)\")"
+      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('YAML OK'\\)\")",
+      "Bash(curl -sS -m 15 \"https://www.branv.in/\" -o /tmp/home.html -w \"HTTP %{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(grep -o '.\\\\{60\\\\}/category/new.\\\\{20\\\\}' /tmp/home.html | head -5)"
     ]
   }
 }

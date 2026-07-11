@@ -4,7 +4,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { ProductStatus } from '@/lib/admin-types';
+import { Page, ProductStatus } from '@/lib/admin-types';
+import { EditAdmin } from '@/lib/phase7-types';
 import {
   AdminShell,
   adminButtonDanger,
@@ -51,6 +52,7 @@ interface ProductDetail {
     rawPrice: string | null;
     availabilityStatus: string;
   }>;
+  edits: Array<{ id: string; slug: string; title: string }>;
 }
 
 export default function EditProductPage() {
@@ -94,6 +96,10 @@ export default function EditProductPage() {
       </p>
 
       <BasicsForm product={product} onSaved={reload} />
+
+      <div className="mt-8">
+        <EditsPanel product={product} onChanged={reload} />
+      </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <ImagesPanel product={product} onChanged={reload} />
@@ -267,6 +273,90 @@ function BasicsForm({
         </button>
       </div>
     </form>
+  );
+}
+
+function EditsPanel({
+  product,
+  onChanged,
+}: {
+  product: ProductDetail;
+  onChanged: () => void;
+}) {
+  const [allEdits, setAllEdits] = useState<EditAdmin[]>([]);
+  const [editIds, setEditIds] = useState<string[]>(product.edits.map((e) => e.id));
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      const res = await apiFetch<Page<EditAdmin>>('/admin/edits?pageSize=100');
+      if (res.ok && res.data) {
+        setAllEdits(res.data.data.filter((e) => e.status !== 'ARCHIVED'));
+      }
+    })();
+  }, []);
+
+  function toggle(id: string) {
+    setEditIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
+  async function onSave() {
+    setSubmitting(true);
+    setError(null);
+    const result = await apiFetch(`/admin/products/${product.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ editIds }),
+    });
+    setSubmitting(false);
+    if (!result.ok) {
+      setError(result.error ?? 'Save failed');
+      return;
+    }
+    onChanged();
+  }
+
+  return (
+    <div className={adminCard}>
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+        Also show in these collections
+      </h2>
+      {allEdits.length === 0 ? (
+        <p className="text-sm text-neutral-500">
+          No collections yet — create one under{' '}
+          <a href="/admin/edits/new" className="underline">
+            The Edit
+          </a>
+          .
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-3">
+          {allEdits.map((edit) => (
+            <label key={edit.id} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={editIds.includes(edit.id)}
+                onChange={() => toggle(edit.id)}
+              />
+              {edit.title}
+            </label>
+          ))}
+        </div>
+      )}
+      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      <div className="mt-4 flex justify-end">
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={submitting}
+          className={adminButtonPrimary}
+        >
+          {submitting ? 'Saving…' : 'Save collections'}
+        </button>
+      </div>
+    </div>
   );
 }
 

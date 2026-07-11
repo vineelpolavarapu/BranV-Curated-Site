@@ -33,6 +33,8 @@ from ...core.slug import ensure_unique_slug, slugify
 from ...db.models import (
     Brand,
     Category,
+    Edit,
+    EditProduct,
     Product,
     ProductImage,
     ProductRetailerListing,
@@ -116,6 +118,7 @@ class ProductBase(ApiModel):
     variants: list[VariantInput] | None = Field(default=None, max_length=20)
     images: list[ImageInput] | None = Field(default=None, max_length=20)
     retailerListings: list[RetailerListingInput] | None = Field(default=None, max_length=20)
+    editIds: list[str] | None = Field(default=None, max_length=20)
 
 
 class CreateProductRequest(ProductBase):
@@ -137,6 +140,7 @@ class UpdateProductRequest(ApiModel):
     metaDescription: str | None = None
     featureDays: int | None = None
     tags: list[str] | None = None
+    editIds: list[str] | None = Field(default=None, max_length=20)
 
 
 def _serialize_product(p: Product) -> dict[str, Any]:
@@ -217,6 +221,16 @@ async def _serialize_admin_products(db: AsyncSession, products: list[Product]) -
     )).all() if product_ids else []
     listings_count_map = {l[0]: l[1] for l in listings_counts}
 
+    # Batch query edits (collections) a product belongs to
+    edit_rows = (await db.execute(
+        select(EditProduct.productId, Edit.id_, Edit.slug, Edit.title)
+        .join(Edit, Edit.id_ == EditProduct.editId)
+        .where(EditProduct.productId.in_(product_ids))
+    )).all() if product_ids else []
+    edits_by_prod: dict[str, list[dict[str, Any]]] = {}
+    for pid_, eid, eslug, etitle in edit_rows:
+        edits_by_prod.setdefault(pid_, []).append({"id": eid, "slug": eslug, "title": etitle})
+
     out = []
     for p in products:
         p_imgs = images_by_prod.get(p.id_) or []
@@ -244,6 +258,7 @@ async def _serialize_admin_products(db: AsyncSession, products: list[Product]) -
             "category": cat_map.get(p.categoryId) if p.categoryId else None,
             "subcategory": cat_map.get(p.subcategoryId) if p.subcategoryId else None,
             "images": p_imgs,
+            "edits": edits_by_prod.get(p.id_) or [],
             "_count": {
                 "variants": variants_count_map.get(p.id_) or 0,
                 "retailerListings": listings_count_map.get(p.id_) or 0,
@@ -563,6 +578,9 @@ async def admin_create(
             syncFailedCount=0,
             createdAt=now, updatedAt=now,
         ))
+    for idx, eid in enumerate(payload.editIds or []):
+        db.add(EditProduct(id_=_cuid(), editId=eid, productId=pid, position=idx,
+                           createdAt=now, updatedAt=now))
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.create", targetType="product", targetId=pid)
     fresh = (await db.execute(select(Product).where(Product.id_ == pid))).scalar_one()
@@ -601,6 +619,22 @@ async def admin_update(
             _now() + timedelta(days=payload.featureDays) if payload.featureDays > 0 else None
         )
     await db.execute(update(Product).where(Product.id_ == product_id).values(**values))
+    if payload.editIds is not None:
+        await db.execute(delete(EditProduct).where(
+            EditProduct.productId == product_id,
+            EditProduct.editId.notin_(payload.editIds) if payload.editIds else True,
+        ))
+        existing_edit_ids = set((await db.execute(
+            select(EditProduct.editId).where(EditProduct.productId == product_id)
+        )).scalars().all())
+        now2 = _now()
+        for eid in payload.editIds:
+            if eid not in existing_edit_ids:
+                pos = (await db.execute(
+                    select(func.count(EditProduct.id_)).where(EditProduct.editId == eid)
+                )).scalar_one()
+                db.add(EditProduct(id_=_cuid(), editId=eid, productId=product_id, position=pos,
+                                   createdAt=now2, updatedAt=now2))
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.update", targetType="product", targetId=product_id)
     fresh = (await db.execute(select(Product).where(Product.id_ == product_id))).scalar_one()
