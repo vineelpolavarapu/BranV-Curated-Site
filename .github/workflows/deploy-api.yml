@@ -132,12 +132,6 @@ jobs:
     needs: [build-and-push]
     if: always() && needs.build-and-push.result == 'success'
     steps:
-      - name: DEBUG - dump dispatch inputs
-        run: |
-          echo "event_name: ${{ github.event_name }}"
-          echo "github.event.inputs.seed_categories: '${{ github.event.inputs.seed_categories }}'"
-          echo "inputs.seed_categories: '${{ inputs.seed_categories }}'"
-          echo "raw event.inputs json: ${{ toJSON(github.event.inputs) }}"
       # A missing or environment-scoped secret does NOT fail here with an
       # auth error — GitHub Actions silently substitutes an empty string, so
       # the deploy-to-vm job below used to just silently show as "skipped"
@@ -324,7 +318,16 @@ jobs:
     name: Seed production categories (one-off)
     runs-on: ubuntu-latest
     needs: [check-deploy-secrets, deploy-to-vm]
+    # Same always() requirement as sync-deploy-config/deploy-to-vm above —
+    # without it, GitHub implicitly ANDs in success() across the whole
+    # ancestor graph (including check-ci-status, which skips itself on
+    # workflow_dispatch), so this job silently skips despite every explicit
+    # condition below being true. Confirmed via a debug run: both
+    # github.event.inputs.seed_categories and inputs.seed_categories
+    # correctly resolved to 'true' and deploy-to-vm had already succeeded,
+    # yet the job was still skipped until always() was added here.
     if: >-
+      always() &&
       github.event_name == 'workflow_dispatch' &&
       github.event.inputs.seed_categories == 'true' &&
       needs.deploy-to-vm.result == 'success'
