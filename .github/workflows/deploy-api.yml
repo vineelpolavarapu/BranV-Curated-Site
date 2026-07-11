@@ -320,7 +320,7 @@ jobs:
     needs: [check-deploy-secrets, deploy-to-vm]
     if: >-
       github.event_name == 'workflow_dispatch' &&
-      inputs.seed_categories == true &&
+      github.event.inputs.seed_categories == 'true' &&
       needs.deploy-to-vm.result == 'success'
     steps:
       - name: Checkout repository
