@@ -11,6 +11,11 @@ on:
         description: Git ref to build (branch, tag, or SHA). Defaults to BranV-main.
         required: false
         default: BranV-main
+      seed_categories:
+        description: Also run deploy/seed-categories.sql against production Postgres (one-off, idempotent).
+        required: false
+        default: false
+        type: boolean
 
 env:
   REGISTRY: ghcr.io
@@ -308,3 +313,38 @@ jobs:
               fi
               exit 1
             fi
+
+  seed-categories-data:
+    name: Seed production categories (one-off)
+    runs-on: ubuntu-latest
+    needs: [check-deploy-secrets, deploy-to-vm]
+    if: >-
+      github.event_name == 'workflow_dispatch' &&
+      inputs.seed_categories == true &&
+      needs.deploy-to-vm.result == 'success'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy seed script to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          source: "deploy/seed-categories.sql"
+          target: ${{ vars.OCI_DEPLOY_PATH }}
+          strip_components: 1
+
+      - name: Run seed script against production Postgres
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          script: |
+            set -e
+            cd "${{ vars.OCI_DEPLOY_PATH }}"
+            docker compose exec -T postgres psql -U branv -d branv < seed-categories.sql
+            echo "=== Category count after seed ==="
+            docker compose exec -T postgres psql -U branv -d branv -c "SELECT count(*) FROM categories;"
