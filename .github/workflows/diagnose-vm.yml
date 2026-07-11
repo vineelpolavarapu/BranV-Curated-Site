@@ -1,0 +1,28 @@
+name: Diagnose Oracle VM (read-only)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  diagnose:
+    name: Dump VM/container diagnostics
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump docker compose status and logs
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          script: |
+            cd "${{ vars.OCI_DEPLOY_PATH }}"
+            echo "=== docker compose ps ==="
+            docker compose ps
+            echo "=== docker stats (single snapshot) ==="
+            docker stats --no-stream
+            echo "=== free -h ==="
+            free -h
+            echo "=== api logs (last 200) ==="
+            docker compose logs api --tail 200
+            echo "=== caddy logs (last 50) ==="
+            docker compose logs caddy --tail 50
