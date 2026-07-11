@@ -56,7 +56,12 @@ services:
   # The FastAPI app does not own the schema — Prisma still owns it (the Python
   # SQLAlchemy models are read-only auto-generated views of the Prisma schema).
   migrate:
-    image: node:20-alpine
+    # node:20-alpine (musl libc) lacks the OpenSSL variant Prisma's schema
+    # engine binary needs — it crashes on startup and its error text gets fed
+    # into the JSON parser instead of a real response ("Could not parse
+    # schema engine response... 'Error load'... is not valid JSON"). Use
+    # bullseye-slim (glibc) and install openssl/ca-certificates explicitly.
+    image: node:20-bullseye-slim
     restart: "no"
     volumes:
       - ./prisma:/prisma:ro
@@ -67,6 +72,7 @@ services:
       - sh
       - -c
       - |
+        apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && \
         npx --yes prisma@5 migrate deploy --schema=/prisma/schema.prisma
     depends_on:
       postgres:
