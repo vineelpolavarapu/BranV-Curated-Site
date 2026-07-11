@@ -132,6 +132,12 @@ jobs:
     needs: [build-and-push]
     if: always() && needs.build-and-push.result == 'success'
     steps:
+      - name: DEBUG - dump dispatch inputs
+        run: |
+          echo "event_name: ${{ github.event_name }}"
+          echo "github.event.inputs.seed_categories: '${{ github.event.inputs.seed_categories }}'"
+          echo "inputs.seed_categories: '${{ inputs.seed_categories }}'"
+          echo "raw event.inputs json: ${{ toJSON(github.event.inputs) }}"
       # A missing or environment-scoped secret does NOT fail here with an
       # auth error — GitHub Actions silently substitutes an empty string, so
       # the deploy-to-vm job below used to just silently show as "skipped"
