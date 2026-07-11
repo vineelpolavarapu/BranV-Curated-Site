@@ -41,7 +41,15 @@
       "Bash(curl -sS -m 15 \"https://api.branv.in/api/health\")",
       "Bash(awk -v m=\"20260512181814_phase5_click_events\" '$0>=m')",
       "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('deploy-api.yml OK'\\)\")",
-      "Bash(python -m py_compile apps/api/app/schemas/clicks.py apps/api/app/jobs/scheduler.py)"
+      "Bash(python -m py_compile apps/api/app/schemas/clicks.py apps/api/app/jobs/scheduler.py)",
+      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('deploy/docker-compose.yml'\\)\\); print\\('docker-compose.yml OK'\\)\")",
+      "Bash(gh --version)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(env)",
+      "Bash(git credential *)",
+      "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('YAML OK'\\)\")"
     ]
   }
 }
