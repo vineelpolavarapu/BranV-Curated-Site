@@ -151,6 +151,7 @@ async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
         "retailers": [
             {
                 "retailer": l.retailer,
+                "retailerDisplayName": l.retailerDisplayName,
                 "rawPrice": float(l.rawPrice) if l.rawPrice is not None else None,
                 "availabilityStatus": l.availabilityStatus,
                 "affiliateUrl": link_map.get(l.id_).convertedUrl if link_map.get(l.id_) else l.retailerProductUrl,
@@ -161,6 +162,7 @@ async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
         ],
         "buyNow": {
             "retailer": best_listing.retailer,
+            "retailerDisplayName": best_listing.retailerDisplayName,
             "url": best_affiliate.convertedUrl if best_affiliate else best_listing.retailerProductUrl,
             "partner": best_affiliate.partner if best_affiliate else None,
             "pending": best_affiliate.pendingConversion if best_affiliate else True,

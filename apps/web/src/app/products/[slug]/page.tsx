@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { apiServer } from '@/lib/api-server';
-import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { ProductCardData } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard, BuyNowButton } from '@/components/ProductCard';
@@ -13,19 +13,6 @@ import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { categoryHrefL2 } from '@/lib/category-href';
 
 export const dynamic = 'force-dynamic';
-
-const retailerLabel: Record<string, string> = {
-  flipkart: 'Flipkart',
-  amazon: 'Amazon',
-  myntra: 'Myntra',
-  ajio: 'Ajio',
-  meesho: 'Meesho',
-  nykaa: 'Nykaa',
-  snitch: 'Snitch',
-  bewakoof: 'Bewakoof',
-  thesouledstore: 'The Souled Store',
-  other: 'Retailer',
-};
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
@@ -244,6 +231,7 @@ function Summary({ product }: { product: ProductCardData }) {
           <BuyNowButton
             href={resolveBuyNowHref(product.buyNow)}
             retailer={product.buyNow.retailer}
+            retailerDisplayName={product.buyNow.retailerDisplayName}
             size="lg"
             trackingId={product.buyNow.trackingId}
             productTitle={product.title}
@@ -312,7 +300,7 @@ function WhereToBuy({ product }: { product: ProductCardData }) {
         <h2 className="bv-enter mb-4 text-xl font-semibold tracking-tight">Where to buy</h2>
         <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {product.retailers.map((r, i) => {
-            const label = retailerLabel[r.retailer] ?? r.retailer;
+            const label = resolveRetailerLabel(r.retailer, r.retailerDisplayName);
             return (
               <li
                 key={r.retailer}
@@ -326,7 +314,11 @@ function WhereToBuy({ product }: { product: ProductCardData }) {
                     </p>
                   )}
                 </div>
-                <BuyNowButton href={r.affiliateUrl} retailer={r.retailer} />
+                <BuyNowButton
+                  href={r.affiliateUrl}
+                  retailer={r.retailer}
+                  retailerDisplayName={r.retailerDisplayName}
+                />
               </li>
             );
           })}

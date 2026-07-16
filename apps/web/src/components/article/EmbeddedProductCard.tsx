@@ -3,22 +3,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { EmbeddedProduct } from '@/lib/article-types';
-import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { formatINR } from '@/lib/format';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
-
-const retailerLabel: Record<string, string> = {
-  flipkart: 'Flipkart',
-  amazon: 'Amazon',
-  myntra: 'Myntra',
-  ajio: 'Ajio',
-  meesho: 'Meesho',
-  nykaa: 'Nykaa',
-  snitch: 'Snitch',
-  bewakoof: 'Bewakoof',
-  thesouledstore: 'The Souled Store',
-  other: 'Retailer',
-};
 
 /**
  * Inline product card rendered inside an article body where the author placed
@@ -31,7 +18,6 @@ export function EmbeddedProductCard({ product }: { product: EmbeddedProduct }) {
   const buyHref = product.buyNow
     ? resolveBuyNowHref(product.buyNow)
     : null;
-  const retailer = product.buyNow?.retailer ?? '';
 
   return (
     <aside
@@ -107,7 +93,7 @@ export function EmbeddedProductCard({ product }: { product: EmbeddedProduct }) {
             }}
             className="mt-auto inline-flex items-center justify-center self-start rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-neutral-800"
           >
-            Buy on {retailerLabel[retailer] ?? retailer}
+            Buy on {resolveRetailerLabel(product.buyNow?.retailer ?? '', product.buyNow?.retailerDisplayName)}
             <span aria-hidden className="ml-1.5">↗</span>
           </a>
         )}

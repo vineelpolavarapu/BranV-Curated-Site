@@ -4,23 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
-import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { formatINR } from '@/lib/format';
 import { useClickReturn } from './click-return/ClickReturnProvider';
 import { useWishlist } from './wishlist/WishlistProvider';
-
-const retailerLabel: Record<string, string> = {
-  flipkart: 'Flipkart',
-  amazon: 'Amazon',
-  myntra: 'Myntra',
-  ajio: 'Ajio',
-  meesho: 'Meesho',
-  nykaa: 'Nykaa',
-  snitch: 'Snitch',
-  bewakoof: 'Bewakoof',
-  thesouledstore: 'The Souled Store',
-  other: 'Retailer',
-};
 
 export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
@@ -152,6 +139,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
             <BuyNowButton
               href={resolveBuyNowHref(product.buyNow)}
               retailer={product.buyNow.retailer}
+              retailerDisplayName={product.buyNow.retailerDisplayName}
               trackingId={product.buyNow.trackingId}
               productTitle={product.title}
             />
@@ -165,17 +153,19 @@ export function ProductCard({ product }: { product: ProductCardData }) {
 export function BuyNowButton({
   href,
   retailer,
+  retailerDisplayName,
   size = 'sm',
   trackingId,
   productTitle,
 }: {
   href: string;
   retailer: string;
+  retailerDisplayName?: string | null;
   size?: 'sm' | 'lg';
   trackingId?: string | null;
   productTitle?: string;
 }) {
-  const label = retailerLabel[retailer] ?? retailer;
+  const label = resolveRetailerLabel(retailer, retailerDisplayName);
   const { startTracking } = useClickReturn();
   const onClick = () => {
     if (trackingId && productTitle) {

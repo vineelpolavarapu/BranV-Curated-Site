@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { LookbookPublicImage } from '@/lib/phase7-types';
 import { formatINR } from '@/lib/format';
-import { resolveBuyNowHref } from '@/lib/click-tracking';
+import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
 
 interface Props {
@@ -143,7 +143,7 @@ function Hotspot({
               }}
               className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800"
             >
-              Buy on {product.buyNow.retailer}
+              Buy on {resolveRetailerLabel(product.buyNow.retailer, product.buyNow.retailerDisplayName)}
               <span aria-hidden className="ml-1.5">↗</span>
             </a>
           )}

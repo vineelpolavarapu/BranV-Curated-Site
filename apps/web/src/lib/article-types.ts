@@ -26,6 +26,7 @@ export interface EmbeddedProduct {
   } | null;
   buyNow: {
     retailer: string;
+    retailerDisplayName: string | null;
     url: string;
     partner: string | null;
     pending: boolean;

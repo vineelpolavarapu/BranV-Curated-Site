@@ -28,6 +28,7 @@ export interface ProductDetail {
   primaryImage: { url: string; altText: string | null; isAiGenerated: boolean } | null;
   buyNow: {
     retailer: string;
+    retailerDisplayName: string | null;
     url: string;
     partner: string | null;
     pending: boolean;

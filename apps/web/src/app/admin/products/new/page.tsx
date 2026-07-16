@@ -14,6 +14,8 @@ import {
   adminLabel,
 } from '@/components/AdminShell';
 
+const FALLBACK_BRAND_SLUG = 'unbranded';
+
 export default function NewProductPage() {
   const router = useRouter();
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -62,9 +64,16 @@ export default function NewProductPage() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    const resolvedBrandId =
+      brandId || brands.find((b) => b.slug === FALLBACK_BRAND_SLUG)?.id;
+    if (!resolvedBrandId) {
+      setSubmitting(false);
+      setError('Pick a brand — fallback "Unbranded" brand not found');
+      return;
+    }
     const body = {
       title,
-      brandId,
+      brandId: resolvedBrandId,
       categoryId,
       subcategoryId: subcategoryId || undefined,
       price: Number(price),
@@ -103,19 +112,20 @@ export default function NewProductPage() {
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className={adminLabel}>Brand</label>
+            <label className={adminLabel}>Brand (optional — defaults to Unbranded)</label>
             <select
-              required
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
               className={adminInput}
             >
-              <option value="">— select —</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              ))}
+              <option value="">— Unbranded —</option>
+              {brands
+                .filter((b) => b.slug !== FALLBACK_BRAND_SLUG)
+                .map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
             </select>
           </div>
           <div>

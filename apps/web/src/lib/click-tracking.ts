@@ -19,6 +19,32 @@ export function resolveBuyNowHref(buyNow: {
   return buyNow.url;
 }
 
+const RETAILER_LABEL: Record<string, string> = {
+  flipkart: 'Flipkart',
+  amazon: 'Amazon',
+  myntra: 'Myntra',
+  ajio: 'Ajio',
+  meesho: 'Meesho',
+  nykaa: 'Nykaa',
+  snitch: 'Snitch',
+  bewakoof: 'Bewakoof',
+  thesouledstore: 'The Souled Store',
+  other: 'Retailer',
+};
+
+/**
+ * Resolves the label shown as "Buy on {}". An admin-entered
+ * `retailerDisplayName` (set when `retailer` is 'other' or otherwise
+ * unmapped, e.g. a scraper's 'unknown' fallback) always wins; otherwise
+ * falls back to the known-retailer map, then the raw retailer key.
+ */
+export function resolveRetailerLabel(
+  retailer: string,
+  retailerDisplayName?: string | null,
+): string {
+  return retailerDisplayName?.trim() || RETAILER_LABEL[retailer] || retailer;
+}
+
 /**
  * Records the user's "Did you buy this?" answer. Fire-and-forget — analytics
  * shouldn't block the celebration flow if the network blips.

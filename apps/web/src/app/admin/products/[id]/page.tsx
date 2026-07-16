@@ -47,6 +47,7 @@ interface ProductDetail {
   retailerListings: Array<{
     id: string;
     retailer: string;
+    retailerDisplayName: string | null;
     retailerProductUrl: string;
     retailerImageUrl: string | null;
     rawPrice: string | null;
@@ -622,6 +623,7 @@ function RetailerListingsPanel({
   onChanged: () => void;
 }) {
   const [retailer, setRetailer] = useState('flipkart');
+  const [retailerDisplayName, setRetailerDisplayName] = useState('');
   const [url, setUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [rawPrice, setRawPrice] = useState('');
@@ -636,6 +638,7 @@ function RetailerListingsPanel({
         method: 'POST',
         body: JSON.stringify({
           retailer,
+          retailerDisplayName: retailer === 'other' ? retailerDisplayName || undefined : undefined,
           retailerProductUrl: url,
           retailerImageUrl: imageUrl || undefined,
           rawPrice: rawPrice ? Number(rawPrice) : undefined,
@@ -648,6 +651,7 @@ function RetailerListingsPanel({
       return;
     }
     setRetailer('flipkart');
+    setRetailerDisplayName('');
     setUrl('');
     setImageUrl('');
     setRawPrice('');
@@ -676,7 +680,7 @@ function RetailerListingsPanel({
               className="flex flex-wrap items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 text-sm"
             >
               <div className="min-w-0 break-words">
-                <strong className="capitalize">{l.retailer}</strong>
+                <strong className="capitalize">{l.retailerDisplayName || l.retailer}</strong>
                 {l.rawPrice && <span className="ml-2">₹{l.rawPrice}</span>}
                 <span className="ml-2 text-xs text-neutral-500">
                   {l.availabilityStatus.replaceAll('_', ' ').toLowerCase()}
@@ -719,6 +723,15 @@ function RetailerListingsPanel({
             <option value="thesouledstore">The Souled Store</option>
             <option value="other">Other</option>
           </select>
+          {retailer === 'other' && (
+            <input
+              required
+              value={retailerDisplayName}
+              onChange={(e) => setRetailerDisplayName(e.target.value)}
+              placeholder="Provider name, e.g. Purple Store"
+              className={`${adminInput} mt-2`}
+            />
+          )}
         </div>
         <div>
           <label className={adminLabel}>Raw price (₹)</label>

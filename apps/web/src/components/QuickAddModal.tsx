@@ -43,6 +43,7 @@ interface PresignResult {
 interface FormState {
   rawUrl: string;
   retailer: string;
+  retailerDisplayName: string;
   title: string;
   brandId: string;
   newBrandName: string;
@@ -62,6 +63,7 @@ interface FormState {
 const EMPTY: FormState = {
   rawUrl: '',
   retailer: 'flipkart',
+  retailerDisplayName: '',
   title: '',
   brandId: '',
   newBrandName: '',
@@ -79,6 +81,11 @@ const EMPTY: FormState = {
 };
 
 const DRAFT_KEY = 'branv:quickadd:draft';
+
+const KNOWN_RETAILERS = [
+  'flipkart', 'amazon', 'myntra', 'ajio', 'meesho', 'nykaa',
+  'snitch', 'bewakoof', 'thesouledstore', 'other',
+];
 
 export function QuickAddModal({
   open,
@@ -192,9 +199,17 @@ export function QuickAddModal({
       return;
     }
     const s = result.data;
+    // Keep the admin's current pick when the scraper couldn't tell (returns
+    // 'other'). But a value like 'unknown' isn't a dropdown option either —
+    // route it to 'other' so the manual name input appears, instead of
+    // silently carrying an unmapped retailer key through to "Buy on unknown".
+    let scrapedRetailer = form.retailer;
+    if (s.retailer && s.retailer !== 'other') {
+      scrapedRetailer = KNOWN_RETAILERS.includes(s.retailer) ? s.retailer : 'other';
+    }
     setForm((prev) => ({
       ...prev,
-      retailer: s.retailer === 'other' ? prev.retailer : s.retailer,
+      retailer: scrapedRetailer,
       title: prev.title || s.title || '',
       price: prev.price || (s.price ? String(s.price) : ''),
       mrp: prev.mrp || (s.mrp ? String(s.mrp) : ''),
@@ -299,6 +314,8 @@ export function QuickAddModal({
       title: form.title,
       rawUrl: form.rawUrl,
       retailer: form.retailer,
+      retailerDisplayName:
+        form.retailer === 'other' ? form.retailerDisplayName || undefined : undefined,
       brandId: form.brandId || undefined,
       newBrandName: form.brandId ? undefined : form.newBrandName || undefined,
       categoryId: form.categoryId,
@@ -466,15 +483,21 @@ export function QuickAddModal({
                 onChange={(e) => set('retailer', e.target.value)}
                 className={adminInput}
               >
-                {[
-                  'flipkart', 'amazon', 'myntra', 'ajio', 'meesho', 'nykaa',
-                  'snitch', 'bewakoof', 'thesouledstore', 'other',
-                ].map((r) => (
+                {KNOWN_RETAILERS.map((r) => (
                   <option key={r} value={r}>
                     {r}
                   </option>
                 ))}
               </select>
+              {form.retailer === 'other' && (
+                <input
+                  required
+                  value={form.retailerDisplayName}
+                  onChange={(e) => set('retailerDisplayName', e.target.value)}
+                  placeholder="Provider name, e.g. Purple Store"
+                  className={`${adminInput} mt-2`}
+                />
+              )}
             </div>
             <div>
               <label className={adminLabel}>Category</label>

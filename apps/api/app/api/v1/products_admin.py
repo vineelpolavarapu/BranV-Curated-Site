@@ -94,6 +94,7 @@ class ImageInput(ApiModel):
 
 class RetailerListingInput(ApiModel):
     retailer: str = Field(min_length=1, max_length=40)
+    retailerDisplayName: str | None = Field(default=None, max_length=60)
     retailerProductUrl: str
     retailerImageUrl: str | None = None
     rawPrice: float
@@ -312,6 +313,7 @@ class QuickAddRequest(ApiModel):
     title: str = Field(min_length=1, max_length=200)
     rawUrl: str = Field(min_length=1, max_length=2048)
     retailer: str = Field(min_length=1, max_length=40)
+    retailerDisplayName: str | None = Field(default=None, max_length=60)
     categoryId: str
     subcategoryId: str | None = None
     price: float
@@ -410,6 +412,7 @@ async def quick_add(
     listing_id = _cuid()
     db.add(ProductRetailerListing(
         id_=listing_id, productId=pid, retailer=payload.retailer,
+        retailerDisplayName=payload.retailerDisplayName,
         retailerProductUrl=payload.rawUrl, retailerImageUrl=payload.retailerImageUrl,
         rawPrice=Decimal(str(payload.price)),
         availabilityStatus="IN_STOCK",
@@ -508,7 +511,8 @@ async def admin_get(product_id: str, db: DbDep) -> dict[str, Any]:
         )).scalars().all()
     ]
     out["retailerListings"] = [
-        {"id": l.id_, "retailer": l.retailer, "retailerProductUrl": l.retailerProductUrl,
+        {"id": l.id_, "retailer": l.retailer, "retailerDisplayName": l.retailerDisplayName,
+         "retailerProductUrl": l.retailerProductUrl,
          "retailerImageUrl": l.retailerImageUrl, "rawPrice": _dec(l.rawPrice),
          "availabilityStatus": l.availabilityStatus, "lastSyncedAt": _iso(l.lastSyncedAt)}
         for l in (await db.execute(
@@ -572,6 +576,7 @@ async def admin_create(
     for l in payload.retailerListings or []:
         db.add(ProductRetailerListing(
             id_=_cuid(), productId=pid, retailer=l.retailer,
+            retailerDisplayName=l.retailerDisplayName,
             retailerProductUrl=l.retailerProductUrl, retailerImageUrl=l.retailerImageUrl,
             rawPrice=Decimal(str(l.rawPrice)),
             availabilityStatus=l.availabilityStatus or "IN_STOCK",
@@ -768,6 +773,7 @@ async def admin_add_listing(
     lid = _cuid()
     db.add(ProductRetailerListing(
         id_=lid, productId=product_id, retailer=payload.retailer,
+        retailerDisplayName=payload.retailerDisplayName,
         retailerProductUrl=payload.retailerProductUrl, retailerImageUrl=payload.retailerImageUrl,
         rawPrice=Decimal(str(payload.rawPrice)),
         availabilityStatus=payload.availabilityStatus or "IN_STOCK",

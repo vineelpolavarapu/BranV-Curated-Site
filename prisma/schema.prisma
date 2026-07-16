@@ -310,6 +310,10 @@ model ProductRetailerListing {
   productId          String
   product            Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
   retailer           String
+  /// Admin-entered display label shown as "Buy on {retailerDisplayName}"
+  /// when `retailer` is 'other' (or otherwise unmapped) — overrides the
+  /// hardcoded retailerLabel lookup on the frontend.
+  retailerDisplayName String?
   retailerProductUrl String
   retailerImageUrl   String?
   rawPrice           Decimal?           @db.Decimal(12, 2)

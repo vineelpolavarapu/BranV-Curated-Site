@@ -11,6 +11,7 @@ export interface GalleryImage extends ImageRef {
 
 export interface RetailerOffer {
   retailer: string;
+  retailerDisplayName: string | null;
   rawPrice: number | null;
   availabilityStatus: 'IN_STOCK' | 'OUT_OF_STOCK_AT_RETAILER' | 'DELISTED';
   affiliateUrl: string;
@@ -51,6 +52,7 @@ export interface ProductCardData {
   retailers: RetailerOffer[];
   buyNow: {
     retailer: string;
+    retailerDisplayName: string | null;
     url: string;
     partner: string | null;
     pending: boolean;

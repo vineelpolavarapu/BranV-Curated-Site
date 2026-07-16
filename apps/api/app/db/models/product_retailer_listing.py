@@ -21,6 +21,7 @@ class ProductRetailerListing(Base):
     id_: Mapped[str] = mapped_column(Text, primary_key=True, nullable=False, name='id')
     productId: Mapped[str] = mapped_column(Text, nullable=False, name='productId')
     retailer: Mapped[str] = mapped_column(Text, nullable=False, name='retailer')
+    retailerDisplayName: Mapped[str | None] = mapped_column(Text, nullable=True, name='retailerDisplayName')
     retailerProductUrl: Mapped[str] = mapped_column(Text, nullable=False, name='retailerProductUrl')
     retailerImageUrl: Mapped[str | None] = mapped_column(Text, nullable=True, name='retailerImageUrl')
     rawPrice: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True, name='rawPrice')
