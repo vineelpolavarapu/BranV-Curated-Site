@@ -56,6 +56,7 @@ _ALPH = string.ascii_lowercase + string.digits
 
 ProductStatusLit = Literal["DRAFT", "ACTIVE", "ARCHIVED"]
 AvailabilityLit = Literal["IN_STOCK", "OUT_OF_STOCK_AT_RETAILER", "DELISTED"]
+ManualAffiliatePartnerLit = Literal["EARNKARO", "MEESHO", "DIRECT"]
 
 
 def _cuid() -> str:
@@ -328,6 +329,7 @@ class QuickAddRequest(ApiModel):
     avatarImageUrl: str | None = None
     retailerImageUrl: str | None = None
     status: ProductStatusLit | None = None
+    affiliatePartner: ManualAffiliatePartnerLit | None = None
 
 
 @router.post("/quick-add", status_code=201, dependencies=AdminDeps)
@@ -337,10 +339,11 @@ async def quick_add(
     db: DbDep,
 ) -> dict[str, Any]:
     """Atomic: brand upsert → product → variants from sizes → primary image →
-    retailer listing → affiliate URL conversion (Amazon direct / Cuelinks)."""
+    retailer listing → affiliate link (Amazon auto-tagged / everything else
+    stored exactly as pasted — the admin brings an already-affiliate-wrapped
+    URL from EarnKaro, Meesho, etc.)."""
     from ...db.models import AffiliateLink, Brand
     from ...integrations.amazon import tag_url
-    from ...integrations.cuelinks import convert_url as cuelinks_convert
     from ...core.slug import ensure_unique_slug
 
     if not payload.brandId and not payload.newBrandName:
@@ -421,18 +424,17 @@ async def quick_add(
     ))
     await db.flush()
 
-    # 6. Affiliate URL conversion.
+    # 6. Affiliate link. Amazon gets your Associates tag appended
+    # automatically; every other retailer is stored exactly as pasted — the
+    # admin already has the affiliate-wrapped URL from EarnKaro/Meesho/etc.
     if payload.retailer.lower() == "amazon" or "amazon" in payload.rawUrl.lower():
         converted_url = tag_url(payload.rawUrl)
         partner = "AMAZON"
-        pending = False
-        partner_link_id = None
     else:
-        result = await cuelinks_convert(payload.rawUrl)
-        converted_url = result.convertedUrl
-        partner = "CUELINKS"
-        pending = result.pending
-        partner_link_id = result.partnerLinkId
+        converted_url = payload.rawUrl
+        partner = payload.affiliatePartner or "DIRECT"
+    pending = False
+    partner_link_id = None
 
     db.add(AffiliateLink(
         id_=_cuid(),

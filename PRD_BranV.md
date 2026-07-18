@@ -22,9 +22,8 @@ The platform is built as a **mobile-first responsive Progressive Web App (PWA)**
 
 ### 2.1 Revenue
 
-- **Affiliate commissions** via **Cuelinks** as the primary aggregator (700+ retailers including Flipkart, Amazon, Myntra, Ajio, Meesho, Nykaa, Snitch, Bewakoof, The Souled Store, and more — single API integration).
-- **Amazon Associates direct** as a secondary integration for Amazon-specific products (slightly better rates than aggregator-routed Amazon traffic).
-- **EarnKaro** documented as a fallback for any retailer not covered by Cuelinks.
+- **Affiliate commissions** via **Amazon Associates direct** (server-side auto-tagging) for Amazon products.
+- **EarnKaro**, **Meesho affiliate program**, and other manually-managed networks for everything else — the admin joins each program directly, generates the affiliate-wrapped URL on the network's own dashboard, and pastes it into the retailer URL field. BranV stores and redirects to it verbatim; no conversion API call.
 - **Direct brand programs** (Bewakoof, Snitch, The Souled Store) added opportunistically once traffic justifies the operational overhead.
 
 ### 2.2 Cost Structure
@@ -39,7 +38,7 @@ The platform is built as a **mobile-first responsive Progressive Web App (PWA)**
 - Prominent affiliate disclosure on every product page and in the footer (ASCI-aligned for India, FTC-aligned for international visitors): *"We earn a small commission when you buy through our links — at no extra cost to you."*
 - AI-generated imagery disclosure on every avatar image: small tag reading *"AI-rendered model"* or *"Styled with AI."*
 - No misrepresentation of the affiliate relationship anywhere in UX copy.
-- Product imagery from retailers used per their affiliate program terms (Cuelinks/PA-API compliant usage).
+- Product imagery from retailers used per each affiliate program's terms (Amazon PA-API / EarnKaro / Meesho compliant usage).
 
 ---
 
@@ -194,7 +193,8 @@ Single-screen modal — no tabs, no multi-step. Layout:
 │  [ ✓ extracted from Flipkart                   ] │
 │                                                  │
 │  🔗 Affiliate Link                               │
-│  [ ✓ auto-converted via Cuelinks                ]│
+│  [ stored exactly as pasted — pick network:     ]│
+│  [ EarnKaro ▾ ]                                  │
 │                                                  │
 │  Status:  ○ Draft   ● Publish now                │
 │  ☐ Keep modal open after submit (bulk mode)      │
@@ -206,13 +206,12 @@ Single-screen modal — no tabs, no multi-step. Layout:
 ### 7.3 Capabilities
 
 - **Auto-fill from URL**: paste a Flipkart, Amazon, Myntra, Ajio, Meesho, or Nykaa Man URL → backend scrapes title, price, MRP, primary product image, brand (best-effort), and pre-fills the form.
-  - Uses Cuelinks product API where supported.
-  - Falls back to lightweight server-side HTML scraping for the rest (cheerio for Node, BeautifulSoup for Python).
+  - Lightweight server-side HTML scraping (cheerio for Node, BeautifulSoup for Python).
   - Auto-fill is best-effort; admin reviews and corrects before submitting.
 - **Paste-from-clipboard image upload**: `Ctrl+V` / `Cmd+V` inside the modal pastes an image directly (no file dialog). Critical for fast workflow since Vineel generates avatars in Gemini/ChatGPT and pastes results in.
 - **Drag-drop image upload** as alternative.
-- **Auto-converted affiliate link**: admin pastes the raw retailer URL; backend calls Cuelinks API to convert to affiliate-tagged URL, stored separately from the display URL. Admin never has to manually construct affiliate links.
-- **Inline brand creation**: typing a brand name not in the dropdown shows "+ Create 'Snitch'" as the last option. Creates brand on the fly without leaving the modal.
+- **Affiliate link stored as pasted**: admin brings an already affiliate-wrapped URL from their network's own dashboard (EarnKaro, Meesho, etc.) and pastes it into the retailer URL field; it's stored and redirected to exactly as given, tagged with the network picked from a dropdown. Amazon URLs are the one exception — those get the Associates tag appended automatically server-side.
+- **Brand dropdown with inline creation**: pick an existing brand from the dropdown, or choose "+ New brand" to open a full brand-creation form in a modal layered on top — Quick Add stays open and untouched underneath. The new brand is selected automatically once created.
 - **Inline category navigation**: subcategory dropdown depends on selected category.
 - **Keyboard-first**: Tab through fields. `Ctrl/Cmd + Enter` submits.
 - **Bulk mode**: checkbox keeps modal open after submit, clears form, refocuses URL field — for adding 10–20 products in rapid succession.
@@ -306,7 +305,7 @@ This is the core revenue moment. Designed for honesty and delight.
 
 - Click goes through `/go/:trackingId` redirect endpoint.
 - Server logs: user_id (or anonymous session_id), product_id, retailer, source page, UTM data, timestamp, user agent, IP region.
-- Server responds with 302 redirect to the Cuelinks-converted affiliate URL.
+- Server responds with 302 redirect to the stored affiliate URL (Amazon: auto-tagged; everything else: the URL exactly as the admin pasted it).
 - Frontend opens this URL in a **new tab** (`target="_blank"` with `rel="noopener nofollow sponsored"` for SEO compliance and security).
 
 **Step 2 — Optional in-tab return modal**
@@ -507,29 +506,23 @@ A full editorial system — this is the engine of SEO and affiliate revenue.
 
 ## 13. Affiliate Link Management
 
-### 13.1 Primary Integration: Cuelinks
-
-- Sign up for Cuelinks (free).
-- Integrate Cuelinks API for link conversion: send raw retailer URL → receive affiliate-tagged URL.
-- All affiliate links stored as `(raw_url, converted_url, partner, partner_link_id, created_at)` in `affiliate_links` table.
-- Conversion happens automatically inside the Quick Add modal — admin never sees the converted URL unless they expand a "Show affiliate URL" toggle.
-
-### 13.2 Secondary: Amazon Associates Direct
+### 13.1 Primary: Amazon Associates Direct
 
 - Register for Amazon Associates India (requires a website with content; approval can take days).
-- For Amazon URLs, use direct Amazon Associates tag (`tag=brandbyvineel-21` or similar) instead of routing through Cuelinks. Rates are slightly better direct.
-- Backend detects Amazon URLs and routes them through the direct integration.
+- For Amazon URLs, use direct Amazon Associates tag (`tag=brandbyvineel-21` or similar), appended server-side.
+- Backend detects Amazon URLs (by retailer field or hostname) and routes them through this direct integration automatically — no admin action needed beyond pasting the plain product URL.
 
-### 13.3 Tertiary: EarnKaro (Fallback)
+### 13.2 Everything Else: Manual Affiliate Links (EarnKaro, Meesho, and others)
 
-- Used if Cuelinks doesn't cover a retailer.
-- Same flow as Cuelinks — admin pastes URL, backend converts.
+- No conversion API for these — the admin joins each network directly (EarnKaro, Meesho affiliate program, etc.), generates the affiliate-wrapped URL on that network's own dashboard, and pastes the finished link into the retailer URL field in Quick Add.
+- Stored as `(raw_url, converted_url, partner, partner_link_id, created_at)` in `affiliate_links` table — `converted_url` is identical to `raw_url` for these rows (no conversion happened), and `partner` records which network the admin selected from a dropdown (EarnKaro / Meesho / Other-Direct) so reconciliation reports can still be split per network.
+- The redirect endpoint (`/go/:trackingId`) simply serves this stored URL — no external call at click time either.
 
-### 13.4 Direct Brand Programs (Future)
+### 13.3 Direct Brand Programs (Future)
 
 - Architecture supports adding Snitch, Bewakoof, The Souled Store direct programs later via the same `affiliate_links` table with a different `partner` value.
 
-### 13.5 Sync Worker
+### 13.4 Sync Worker
 
 - Nightly job per product:
   - Re-checks product availability via retailer page (lightweight HEAD/GET request).
@@ -672,7 +665,7 @@ Lightweight ticket system.
 
 - DB writes in transactions.
 - Idempotent operations where retried (affiliate sync, notifications).
-- Graceful degradation if Cuelinks API is down (fall back to storing raw URL with a flag, retry later).
+- No external conversion API in the affiliate-link write path to degrade — links are stored exactly as pasted (Amazon tagging is a local string operation).
 
 ### 19.5 Observability
 
@@ -810,7 +803,7 @@ platform_settings          — key PK, value_jsonb, updated_at, updated_by
 | **Object Storage** | Cloudflare R2 (cheapest egress) | AI avatar images, lookbook media |
 | **CDN** | Cloudflare | |
 | **Email** | Resend or Buttondown | Transactional + newsletter |
-| **Affiliate** | **Cuelinks (primary)**, Amazon Associates direct, EarnKaro fallback | |
+| **Affiliate** | **Amazon Associates direct** (auto-tagged), manual pasted links (EarnKaro, Meesho, others) | |
 | **Confetti** | `canvas-confetti` (~1KB gzipped) | Nice-pick celebration |
 | **Auth** | JWT + httpOnly cookies, TOTP 2FA | |
 | **Container** | Docker + Docker Compose | |
@@ -854,7 +847,6 @@ platform_settings          — key PK, value_jsonb, updated_at, updated_by
                                     │
                   ┌─────────────────▼──────────────────┐
                   │  External Services                 │
-                  │  · Cuelinks API                    │
                   │  · Amazon PA-API                   │
                   │  · Retailer scrapers (fallback)    │
                   │  · ESP (Resend / Buttondown)       │
@@ -915,7 +907,6 @@ POST   /api/support/tickets/:id/messages
 # Admin
 POST   /api/admin/products/quick-add
 POST   /api/admin/products/scrape-url            (URL → autofill payload)
-POST   /api/admin/affiliate/convert-url          (raw URL → affiliate URL via Cuelinks)
 GET/POST/PATCH/DELETE /api/admin/brands
 GET/POST/PATCH/DELETE /api/admin/products
 GET/POST/PATCH/DELETE /api/admin/articles
@@ -945,7 +936,7 @@ GET    /api/admin/settings, PATCH same
   - Member: register → verify → browse → filter → product → Buy Now → return → "Yes I bought it" → Nice Pick celebration → Wardrobe → review.
   - Admin: Quick Add via URL paste → AI avatar paste → publish → see live on storefront within seconds.
   - Drop: schedule → pre-launch view → launch flip → notification fired → live affiliate clicks tracked.
-- **Contract tests:** Cuelinks API responses, Amazon PA-API responses (stubbed).
+- **Contract tests:** Amazon PA-API responses (stubbed).
 - **Concurrency:** click tracking under load (1000 concurrent /go hits).
 - **Security:** Dependabot, CodeQL, gitleaks, ZAP scan.
 
@@ -964,7 +955,7 @@ GitHub Actions on PR + push: lint, typecheck, unit, integration (services: postg
 | 0 | Foundations | 1 week |
 | 1 | Identity (member + admin) | 1 week |
 | 2 | Brand & catalog core, AI avatar library | 1.5 weeks |
-| 3 | Quick Add workflow (URL scrape, Cuelinks integration) | 1 week |
+| 3 | Quick Add workflow (URL scrape, affiliate link storage) | 1 week |
 | 4 | Storefront browse, filters, search | 2 weeks |
 | 5 | Click-out flow + Nice Pick celebration + Wardrobe | 1 week |
 | 6 | Articles & content management | 1.5 weeks |
@@ -984,9 +975,8 @@ GitHub Actions on PR + push: lint, typecheck, unit, integration (services: postg
 
 | Risk | Mitigation |
 |---|---|
-| Affiliate program terms change or rates cut | Diversify partners (Cuelinks + Amazon direct + EarnKaro + brand direct). Track per-partner economics. |
-| Retailer scraping breaks Quick Add autofill | Cuelinks product API as primary; cheerio/BeautifulSoup as fallback; manual entry always works. |
-| Cuelinks API down | Queue link conversions; admin can publish with raw URL; worker retries later. |
+| Affiliate program terms change or rates cut | Diversify partners (Amazon direct + EarnKaro + Meesho + brand direct). Track per-partner economics. |
+| Retailer scraping breaks Quick Add autofill | cheerio/BeautifulSoup scraping for autofill only; manual entry always works regardless. |
 | AI image consistency drift | Avatar Asset Library with stored prompt templates and reference images. |
 | Content velocity below threshold | Quick Add modal is the primary mitigation — sub-60s product addition. |
 | SEO ranking takes 6–12 months | Bake SEO infrastructure (schema.org, sitemap, OG, canonicals) from day one. |
@@ -1034,8 +1024,7 @@ The platform is successful when:
 
 ## 31. Glossary
 
-- **Affiliate Link** — Special URL that tracks Vineel as the referrer and pays commission on resulting sales.
-- **Cuelinks** — Aggregator service that converts raw retailer URLs to affiliate URLs across 700+ partners.
+- **Affiliate Link** — Special URL that tracks Vineel as the referrer and pays commission on resulting sales. For every retailer except Amazon, this is pasted in by the admin already-wrapped from the network's own dashboard (EarnKaro, Meesho, etc.) and stored verbatim — BranV performs no server-side conversion.
 - **Click-out** — When a user clicks Buy Now and is redirected to the retailer.
 - **Self-reported Conversion** — User-disclosed "Yes I bought it" event; not verified.
 - **Reconciliation** — Matching self-reported and tracked click events to actual affiliate-program-confirmed payouts.

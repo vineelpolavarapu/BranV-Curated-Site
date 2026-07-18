@@ -118,8 +118,6 @@ services:
       S3_SECRET_KEY: ${S3_SECRET_KEY}
       S3_FORCE_PATH_STYLE: "true"
       # ── Affiliate integrations ────────────────────────────────────────────
-      CUELINKS_API_KEY: ${CUELINKS_API_KEY}
-      CUELINKS_API_BASE: "https://www.cuelinks.com/api/v2"
       AMAZON_ASSOCIATES_TAG: ${AMAZON_ASSOCIATES_TAG}
       AMAZON_ACCESS_KEY: ${AMAZON_ACCESS_KEY}
       AMAZON_SECRET_KEY: ${AMAZON_SECRET_KEY}

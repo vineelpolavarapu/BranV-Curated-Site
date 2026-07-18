@@ -334,6 +334,7 @@ enum AffiliatePartner {
   CUELINKS
   AMAZON
   EARNKARO
+  MEESHO
   DIRECT
 }
 

@@ -23,7 +23,7 @@ export function StorefrontShell({
   return (
     <WishlistProvider>
       <ClickReturnProvider>
-        <div className="min-h-screen pb-16 lg:pb-0">
+        <div className="min-h-[100dvh] pb-16 lg:pb-0">
           <SiteHeader overlay={heroOverlay} />
           {children}
           <SiteFooter />
@@ -39,21 +39,26 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Keep header visible at the top
-      if (currentScrollY <= 80) {
-        setVisible(true);
-      } else {
-        // Hide if scrolling down, show if scrolling up
-        if (currentScrollY > lastScrollY) {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+
+        // Keep header visible at the top
+        if (currentScrollY <= 80) {
+          setVisible(true);
+        } else if (currentScrollY > lastScrollY) {
+          // Hide if scrolling down, show if scrolling up
           setVisible(false);
         } else {
           setVisible(true);
         }
-      }
-      setLastScrollY(currentScrollY);
+        setLastScrollY(currentScrollY);
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

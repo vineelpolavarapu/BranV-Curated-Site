@@ -55,7 +55,7 @@ export default function ReconciliationAdminPage() {
       }
     >
       <p className="mb-4 text-sm text-neutral-600">
-        Upload Cuelinks / Amazon / EarnKaro CSV exports. We parse, match each
+        Upload Amazon / EarnKaro / Meesho CSV exports. We parse, match each
         row to a tracked click within ±48h and the amount band, and surface
         anything unmatched for review. Re-uploads of the same file are skipped.
       </p>
@@ -171,7 +171,7 @@ export default function ReconciliationAdminPage() {
 
 function VarianceCards({ variance }: { variance: VarianceResponse | null }) {
   if (!variance) return null;
-  const partners: AffiliatePartner[] = ['CUELINKS', 'AMAZON', 'EARNKARO', 'DIRECT'];
+  const partners: AffiliatePartner[] = ['AMAZON', 'EARNKARO', 'MEESHO', 'DIRECT'];
   // Roll up across recent payouts per partner.
   const byPartner = new Map<
     AffiliatePartner,
@@ -212,6 +212,13 @@ function VarianceCards({ variance }: { variance: VarianceResponse | null }) {
   );
 }
 
+const UPLOAD_PARTNER_OPTIONS: Array<{ value: AffiliatePartner; label: string }> = [
+  { value: 'EARNKARO', label: 'EarnKaro' },
+  { value: 'AMAZON', label: 'Amazon Associates' },
+  { value: 'MEESHO', label: 'Meesho affiliate program' },
+  { value: 'DIRECT', label: 'Other / direct' },
+];
+
 function UploadModal({
   onClose,
   onUploaded,
@@ -220,6 +227,7 @@ function UploadModal({
   onUploaded: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
+  const [partner, setPartner] = useState<AffiliatePartner>('EARNKARO');
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -234,6 +242,7 @@ function UploadModal({
     setError(null);
     const form = new FormData();
     form.append('file', file);
+    form.append('partner', partner);
     if (notes) form.append('notes', notes);
     try {
       const res = await fetch(
@@ -277,16 +286,30 @@ function UploadModal({
               className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
             />
             <p className="mt-1 text-xs text-neutral-500">
-              Cuelinks / Amazon / EarnKaro exports. Provider is detected from
-              column headers.
+              Amazon / EarnKaro / Meesho exports. Column headers vary by
+              network — pick which one below.
             </p>
+          </div>
+          <div>
+            <label className={adminLabel}>Network</label>
+            <select
+              value={partner}
+              onChange={(e) => setPartner(e.target.value as AffiliatePartner)}
+              className={adminInput}
+            >
+              {UPLOAD_PARTNER_OPTIONS.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className={adminLabel}>Notes (optional)</label>
             <input
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. October 2026 Cuelinks payout"
+              placeholder="e.g. October 2026 EarnKaro payout"
               className={adminInput}
             />
           </div>

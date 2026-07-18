@@ -202,7 +202,7 @@ Fill in (at minimum) the values above, plus:
 - `COOKIE_DOMAIN=.yourdomain.com` (leading dot covers subdomains)
 - `WEB_ORIGIN=https://www.yourdomain.com`
 - **Cloudflare R2** — Create 2 R2 buckets in Cloudflare → R2 (`branv-uploads`, `branv-pg-backups`). Create an R2 API token with read/write on both. Paste keys + your R2 account ID.
-- **Cuelinks / Amazon / EarnKaro** — leave blank if you don't have them yet; the affiliate worker stays in mock mode until you fill them.
+- **Amazon** — leave blank if you don't have Associates keys yet; Amazon URLs pass through untagged until you fill them. Other retailers (EarnKaro, Meesho, etc.) don't need keys at all — the admin pastes the already affiliate-wrapped URL directly.
 - **Resend** — sign up at resend.com (free), verify your domain, paste API key, set `MAIL_FROM=hello@yourdomain.com`.
 
 Save and exit nano (Ctrl+O, Enter, Ctrl+X).

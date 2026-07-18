@@ -61,9 +61,8 @@
    JWT_ACCESS_SECRET
    JWT_REFRESH_SECRET
    S3_ENDPOINT  S3_BUCKET  S3_ACCESS_KEY  S3_SECRET_KEY
-   CUELINKS_API_KEY  CUELINKS_API_BASE
    AMAZON_ASSOCIATES_TAG  AMAZON_ACCESS_KEY  AMAZON_SECRET_KEY  AMAZON_REGION
-   EARNKARO_API_KEY (optional)
+   EARNKARO_API_KEY (optional, unused — EarnKaro links are pasted in manually)
    MAIL_PROVIDER  MAIL_API_KEY  MAIL_FROM
    BASE_CURRENCY=INR
    PRICE_SYNC_DRIFT_THRESHOLD_PCT=5
@@ -189,17 +188,18 @@ This is the platform's productivity centerpiece. Build it carefully.
 1. **URL scraper endpoint:** `POST /api/admin/products/scrape-url` with `{ url }`.
    - Detect retailer from hostname (flipkart, amazon, myntra, ajio, meesho, nykaa, snitch, bewakoof, thesouledstore or anything).
    - Per-retailer parser: extract title, brand (best-effort), price, MRP, primary image URL.
-   - Use Cuelinks product API where supported.
    - Fallback: server-side HTML scrape with cheerio (Node) or BeautifulSoup (Python). Use a realistic `User-Agent`.
    - Return payload: `{ title, brand_hint, price, mrp, primary_image_url, retailer, raw_url }`.
    - Cache aggressive (Redis, 1 hour) so the same URL doesn't re-scrape.
 
-2. **Cuelinks link converter:** `POST /api/admin/affiliate/convert-url` with `{ raw_url, retailer }`.
-   - Call Cuelinks API → receive affiliate-tagged URL.
-   - Store `affiliate_links` row.
-   - Return converted URL.
-   - For Amazon URLs, route to Amazon Associates direct: append `?tag={AMAZON_ASSOCIATES_TAG}` instead of Cuelinks-converting.
-   - On Cuelinks API failure: store raw URL with a `pending_conversion: true` flag; a worker retries hourly.
+2. **Affiliate link handling (no conversion API):** the admin brings an already
+   affiliate-wrapped URL from their network of choice (EarnKaro, Meesho,
+   etc.), pastes it into the retailer URL field, and it's stored + redirected
+   verbatim — no third-party conversion call.
+   - For Amazon URLs only: route to Amazon Associates direct — append
+     `?tag={AMAZON_ASSOCIATES_TAG}` server-side.
+   - Store the resulting `affiliate_links` row with `partner` set to whichever
+     network the admin selected (EARNKARO / MEESHO / AMAZON / DIRECT).
 
 3. **Quick Add endpoint:** `POST /api/admin/products/quick-add` with one combined payload:
    ```
@@ -250,7 +250,7 @@ This is the platform's productivity centerpiece. Build it carefully.
 - [ ] "Bulk mode": after submit, modal stays open, fields cleared, URL field focused.
 - [ ] New brand created inline without leaving modal.
 - [ ] End-to-end Quick Add timed: under 60 seconds for an experienced admin.
-- [ ] Cuelinks API down: product still creates with `pending_conversion` flag; worker resolves later.
+- [ ] Pasted EarnKaro/Meesho URL → stored and redirects exactly as pasted, no conversion delay or pending state.
 
 ---
 
@@ -586,7 +586,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 1. **Price/availability sync worker:**
    - Runs nightly.
    - For each `ACTIVE` product, for each retailer listing:
-     - Fetch current price + availability via Cuelinks product API (where supported) or lightweight scrape.
+     - Fetch current price + availability via a lightweight scrape.
      - If price drifted beyond `PRICE_SYNC_DRIFT_THRESHOLD_PCT`:
        - Update `product_retailer_listings.raw_price`.
        - Update `products.price` if this is the primary retailer.
@@ -595,11 +595,11 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
    - Concurrency-limited (don't hammer retailers — 1–2 requests/second per retailer, with backoff).
    - Failed syncs logged; product flagged with `sync_failed` after 3 consecutive failures (admin alert).
 
-2. **Pending affiliate link resolver:** worker every 10 min checks `affiliate_links.pending_conversion = true`, retries Cuelinks API conversion.
+2. **Affiliate link self-heal:** worker every 10 min checks `affiliate_links.pending_conversion = true` — only ever true for historical rows from the retired Cuelinks integration — and falls back to storing the raw URL directly. New links never end up in this state; every partner is written synchronously at Quick Add time.
 
 3. **CSV reconciliation:**
-   - Admin uploads provider CSV via `POST /api/admin/affiliate/reconciliation` (multipart).
-   - Parser detects provider from CSV column structure (Cuelinks, Amazon, EarnKaro — each has different formats).
+   - Admin uploads provider CSV via `POST /api/admin/affiliate/reconciliation` (multipart), labeled with the partner (EarnKaro, Amazon, Meesho, etc.).
+   - Parser normalizes CSV column structure (Amazon, EarnKaro, Meesho — each has different formats).
    - For each row: try to match to a `click_events` record by (partner, time window, amount band). Store match in `affiliate_payout_items`.
    - Unmatched rows still stored, flagged for admin review.
    - Idempotent: re-uploading the same CSV (detected via `csv_row_hash`) doesn't duplicate.
@@ -613,7 +613,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 - [ ] Nightly sync updates prices for products whose retailer prices changed.
 - [ ] Price-drop notifications fire to wishlisters.
-- [ ] Pending Cuelinks conversions resolve within an hour of being created.
+- [ ] Any leftover historical pending-conversion rows self-heal to their raw URL within 10 minutes.
 - [ ] CSV upload matches 80%+ of rows to click events on a test file.
 - [ ] Re-uploading the same CSV doesn't duplicate payouts.
 
@@ -726,7 +726,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ### 12.1 Tests
 
-1. **Unit:** affiliate URL conversion (Cuelinks + Amazon), click tracking, scraping parsers per retailer, drop status transitions, Nice Pick headline randomizer, reconciliation CSV parser. ≥80% coverage on backend.
+1. **Unit:** affiliate URL handling (Amazon auto-tagging + direct passthrough), click tracking, scraping parsers per retailer, drop status transitions, Nice Pick headline randomizer, reconciliation CSV parser. ≥80% coverage on backend.
 
 2. **Integration:** full API tests against test Postgres + Redis (testcontainers).
 
@@ -789,11 +789,10 @@ Required checks on PRs: all green before merge. On merge to `main`: build, push,
 
 5. **Log aggregation:** stdout JSON → Better Stack / Grafana Loki / CloudWatch.
 
-6. **Cuelinks dashboard URL** configured in env; admin docs include screenshots of where to find the CSV export.
+6. **Affiliate network dashboards** (EarnKaro, Meesho, Amazon Associates, etc.) documented for admins; admin docs include screenshots of where to find each network's CSV export.
 
 7. **Runbooks** in `/docs/runbooks/`:
    - Sync worker failure recovery.
-   - Cuelinks API outage handling.
    - Drop launch failure recovery.
    - DB failover (Neon handles most of it).
    - Rolling back a bad deploy.
@@ -804,7 +803,7 @@ Required checks on PRs: all green before merge. On merge to `main`: build, push,
 
 ### 13.2 Acceptance Checks
 
-- [ ] Staging passes all E2E tests against real Cuelinks API (using test products).
+- [ ] Staging passes all E2E tests for Quick Add + affiliate link storage (using test products).
 - [ ] Production deploys via manual approval gate.
 - [ ] Monitoring dashboards show real traffic.
 - [ ] Alerts fire on simulated errors.
@@ -856,7 +855,7 @@ Run these manually on production after Phase 13.
 
 1. Kill backend during a click; restart. Click event logged via queue or repeated client retry.
 2. 1000 concurrent `/go/:trackingId` requests — all logged, p95 < 100ms.
-3. Cuelinks API simulated down — Quick Add still completes, link stored with `pending_conversion`. Worker resolves later.
+3. Paste a malformed/empty affiliate URL — Quick Add still completes, link stored exactly as given (no external call to fail).
 4. Run sync worker on a retailer that returns 404 — product flagged after 3 consecutive failures; admin alerted.
 5. Upload the same reconciliation CSV twice — second upload detected as duplicate, no double-counting.
 

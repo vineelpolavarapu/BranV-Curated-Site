@@ -37,7 +37,7 @@ A live, publicly deployed product at **www.branv.in** that gives shoppers one tr
 - **Uptime monitoring:** UptimeRobot (planned)
 
 ### Integrations
-- **Affiliate networks:** Cuelinks, Amazon Associates, EarnKaro
+- **Affiliate networks:** Amazon Associates (auto-tagged server-side); EarnKaro, Meesho, and others (admin pastes an already affiliate-wrapped URL, stored and redirected as-is)
 - **Email:** Transactional email provider (env-configured)
 
 ## Prerequisites
@@ -134,6 +134,6 @@ Production deployment lives in [`deploy/`](deploy/). Full step-by-step runbook a
 
 ## Notes
 
-- External integrations (Cuelinks, Amazon, ESP) are mocked when `USE_MOCK_INTEGRATIONS=true` in `.env`. Flip to `false` and supply real keys to hit production APIs.
+- External integrations (Amazon, ESP) are mocked when `USE_MOCK_INTEGRATIONS=true` in `.env`. Flip to `false` and supply real keys to hit production APIs.
 - Windows PowerShell users: chain commands with `;` instead of `&&` (e.g. `pnpm docker:up; pnpm dev`).
 - Prisma remains the single source of truth for the database schema. The FastAPI backend reads the schema via auto-generated SQLAlchemy models; production migrations run in a one-shot `migrate` container before the API starts.

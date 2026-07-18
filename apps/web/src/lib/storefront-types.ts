@@ -15,7 +15,9 @@ export interface RetailerOffer {
   rawPrice: number | null;
   availabilityStatus: 'IN_STOCK' | 'OUT_OF_STOCK_AT_RETAILER' | 'DELISTED';
   affiliateUrl: string;
-  affiliatePartner: 'CUELINKS' | 'AMAZON' | 'EARNKARO' | 'DIRECT' | null;
+  // CUELINKS is retained only so historical listings still type-check — it's
+  // never written going forward.
+  affiliatePartner: 'CUELINKS' | 'AMAZON' | 'EARNKARO' | 'MEESHO' | 'DIRECT' | null;
   pending: boolean;
 }
 

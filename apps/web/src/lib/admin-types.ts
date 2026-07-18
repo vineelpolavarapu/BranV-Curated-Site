@@ -1,5 +1,6 @@
 export type BrandStatus = 'ACTIVE' | 'HIDDEN' | 'ARCHIVED';
 export type ProductStatus = 'DRAFT' | 'ACTIVE' | 'ARCHIVED';
+export type AffiliatePartner = 'AMAZON' | 'EARNKARO' | 'MEESHO' | 'DIRECT';
 export type FilterType = 'SELECT' | 'MULTI_SELECT' | 'RANGE' | 'TOGGLE';
 export type AvailabilityStatus =
   | 'IN_STOCK'

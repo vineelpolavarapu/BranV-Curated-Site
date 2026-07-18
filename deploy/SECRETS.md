@@ -29,6 +29,6 @@ resolve to empty strings.
 
 ## On the VM itself (never in GitHub, never in git)
 
-`$OCI_DEPLOY_PATH/.env` — copied once from `deploy/.env.production.example` and filled in by hand over SSH. Required keys: `API_HOSTNAME`, `ACME_EMAIL`, `DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `COOKIE_DOMAIN`, `WEB_ORIGIN`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BACKUP_BUCKET`. Optional (blank is fine at first launch): `CUELINKS_API_KEY`, `AMAZON_ASSOCIATES_TAG`/`AMAZON_ACCESS_KEY`/`AMAZON_SECRET_KEY`, `EARNKARO_API_KEY`, `MAIL_API_KEY`/`MAIL_FROM`. Full list and generation commands: `DEPLOYMENT_PROGRESS.md` Step 12.
+`$OCI_DEPLOY_PATH/.env` — copied once from `deploy/.env.production.example` and filled in by hand over SSH. Required keys: `API_HOSTNAME`, `ACME_EMAIL`, `DB_PASSWORD`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `COOKIE_DOMAIN`, `WEB_ORIGIN`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BACKUP_BUCKET`. Optional (blank is fine at first launch): `AMAZON_ASSOCIATES_TAG`/`AMAZON_ACCESS_KEY`/`AMAZON_SECRET_KEY`, `EARNKARO_API_KEY`, `MAIL_API_KEY`/`MAIL_FROM`. Full list and generation commands: `DEPLOYMENT_PROGRESS.md` Step 12.
 
 This file — not the inline YAML comments — is the source of truth for what needs configuring on a fresh clone or handoff. `DEPLOYMENT.md` and `DEPLOYMENT_PROGRESS.md` link here instead of repeating the list.

@@ -429,7 +429,6 @@ Pick up from here. The VM is provisioned, the image is in GHCR, the deploy folde
 
 4. **Optional values (can stay blank for first launch):**
 
-   - `CUELINKS_API_KEY` (affiliate URL converter — leave blank, app falls back to raw URLs)
    - `AMAZON_ASSOCIATES_TAG`, `AMAZON_ACCESS_KEY`, `AMAZON_SECRET_KEY`
    - `EARNKARO_API_KEY`
    - `MAIL_API_KEY`, `MAIL_FROM` (email won't send — affects member signup/reset)

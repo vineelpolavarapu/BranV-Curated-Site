@@ -40,6 +40,7 @@ class AffiliatePartner(str, Enum):
     CUELINKS = 'CUELINKS'
     AMAZON = 'AMAZON'
     EARNKARO = 'EARNKARO'
+    MEESHO = 'MEESHO'
     DIRECT = 'DIRECT'
 
 class ClickReportOutcome(str, Enum):

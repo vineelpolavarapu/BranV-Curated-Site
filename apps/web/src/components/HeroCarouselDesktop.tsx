@@ -267,7 +267,7 @@ export function HeroCarouselDesktop({ edits = [] }: { edits?: EditSummary[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      className="hero-grab relative h-screen min-h-[560px] w-full select-none overflow-hidden bg-neutral-900"
+      className="hero-grab relative h-[100svh] min-h-[560px] w-full select-none overflow-hidden bg-neutral-900"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}

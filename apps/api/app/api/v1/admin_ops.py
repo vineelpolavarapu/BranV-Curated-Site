@@ -1,6 +1,5 @@
 """
-Admin operational endpoints: analytics, reconciliation, affiliate convert,
-price-sync trigger.
+Admin operational endpoints: analytics, reconciliation, price-sync trigger.
 
 Analytics rollups are computed live for now (Step 8 cron will pre-aggregate
 into analytics_daily_*). Reconciliation accepts the CSV upload and
@@ -20,7 +19,6 @@ from decimal import Decimal
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
-from pydantic import Field
 from sqlalchemy import and_, desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,7 +28,6 @@ from ...core.auth_deps import (
     enforce_two_factor,
     require_roles,
 )
-from ...core.pydantic_config import ApiModel
 from ...db.models import (
     AffiliateLink,
     AffiliatePayout,
@@ -46,8 +43,6 @@ from ...db.models import (
 )
 from ...db.enums import OutboxStatus, ReviewStatus
 from ...db.session import get_db
-from ...integrations.amazon import tag_url
-from ...integrations.cuelinks import convert_url as cuelinks_convert
 from ...services import audit_service
 
 DbDep = Annotated[AsyncSession, Depends(get_db)]
@@ -320,7 +315,7 @@ async def recon_upload(
     db: DbDep,
     file: UploadFile = File(...),
     notes: Annotated[str | None, Form()] = None,
-    partner: Annotated[str, Form()] = "CUELINKS",
+    partner: Annotated[str, Form()] = "EARNKARO",
 ) -> dict[str, Any]:
     if not _is_csvish(file.content_type):
         raise HTTPException(
@@ -364,7 +359,7 @@ async def recon_upload(
 
     for row in rows:
         row_hash = hashlib.sha256(repr(sorted(row.items())).encode()).hexdigest()
-        # Field name normalization — Cuelinks/Amazon/EarnKaro use varying headers.
+        # Field name normalization — EarnKaro/Amazon/Meesho use varying headers.
         amount_str = row.get("amount") or row.get("Amount") or row.get("order_value") or "0"
         commission_str = row.get("commission") or row.get("Commission") or row.get("payout") or "0"
         order_id = row.get("order_id") or row.get("OrderId") or row.get("transaction_id")
@@ -465,30 +460,6 @@ async def recon_upload(
         "ambiguousCount": ambiguous_count,
         "unmatchedCount": unmatched_count,
         "totalCommissionInr": str(total_commission),
-    }
-
-
-# ───────────── AFFILIATE CONVERT-URL ────────────────────────────────────────
-
-affiliate_router = APIRouter(prefix="/admin/affiliate", tags=["admin-affiliate"], dependencies=AdminDeps)
-
-
-class ConvertUrlRequest(ApiModel):
-    rawUrl: str = Field(min_length=1, max_length=2048)
-    retailer: str | None = Field(default=None, max_length=40)
-
-
-@affiliate_router.post("/convert-url")
-async def convert_url(payload: ConvertUrlRequest) -> dict[str, Any]:
-    retailer = (payload.retailer or "").lower()
-    if "amazon" in retailer or "amazon" in payload.rawUrl.lower():
-        return {"affiliateUrl": tag_url(payload.rawUrl), "partner": "AMAZON", "pending": False}
-    result = await cuelinks_convert(payload.rawUrl)
-    return {
-        "affiliateUrl": result.convertedUrl,
-        "partner": "CUELINKS",
-        "pending": result.pending,
-        "partnerLinkId": result.partnerLinkId,
     }
 
 

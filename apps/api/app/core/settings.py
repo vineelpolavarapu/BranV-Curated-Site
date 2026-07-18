@@ -70,8 +70,6 @@ class Settings(BaseSettings):
 
     # ---- Integrations ----
     USE_MOCK_INTEGRATIONS: bool = True
-    CUELINKS_API_KEY: str = ""
-    CUELINKS_API_BASE: str = "https://www.cuelinks.com/api/v2"
     AMAZON_ASSOCIATES_TAG: str = "branv-21"
     AMAZON_ACCESS_KEY: str = ""
     AMAZON_SECRET_KEY: str = ""

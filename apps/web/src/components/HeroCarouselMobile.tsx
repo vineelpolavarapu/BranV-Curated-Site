@@ -131,16 +131,6 @@ export function HeroCarouselMobile({ edits = [] }: { edits?: EditSummary[] }) {
   const pointerStartX = useRef<number | null>(null);
   const pointerMoved = useRef(false);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const [viewportHeight, setViewportHeight] = useState<string>('100vh');
-
-  useEffect(() => {
-    const updateHeight = () => {
-      setViewportHeight(`${window.innerHeight}px`);
-    };
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    return () => window.removeEventListener('resize', updateHeight);
-  }, []);
 
   const DRAG_THRESHOLD = 5;
 
@@ -281,8 +271,7 @@ export function HeroCarouselMobile({ edits = [] }: { edits?: EditSummary[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      className="relative w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
-      style={{ height: viewportHeight }}
+      className="relative h-[100svh] min-h-[480px] w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}

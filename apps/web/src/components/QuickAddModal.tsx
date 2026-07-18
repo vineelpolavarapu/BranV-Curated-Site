@@ -13,13 +13,14 @@ import {
   useState,
 } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
+import { AffiliatePartner, Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
 import {
   adminButtonPrimary,
   adminButtonSecondary,
   adminInput,
   adminLabel,
 } from './AdminShell';
+import { BrandFormModal } from './BrandFormModal';
 
 interface ScrapeResult {
   retailer: string;
@@ -46,7 +47,6 @@ interface FormState {
   retailerDisplayName: string;
   title: string;
   brandId: string;
-  newBrandName: string;
   categoryId: string;
   subcategoryId: string;
   price: string;
@@ -58,6 +58,7 @@ interface FormState {
   avatarImageUrl: string;
   retailerImageUrl: string;
   status: ProductStatus;
+  affiliatePartner: AffiliatePartner;
 }
 
 const EMPTY: FormState = {
@@ -66,7 +67,6 @@ const EMPTY: FormState = {
   retailerDisplayName: '',
   title: '',
   brandId: '',
-  newBrandName: '',
   categoryId: '',
   subcategoryId: '',
   price: '',
@@ -78,6 +78,7 @@ const EMPTY: FormState = {
   avatarImageUrl: '',
   retailerImageUrl: '',
   status: 'ACTIVE',
+  affiliatePartner: 'EARNKARO',
 };
 
 const DRAFT_KEY = 'branv:quickadd:draft';
@@ -85,6 +86,12 @@ const DRAFT_KEY = 'branv:quickadd:draft';
 const KNOWN_RETAILERS = [
   'flipkart', 'amazon', 'myntra', 'ajio', 'meesho', 'nykaa',
   'snitch', 'bewakoof', 'thesouledstore', 'other',
+];
+
+const AFFILIATE_PARTNER_OPTIONS: Array<{ value: AffiliatePartner; label: string }> = [
+  { value: 'EARNKARO', label: 'EarnKaro' },
+  { value: 'MEESHO', label: 'Meesho affiliate program' },
+  { value: 'DIRECT', label: 'Other / direct link' },
 ];
 
 export function QuickAddModal({
@@ -107,6 +114,7 @@ export function QuickAddModal({
   const [autofillSource, setAutofillSource] = useState<string | null>(null);
   const [pendingAffiliate, setPendingAffiliate] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
+  const [showNewBrand, setShowNewBrand] = useState(false);
 
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -221,7 +229,6 @@ export function QuickAddModal({
         (b) => b.name.toLowerCase() === s.brandHint!.toLowerCase(),
       );
       if (match) set('brandId', match.id);
-      else if (!form.newBrandName) set('newBrandName', s.brandHint);
     }
     setAutofillSource(s.source);
   }
@@ -294,9 +301,9 @@ export function QuickAddModal({
     setError(null);
     setPendingAffiliate(false);
 
-    if (!form.brandId && !form.newBrandName) {
+    if (!form.brandId) {
       setSubmitting(false);
-      setError('Pick a brand or type a new brand name');
+      setError('Pick a brand');
       return;
     }
     if (!form.categoryId) {
@@ -316,8 +323,7 @@ export function QuickAddModal({
       retailer: form.retailer,
       retailerDisplayName:
         form.retailer === 'other' ? form.retailerDisplayName || undefined : undefined,
-      brandId: form.brandId || undefined,
-      newBrandName: form.brandId ? undefined : form.newBrandName || undefined,
+      brandId: form.brandId,
       categoryId: form.categoryId,
       subcategoryId: form.subcategoryId || undefined,
       price: Number(form.price),
@@ -333,6 +339,7 @@ export function QuickAddModal({
       avatarImageUrl: form.avatarImageUrl || undefined,
       retailerImageUrl: form.retailerImageUrl || undefined,
       status: form.status,
+      affiliatePartner: form.affiliatePartner,
     };
 
     const result = await apiFetch<{
@@ -466,15 +473,27 @@ export function QuickAddModal({
             </div>
             <div>
               <label className={adminLabel}>Brand</label>
-              <BrandPicker
-                brands={brands}
-                selectedId={form.brandId}
-                newName={form.newBrandName}
-                onSelect={(id, newName) => {
-                  set('brandId', id);
-                  set('newBrandName', newName);
+              <select
+                required
+                value={form.brandId}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === '__new__') {
+                    setShowNewBrand(true);
+                    return;
+                  }
+                  set('brandId', v);
                 }}
-              />
+                className={adminInput}
+              >
+                <option value="__new__">+ New brand</option>
+                <option value="">— select —</option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className={adminLabel}>Retailer</label>
@@ -647,18 +666,31 @@ export function QuickAddModal({
           {/* Affiliate */}
           <section>
             <label className={adminLabel}>🔗 Affiliate Link</label>
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm">
-              {form.retailer === 'amazon' ? (
-                <span className="text-neutral-700">
-                  Will route through <strong>Amazon Associates direct</strong>{' '}
-                  on submit.
-                </span>
-              ) : (
-                <span className="text-neutral-700">
-                  Will be auto-converted via <strong>Cuelinks</strong> on submit.
-                </span>
-              )}
-            </div>
+            {form.retailer === 'amazon' ? (
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-700">
+                Will route through <strong>Amazon Associates direct</strong> —
+                your affiliate tag is appended automatically on submit.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <p className="text-xs text-neutral-500">
+                  Paste the ready-to-use affiliate link above in{' '}
+                  <strong>Paste retailer URL</strong> — it's stored and used
+                  for redirects exactly as pasted, no conversion.
+                </p>
+                <select
+                  value={form.affiliatePartner}
+                  onChange={(e) => set('affiliatePartner', e.target.value as AffiliatePartner)}
+                  className={adminInput}
+                >
+                  {AFFILIATE_PARTNER_OPTIONS.map((p) => (
+                    <option key={p.value} value={p.value}>
+                      {p.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </section>
 
           <hr className="border-neutral-100" />
@@ -741,87 +773,18 @@ export function QuickAddModal({
           </footer>
         </form>
       </div>
-    </div>
-  );
-}
 
-// ─────────────── Brand picker with inline create ───────────────
-
-function BrandPicker({
-  brands,
-  selectedId,
-  newName,
-  onSelect,
-}: {
-  brands: Brand[];
-  selectedId: string;
-  newName: string;
-  onSelect: (id: string, newName: string) => void;
-}) {
-  const [search, setSearch] = useState('');
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q && !selectedId) return brands.slice(0, 6);
-    return brands.filter((b) => b.name.toLowerCase().includes(q)).slice(0, 8);
-  }, [brands, search, selectedId]);
-
-  if (selectedId) {
-    const sel = brands.find((b) => b.id === selectedId);
-    return (
-      <div className="flex items-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm">
-        <span className="font-medium">{sel?.name ?? selectedId}</span>
-        <button
-          type="button"
-          onClick={() => onSelect('', '')}
-          className="ml-auto text-xs text-neutral-500 underline"
-        >
-          Change
-        </button>
-      </div>
-    );
-  }
-  return (
-    <div>
-      <input
-        value={newName || search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          onSelect('', e.target.value);
-        }}
-        placeholder="Type to search or create…"
-        className={adminInput}
-      />
-      {(search || newName) && (
-        <ul className="mt-1 max-h-40 overflow-auto rounded-md border border-neutral-200 bg-white text-sm shadow-sm">
-          {filtered.map((b) => (
-            <li key={b.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  onSelect(b.id, '');
-                  setSearch('');
-                }}
-                className="block w-full px-3 py-1.5 text-left hover:bg-neutral-100"
-              >
-                {b.name}
-              </button>
-            </li>
-          ))}
-          {(newName || search) && (
-            <li className="border-t border-neutral-200">
-              <button
-                type="button"
-                onClick={() => {
-                  onSelect('', newName || search);
-                  setSearch('');
-                }}
-                className="block w-full px-3 py-1.5 text-left text-emerald-700 hover:bg-emerald-50"
-              >
-                + Create &ldquo;{newName || search}&rdquo;
-              </button>
-            </li>
-          )}
-        </ul>
+      {showNewBrand && (
+        <BrandFormModal
+          brand={null}
+          zIndexClassName="z-[60]"
+          onClose={() => setShowNewBrand(false)}
+          onSaved={(brand) => {
+            setBrands((prev) => [brand, ...prev]);
+            set('brandId', brand.id);
+            setShowNewBrand(false);
+          }}
+        />
       )}
     </div>
   );

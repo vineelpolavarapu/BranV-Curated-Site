@@ -238,13 +238,20 @@ async def analytics_rollup() -> None:
 
 
 async def affiliate_retry() -> None:
-    """Retry up to 50 affiliate_links with pendingConversion=true."""
+    """Self-heal up to 50 affiliate_links stuck with pendingConversion=true.
+
+    These are historical rows from the old Cuelinks integration (now
+    removed) whose async conversion never completed. Every current link
+    type is written synchronously at Quick Add time (Amazon auto-tagged,
+    everything else stored exactly as pasted), so nothing new ever lands
+    here — this cron only drains pre-existing orphans by falling back to
+    the raw URL, consistent with the "store the link as given" model.
+    """
     from datetime import datetime, timezone
     from sqlalchemy import select, update
     from sqlalchemy.ext.asyncio import async_sessionmaker
     from ..db.models import AffiliateLink, ProductRetailerListing
     from ..db.session import get_engine
-    from ..integrations.cuelinks import convert_url as cuelinks_convert
 
     engine = get_engine()
     Session = async_sessionmaker(engine, expire_on_commit=False)
@@ -258,28 +265,20 @@ async def affiliate_retry() -> None:
         )).all()
         if not rows:
             return
-        success = 0
         for link, raw_url in rows:
-            if link.partner != "CUELINKS":
-                continue  # Amazon is direct, EarnKaro not yet ported
-            result = await cuelinks_convert(raw_url)
-            if result.pending:
-                continue
             await db.execute(
                 update(AffiliateLink)
                 .where(AffiliateLink.id_ == link.id_)
                 .values(
-                    convertedUrl=result.convertedUrl,
-                    partnerLinkId=result.partnerLinkId,
+                    convertedUrl=raw_url,
                     pendingConversion=False,
                     lastValidatedAt=now,
-                    lastError=None,
+                    lastError="cuelinks integration removed — fell back to raw URL",
                     updatedAt=now,
                 )
             )
-            success += 1
         await db.commit()
-        log.info("affiliate_retry.processed", total=len(rows), succeeded=success)
+        log.info("affiliate_retry.self_healed", total=len(rows))
 
 
 async def price_sync_nightly() -> None:
