@@ -73,6 +73,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Emit a job-summary card so the commit SHA, branch, and production URL
+      # are always visible at the top of the Actions run — no more guessing
+      # whether "the pipeline ran" actually deployed the commit you just pushed.
+      - name: Log deployment context
+        env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          echo "## Vercel Deployment" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Field | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit SHA | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Triggered by | \`${{ github.event_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Production URL | $SITE_URL |" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploying commit ${{ github.sha }} (branch: ${{ github.ref_name }})"
+
       - uses: pnpm/action-setup@v4
         with:
           version: 9.0.0
@@ -161,3 +177,36 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # Smoke-test the Vercel deployment URL to confirm the build is actually
+      # live before the job reports success. This catches cases where the CLI
+      # exits 0 but the edge network is still propagating (or the deploy
+      # silently targeted the wrong project). Retries with back-off so a cold
+      # Vercel edge doesn't produce a false alarm. A warning (not a hard
+      # failure) is emitted if the URL is still non-200 after all retries —
+      # this avoids blocking the pipeline on transient CDN latency.
+      - name: Verify deployment is live
+        env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+        run: |
+          DEPLOY_URL="${{ steps.deploy.outputs.url }}"
+          echo "Vercel deployment URL : $DEPLOY_URL"
+          echo "Production domain     : $SITE_URL"
+          echo "Commit deployed       : ${{ github.sha }}"
+          echo "## Vercel Deployment Result" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Vercel URL: $DEPLOY_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${{ github.sha }}\`" >> "$GITHUB_STEP_SUMMARY"
+          STATUS="000"
+          for i in $(seq 1 8); do
+            STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "$DEPLOY_URL" \
+              --max-time 15 --retry 0 2>/dev/null || echo "000")
+            echo "Smoke-test attempt $i/8: HTTP $STATUS"
+            [ "$STATUS" = "200" ] && break
+            sleep 8
+          done
+          if [ "$STATUS" = "200" ]; then
+            echo "Deployment smoke-test PASSED — $DEPLOY_URL is live." | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Smoke-test returned HTTP $STATUS after 8 attempts. The deploy URL ($DEPLOY_URL) may still be propagating, or the wrong project was targeted. Verify $SITE_URL manually."
+            echo "**Warning**: smoke-test returned HTTP $STATUS — verify $SITE_URL manually." >> "$GITHUB_STEP_SUMMARY"
+          fi
