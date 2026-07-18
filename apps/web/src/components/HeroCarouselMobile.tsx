@@ -26,7 +26,7 @@ const EDIT_SLUG_BY_KEY: Record<string, string> = {
   formals: 'sharp-formals',
   classic: 'classic-essentials',
   trendy: 'trendy-wear',
-  suits: 'sports-wear',
+  sportswear: 'sports-wear',
   fashion: 'fashion-forward',
   casual: 'easy-casuals',
 };
@@ -60,11 +60,11 @@ const BASE_SLIDES: HeroSlide[] = [
     ctaHref: '#',
   },
   {
-    key: 'suits',
+    key: 'sportswear',
     imageUrl: '/mobile-hero/mobile_sports.png',
-    eyebrow: 'Occasion',
+    eyebrow: 'Game Day',
     headline: 'Sports Wear',
-    subtext: 'Two-piece, three-piece, and tuxedos for every milestone.',
+    subtext: 'Performance fits built for the gym, the run, and everything after.',
     ctaLabel: 'Explore Collection',
     ctaHref: '#',
   },
@@ -102,7 +102,7 @@ const BASE_SLIDES: HeroSlide[] = [
     headline: 'Watches',
     subtext: 'Watches, belts, bags — the details that complete a look.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/category/watches',
   },
 ];
 
