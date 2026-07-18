@@ -52,7 +52,13 @@
       "Bash(python -c \"import yaml; yaml.safe_load\\(open\\('.github/workflows/deploy-api.yml'\\)\\); print\\('YAML OK'\\)\")",
       "Bash(curl -sS -m 15 \"https://www.branv.in/\" -o /tmp/home.html -w \"HTTP %{http_code}\\\\n\")",
       "Read(//tmp/**)",
-      "Bash(grep -o '.\\\\{60\\\\}/category/new.\\\\{20\\\\}' /tmp/home.html | head -5)"
+      "Bash(grep -o '.\\\\{60\\\\}/category/new.\\\\{20\\\\}' /tmp/home.html | head -5)",
+      "Bash(git branch *)",
+      "PowerShell($response = Invoke-WebRequest -Uri \"https://api.github.com/repos/vineelpolavarapu/BranV-Curated-Site/actions/runs?branch=BranV-main&per_page=3\" -Headers @{\"User-Agent\"=\"curl/8.0\"} -UseBasicParsing; \\($response.Content | ConvertFrom-Json\\).workflow_runs | Select-Object id, name, status, conclusion, created_at, head_sha | Format-Table -AutoSize)",
+      "PowerShell($jobs = Invoke-WebRequest -Uri \"https://api.github.com/repos/vineelpolavarapu/BranV-Curated-Site/actions/runs/29638657690/jobs\" -Headers @{\"User-Agent\"=\"curl/8.0\"} -UseBasicParsing; \\($jobs.Content | ConvertFrom-Json\\).jobs | Select-Object name, status, conclusion, started_at, completed_at | Format-Table -AutoSize)",
+      "PowerShell($r = Invoke-WebRequest -Uri \"https://www.branv.in\" -UseBasicParsing -MaximumRedirection 5; Write-Host \"HTTP Status: $\\($r.StatusCode\\)\"; $r.Headers | Where-Object {$_.Key -match \"x-vercel|x-matched|cache|etag|last-mod|content-len\"} | ForEach-Object {\"$\\($_.Key\\): $\\($_.Value\\)\"})",
+      "PowerShell($r = Invoke-WebRequest -Uri \"https://www.branv.in\" -UseBasicParsing -MaximumRedirection 5; $r.Headers.GetEnumerator\\(\\) | Sort-Object Name | Format-Table -AutoSize)",
+      "PowerShell($runs = Invoke-WebRequest -Uri \"https://api.github.com/repos/vineelpolavarapu/BranV-Curated-Site/actions/runs?branch=BranV-main&per_page=3\" -Headers @{\"User-Agent\"=\"curl/8.0\"} -UseBasicParsing; \\($runs.Content | ConvertFrom-Json\\).workflow_runs | Select-Object id, name, status, conclusion, head_sha | Format-Table -AutoSize)"
     ]
   }
 }
