@@ -184,15 +184,15 @@ export default function ProductsAdminPage() {
 
             {/* Tablet/desktop: table */}
             <div className="hidden sm:block">
-              <table className="w-full text-sm">
+              <table className="w-full table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
-                    <th className="px-2 pb-3 font-medium">Product</th>
-                    <th className="px-2 pb-3 font-medium">Brand</th>
-                    <th className="px-2 pb-3 font-medium">Category</th>
-                    <th className="px-2 pb-3 font-medium">Price</th>
-                    <th className="px-2 pb-3 font-medium">Status</th>
-                    <th className="px-2 pb-3 font-medium" />
+                    <th className="w-[34%] px-2 pb-3 font-medium">Product</th>
+                    <th className="w-[13%] px-2 pb-3 font-medium">Brand</th>
+                    <th className="w-[13%] px-2 pb-3 font-medium">Category</th>
+                    <th className="w-[14%] px-2 pb-3 font-medium">Price</th>
+                    <th className="w-[12%] px-2 pb-3 font-medium">Status</th>
+                    <th className="w-[14%] px-2 pb-3 font-medium" />
                   </tr>
                 </thead>
                 <tbody>
@@ -223,9 +223,9 @@ export default function ProductsAdminPage() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-2 py-3 text-neutral-600">{p.brand.name}</td>
-                        <td className="px-2 py-3 text-neutral-600">{p.category.name}</td>
-                        <td className="px-2 py-3">
+                        <td className="truncate px-2 py-3 text-neutral-600">{p.brand.name}</td>
+                        <td className="truncate px-2 py-3 text-neutral-600">{p.category.name}</td>
+                        <td className="truncate px-2 py-3">
                           <span className="font-medium">₹{p.price}</span>
                           {p.mrp && (
                             <span className="ml-2 text-xs text-neutral-400 line-through">
