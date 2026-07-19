@@ -26,6 +26,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core import security
+from ..core.logging import get_logger
 from ..core.security import AuthenticatedUser
 from ..core.settings import get_settings
 from ..db.models import (
@@ -38,6 +39,8 @@ from ..db.models import (
 from ..integrations.mail import get_mail_service
 from . import audit_service
 from . import token_service
+
+log = get_logger("auth")
 
 VERIFICATION_TTL = timedelta(hours=24)
 PASSWORD_RESET_TTL = timedelta(hours=1)
@@ -128,13 +131,18 @@ async def register(
     )
     await db.flush()
 
-    # Issue verification token + send email INSIDE the same transaction so
-    # that a mail failure rolls back the user creation. (Mock mailer never
-    # fails, but the real one might.)
-    await _issue_and_send_verification(db, user_id=user_id, email=normalized)
+    # Persist the verification token WITH the user, then commit. The account is
+    # now durably created regardless of what the mailer does.
+    raw = await _issue_verification_token(db, user_id=user_id)
 
     await db.commit()
 
+    # Send the verification email AFTER commit, best-effort. A mail failure
+    # (provider outage, missing key, transient error) must never roll back or
+    # fail a completed signup — the token is already stored, so the user can
+    # request a resend. Runs as a background task so it never blocks the
+    # response either.
+    background.add_task(_send_verification_email_safe, normalized, raw)
     background.add_task(
         audit_service.record,
         actorId=user_id,
@@ -145,10 +153,9 @@ async def register(
     return user_id
 
 
-async def _issue_and_send_verification(
-    db: AsyncSession, *, user_id: str, email: str
-) -> None:
-    s = get_settings()
+async def _issue_verification_token(db: AsyncSession, *, user_id: str) -> str:
+    """Insert an email-verification token row and return its raw (unhashed)
+    value for embedding in the verification link. Does NOT send anything."""
     raw = _nanoid(48)
     token_hash = _sha256(raw)
     now = _utcnow_naive()
@@ -162,8 +169,18 @@ async def _issue_and_send_verification(
         )
     )
     await db.flush()
-    link = f"{s.WEB_ORIGIN}/verify-email?token={raw}"
-    await get_mail_service().send_email_verification(email, link)
+    return raw
+
+
+async def _send_verification_email_safe(email: str, raw_token: str) -> None:
+    """Best-effort verification email — swallows and logs any failure so it can
+    never break a signup that already committed."""
+    try:
+        s = get_settings()
+        link = f"{s.WEB_ORIGIN}/verify-email?token={raw_token}"
+        await get_mail_service().send_email_verification(email, link)
+    except Exception as e:  # noqa: BLE001
+        log.warning("verification_email_send_failed", email=email, error=str(e))
 
 
 def _nanoid(length: int) -> str:
@@ -356,8 +373,10 @@ async def resend_verification(db: AsyncSession, *, email: str) -> None:
         select(User).where(User.email == _normalize_email(email))
     )).scalar_one_or_none()
     if user and user.emailVerifiedAt is None:
-        await _issue_and_send_verification(db, user_id=user.id_, email=user.email)
+        raw = await _issue_verification_token(db, user_id=user.id_)
         await db.commit()
+        # Best-effort send after commit — the token is already persisted.
+        await _send_verification_email_safe(user.email, raw)
     # else: silent success to avoid enumeration
 
 

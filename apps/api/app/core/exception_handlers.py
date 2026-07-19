@@ -26,8 +26,27 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from .logging import get_logger
+from .settings import get_settings
 
 log = get_logger("exception_handlers")
+
+
+def _with_cors(request: Request, response: JSONResponse) -> JSONResponse:
+    """Echo the CORS headers onto a response.
+
+    Starlette handles bare-``Exception`` (500) responses in its outermost
+    ServerErrorMiddleware, which sits ABOVE CORSMiddleware — so those 500s
+    ship without an ``Access-Control-Allow-Origin`` header and the browser
+    masks the real error as an opaque "CORS error". Re-add the header here
+    (mirroring the CORS middleware's allow-list) so genuine server errors
+    surface as 500s in the browser instead of misleading CORS failures.
+    """
+    origin = request.headers.get("origin")
+    if origin and origin == get_settings().WEB_ORIGIN:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Vary"] = "Origin"
+    return response
 
 
 def _http_status_label(code: int) -> str:
@@ -80,7 +99,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
         "message": "Internal server error",
         "error": "Internal Server Error",
     }
-    return JSONResponse(status_code=500, content=body)
+    return _with_cors(request, JSONResponse(status_code=500, content=body))
 
 
 def register_exception_handlers(app: FastAPI) -> None:

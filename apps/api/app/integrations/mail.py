@@ -5,12 +5,18 @@ USE_MOCK_INTEGRATIONS=true (default in dev): writes the message body to stdout
 exactly like Nest does, so the verification / reset links can be grabbed from
 the API logs without a real provider.
 
-USE_MOCK_INTEGRATIONS=false (Step 7 fills in Resend / Buttondown).
+USE_MOCK_INTEGRATIONS=false (production): sends via the configured provider
+(Resend). If no MAIL_API_KEY is set yet, the message is logged and the call
+returns WITHOUT raising — email must never be a hard dependency of the flows
+that call it (registration, password reset). Callers that need delivery
+guarantees should treat sends as best-effort and surface/retry accordingly.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+
+import httpx
 
 from ..core.logging import get_logger
 from ..core.settings import get_settings
@@ -46,10 +52,48 @@ class MailService:
                 },
             )
             return
-        raise RuntimeError(
-            "Real email provider not yet implemented (Step 7). "
-            "Set USE_MOCK_INTEGRATIONS=true."
-        )
+
+        s = get_settings()
+        if not s.MAIL_API_KEY:
+            # Real integrations are on, but no provider key is configured yet.
+            # Log the message (so verification / reset links remain recoverable
+            # from the API logs) and return WITHOUT raising — a missing key must
+            # not break registration or password-reset.
+            log.warning(
+                "mail_no_api_key",
+                to=message.to,
+                subject=message.subject,
+                text=message.text,
+            )
+            return
+
+        provider = (s.MAIL_PROVIDER or "").lower()
+        if provider == "resend":
+            await self._send_via_resend(s.MAIL_API_KEY, message)
+        else:
+            log.warning(
+                "mail_provider_unsupported",
+                provider=s.MAIL_PROVIDER,
+                to=message.to,
+            )
+
+    async def _send_via_resend(self, api_key: str, message: MailMessage) -> None:
+        body: dict[str, object] = {
+            "from": self.from_addr,
+            "to": [message.to],
+            "subject": message.subject,
+            "text": message.text,
+        }
+        if message.html:
+            body["html"] = message.html
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            r = await client.post(
+                "https://api.resend.com/emails",
+                headers={"Authorization": f"Bearer {api_key}"},
+                json=body,
+            )
+            r.raise_for_status()
+        log.info("mail_sent", provider="resend", to=message.to, subject=message.subject)
 
     async def send_email_verification(self, to: str, link: str) -> None:
         await self.send(
