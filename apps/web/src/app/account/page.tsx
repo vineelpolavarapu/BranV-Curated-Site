@@ -75,9 +75,7 @@ export default function AccountPage() {
           />
         </div>
 
-        <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-8 text-center text-sm text-neutral-600">
-          Wardrobe, Wishlist, Reviews and Notifications land in Phase 5 and Phase 8.
-        </div>
+        
       </section>
     </main>
   );

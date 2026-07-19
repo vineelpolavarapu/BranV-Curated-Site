@@ -97,10 +97,7 @@ export default function CategoriesAdminPage() {
 
   return (
     <AdminShell title="Categories & filters">
-      <p className="mb-4 text-sm text-neutral-600">
-        L1/L2 categories are seeded via <code className="rounded bg-neutral-100 px-1 py-0.5 text-xs">pnpm seed:catalog</code>.
-        Edit attribute schemas here they drive the storefront filter UI in Phase 4.
-      </p>
+      
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_1fr]">
         <div className={`${adminCard} min-w-0 overflow-hidden`}>
           

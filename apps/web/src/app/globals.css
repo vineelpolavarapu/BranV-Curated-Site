@@ -38,9 +38,9 @@ textarea {
 
 /* Hero carousel grab cursor — open hand on hover, closed fist when the
    user presses the mouse button (:active fires on mousedown and clears on
-   mouseup). Falls back to the OS-native grab/grabbing cursors if the .cur
-   assets fail to load. Hotspot (10,10) matches the value baked into both
-   .cur files so the click-point is identical across browsers.
+   mouseup). Native OS grab/grabbing cursors — no custom .cur asset (there
+   isn't one shipped in /public/cursors), which used to 404 twice per page
+   load for zero visual gain since the fallback rendered identically anyway.
 
    The cursor is also forced onto every non-interactive descendant inside
    .hero-grab so it shows over the slide image and gradient overlay — those
@@ -48,12 +48,12 @@ textarea {
    cursor. <a> and <button> are excluded so the CTA + dots keep `pointer`. */
 .hero-grab,
 .hero-grab *:not(a):not(button) {
-  cursor: url('/cursors/grab.cur') 10 10, grab;
+  cursor: grab;
 }
 
 .hero-grab:active,
 .hero-grab:active *:not(a):not(button) {
-  cursor: url('/cursors/grabbing.cur') 10 10, grabbing;
+  cursor: grabbing;
 }
 
 /* Mobile + desktop hero layouts now live in HeroCarouselMobile.tsx and
