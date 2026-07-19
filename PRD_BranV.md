@@ -127,7 +127,6 @@ One backend, one design system, shared auth, separate IA.
 | L1 Category | L2 Subcategories |
 |---|---|
 | **Clothing** | T-Shirts, Shirts, Polos, Jeans, Trousers, Shorts, Jackets, Sweaters, Sweatshirts & Hoodies, Ethnic Wear |
-| **Suits & Formal** | 2-Piece Suits, 3-Piece Suits, Blazers, Formal Trousers, Formal Shirts, Ties, Bow Ties, Pocket Squares, Suspenders |
 | **Footwear** | Sneakers, Loafers, Formal Shoes, Boots, Sandals & Slippers, Sports Shoes |
 | **Watches** | Analog, Digital, Smartwatches, Luxury, Chronographs |
 | **Eyewear** | Sunglasses, Optical Frames, Blue-Light Glasses |
@@ -411,7 +410,6 @@ Price range, Brand (multi-select with logos), Color (swatches), Retailer (Flipka
 | Category | Filters |
 |---|---|
 | **Clothing** | Size, Fit, Material, Sleeve, Pattern, Occasion |
-| **Suits & Formal** | Size, Fit, Fabric, Pattern, Piece count, Occasion |
 | **Footwear** | Size (UK/US/EU), Shoe type, Material, Sole, Closure |
 | **Watches** | Movement, Case material, Strap, Dial color, Water resistance, Case size |
 | **Eyewear** | Frame shape, Frame material, Lens type, Frame color |

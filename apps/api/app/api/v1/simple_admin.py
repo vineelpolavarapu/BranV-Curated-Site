@@ -387,7 +387,17 @@ SETTING_DEFAULTS: dict[str, Any] = {
     "GOOGLE_OAUTH_ENABLED": False,
     "WEB_PUSH_ENABLED": False,
     "SMS_ENABLED": False,
+    "AFFILIATE_DISCLOSURE_TEXT": (
+        "BranV is a curated affiliate platform. We never hold inventory, never "
+        "process payments, never fulfill orders. When you click Buy Now, you are "
+        "redirected to the retailer's site to complete your purchase. We earn a "
+        "small commission on qualifying sales, at no extra cost to you."
+    ),
 }
+
+# Keys exposed to the public (unauthenticated) storefront. Keep this list
+# short and content-only; feature flags / numeric tunables stay admin-only.
+PUBLIC_SETTING_KEYS = {"AFFILIATE_DISCLOSURE_TEXT"}
 
 
 class UpdateSettingRequest(ApiModel):
@@ -437,3 +447,19 @@ async def settings_upsert(
         metadata={"key": payload.key, "value": payload.value},
     )
     return {"key": payload.key, "value": payload.value}
+
+
+# ───────────── PUBLIC SETTINGS (unauthenticated storefront) ─────────────────
+
+public_settings_router = APIRouter(prefix="/settings", tags=["settings"])
+
+
+@public_settings_router.get("/public")
+async def public_settings(db: DbDep) -> dict[str, Any]:
+    rows = (await db.execute(
+        select(PlatformSetting).where(PlatformSetting.key.in_(PUBLIC_SETTING_KEYS))
+    )).scalars().all()
+    merged = {k: SETTING_DEFAULTS[k] for k in PUBLIC_SETTING_KEYS}
+    for r in rows:
+        merged[r.key] = r.valueJson
+    return merged

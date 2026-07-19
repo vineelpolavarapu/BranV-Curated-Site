@@ -37,19 +37,6 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
     ],
   },
   {
-    name: 'Footwear',
-    slug: 'footwear',
-    subcategories: [
-      { name: 'Sneakers', slug: 'footwear-sneakers' },
-      { name: 'Loafers', slug: 'footwear-loafers' },
-      { name: 'Formal Shoes', slug: 'footwear-formal-shoes' },
-      { name: 'Boots', slug: 'footwear-boots' },
-      { name: 'Sandals & Slippers', slug: 'footwear-sandals-and-slippers' },
-      { name: 'Sports Shoes', slug: 'footwear-sports-shoes' },
-      { name: 'Chappals', slug: 'footwear-chappals' },
-    ],
-  },
-  {
     name: 'Tracks',
     slug: 'tracks',
     subcategories: [
@@ -63,14 +50,38 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
     ],
   },
   {
+    name: 'Footwear',
+    slug: 'footwear',
+    subcategories: [
+      { name: 'Sneakers', slug: 'footwear-sneakers' },
+      { name: 'Loafers', slug: 'footwear-loafers' },
+      { name: 'Formal Shoes', slug: 'footwear-formal-shoes' },
+      { name: 'Boots', slug: 'footwear-boots' },
+      { name: 'Sandals & Slippers', slug: 'footwear-sandals-and-slippers' },
+      { name: 'Sports Shoes', slug: 'footwear-sports-shoes' },
+      { name: 'Chappals', slug: 'footwear-chappals' },
+    ],
+  },
+  {
     name: 'Watches',
     slug: 'watches',
     subcategories: [
       { name: 'Digital', slug: 'watches-digital' },
       { name: 'Analog', slug: 'watches-analog' },
       { name: 'Classical', slug: 'watches-classical' },
+      { name: 'Smartwatches', slug: 'watches-smartwatches' },
+      { name: 'Luxury', slug: 'watches-luxury' },
       { name: 'Strap Watches', slug: 'watches-strap-watches' },
       { name: 'Chained Watches', slug: 'watches-chained-watches' },
+      { name: 'Chronographs', slug: 'watches-chronographs' },
     ],
   },
+  // Promoted from former Clothing subcategories to standalone top-level
+  // categories. Flat (no subcategories of their own).
+  { name: 'Trousers', slug: 'trousers', subcategories: [] },
+  { name: 'Shorts', slug: 'shorts', subcategories: [] },
+  { name: 'Jackets', slug: 'jackets', subcategories: [] },
+  { name: 'Sweaters', slug: 'sweaters', subcategories: [] },
+  { name: 'Sweatshirts & Hoodies', slug: 'sweatshirts-and-hoodies', subcategories: [] },
+  { name: 'Ethnic Wear', slug: 'ethnic-wear', subcategories: [] },
 ];

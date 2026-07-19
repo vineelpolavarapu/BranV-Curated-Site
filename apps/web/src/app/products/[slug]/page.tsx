@@ -11,6 +11,7 @@ import { formatINR } from '@/lib/format';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { categoryHrefL2 } from '@/lib/category-href';
+import { RecordRecentlyViewed } from '@/components/RecordRecentlyViewed';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +45,7 @@ export default async function ProductDetailPage(props: {
 
   return (
     <StorefrontShell>
+      <RecordRecentlyViewed product={product} />
       <Breadcrumbs product={product} />
       <ProductSchema product={product} />
       <AnimateOnScroll>

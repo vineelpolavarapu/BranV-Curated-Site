@@ -14,7 +14,7 @@ import {
 interface SettingSpec {
   key: string;
   label: string;
-  kind: 'number' | 'string' | 'boolean';
+  kind: 'number' | 'string' | 'boolean' | 'text';
   hint?: string;
   min?: number;
   max?: number;
@@ -65,6 +65,12 @@ const SETTING_SPECS: SettingSpec[] = [
     key: 'SMS_ENABLED',
     label: 'SMS notifications enabled',
     kind: 'boolean',
+  },
+  {
+    key: 'AFFILIATE_DISCLOSURE_TEXT',
+    label: 'Affiliate disclosure text',
+    kind: 'text',
+    hint: 'Shown on the account page (and anywhere else the storefront reads /settings/public). Explains BranV’s affiliate relationship to shoppers.',
   },
 ];
 
@@ -194,17 +200,26 @@ function BoxedInput({
     value === undefined || value === null ? '' : String(value),
   );
   return (
-    <div className="grid gap-2 md:grid-cols-[1fr_auto] md:items-end">
+    <div className={`grid gap-2 ${spec.kind === 'text' ? '' : 'md:grid-cols-[1fr_auto] md:items-end'}`}>
       <div>
         <label className={adminLabel}>{spec.label}</label>
-        <input
-          type={spec.kind === 'number' ? 'number' : 'text'}
-          min={spec.min}
-          max={spec.max}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          className={adminInput}
-        />
+        {spec.kind === 'text' ? (
+          <textarea
+            rows={3}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            className={adminInput}
+          />
+        ) : (
+          <input
+            type={spec.kind === 'number' ? 'number' : 'text'}
+            min={spec.min}
+            max={spec.max}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            className={adminInput}
+          />
+        )}
         {spec.hint && (
           <p className="mt-1 text-xs text-neutral-500">{spec.hint}</p>
         )}
@@ -216,7 +231,7 @@ function BoxedInput({
         type="button"
         disabled={saving || String(value) === draft}
         onClick={() => onSave(draft)}
-        className={adminButtonPrimary}
+        className={`${adminButtonPrimary} ${spec.kind === 'text' ? 'mt-2 w-fit' : ''}`}
       >
         {saving ? 'Saving…' : 'Save'}
       </button>

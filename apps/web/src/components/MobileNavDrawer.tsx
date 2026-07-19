@@ -94,6 +94,7 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
               <ul className="space-y-0.5">
                 {SHOP_CATEGORIES.map((c) => {
                   const isOpen = expanded.has(c.slug);
+                  const hasSubs = c.subcategories.length > 0;
                   return (
                     <li key={c.slug}>
                       <div className="flex items-stretch">
@@ -104,25 +105,27 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
                         >
                           {c.name}
                         </Link>
-                        <button
-                          type="button"
-                          aria-label={isOpen ? `Collapse ${c.name}` : `Expand ${c.name}`}
-                          aria-expanded={isOpen}
-                          onClick={() => toggleL1(c.slug)}
-                          className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100"
-                        >
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 12 12"
-                            aria-hidden
-                            className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        {hasSubs && (
+                          <button
+                            type="button"
+                            aria-label={isOpen ? `Collapse ${c.name}` : `Expand ${c.name}`}
+                            aria-expanded={isOpen}
+                            onClick={() => toggleL1(c.slug)}
+                            className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-md text-neutral-500 hover:bg-neutral-100"
                           >
-                            <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-                          </svg>
-                        </button>
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 12 12"
+                              aria-hidden
+                              className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                            >
+                              <path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
-                      {isOpen && (
+                      {hasSubs && isOpen && (
                         <ul className="mb-1 ml-3 mt-0.5 space-y-0.5 border-l border-neutral-200 pl-2">
                           {c.subcategories.map((sub) => (
                             <li key={sub.slug}>
@@ -140,29 +143,6 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
                     </li>
                   );
                 })}
-              </ul>
-
-              <p className="px-3 pb-2 pt-5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
-                Discover
-              </p>
-              <ul className="space-y-0.5">
-                {[
-                  { href: '/new', label: 'New' },
-                  { href: '/brands', label: 'Brands' },
-                  { href: '/articles', label: 'Articles' },
-                  { href: '/wishlist', label: 'Wishlist' },
-                  { href: '/account', label: 'Account' },
-                ].map((item) => (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-md px-3 py-2.5 font-medium text-neutral-900 hover:bg-neutral-100"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
               </ul>
             </nav>
           </aside>

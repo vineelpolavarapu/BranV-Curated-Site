@@ -70,6 +70,15 @@ export interface ProductPage {
   totalPages: number;
 }
 
+export interface CategoryCard {
+  id: string;
+  slug: string;
+  name: string;
+  parentId: string | null;
+  displayOrder: number;
+  _count: { productsAsCategory: number };
+}
+
 export interface BrandCard {
   id: string;
   slug: string;

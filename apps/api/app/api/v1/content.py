@@ -463,22 +463,25 @@ async def edits_public_list(db: DbDep) -> list[dict[str, Any]]:
 
 @edits_public_router.get("/{slug}")
 async def edits_public_detail(slug: str, db: DbDep) -> dict[str, Any]:
+    from ...services.storefront_service import _hydrate_card
+
     e = (await db.execute(
         select(Edit).where(Edit.slug == slug, Edit.status == "PUBLISHED")
     )).scalar_one_or_none()
     if not e:
         raise HTTPException(404, "Edit not found")
     eps = (await db.execute(
-        select(EditProduct, Product.slug, Product.title, Product.id_)
-        .outerjoin(Product, Product.id_ == EditProduct.productId)
-        .where(EditProduct.editId == e.id_)
+        select(EditProduct, Product)
+        .join(Product, Product.id_ == EditProduct.productId)
+        .where(EditProduct.editId == e.id_, Product.status == "ACTIVE")
         .order_by(EditProduct.position.asc())
     )).all()
-    products = [
-        {"id": pid, "slug": pslug, "title": ptitle, "position": ep.position}
-        for ep, pslug, ptitle, pid in eps if pslug
-    ]
-    return _serialize_edit(e, products=products)
+    # Full storefront card shape (brand, image, price, buyNow) — the same
+    # hydration the product-list/detail pages use — not the minimal
+    # {id, slug, title, position} shape the admin product-picker needs.
+    out = _serialize_edit(e)
+    out["products"] = [await _hydrate_card(db, p) for _, p in eps]
+    return out
 
 
 # ───────────── LOOKBOOKS (3-level nested) ───────────────────────────────────

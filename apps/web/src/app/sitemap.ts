@@ -18,10 +18,18 @@ const BASE =
   'http://localhost:3000';
 
 const CATEGORY_SLUGS = [
-  'clothing',
-  'suits-and-formal',
+  'shirts',
+  't-shirts',
+  'jeans',
+  'tracks',
   'footwear',
   'watches',
+  'trousers',
+  'shorts',
+  'jackets',
+  'sweaters',
+  'sweatshirts-and-hoodies',
+  'ethnic-wear',
 ];
 
 interface LookbookListItem {

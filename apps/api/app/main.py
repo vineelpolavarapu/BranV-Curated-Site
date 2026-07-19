@@ -114,6 +114,7 @@ def create_app() -> FastAPI:
     app.include_router(simple_admin.brand_story_admin_router, prefix="/api")
     app.include_router(simple_admin.brand_story_public_router, prefix="/api")
     app.include_router(simple_admin.settings_router, prefix="/api")
+    app.include_router(simple_admin.public_settings_router, prefix="/api")
     app.include_router(admin_ops.analytics_router, prefix="/api")
     app.include_router(admin_ops.recon_router, prefix="/api")
     app.include_router(admin_ops.price_sync_router, prefix="/api")

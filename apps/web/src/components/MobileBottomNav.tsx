@@ -5,9 +5,9 @@ import { usePathname } from 'next/navigation';
 
 const ITEMS = [
   { href: '/', label: 'Home', icon: HomeIcon },
-  { href: '/brands', label: 'Shop', icon: ShopIcon },
+  { href: '/shop', label: 'Shop', icon: ShopIcon },
   { href: '/wishlist', label: 'Wishlist', icon: HeartIcon },
-  { href: '/wardrobe', label: 'Wardrobe', icon: WardrobeIcon },
+  { href: '/help', label: 'Help', icon: HelpIcon },
   { href: '/account', label: 'Account', icon: UserIcon },
 ];
 
@@ -84,15 +84,17 @@ function HeartIcon() {
     </svg>
   );
 }
-function WardrobeIcon() {
+function HelpIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth={stroke} />
       <path
-        d="M4 4h16v16H4zM4 12h16M10 8v2M14 8v2"
+        d="M9.5 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.4 2-2.4 3.5"
         stroke="currentColor"
         strokeWidth={stroke}
-        strokeLinejoin="round"
+        strokeLinecap="round"
       />
+      <circle cx="12" cy="16.7" r="0.9" fill="currentColor" stroke="none" />
     </svg>
   );
 }

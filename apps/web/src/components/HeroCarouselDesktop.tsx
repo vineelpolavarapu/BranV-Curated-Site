@@ -1,8 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { EditSummary } from '@/lib/phase7-types';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Desktop-only hero carousel. Renders at >=1080px (parent gates via matchMedia).
 // All image references point at /hero/ (landscape art).
@@ -12,95 +11,79 @@ import { EditSummary } from '@/lib/phase7-types';
 type HeroSlide = {
   key: string;
   imageUrl: string;
-  eyebrow?: string;
   headline: string;
   subtext?: string;
   ctaLabel: string;
   ctaHref: string;
 };
 
-// Maps a slide's `key` to the slug of the "Edit" (curated collection, managed
-// under /admin/edits) whose products it should link to. A slide falls back to
-// its hardcoded ctaHref until an Edit with that slug exists and is published.
-const EDIT_SLUG_BY_KEY: Record<string, string> = {
-  formals: 'sharp-formals',
-  classic: 'classic-essentials',
-  trendy: 'trendy-wear',
-  sportswear: 'sports-wear',
-  fashion: 'fashion-forward',
-  casual: 'easy-casuals',
-};
-
 const BASE_SLIDES: HeroSlide[] = [
   {
     key: 'formals',
     imageUrl: '/hero/formals1.png',
-    eyebrow: 'Workwear',
+
     headline: 'Sharp Formals',
     subtext: 'Tailored shirts and trousers for the office and beyond.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/sharp-formals',
   },
   {
     key: 'classic',
     imageUrl: '/hero/easy_causal.png',
-    eyebrow: 'Timeless',
+
     headline: 'Classic Essentials',
     subtext: 'The wardrobe staples that never go out of style.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/classic-essentials',
   },
   {
     key: 'trendy',
     imageUrl: '/hero/latest_web.png',
-    eyebrow: 'This Season',
+
     headline: 'Trendy Wear',
     subtext: 'The pieces everyone is reaching for right now.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/trendy-wear',
   },
   {
     key: 'sportswear',
     imageUrl: '/hero/sports.png',
-    eyebrow: 'Game Day',
+
     headline: 'Sports Wear',
     subtext: 'Performance fits built for the gym, the run, and everything after.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/sports-wear',
   },
   {
     key: 'fashion',
     imageUrl: '/hero/fashoin.png',
-    eyebrow: 'Statement',
+
     headline: 'Fashion Forward',
     subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/fashion-forward',
   },
   {
     key: 'casual',
     imageUrl: '/hero/casual2.png',
-    eyebrow: 'Off Duty',
     headline: 'Easy Casuals',
     subtext: 'Weekend-ready tees, joggers, and overshirts.',
     ctaLabel: 'Explore Collection',
-    ctaHref: '#',
+    ctaHref: '/easy-casuals',
   },
   {
     key: 'footwear',
     imageUrl: '/hero/footwear.png',
-    eyebrow: 'On Your Feet',
     headline: 'Footwear',
-    subtext: 'Sneakers, loafers, boots — the foundation of every outfit.',
+    subtext: 'Sneakers, loafers, boots, the foundation of every outfit.',
     ctaLabel: 'Explore Collection',
     ctaHref: '/category/footwear',
   },
   {
     key: 'watches',
     imageUrl: '/hero/watches.png',
-    eyebrow: 'Finishing Touch',
     headline: 'Watches',
-    subtext: 'Watches, belts, bags — the details that complete a look.',
+    subtext: 'Watches, belts, bags, the details that complete a look.',
     ctaLabel: 'Explore Collection',
     ctaHref: '/category/watches',
   },
@@ -109,18 +92,8 @@ const BASE_SLIDES: HeroSlide[] = [
 const ROTATE_MS = 3000;
 const TRANSITION_MS = 700;
 
-export function HeroCarouselDesktop({ edits = [] }: { edits?: EditSummary[] }) {
-  const editSlugs = useMemo(() => new Set(edits.map((e) => e.slug)), [edits]);
-  const SLIDES = useMemo(
-    () =>
-      BASE_SLIDES.map((slide) => {
-        const editSlug = EDIT_SLUG_BY_KEY[slide.key];
-        return editSlug && editSlugs.has(editSlug)
-          ? { ...slide, ctaHref: `/edits/${editSlug}` }
-          : slide;
-      }),
-    [editSlugs],
-  );
+export function HeroCarouselDesktop() {
+  const SLIDES = BASE_SLIDES;
   const total = SLIDES.length;
   const trackSlides = [SLIDES[total - 1], ...SLIDES, SLIDES[0]];
 
@@ -307,11 +280,7 @@ export function HeroCarouselDesktop({ edits = [] }: { edits?: EditSummary[] }) {
                 <div className={`max-w-2xl text-white hero-slide-text ${
                   i - 1 === realIndex ? 'hero-slide-active' : ''
                 }`}>
-                  {slide.eyebrow && (
-                    <p className="mb-3 text-[11px] font-medium uppercase tracking-[0.22em] opacity-90">
-                      {slide.eyebrow}
-                    </p>
-                  )}
+                  
                   <h2 className="text-6xl font-semibold tracking-tight">
                     {slide.headline}
                   </h2>

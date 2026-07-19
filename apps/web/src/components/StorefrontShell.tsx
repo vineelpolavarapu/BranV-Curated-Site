@@ -139,37 +139,44 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
       <div className="invisible absolute left-0 top-full -translate-y-1.5 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
         <div className={panelClasses}>
           <ul className="space-y-0.5">
-            {SHOP_CATEGORIES.map((c) => (
-              <li key={c.slug} className="bv-dropdown-item group/cat relative">
-                <Link href={`/category/${c.slug}`} className={`${itemClasses} transition-colors duration-150`}>
-                  <span>{c.name}</span>
-                  <span className="opacity-40">
-                    <ChevronRight />
-                  </span>
-                </Link>
+            {SHOP_CATEGORIES.map((c) => {
+              const hasSubs = c.subcategories.length > 0;
+              return (
+                <li key={c.slug} className="bv-dropdown-item group/cat relative">
+                  <Link href={`/category/${c.slug}`} className={`${itemClasses} transition-colors duration-150`}>
+                    <span>{c.name}</span>
+                    {hasSubs && (
+                      <span className="opacity-40">
+                        <ChevronRight />
+                      </span>
+                    )}
+                  </Link>
 
-                {/* L2 flyout — slides in from left by 6px, fixed w-48 for consistency */}
-                <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
-                  <div className={`${panelClasses} w-48`}>
-                    <ul className="space-y-0.5">
-                      {/* "All [Category]" always first */}
-                      <li className="bv-flyout-item">
-                        <Link href={`/category/${c.slug}`} className={subItemClasses}>
-                          All {c.name}
-                        </Link>
-                      </li>
-                      {c.subcategories.map((sub) => (
-                        <li key={sub.slug} className="bv-flyout-item">
-                          <Link href={categoryHrefL2(c.slug, sub.slug)} className={subItemClasses}>
-                            {sub.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </li>
-            ))}
+                  {/* L2 flyout — slides in from left by 6px, fixed w-48 for consistency */}
+                  {hasSubs && (
+                    <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
+                      <div className={`${panelClasses} w-48`}>
+                        <ul className="space-y-0.5">
+                          {/* "All [Category]" always first */}
+                          <li className="bv-flyout-item">
+                            <Link href={`/category/${c.slug}`} className={subItemClasses}>
+                              All {c.name}
+                            </Link>
+                          </li>
+                          {c.subcategories.map((sub) => (
+                            <li key={sub.slug} className="bv-flyout-item">
+                              <Link href={categoryHrefL2(c.slug, sub.slug)} className={subItemClasses}>
+                                {sub.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
@@ -188,7 +195,7 @@ function SiteFooter() {
               BranV is a curated affiliate platform. We never hold inventory, never
               process payments, never fulfill orders. When you click Buy Now, you
               are redirected to the retailer&apos;s site to complete your purchase.{' '}
-              <strong>We earn a small commission on qualifying sales — at no extra cost to you.</strong>
+              <strong>We earn a small commission on qualifying sales, at no extra cost to you.</strong>
             </p>
             <p className="mt-6 text-xs text-neutral-400">
               © {new Date().getFullYear()} BranV. All rights reserved.
