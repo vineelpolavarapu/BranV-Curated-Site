@@ -47,7 +47,7 @@ export default function NotificationsCenterPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Notifications</h1>
-            <p className="mt-1 text-sm text-neutral-600">
+            <p className="mt-1 text-sm text-content-soft">
               {data?.unread ?? 0} unread · {data?.total ?? 0} total
             </p>
           </div>
@@ -63,14 +63,14 @@ export default function NotificationsCenterPage() {
             {(data?.unread ?? 0) > 0 && (
               <button
                 onClick={onMarkAllRead}
-                className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                className="text-sm font-medium text-content-soft hover:text-primary"
               >
                 Mark all read
               </button>
             )}
             <Link
               href="/account/preferences"
-              className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+              className="text-sm font-medium text-content-soft hover:text-primary"
             >
               Preferences →
             </Link>
@@ -78,9 +78,9 @@ export default function NotificationsCenterPage() {
         </div>
 
         {loading ? (
-          <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+          <div className="h-2 w-32 animate-pulse rounded bg-line" />
         ) : !data || data.data.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+          <p className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
             Nothing here yet.
           </p>
         ) : (
@@ -94,15 +94,15 @@ export default function NotificationsCenterPage() {
                 <div className="flex items-start gap-3">
                   <div
                     className={`mt-1.5 h-2 w-2 flex-none rounded-full ${
-                      isUnread ? 'bg-blue-500' : 'bg-neutral-200'
+                      isUnread ? 'bg-blue-500' : 'bg-line'
                     }`}
                   />
                   <div className="flex-1">
-                    <p className="font-medium text-neutral-900">{title}</p>
+                    <p className="font-medium text-content">{title}</p>
                     {body && (
-                      <p className="mt-0.5 text-sm text-neutral-600">{body}</p>
+                      <p className="mt-0.5 text-sm text-content-soft">{body}</p>
                     )}
-                    <p className="mt-1 text-xs text-neutral-400">
+                    <p className="mt-1 text-xs text-content-muted">
                       {new Date(n.createdAt).toLocaleString()}
                     </p>
                   </div>
@@ -114,7 +114,7 @@ export default function NotificationsCenterPage() {
                         e.stopPropagation();
                         void onMarkOneRead(n.id);
                       }}
-                      className="text-xs text-neutral-500 underline hover:text-neutral-900"
+                      className="text-xs text-content-soft underline hover:text-primary"
                     >
                       Mark read
                     </button>
@@ -124,8 +124,8 @@ export default function NotificationsCenterPage() {
               return (
                 <li
                   key={n.id}
-                  className={`rounded-xl border border-neutral-200 p-4 ${
-                    isUnread ? 'bg-blue-50/30' : 'bg-white'
+                  className={`rounded-xl border border-line p-4 ${
+                    isUnread ? 'bg-blue-50/30' : 'bg-surface'
                   }`}
                 >
                   {link ? <Link href={link}>{content}</Link> : content}

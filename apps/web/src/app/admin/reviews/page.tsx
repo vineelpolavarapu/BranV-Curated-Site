@@ -63,13 +63,13 @@ export default function AdminReviewsPage() {
     <AdminShell title="Reviews">
       <div className={`${adminCard} mb-4`}>
         <div className="flex items-center gap-2">
-          <span className="text-xs uppercase tracking-wider text-neutral-500">
+          <span className="text-xs uppercase tracking-wider text-content-soft">
             Status
           </span>
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as ReviewStatus | '')}
-            className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm"
+            className="rounded-md border border-line px-2 py-1.5 text-sm"
           >
             {STATUSES.map((s) => (
               <option key={s} value={s}>
@@ -77,21 +77,21 @@ export default function AdminReviewsPage() {
               </option>
             ))}
           </select>
-          <span className="ml-auto text-sm text-neutral-500">{total} total</span>
+          <span className="ml-auto text-sm text-content-soft">{total} total</span>
         </div>
       </div>
 
       <div className={adminCard}>
         {loading ? (
-          <p className="text-sm text-neutral-500">Loading…</p>
+          <p className="text-sm text-content-soft">Loading…</p>
         ) : data.length === 0 ? (
-          <p className="text-sm text-neutral-500">No reviews match.</p>
+          <p className="text-sm text-content-soft">No reviews match.</p>
         ) : (
           <ul className="space-y-3">
             {data.map((r) => (
               <li
                 key={r.id}
-                className="rounded-xl border border-neutral-200 bg-white p-4"
+                className="rounded-xl border border-line bg-surface p-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
@@ -118,13 +118,13 @@ export default function AdminReviewsPage() {
                       <p className="mt-1 text-sm font-medium">{r.title}</p>
                     )}
                     {r.body && (
-                      <p className="mt-1 text-sm text-neutral-700">{r.body}</p>
+                      <p className="mt-1 text-sm text-content-soft">{r.body}</p>
                     )}
-                    <p className="mt-2 text-xs text-neutral-500">
+                    <p className="mt-2 text-xs text-content-soft">
                       {r.user.email} · {new Date(r.createdAt).toLocaleString()}
                     </p>
                     {r.status === 'HIDDEN' && r.moderationReason && (
-                      <p className="mt-1 text-xs text-red-600">
+                      <p className="mt-1 text-xs text-danger">
                         Hidden: {r.moderationReason}
                       </p>
                     )}

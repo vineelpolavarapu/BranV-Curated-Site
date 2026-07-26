@@ -102,7 +102,7 @@ export default function CategoriesAdminPage() {
         <div className={`${adminCard} min-w-0 overflow-hidden`}>
           
           {loading ? (
-            <p className="text-sm text-neutral-500">Loading…</p>
+            <p className="text-sm text-content-soft">Loading…</p>
           ) : (
             <ul className="space-y-0.5 overflow-hidden text-sm">
               {tree.map((l1) => (
@@ -122,19 +122,19 @@ export default function CategoriesAdminPage() {
         <div className="min-w-0">
           {!selected ? (
             <div className={adminCard}>
-              <p className="text-sm text-neutral-500">Select a category.</p>
+              <p className="text-sm text-content-soft">Select a category.</p>
             </div>
           ) : (
             <div className={`${adminCard} min-w-0`}>
               <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-xs uppercase tracking-wider text-neutral-500">
+                  <p className="text-xs uppercase tracking-wider text-content-soft">
                     Attribute schemas for
                   </p>
                   <h2 className="truncate text-xl font-semibold tracking-tight">
                     {selected.name}
                   </h2>
-                  <p className="truncate text-xs text-neutral-500">{selected.path}</p>
+                  <p className="truncate text-xs text-content-soft">{selected.path}</p>
                 </div>
                 <button
                   onClick={() => {
@@ -148,7 +148,7 @@ export default function CategoriesAdminPage() {
               </div>
 
               {schemas.length === 0 ? (
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-content-soft">
                   No attributes for this category yet.
                 </p>
               ) : (
@@ -158,12 +158,12 @@ export default function CategoriesAdminPage() {
                     {schemas.map((s) => (
                       <li
                         key={s.id}
-                        className="min-w-0 rounded-xl border border-neutral-200 p-3"
+                        className="min-w-0 rounded-xl border border-line p-3"
                       >
                         <div className="mb-2 flex min-w-0 items-start justify-between gap-2">
                           <div className="min-w-0">
                             <p className="truncate text-sm font-medium">{s.displayName}</p>
-                            <p className="truncate font-mono text-xs text-neutral-500">
+                            <p className="truncate font-mono text-xs text-content-soft">
                               {s.attributeKey}
                             </p>
                           </div>
@@ -175,10 +175,10 @@ export default function CategoriesAdminPage() {
                           </button>
                         </div>
                         <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-xs">
-                          <dt className="text-neutral-500">Type</dt>
-                          <dd className="min-w-0 truncate text-neutral-700">{s.filterType}</dd>
-                          <dt className="text-neutral-500">Options</dt>
-                          <dd className="min-w-0 truncate text-neutral-500">
+                          <dt className="text-content-soft">Type</dt>
+                          <dd className="min-w-0 truncate text-content-soft">{s.filterType}</dd>
+                          <dt className="text-content-soft">Options</dt>
+                          <dd className="min-w-0 truncate text-content-soft">
                             {Array.isArray(s.optionsJson)
                               ? (s.optionsJson as string[]).join(', ')
                               : '—'}
@@ -192,7 +192,7 @@ export default function CategoriesAdminPage() {
                   <div className="hidden sm:block">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                        <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                           <th className="pb-2 font-medium">Key</th>
                           <th className="pb-2 font-medium">Display</th>
                           <th className="pb-2 font-medium">Type</th>
@@ -205,8 +205,8 @@ export default function CategoriesAdminPage() {
                           <tr key={s.id} className="border-b border-neutral-100">
                             <td className="py-2 font-mono text-xs">{s.attributeKey}</td>
                             <td className="py-2">{s.displayName}</td>
-                            <td className="py-2 text-neutral-600">{s.filterType}</td>
-                            <td className="max-w-xs truncate py-2 text-xs text-neutral-500">
+                            <td className="py-2 text-content-soft">{s.filterType}</td>
+                            <td className="max-w-xs truncate py-2 text-xs text-content-soft">
                               {Array.isArray(s.optionsJson)
                                 ? (s.optionsJson as string[]).join(', ')
                                 : '—'}
@@ -290,8 +290,8 @@ function CategoryAccordion({
         aria-controls={hasChildren ? `cat-children-${l1.id}` : undefined}
         className={`flex w-full min-w-0 items-center justify-between rounded px-2 py-1.5 text-left transition ${
           isL1Selected
-            ? 'bg-neutral-900 text-white'
-            : 'hover:bg-neutral-100'
+            ? 'bg-primary text-primary-fg'
+            : 'hover:bg-surface-muted'
         }`}
       >
         <span className="min-w-0 truncate font-medium">{l1.name}</span>
@@ -312,7 +312,7 @@ function CategoryAccordion({
             expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
           }`}
         >
-          <ul className="ml-3 mt-0.5 space-y-0.5 overflow-hidden border-l border-neutral-200 pl-2">
+          <ul className="ml-3 mt-0.5 space-y-0.5 overflow-hidden border-l border-line pl-2">
             {l1.children.map((l2) => {
               const isL2Selected = selectedId === l2.id;
               return (
@@ -322,8 +322,8 @@ function CategoryAccordion({
                     onClick={() => onPickChild(l2.id)}
                     className={`flex w-full min-w-0 items-center justify-between rounded px-2 py-1.5 text-left text-sm transition ${
                       isL2Selected
-                        ? 'bg-neutral-900 text-white'
-                        : 'text-neutral-700 hover:bg-neutral-100'
+                        ? 'bg-primary text-primary-fg'
+                        : 'text-content-soft hover:bg-surface-muted'
                     }`}
                   >
                     <span className="min-w-0 truncate">{l2.name}</span>
@@ -421,13 +421,13 @@ function AttributeForm({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl sm:p-6">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-content/40 p-4">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-surface p-5 shadow-xl sm:p-6">
         <div className="mb-4 flex items-start justify-between gap-2">
           <h2 className="min-w-0 truncate text-lg font-semibold">
             {schema ? 'Edit attribute' : 'New attribute'}
           </h2>
-          <button onClick={onClose} className="shrink-0 text-neutral-400">✕</button>
+          <button onClick={onClose} className="shrink-0 text-content-muted">✕</button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -478,7 +478,7 @@ function AttributeForm({
               />
             </div>
           )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className={adminButtonSecondary}>
               Cancel

@@ -25,7 +25,7 @@ export default function EditArticlePage() {
   if (loading) {
     return (
       <AdminShell title="Loading article…">
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       </AdminShell>
     );
   }
@@ -39,7 +39,7 @@ export default function EditArticlePage() {
 
   return (
     <AdminShell title={article.title}>
-      <p className="mb-4 text-sm text-neutral-500">/{article.slug}</p>
+      <p className="mb-4 text-sm text-content-soft">/{article.slug}</p>
       <ArticleEditor article={article} />
     </AdminShell>
   );

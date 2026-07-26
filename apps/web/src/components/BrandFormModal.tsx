@@ -118,8 +118,8 @@ export function BrandFormModal({
   }
 
   return (
-    <div className={`fixed inset-0 ${zIndexClassName} flex items-center justify-center bg-black/40 p-4`}>
-      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div className={`fixed inset-0 ${zIndexClassName} flex items-center justify-center bg-content/40 p-4`}>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
           <h2 className="text-lg font-semibold">
             {brand ? 'Edit brand' : 'New brand'}
@@ -127,7 +127,7 @@ export function BrandFormModal({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-neutral-400 hover:text-neutral-900"
+            className="text-content-muted hover:text-primary"
           >
             ✕
           </button>
@@ -184,7 +184,7 @@ export function BrandFormModal({
             />
             Featured brand (rotates on home page)
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
@@ -236,7 +236,7 @@ function ImagePicker({
             className={previewClass}
           />
           <div className="flex flex-col gap-1">
-            <label className="cursor-pointer text-sm font-medium text-neutral-700 hover:text-neutral-950">
+            <label className="cursor-pointer text-sm font-medium text-content-soft hover:text-primary">
               Replace
               <input
                 type="file"
@@ -255,12 +255,12 @@ function ImagePicker({
             </button>
           </div>
           {uploading && (
-            <span className="text-xs text-neutral-500">Uploading…</span>
+            <span className="text-xs text-content-soft">Uploading…</span>
           )}
         </div>
       ) : (
         <label
-          className={`flex cursor-pointer items-center justify-center rounded-md border border-dashed border-neutral-300 px-3 py-4 text-sm text-neutral-600 hover:border-neutral-500 hover:text-neutral-900 ${
+          className={`flex cursor-pointer items-center justify-center rounded-md border border-dashed border-line px-3 py-4 text-sm text-content-soft hover:border-neutral-500 hover:text-primary ${
             uploading ? 'opacity-60' : ''
           }`}
         >

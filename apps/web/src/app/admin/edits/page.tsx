@@ -58,7 +58,7 @@ export default function EditsAdminPage() {
         </Link>
       }
     >
-      <p className="mb-4 text-sm text-neutral-600">
+      <p className="mb-4 text-sm text-content-soft">
         Curated themed collections. Toggle <strong>Featured on home</strong> to surface one in the home page slot (at most one at a time).
       </p>
 
@@ -84,19 +84,19 @@ export default function EditsAdminPage() {
             ))}
           </select>
           <button onClick={refresh} className={adminButtonSecondary}>Apply</button>
-          <span className="ml-auto text-sm text-neutral-500">{total} total</span>
+          <span className="ml-auto text-sm text-content-soft">{total} total</span>
         </div>
       </div>
 
       <div className={adminCard}>
         {loading ? (
-          <p className="text-sm text-neutral-500">Loading…</p>
+          <p className="text-sm text-content-soft">Loading…</p>
         ) : edits.length === 0 ? (
-          <p className="text-sm text-neutral-500">No edits yet.</p>
+          <p className="text-sm text-content-soft">No edits yet.</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+              <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                 <th className="px-2 pb-3 font-medium">Edit</th>
                 <th className="px-2 pb-3 font-medium">Status</th>
                 <th className="px-2 pb-3 font-medium">Products</th>
@@ -111,7 +111,7 @@ export default function EditsAdminPage() {
                     <Link href={`/admin/edits/${e.id}`} className="font-medium hover:underline">
                       {e.title}
                     </Link>
-                    <p className="text-xs text-neutral-500">/{e.slug}</p>
+                    <p className="text-xs text-content-soft">/{e.slug}</p>
                   </td>
                   <td className="px-2 py-3">
                     <span
@@ -120,21 +120,21 @@ export default function EditsAdminPage() {
                           ? 'bg-green-100 text-green-800'
                           : e.status === 'DRAFT'
                             ? 'bg-amber-100 text-amber-800'
-                            : 'bg-neutral-200 text-neutral-700'
+                            : 'bg-line text-content-soft'
                       }`}
                     >
                       {e.status}
                     </span>
                   </td>
-                  <td className="px-2 py-3 text-neutral-600">{e._count?.editProducts ?? 0}</td>
-                  <td className="px-2 py-3 text-neutral-600">
+                  <td className="px-2 py-3 text-content-soft">{e._count?.editProducts ?? 0}</td>
+                  <td className="px-2 py-3 text-content-soft">
                     {e.isFeaturedOnHome ? '★' : '—'}
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">
                       {/* <Link
                         href={`/admin/edits/${e.id}`}
-                        className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                        className="text-sm font-medium text-content-soft hover:text-primary"
                       >
                         Edit
                       </Link> */}
@@ -143,7 +143,7 @@ export default function EditsAdminPage() {
                           href={`/edits/${e.slug}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                          className="text-sm font-medium text-content-soft hover:text-primary"
                         >
                           View ↗
                         </a>

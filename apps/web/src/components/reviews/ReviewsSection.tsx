@@ -45,7 +45,7 @@ export function ReviewsSection({ productId, avgRating, reviewCount }: Props) {
       <header className="mb-6 flex items-end justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">Reviews</h2>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-content-soft">
             {reviewCount > 0
               ? `★ ${avgRating?.toFixed(2) ?? '—'} · ${reviewCount} review${reviewCount === 1 ? '' : 's'}`
               : 'No reviews yet.'}
@@ -56,18 +56,18 @@ export function ReviewsSection({ productId, avgRating, reviewCount }: Props) {
       {reviewability?.canReview ? (
         <ReviewForm productId={productId} onSubmitted={load} />
       ) : reviewability?.ownReview ? (
-        <p className="mb-6 rounded-md bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        <p className="mb-6 rounded-md bg-emerald-50 px-4 py-3 text-sm text-success">
           ✓ You&apos;ve reviewed this. Yours appears below.
         </p>
       ) : reviewability ? (
-        <p className="mb-6 rounded-md bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
+        <p className="mb-6 rounded-md bg-surface-muted px-4 py-3 text-sm text-content-soft">
           Reviews are open to members who&apos;ve bought this product.{' '}
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-content-muted">
             (Click Buy Now → confirm "Yes I bought it" on return to unlock.)
           </span>
         </p>
       ) : (
-        <p className="mb-6 rounded-md bg-neutral-50 px-4 py-3 text-sm text-neutral-600">
+        <p className="mb-6 rounded-md bg-surface-muted px-4 py-3 text-sm text-content-soft">
           <Link href="/login" className="font-medium underline">
             Sign in
           </Link>{' '}
@@ -76,9 +76,9 @@ export function ReviewsSection({ productId, avgRating, reviewCount }: Props) {
       )}
 
       {loading ? (
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       ) : !page || page.data.length === 0 ? (
-        <p className="text-sm text-neutral-500">Be the first to review.</p>
+        <p className="text-sm text-content-soft">Be the first to review.</p>
       ) : (
         <ul className="space-y-5">
           {page.data.map((r) => (
@@ -94,10 +94,10 @@ export function ReviewsSection({ productId, avgRating, reviewCount }: Props) {
 
 function ReviewItem({ review }: { review: ReviewPublic }) {
   return (
-    <article className="rounded-xl border border-neutral-200 bg-white p-5">
+    <article className="rounded-xl border border-line bg-surface p-5">
       <div className="mb-2 flex items-center justify-between">
         <Stars value={review.rating} />
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-content-soft">
           {review.author.displayName} ·{' '}
           {new Date(review.createdAt).toLocaleDateString()}
         </p>
@@ -106,7 +106,7 @@ function ReviewItem({ review }: { review: ReviewPublic }) {
         <p className="text-base font-medium">{review.title}</p>
       )}
       {review.body && (
-        <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+        <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-content-soft">
           {review.body}
         </p>
       )}
@@ -171,11 +171,11 @@ function ReviewForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="mb-6 rounded-xl border border-neutral-200 bg-white p-5"
+      className="mb-6 rounded-xl border border-line bg-surface p-5"
     >
       <p className="text-sm font-medium">Leave a review</p>
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-xs uppercase tracking-wider text-neutral-500">
+        <span className="text-xs uppercase tracking-wider text-content-soft">
           Rating
         </span>
         <span className="inline-flex gap-1">
@@ -204,21 +204,21 @@ function ReviewForm({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title (optional)"
-        className="mt-3 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+        className="mt-3 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
       />
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder="Share your experience…"
         rows={4}
-        className="mt-2 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+        className="mt-2 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
       />
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-sm text-danger">{error}</p>}
       <div className="mt-3 flex justify-end">
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover disabled:opacity-50"
         >
           {submitting ? 'Submitting…' : 'Submit review'}
         </button>

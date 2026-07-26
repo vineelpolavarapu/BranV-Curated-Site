@@ -92,12 +92,12 @@ export default async function ProductDetailPage(props: {
 function Breadcrumbs({ product }: { product: ProductCardData }) {
   return (
     <AnimateOnScroll>
-      <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
-        <Link href="/" className="hover:text-neutral-900">Home</Link>
+      <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
+        <Link href="/" className="hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
         <Link
           href={`/category/${product.category.slug}`}
-          className="hover:text-neutral-900"
+          className="hover:text-primary"
         >
           {product.category.name}
         </Link>
@@ -106,14 +106,14 @@ function Breadcrumbs({ product }: { product: ProductCardData }) {
             <span className="mx-2">/</span>
             <Link
               href={categoryHrefL2(product.category.slug, product.subcategory.slug)}
-              className="hover:text-neutral-900"
+              className="hover:text-primary"
             >
               {product.subcategory.name}
             </Link>
           </>
         )}
         <span className="mx-2">/</span>
-        <span className="text-neutral-900">{product.title}</span>
+        <span className="text-content">{product.title}</span>
       </nav>
     </AnimateOnScroll>
   );
@@ -126,7 +126,7 @@ function Gallery({ product }: { product: ProductCardData }) {
 
   return (
     <div>
-      <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-100">
+      <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted">
         {hero && 'url' in hero ? (
           <>
             <Image
@@ -141,14 +141,14 @@ function Gallery({ product }: { product: ProductCardData }) {
             {hero.isAiGenerated && (
               <span
                 title="AI-rendered on Vineel's avatar"
-                className="absolute bottom-3 right-3 rounded bg-black/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-white backdrop-blur"
+                className="absolute bottom-3 right-3 rounded bg-content/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary-fg backdrop-blur"
               >
                 AI-rendered
               </span>
             )}
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+          <div className="flex h-full w-full items-center justify-center text-content-muted">
             no image
           </div>
         )}
@@ -159,7 +159,7 @@ function Gallery({ product }: { product: ProductCardData }) {
             <li
               key={idx}
               style={{ animationDelay: `${40 + idx * 40}ms` }}
-              className="bv-enter-fade relative aspect-[4/5] overflow-hidden rounded-md bg-neutral-100"
+              className="bv-enter-fade relative aspect-[4/5] overflow-hidden rounded-md bg-surface-muted"
             >
               <Image
                 src={img.url}
@@ -170,7 +170,7 @@ function Gallery({ product }: { product: ProductCardData }) {
                 className="object-cover"
               />
               {img.isAiGenerated && (
-                <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 py-0.5 text-[8px] font-medium uppercase text-white">
+                <span className="absolute bottom-1 right-1 rounded bg-content/70 px-1 py-0.5 text-[8px] font-medium uppercase text-primary-fg">
                   AI
                 </span>
               )}
@@ -187,7 +187,7 @@ function Summary({ product }: { product: ProductCardData }) {
     <div className="flex flex-col gap-0">
       <Link
         href={`/brands/${product.brand.slug}`}
-        className="text-xs font-medium uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
+        className="text-xs font-medium uppercase tracking-wider text-content-soft hover:text-primary"
       >
         {product.brand.name}
       </Link>
@@ -201,11 +201,11 @@ function Summary({ product }: { product: ProductCardData }) {
         </span>
         {product.mrp && product.mrp > product.price && (
           <>
-            <span className="text-base text-neutral-400 line-through">
+            <span className="text-base text-content-muted line-through">
               ₹{formatINR(product.mrp)}
             </span>
             {product.discountPct && (
-              <span className="text-sm font-medium text-emerald-700">
+              <span className="text-sm font-medium text-success">
                 {Math.round(product.discountPct)}% off
               </span>
             )}
@@ -221,7 +221,7 @@ function Summary({ product }: { product: ProductCardData }) {
           {product.sizes.length > 0 && (
             <DisplayList label="Sizes" values={product.sizes} />
           )}
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-content-soft">
             Size/colour selection happens on the retailer&apos;s site after you
             click Buy Now.
           </p>
@@ -238,7 +238,7 @@ function Summary({ product }: { product: ProductCardData }) {
             trackingId={product.buyNow.trackingId}
             productTitle={product.title}
           />
-          <p className="mt-2 text-xs text-neutral-500">
+          <p className="mt-2 text-xs text-content-soft">
             We earn a small commission when you buy through our link — at no
             extra cost to you.
           </p>
@@ -246,11 +246,11 @@ function Summary({ product }: { product: ProductCardData }) {
       )}
 
       {product.description && (
-        <div className="mt-8 border-t border-neutral-200 pt-6">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+        <div className="mt-8 border-t border-line pt-6">
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Description
           </h2>
-          <p className="whitespace-pre-line text-sm leading-relaxed text-neutral-700">
+          <p className="whitespace-pre-line text-sm leading-relaxed text-content-soft">
             {product.description}
           </p>
         </div>
@@ -261,7 +261,7 @@ function Summary({ product }: { product: ProductCardData }) {
           {product.tags.map((t) => (
             <span
               key={t}
-              className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-600"
+              className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-content-soft"
             >
               {t}
             </span>
@@ -275,14 +275,14 @@ function Summary({ product }: { product: ProductCardData }) {
 function DisplayList({ label, values }: { label: string; values: string[] }) {
   return (
     <div>
-      <p className="mb-1 text-xs font-medium uppercase tracking-wider text-neutral-500">
+      <p className="mb-1 text-xs font-medium uppercase tracking-wider text-content-soft">
         {label}
       </p>
       <ul className="flex flex-wrap gap-1.5">
         {values.map((v) => (
           <li
             key={v}
-            className="rounded-md border border-neutral-300 px-2 py-1 text-xs"
+            className="rounded-md border border-line px-2 py-1 text-xs"
           >
             {v}
           </li>
@@ -306,12 +306,12 @@ function WhereToBuy({ product }: { product: ProductCardData }) {
             return (
               <li
                 key={r.retailer}
-                className={`bv-enter ${RETAILER_STAGGER[i % RETAILER_STAGGER.length] ?? ''} flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-shadow duration-200 hover:shadow-md`}
+                className={`bv-enter ${RETAILER_STAGGER[i % RETAILER_STAGGER.length] ?? ''} flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3 transition-shadow duration-200 hover:shadow-card-hover`}
               >
                 <div>
                   <p className="font-medium capitalize">{label}</p>
                   {r.rawPrice !== null && (
-                    <p className="text-sm text-neutral-600">
+                    <p className="text-sm text-content-soft">
                       ₹{formatINR(r.rawPrice)}
                     </p>
                   )}

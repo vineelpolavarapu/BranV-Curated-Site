@@ -117,15 +117,15 @@ export default function SettingsAdminPage() {
 
   return (
     <AdminShell title="Platform settings">
-      <p className="mb-4 text-sm text-neutral-600">
+      <p className="mb-4 text-sm text-content-soft">
         Tunables that take effect within the next request cycle (≤30s Redis cache).
       </p>
 
       {loading ? (
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       ) : (
         <div className={adminCard}>
-          <ul className="divide-y divide-neutral-200">
+          <ul className="divide-y divide-line">
             {SETTING_SPECS.map((spec) => (
               <li key={spec.key} className="py-4">
                 <SettingRow
@@ -137,8 +137,8 @@ export default function SettingsAdminPage() {
               </li>
             ))}
           </ul>
-          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-          {flash && <p className="mt-3 text-sm text-emerald-700">{flash}</p>}
+          {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+          {flash && <p className="mt-3 text-sm text-success">{flash}</p>}
         </div>
       )}
     </AdminShell>
@@ -162,8 +162,8 @@ function SettingRow({
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-medium">{spec.label}</p>
-          {spec.hint && <p className="text-xs text-neutral-500">{spec.hint}</p>}
-          <p className="mt-1 font-mono text-[10px] uppercase text-neutral-400">
+          {spec.hint && <p className="text-xs text-content-soft">{spec.hint}</p>}
+          <p className="mt-1 font-mono text-[10px] uppercase text-content-muted">
             {spec.key}
           </p>
         </div>
@@ -221,9 +221,9 @@ function BoxedInput({
           />
         )}
         {spec.hint && (
-          <p className="mt-1 text-xs text-neutral-500">{spec.hint}</p>
+          <p className="mt-1 text-xs text-content-soft">{spec.hint}</p>
         )}
-        <p className="mt-1 font-mono text-[10px] uppercase text-neutral-400">
+        <p className="mt-1 font-mono text-[10px] uppercase text-content-muted">
           {spec.key}
         </p>
       </div>

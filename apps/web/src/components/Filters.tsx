@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { CustomSelect } from './CustomSelect';
+import { Icon } from './icons';
 
 export interface FilterDefinition {
   attributeKey: string;
@@ -46,11 +47,12 @@ export function Filters({ context }: { context: FilterContext }) {
       {/* Mobile + tablet trigger */}
       <button
         onClick={() => setOpenMobile(true)}
-        className="lg:hidden flex items-center gap-2 rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium"
+        className="lg:hidden flex items-center gap-2 rounded-full border border-line px-3 py-2 text-sm font-medium text-content"
       >
+        <Icon.Filter size={16} strokeWidth={1.75} aria-hidden />
         Filters
         {activeCount > 0 && (
-          <span className="rounded-full bg-neutral-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
+          <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-fg">
             {activeCount}
           </span>
         )}
@@ -69,16 +71,16 @@ export function Filters({ context }: { context: FilterContext }) {
             if (e.target === e.currentTarget) setOpenMobile(false);
           }}
         >
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-white p-5">
+          <div className="absolute inset-0 bg-content/40" />
+          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-surface p-5">
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Filters</h2>
+              <h2 className="text-lg font-semibold text-content">Filters</h2>
               <button
                 onClick={() => setOpenMobile(false)}
                 aria-label="Close filters"
-                className="text-neutral-500"
+                className="text-content-soft hover:text-content"
               >
-                ✕
+                <Icon.Close size={20} strokeWidth={1.75} aria-hidden />
               </button>
             </div>
             <FilterBody context={context} onApply={() => setOpenMobile(false)} />
@@ -119,7 +121,7 @@ function FilterBody({
       <div className="lg:hidden pt-2">
         <button
           onClick={onApply}
-          className="w-full rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+          className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg"
         >
           Apply
         </button>
@@ -179,7 +181,7 @@ function ActiveFilterChips({ onCleared }: { onCleared?: () => void }) {
         {chips.map((c) => (
           <span
             key={`${c.key}-${c.value}`}
-            className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-700"
+            className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-content-soft"
           >
             {c.label}
           </span>
@@ -190,7 +192,7 @@ function ActiveFilterChips({ onCleared }: { onCleared?: () => void }) {
           clearAll();
           onCleared?.();
         }}
-        className="mt-2 text-xs text-neutral-500 underline"
+        className="mt-2 text-xs text-content-soft underline"
       >
         Clear all filters
       </button>
@@ -212,15 +214,15 @@ function PriceFilter() {
           placeholder="Min"
           value={min}
           onChange={(e) => set('minPrice', e.target.value || undefined)}
-          className="w-20 rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="w-20 rounded border border-line bg-surface px-2 py-1 text-sm text-content"
         />
-        <span className="text-neutral-400">—</span>
+        <span className="text-content-muted">—</span>
         <input
           type="number"
           placeholder="Max"
           value={max}
           onChange={(e) => set('maxPrice', e.target.value || undefined)}
-          className="w-20 rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="w-20 rounded border border-line bg-surface px-2 py-1 text-sm text-content"
         />
       </div>
     </Group>
@@ -239,8 +241,8 @@ function DiscountFilter() {
             onClick={() => set('discount', current === d ? undefined : d)}
             className={`rounded-md border px-2 py-1 text-xs ${
               current === d
-                ? 'border-neutral-900 bg-neutral-900 text-white'
-                : 'border-neutral-300 hover:bg-neutral-100'
+                ? 'border-primary bg-primary text-primary-fg'
+                : 'border-line hover:bg-surface-muted'
             }`}
           >
             {d}%+
@@ -366,8 +368,8 @@ function CategoryFilter({ filter }: { filter: FilterDefinition }) {
               onClick={() => toggleArrayValue(paramName, o)}
               className={`rounded-md border px-2 py-1 text-xs ${
                 active
-                  ? 'border-neutral-900 bg-neutral-900 text-white'
-                  : 'border-neutral-300 hover:bg-neutral-100'
+                  ? 'border-primary bg-primary text-primary-fg'
+                  : 'border-line hover:bg-surface-muted'
               }`}
             >
               {o}
@@ -397,7 +399,7 @@ function ToggleFilter({ param, label }: { param: string; label: string }) {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-content-soft">
         {title}
       </p>
       {children}

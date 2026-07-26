@@ -83,17 +83,17 @@ export default function PreferencesPage() {
     <StorefrontShell>
       <section className="mx-auto max-w-3xl px-6 py-10">
         <h1 className="text-3xl font-semibold tracking-tight">Notification preferences</h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-content-soft">
           Pick which notifications reach you, and how. Defaults are on for
           everything until you turn them off.
         </p>
 
         {loading ? (
-          <div className="mt-8 h-2 w-32 animate-pulse rounded bg-neutral-200" />
+          <div className="mt-8 h-2 w-32 animate-pulse rounded bg-line" />
         ) : (
           <table className="mt-8 w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+              <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                 <th className="pb-3 font-medium">Notification</th>
                 {CHANNELS.map((c) => (
                   <th key={c.key} className="pb-3 font-medium">
@@ -129,7 +129,7 @@ export default function PreferencesPage() {
             </tbody>
           </table>
         )}
-        <p className="mt-6 text-xs text-neutral-500">
+        <p className="mt-6 text-xs text-content-soft">
           Email-only notifications still send if you turn off in-app for the
           same type, and vice versa. Channels are independent.
         </p>

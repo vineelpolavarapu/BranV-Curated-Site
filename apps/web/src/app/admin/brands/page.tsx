@@ -76,21 +76,21 @@ export default function BrandsAdminPage() {
         <button onClick={refresh} className={adminButtonSecondary}>
           Search
         </button>
-        <span className="ml-auto text-sm text-neutral-500">{total} total</span>
+        <span className="ml-auto text-sm text-content-soft">{total} total</span>
       </div>
 
       <div className={adminCard}>
         {loading ? (
-          <p className="text-sm text-neutral-500">Loading…</p>
+          <p className="text-sm text-content-soft">Loading…</p>
         ) : brands.length === 0 ? (
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-content-soft">
             No brands yet. Click <strong>+ New brand</strong> to add one.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[480px] text-sm">
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                   <th className="px-2 pb-3 font-medium">Brand</th>
                   <th className="px-2 pb-3 font-medium">Products</th>
                   <th className="px-2 pb-3 font-medium">Status</th>
@@ -112,11 +112,11 @@ export default function BrandsAdminPage() {
                             className="h-8 w-8 shrink-0 rounded object-cover"
                           />
                         ) : (
-                          <div className="h-8 w-8 shrink-0 rounded bg-neutral-200" />
+                          <div className="h-8 w-8 shrink-0 rounded bg-line" />
                         )}
                         <div className="min-w-0">
                           <p className="truncate font-medium">{b.name}</p>
-                          <p className="truncate text-xs text-neutral-500">{b.slug}</p>
+                          <p className="truncate text-xs text-content-soft">{b.slug}</p>
                         </div>
                         {b.isFeatured && (
                           <span className="ml-1 shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
@@ -125,7 +125,7 @@ export default function BrandsAdminPage() {
                         )}
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-neutral-600">
+                    <td className="px-2 py-3 text-content-soft">
                       {b._count?.products ?? 0}
                     </td>
                     <td className="px-2 py-3">
@@ -137,7 +137,7 @@ export default function BrandsAdminPage() {
                           href={`/admin/brands/${b.id}/story`}
                           aria-label="Brand story"
                           title="Story"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded text-neutral-600 hover:bg-neutral-100 hover:text-neutral-950"
+                          className="inline-flex h-8 w-8 items-center justify-center rounded text-content-soft hover:bg-surface-muted hover:text-primary"
                         >
                           <svg width="14" height="14" viewBox="0 0 4 16" fill="currentColor" aria-hidden>
                             <circle cx="2" cy="2" r="1.5" />
@@ -150,7 +150,7 @@ export default function BrandsAdminPage() {
                             setEditing(b);
                             setShowForm(true);
                           }}
-                          className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                          className="text-sm font-medium text-content-soft hover:text-primary"
                         >
                           Edit
                         </button> */}
@@ -193,7 +193,7 @@ function StatusPill({ status }: { status: Brand['status'] }) {
     status === 'ACTIVE'
       ? 'bg-green-100 text-green-800'
       : status === 'HIDDEN'
-        ? 'bg-neutral-200 text-neutral-700'
+        ? 'bg-line text-content-soft'
         : 'bg-red-100 text-red-700';
   return (
     <span

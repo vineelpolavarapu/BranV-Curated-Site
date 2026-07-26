@@ -396,24 +396,24 @@ export function QuickAddModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-content/50 p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="mt-8 w-full max-w-2xl rounded-2xl bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-neutral-200 px-6 py-4">
+      <div className="mt-8 w-full max-w-2xl rounded-2xl bg-surface shadow-2xl">
+        <header className="flex items-center justify-between border-b border-line px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold">Quick Add Product</h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-content-soft">
               Under 60 seconds. Paste retailer URL, autofill, paste avatar,
-              hit <kbd className="rounded border border-neutral-300 bg-neutral-50 px-1 text-[10px]">Cmd/Ctrl + Enter</kbd>.
+              hit <kbd className="rounded border border-line bg-surface-muted px-1 text-[10px]">Cmd/Ctrl + Enter</kbd>.
             </p>
           </div>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-neutral-400 hover:text-neutral-900"
+            className="text-content-muted hover:text-primary"
           >
             ✕
           </button>
@@ -452,7 +452,7 @@ export function QuickAddModal({
               </button>
             </div>
             {autofillSource && (
-              <p className="mt-1 text-xs text-emerald-700">
+              <p className="mt-1 text-xs text-success">
                 ✓ Autofilled from {autofillSource}
               </p>
             )}
@@ -593,7 +593,7 @@ export function QuickAddModal({
                 placeholder="M, L, XL"
                 className={adminInput}
               />
-              <p className="mt-1 text-[10px] text-neutral-500">
+              <p className="mt-1 text-[10px] text-content-soft">
                 One variant per size. Leave blank for a single sizeless variant.
               </p>
             </div>
@@ -640,7 +640,7 @@ export function QuickAddModal({
               <label className={adminLabel}>
                 📸 Product Image (from {form.retailer})
               </label>
-              <div className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-neutral-50 p-3">
+              <div className="flex items-center gap-3 rounded-lg border border-line bg-surface-muted p-3">
                 <Image
                   src={form.retailerImageUrl}
                   alt=""
@@ -649,13 +649,13 @@ export function QuickAddModal({
                   unoptimized
                   className="rounded object-cover"
                 />
-                <span className="text-xs text-emerald-700">
+                <span className="text-xs text-success">
                   ✓ Extracted from {form.retailer}
                 </span>
                 <button
                   type="button"
                   onClick={() => set('retailerImageUrl', '')}
-                  className="ml-auto text-xs text-neutral-500 underline"
+                  className="ml-auto text-xs text-content-soft underline"
                 >
                   Remove
                 </button>
@@ -667,13 +667,13 @@ export function QuickAddModal({
           <section>
             <label className={adminLabel}>🔗 Affiliate Link</label>
             {form.retailer === 'amazon' ? (
-              <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm text-neutral-700">
+              <div className="rounded-lg border border-line bg-surface-muted p-3 text-sm text-content-soft">
                 Will route through <strong>Amazon Associates direct</strong> —
                 your affiliate tag is appended automatically on submit.
               </div>
             ) : (
               <div className="space-y-2">
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-content-soft">
                   Paste the ready-to-use affiliate link above in{' '}
                   <strong>Paste retailer URL</strong> — it's stored and used
                   for redirects exactly as pasted, no conversion.
@@ -735,7 +735,7 @@ export function QuickAddModal({
             </p>
           )}
           {flash && (
-            <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p className="rounded-md bg-emerald-50 px-3 py-2 text-sm text-success">
               {flash}
               {pendingAffiliate && (
                 <span className="ml-2 text-xs">
@@ -750,7 +750,7 @@ export function QuickAddModal({
             <button
               type="button"
               onClick={clearDraft}
-              className="text-xs text-neutral-500 underline"
+              className="text-xs text-content-soft underline"
             >
               Clear draft
             </button>
@@ -822,7 +822,7 @@ function ImageDropPaste({
       }}
       tabIndex={0}
       className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition ${
-        hover ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-300'
+        hover ? 'border-neutral-900 bg-surface-muted' : 'border-line'
       }`}
     >
       {currentUrl ? (
@@ -836,31 +836,31 @@ function ImageDropPaste({
             className="rounded object-cover"
           />
           <div className="flex-1 text-sm">
-            <p className="text-emerald-700">✓ Avatar uploaded</p>
-            <p className="break-all text-[10px] text-neutral-400">
+            <p className="text-success">✓ Avatar uploaded</p>
+            <p className="break-all text-[10px] text-content-muted">
               {currentUrl}
             </p>
           </div>
           <button
             type="button"
             onClick={onClear}
-            className="text-xs text-neutral-500 underline"
+            className="text-xs text-content-soft underline"
           >
             Remove
           </button>
         </>
       ) : (
         <>
-          <div className="flex h-20 w-16 items-center justify-center rounded bg-neutral-100 text-neutral-400">
+          <div className="flex h-20 w-16 items-center justify-center rounded bg-surface-muted text-content-muted">
             📸
           </div>
           <div className="flex-1 text-sm">
-            <p className="font-medium text-neutral-700">
+            <p className="font-medium text-content-soft">
               {uploading ? 'Uploading…' : 'Drag, drop, or Ctrl+V paste'}
             </p>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-content-soft">
               Or{' '}
-              <label className="cursor-pointer text-neutral-900 underline">
+              <label className="cursor-pointer text-content underline">
                 choose a file
                 <input
                   type="file"

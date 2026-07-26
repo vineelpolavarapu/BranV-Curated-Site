@@ -13,36 +13,41 @@ export function AuthShell({
   footer?: ReactNode;
 }) {
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-neutral-50 px-6 py-12">
+    <main className="flex min-h-[100dvh] items-center justify-center bg-canvas px-6 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link
             href="/"
-            className="inline-block text-2xl font-semibold tracking-tight"
+            className="inline-flex flex-col items-center user-select-none"
           >
-            BranV
+            <div className="font-heading text-3xl font-extrabold tracking-tight text-slate-900">
+              Bran<span className="text-primary">V</span>
+            </div>
+            <div className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">
+              ALL FOR MEN
+            </div>
           </Link>
         </div>
-        <div className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
-          <h1 className="mb-1 text-2xl font-semibold tracking-tight text-neutral-900">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h1 className="mb-1.5 font-heading text-2xl font-extrabold tracking-tight text-slate-900">
             {title}
           </h1>
           {subtitle && (
-            <p className="mb-6 text-sm text-neutral-600">{subtitle}</p>
+            <p className="mb-6 text-sm font-medium text-slate-500">{subtitle}</p>
           )}
           {children}
         </div>
-        {footer && <div className="mt-6 text-center text-sm">{footer}</div>}
+        {footer && <div className="mt-6 text-center text-sm font-medium text-slate-600">{footer}</div>}
       </div>
     </main>
   );
 }
 
 export const inputClass =
-  'w-full rounded-md border border-neutral-300 px-3 py-2 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+  'w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 outline-none placeholder:text-slate-400 focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20 transition-all';
 
 export const labelClass =
-  'mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-700';
+  'mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-slate-500';
 
 export const primaryButtonClass =
-  'w-full rounded-md bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50';
+  'w-full rounded-xl bg-primary px-4 py-3.5 text-sm font-extrabold text-white shadow-md transition-all hover:bg-primary-hover active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50';

@@ -46,14 +46,14 @@ export default function RegisterPage() {
         title="Check your email"
         subtitle="We sent a verification link to your inbox. Click it to activate your account."
         footer={
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-content underline">
             Back to sign in
           </Link>
         }
       >
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-content-soft">
           In development with mock email, the link is logged to the API stdout —
-          check the <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs">pnpm dev</code> console.
+          check the <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs">pnpm dev</code> console.
         </p>
       </AuthShell>
     );
@@ -64,9 +64,9 @@ export default function RegisterPage() {
       title="Create your account"
       subtitle="Free to join. No spam, just curated drops."
       footer={
-        <span className="text-neutral-600">
+        <span className="text-content-soft">
           Already a member?{' '}
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-content underline">
             Sign in
           </Link>
         </span>
@@ -119,12 +119,12 @@ export default function RegisterPage() {
             onChange={(e) => setPassword(e.target.value)}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-content-soft">
             At least 8 characters.
           </p>
         </div>
         {error && (
-          <p className="text-sm text-red-600" role="alert">{error}</p>
+          <p className="text-sm text-danger" role="alert">{error}</p>
         )}
         <button
           type="submit"

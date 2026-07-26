@@ -61,16 +61,16 @@ export default function BannersAdminPage() {
         </button>
       }
     >
-      <p className="mb-4 text-sm text-neutral-600">
+      <p className="mb-4 text-sm text-content-soft">
         Banners with a schedule window appear on the home page only during
         their window. Active + no schedule = always shown.
       </p>
 
       {loading ? (
-        <p className="text-sm text-neutral-500">Loading…</p>
+        <p className="text-sm text-content-soft">Loading…</p>
       ) : banners.length === 0 ? (
         <div className={adminCard}>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-content-soft">
             No banners. Click <strong>+ New banner</strong> to add one.
           </p>
         </div>
@@ -81,7 +81,7 @@ export default function BannersAdminPage() {
             return (
               <li key={b.id} className={adminCard}>
                 <div className="flex gap-4">
-                  <div className="relative h-24 w-40 flex-none overflow-hidden rounded bg-neutral-100">
+                  <div className="relative h-24 w-40 flex-none overflow-hidden rounded bg-surface-muted">
                     {b.imageUrl ? (
                       <Image
                         src={b.imageUrl}
@@ -96,23 +96,23 @@ export default function BannersAdminPage() {
                   <div className="flex-1 text-sm">
                     <p className="font-medium">{b.headline ?? '(no headline)'}</p>
                     {b.ctaLabel && (
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-content-soft">
                         CTA: <strong>{b.ctaLabel}</strong> → {b.ctaLink}
                       </p>
                     )}
-                    <p className="mt-1 text-xs text-neutral-500">
+                    <p className="mt-1 text-xs text-content-soft">
                       Order: {b.displayOrder} · Status: {b.status}{' '}
                       {active ? (
-                        <span className="ml-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-medium uppercase text-emerald-800">
+                        <span className="ml-1 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-medium uppercase text-success">
                           showing now
                         </span>
                       ) : (
-                        <span className="ml-1 rounded-full bg-neutral-200 px-1.5 py-0.5 text-[9px] font-medium uppercase text-neutral-700">
+                        <span className="ml-1 rounded-full bg-line px-1.5 py-0.5 text-[9px] font-medium uppercase text-content-soft">
                           not visible
                         </span>
                       )}
                     </p>
-                    <p className="mt-1 text-xs text-neutral-500">
+                    <p className="mt-1 text-xs text-content-soft">
                       {b.startsAt
                         ? `From ${new Date(b.startsAt).toLocaleString()}`
                         : 'No start'}
@@ -129,7 +129,7 @@ export default function BannersAdminPage() {
                       setEditing(b);
                       setShowForm(true);
                     }}
-                    className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                    className="text-sm font-medium text-content-soft hover:text-primary"
                   >
                     Edit
                   </button> */}
@@ -224,13 +224,13 @@ function BannerForm({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-xl overflow-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-content/40 p-4">
+      <div className="max-h-[90vh] w-full max-w-xl overflow-auto rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
           <h2 className="text-lg font-semibold">
             {banner ? 'Edit banner' : 'New banner'}
           </h2>
-          <button onClick={onClose} className="text-neutral-400">✕</button>
+          <button onClick={onClose} className="text-content-muted">✕</button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
@@ -311,7 +311,7 @@ function BannerForm({
               <option value="HIDDEN">Hidden</option>
             </select>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"

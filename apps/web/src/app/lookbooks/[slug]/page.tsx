@@ -35,15 +35,15 @@ export default async function LookbookDetailPage(props: {
 
   return (
     <StorefrontShell>
-      <nav className="mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
-        <Link href="/" className="hover:text-neutral-900">Home</Link>
+      <nav className="mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
+        <Link href="/" className="hover:text-primary">Home</Link>
         <span className="mx-2">/</span>
-        <span className="text-neutral-900">{lb.title}</span>
+        <span className="text-content">{lb.title}</span>
       </nav>
 
       {lb.heroUrl && (
         <section className="mx-auto max-w-7xl px-6 pt-4">
-          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100">
+          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-surface-muted">
             <Image
               src={lb.heroUrl}
               alt={lb.title}
@@ -62,18 +62,18 @@ export default async function LookbookDetailPage(props: {
           {lb.title}
         </h1>
         {lb.description && (
-          <p className="mt-3 text-base leading-relaxed text-neutral-600">
+          <p className="mt-3 text-base leading-relaxed text-content-soft">
             {lb.description}
           </p>
         )}
-        <p className="mt-2 text-xs text-neutral-500">
+        <p className="mt-2 text-xs text-content-soft">
           Tap any numbered dot to shop the look.
         </p>
       </section>
 
       <section className="mx-auto max-w-3xl px-6 pb-16">
         {lb.images.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-8 text-center text-sm text-neutral-500">
+          <p className="rounded-2xl border border-dashed border-line bg-surface-muted p-8 text-center text-sm text-content-soft">
             No images yet.
           </p>
         ) : (

@@ -24,12 +24,12 @@ export default async function SearchPage(props: {
       <section className="mx-auto max-w-7xl px-6 pt-8">
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
           Search {q && (
-            <span className="text-neutral-500">
+            <span className="text-content-soft">
               for &ldquo;{q}&rdquo;
             </span>
           )}
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-content-soft">
           {list?.total ?? 0} {(list?.total ?? 0) === 1 ? 'result' : 'results'}
         </p>
       </section>
@@ -39,13 +39,13 @@ export default async function SearchPage(props: {
           <Filters context={{ brands: brands ?? [] }} />
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-content-soft">
                 {list?.total ?? 0} results
               </p>
               <SortPicker />
             </div>
             {!list || list.data.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+              <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
                 {q ? 'No results.' : 'Type something to search.'}
               </div>
             ) : (

@@ -146,8 +146,8 @@ export function EditEditor({ edit }: Props) {
         />
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {flash && <p className="text-sm text-emerald-700">{flash}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
+      {flash && <p className="text-sm text-success">{flash}</p>}
 
       <div className="flex justify-end">
         <button type="submit" disabled={submitting} className={adminButtonPrimary}>

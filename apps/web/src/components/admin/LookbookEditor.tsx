@@ -192,10 +192,10 @@ export function LookbookEditor({ lookbook }: Props) {
       </div>
 
       <div className={adminCard}>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
           Images & shoppable hotspots
         </h2>
-        <p className="mb-3 text-xs text-neutral-500">
+        <p className="mb-3 text-xs text-content-soft">
           Click on an image to place a hotspot. The product picker opens; the
           tag lands at the click location as a percentage of width/height.
         </p>
@@ -214,7 +214,7 @@ export function LookbookEditor({ lookbook }: Props) {
         </div>
 
         {images.length === 0 ? (
-          <p className="rounded-md border border-dashed border-neutral-300 bg-neutral-50 px-3 py-4 text-center text-xs text-neutral-500">
+          <p className="rounded-md border border-dashed border-line bg-surface-muted px-3 py-4 text-center text-xs text-content-soft">
             No images yet. Paste a URL above and click <strong>+ Add image</strong>.
           </p>
         ) : (
@@ -233,8 +233,8 @@ export function LookbookEditor({ lookbook }: Props) {
         )}
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {flash && <p className="text-sm text-emerald-700">{flash}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
+      {flash && <p className="text-sm text-success">{flash}</p>}
 
       <div className="flex justify-end">
         <button type="submit" disabled={submitting} className={adminButtonPrimary}>
@@ -269,9 +269,9 @@ function LookbookImageEditor({
   }
 
   return (
-    <div className="rounded-lg border border-neutral-200 p-3">
+    <div className="rounded-lg border border-line p-3">
       <div className="mb-2 flex items-center justify-between text-xs">
-        <span className="font-medium text-neutral-700">
+        <span className="font-medium text-content-soft">
           {image.tags.length} hotspot{image.tags.length === 1 ? '' : 's'}
         </span>
         <button type="button" onClick={onRemove} className={adminButtonDanger}>
@@ -280,7 +280,7 @@ function LookbookImageEditor({
       </div>
       <div
         onClick={onImageClick}
-        className="relative aspect-[4/5] w-full max-w-md cursor-crosshair overflow-hidden rounded-lg bg-neutral-100"
+        className="relative aspect-[4/5] w-full max-w-md cursor-crosshair overflow-hidden rounded-lg bg-surface-muted"
         style={{ position: 'relative' }}
       >
         {image.imageUrl ? (
@@ -302,7 +302,7 @@ function LookbookImageEditor({
               if (confirm(`Remove hotspot for "${t.productTitle}"?`)) onRemoveTag(idx);
             }}
             title={t.productTitle}
-            className="absolute grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-neutral-900 text-xs font-semibold text-white shadow"
+            className="absolute grid h-7 w-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-primary text-xs font-semibold text-primary-fg shadow"
             style={{ left: `${t.xPercent}%`, top: `${t.yPercent}%` }}
           >
             {idx + 1}
@@ -317,11 +317,11 @@ function LookbookImageEditor({
         )}
       </div>
       {image.tags.length > 0 && (
-        <ul className="mt-2 space-y-1 text-xs text-neutral-600">
+        <ul className="mt-2 space-y-1 text-xs text-content-soft">
           {image.tags.map((t, idx) => (
             <li key={idx}>
               <strong>{idx + 1}.</strong> {t.productTitle}{' '}
-              <span className="text-neutral-400">
+              <span className="text-content-muted">
                 @ {t.xPercent.toFixed(1)}%, {t.yPercent.toFixed(1)}%
               </span>
             </li>
@@ -369,11 +369,11 @@ function HotspotProductPicker({
   }, [search]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-24">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-neutral-200 px-4 py-2">
+    <div className="fixed inset-0 z-50 flex items-start justify-center bg-content/40 p-4 pt-24">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl bg-surface shadow-2xl">
+        <header className="flex items-center justify-between border-b border-line px-4 py-2">
           <h2 className="text-sm font-semibold">Tag a product at this point</h2>
-          <button type="button" onClick={onCancel} className="text-neutral-400">✕</button>
+          <button type="button" onClick={onCancel} className="text-content-muted">✕</button>
         </header>
         <div className="p-4">
           <input
@@ -392,7 +392,7 @@ function HotspotProductPicker({
                   <button
                     type="button"
                     onClick={() => onPick({ id: p.id, slug: p.slug, title: p.title })}
-                    className="flex w-full items-center gap-3 rounded-md border border-transparent px-2 py-2 text-left hover:border-neutral-300 hover:bg-neutral-50"
+                    className="flex w-full items-center gap-3 rounded-md border border-transparent px-2 py-2 text-left hover:border-primary/40 hover:bg-surface-muted"
                   >
                     {img ? (
                       <Image
@@ -404,11 +404,11 @@ function HotspotProductPicker({
                         className="h-12 w-9 rounded object-cover"
                       />
                     ) : (
-                      <div className="h-12 w-9 rounded bg-neutral-200" />
+                      <div className="h-12 w-9 rounded bg-line" />
                     )}
                     <div>
                       <p className="text-sm font-medium">{p.title}</p>
-                      <p className="text-xs text-neutral-500">{p.brand.name}</p>
+                      <p className="text-xs text-content-soft">{p.brand.name}</p>
                     </div>
                   </button>
                 </li>

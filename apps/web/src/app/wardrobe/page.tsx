@@ -77,7 +77,7 @@ export default function WardrobePage() {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">My Wardrobe</h1>
 
         {loading && (
-          <div className="mt-6 h-2 w-32 animate-pulse rounded bg-neutral-200" />
+          <div className="mt-6 h-2 w-32 animate-pulse rounded bg-line" />
         )}
 
         {data && (
@@ -122,18 +122,18 @@ function StatsBlock({ stats }: { stats: WardrobePage['stats'] }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-4">
-      <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+    <div className="rounded-xl border border-line bg-surface p-4">
+      <p className="text-xs font-medium uppercase tracking-wider text-content-soft">
         {label}
       </p>
-      <p className="mt-1 text-xl font-semibold text-neutral-900">{value}</p>
+      <p className="mt-1 text-xl font-semibold text-content">{value}</p>
     </div>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="mt-10 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-600">
+    <div className="mt-10 rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
       Your wardrobe is empty. After you confirm &ldquo;Yes, I bought it&rdquo; on a
       product, it&apos;ll show up here.
     </div>
@@ -152,7 +152,7 @@ function WardrobeCard({
     <article className="group flex flex-col">
       <Link
         href={`/products/${item.product.slug}`}
-        className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-neutral-100"
+        className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-muted"
       >
         {img ? (
           <Image
@@ -164,7 +164,7 @@ function WardrobeCard({
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+          <div className="flex h-full w-full items-center justify-center text-content-muted">
             no image
           </div>
         )}
@@ -172,24 +172,24 @@ function WardrobeCard({
       <div className="mt-3 flex flex-1 flex-col gap-1">
         <Link
           href={`/brands/${item.product.brand.slug}`}
-          className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
+          className="text-[11px] font-medium uppercase tracking-wider text-content-soft hover:text-primary"
         >
           {item.product.brand.name}
         </Link>
         <Link
           href={`/products/${item.product.slug}`}
-          className="line-clamp-2 text-sm font-medium leading-snug text-neutral-900 hover:underline"
+          className="line-clamp-2 text-sm font-medium leading-snug text-content hover:underline"
         >
           {item.product.title}
         </Link>
-        <p className="mt-1 text-xs text-neutral-500">
+        <p className="mt-1 text-xs text-content-soft">
           via {item.retailer} · added{' '}
           {new Date(item.createdAt).toLocaleDateString()}
         </p>
         <button
           type="button"
           onClick={() => onRemove(item.id)}
-          className="mt-2 self-start text-xs text-neutral-500 underline hover:text-neutral-900"
+          className="mt-2 self-start text-xs text-content-soft underline hover:text-primary"
         >
           Remove from wardrobe
         </button>

@@ -66,8 +66,8 @@ export default function ProductsAdminPage() {
         </button>
       }
     >
-      <p className="mb-4 text-sm text-neutral-600">
-        Click <strong>+ Quick Add</strong> (or press <kbd className="rounded border border-neutral-300 bg-neutral-100 px-1 text-[10px]">N</kbd>) to add
+      <p className="mb-4 text-sm text-content-soft">
+        Click <strong>+ Quick Add</strong> (or press <kbd className="rounded border border-line bg-surface-muted px-1 text-[10px]">N</kbd>) to add
         a product in under 60 seconds. For multi-variant or multi-retailer
         management, open a product&apos;s edit page.
       </p>
@@ -110,15 +110,15 @@ export default function ProductsAdminPage() {
           <button onClick={refresh} className={adminButtonSecondary}>
             Apply
           </button>
-          <span className="ml-auto text-sm text-neutral-500">{total} total</span>
+          <span className="ml-auto text-sm text-content-soft">{total} total</span>
         </div>
       </div>
 
       <div className={`${adminCard} min-w-0`}>
         {loading ? (
-          <p className="text-sm text-neutral-500">Loading…</p>
+          <p className="text-sm text-content-soft">Loading…</p>
         ) : products.length === 0 ? (
-          <p className="text-sm text-neutral-500">No products match.</p>
+          <p className="text-sm text-content-soft">No products match.</p>
         ) : (
           <>
             {/* Mobile: stacked cards — no horizontal overflow */}
@@ -126,7 +126,7 @@ export default function ProductsAdminPage() {
               {products.map((p) => {
                 const primaryImage = p.images?.[0];
                 return (
-                  <li key={p.id} className="min-w-0 rounded-xl border border-neutral-200 p-3">
+                  <li key={p.id} className="min-w-0 rounded-xl border border-line p-3">
                     <div className="flex min-w-0 items-start gap-3">
                       {primaryImage ? (
                         <Image
@@ -138,7 +138,7 @@ export default function ProductsAdminPage() {
                           className="h-12 w-10 shrink-0 rounded object-cover"
                         />
                       ) : (
-                        <div className="h-12 w-10 shrink-0 rounded bg-neutral-200" />
+                        <div className="h-12 w-10 shrink-0 rounded bg-line" />
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
@@ -150,10 +150,10 @@ export default function ProductsAdminPage() {
                           </Link>
                           <StatusPill status={p.status} />
                         </div>
-                        <p className="truncate text-xs text-neutral-500">
+                        <p className="truncate text-xs text-content-soft">
                           {p.brand.name} · {p.category.name}
                         </p>
-                        <p className="truncate text-xs text-neutral-500">
+                        <p className="truncate text-xs text-content-soft">
                           {p._count.variants} variants · {p._count.retailerListings} retailers
                           {primaryImage?.isAiGenerated && ' · AI hero'}
                         </p>
@@ -161,7 +161,7 @@ export default function ProductsAdminPage() {
                           <p>
                             <span className="font-medium">₹{p.price}</span>
                             {p.mrp && (
-                              <span className="ml-2 text-xs text-neutral-400 line-through">
+                              <span className="ml-2 text-xs text-content-muted line-through">
                                 ₹{p.mrp}
                               </span>
                             )}
@@ -186,7 +186,7 @@ export default function ProductsAdminPage() {
             <div className="hidden sm:block">
               <table className="w-full table-fixed text-sm">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+                  <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                     <th className="w-[34%] px-2 pb-3 font-medium">Product</th>
                     <th className="w-[13%] px-2 pb-3 font-medium">Brand</th>
                     <th className="w-[13%] px-2 pb-3 font-medium">Category</th>
@@ -212,23 +212,23 @@ export default function ProductsAdminPage() {
                                 className="h-12 w-10 shrink-0 rounded object-cover"
                               />
                             ) : (
-                              <div className="h-12 w-10 shrink-0 rounded bg-neutral-200" />
+                              <div className="h-12 w-10 shrink-0 rounded bg-line" />
                             )}
                             <div className="min-w-0">
                               <p className="truncate font-medium">{p.title}</p>
-                              <p className="truncate text-xs text-neutral-500">
+                              <p className="truncate text-xs text-content-soft">
                                 {p._count.variants} variants · {p._count.retailerListings} retailers
                                 {primaryImage?.isAiGenerated && ' · AI hero'}
                               </p>
                             </div>
                           </div>
                         </td>
-                        <td className="truncate px-2 py-3 text-neutral-600">{p.brand.name}</td>
-                        <td className="truncate px-2 py-3 text-neutral-600">{p.category.name}</td>
+                        <td className="truncate px-2 py-3 text-content-soft">{p.brand.name}</td>
+                        <td className="truncate px-2 py-3 text-content-soft">{p.category.name}</td>
                         <td className="truncate px-2 py-3">
                           <span className="font-medium">₹{p.price}</span>
                           {p.mrp && (
-                            <span className="ml-2 text-xs text-neutral-400 line-through">
+                            <span className="ml-2 text-xs text-content-muted line-through">
                               ₹{p.mrp}
                             </span>
                           )}
@@ -240,7 +240,7 @@ export default function ProductsAdminPage() {
                           <div className="flex justify-end gap-2">
                             <Link
                               href={`/admin/products/${p.id}`}
-                              className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                              className="text-sm font-medium text-content-soft hover:text-primary"
                             >
                               Edit
                             </Link>
@@ -273,7 +273,7 @@ function StatusPill({ status }: { status: ProductStatus }) {
       ? 'bg-green-100 text-green-800'
       : status === 'DRAFT'
         ? 'bg-amber-100 text-amber-800'
-        : 'bg-neutral-200 text-neutral-700';
+        : 'bg-line text-content-soft';
   return (
     <span
       className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${tone}`}

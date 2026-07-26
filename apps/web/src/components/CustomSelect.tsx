@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Icon } from './icons';
 
 export interface CustomSelectOption {
   value: string;
@@ -51,23 +52,20 @@ export function CustomSelect({
         aria-expanded={open}
         aria-label={ariaLabel}
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-2 rounded-md border border-neutral-300 bg-white px-3 py-1.5 text-left text-sm hover:border-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900"
+        className="flex w-full items-center justify-between gap-2 rounded-md border border-line bg-surface px-3 py-1.5 text-left text-sm hover:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
       >
         <span className="truncate">{current?.label ?? ''}</span>
-        <svg
-          aria-hidden="true"
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
+        <Icon.ChevronDown
+          aria-hidden
+          size={14}
+          strokeWidth={1.75}
           className={`shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
-        >
-          <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        />
       </button>
       {open && (
         <ul
           role="listbox"
-          className="absolute right-0 z-50 mt-1 max-h-72 min-w-full overflow-auto rounded-md border border-neutral-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-1 max-h-72 min-w-full overflow-auto rounded-md border border-line bg-surface py-1 shadow-lg"
         >
           {options.map((o) => {
             const selected = o.value === value;
@@ -82,8 +80,8 @@ export function CustomSelect({
                 }}
                 className={`cursor-pointer whitespace-nowrap px-3 py-1.5 text-sm transition-colors ${
                   selected
-                    ? 'bg-neutral-900 text-white'
-                    : 'text-neutral-900 hover:bg-neutral-100'
+                    ? 'bg-primary text-primary-fg'
+                    : 'text-content hover:bg-surface-muted'
                 }`}
               >
                 {o.label}

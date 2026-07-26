@@ -240,7 +240,7 @@ export function HeroCarouselDesktop() {
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      className="hero-grab relative h-[100svh] min-h-[560px] w-full select-none overflow-hidden bg-neutral-900"
+      className="hero-grab relative h-[100svh] min-h-[560px] w-full select-none overflow-hidden bg-slate-950"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}
@@ -276,26 +276,28 @@ export function HeroCarouselDesktop() {
                 fetchPriority={i === 1 ? 'high' : 'auto'}
                 className="absolute inset-0 h-full w-full select-none object-cover"
               />
-              <div className="absolute inset-x-0 bottom-0 px-16 pb-28">
-                <div className={`max-w-2xl text-white hero-slide-text ${
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 px-12 lg:px-20 pb-24 lg:pb-28">
+                <div className={`max-w-3xl text-white hero-slide-text ${
                   i - 1 === realIndex ? 'hero-slide-active' : ''
                 }`}>
-                  
-                  <h2 className="text-6xl font-semibold tracking-tight">
+                  <h2 className="font-heading text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">
                     {slide.headline}
                   </h2>
                   {slide.subtext && (
-                    <p className="mt-4 max-w-lg text-lg leading-relaxed opacity-90">
+                    <p className="mt-4 max-w-xl text-lg lg:text-xl font-normal leading-relaxed text-slate-200">
                       {slide.subtext}
                     </p>
                   )}
-                  <Link
-                    href={slide.ctaHref}
-                    tabIndex={isClone ? -1 : 0}
-                    className="mt-8 inline-flex items-center justify-center rounded-full border border-white px-8 py-3 text-sm font-medium uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-neutral-900"
-                  >
-                    {slide.ctaLabel}
-                  </Link>
+                  <div className="mt-8">
+                    <Link
+                      href={slide.ctaHref}
+                      tabIndex={isClone ? -1 : 0}
+                      className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3.5 text-sm font-extrabold uppercase tracking-[0.18em] text-primary shadow-xl transition-all duration-300 hover:bg-primary hover:text-white hover:scale-105 active:scale-95"
+                    >
+                      {slide.ctaLabel}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -306,7 +308,7 @@ export function HeroCarouselDesktop() {
       <div
         role="tablist"
         aria-label="Select slide"
-        className="absolute bottom-8 right-12 flex items-center gap-2"
+        className="absolute bottom-10 right-16 flex items-center gap-2.5 z-20"
       >
         {SLIDES.map((s, i) => (
           <button
@@ -316,8 +318,8 @@ export function HeroCarouselDesktop() {
             aria-selected={i === realIndex}
             aria-label={`Show slide ${i + 1}: ${s.headline}`}
             onClick={() => goTo(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === realIndex ? 'w-10 bg-white' : 'w-5 bg-white/40 hover:bg-white/70'
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === realIndex ? 'w-10 bg-white shadow-sm' : 'w-3 bg-white/40 hover:bg-white/70'
             }`}
           />
         ))}

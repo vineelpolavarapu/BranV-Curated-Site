@@ -19,7 +19,7 @@ export default async function BrandsIndexPage() {
           <h1 className="bv-enter mb-2 text-3xl font-semibold tracking-tight md:text-4xl">
             Brands
           </h1>
-          <p className="bv-enter-fade bv-delay-1 text-sm text-neutral-600">
+          <p className="bv-enter-fade bv-delay-1 text-sm text-content-soft">
             {brands.length} {brands.length === 1 ? 'brand' : 'brands'} curated for BranV.
           </p>
         </section>
@@ -31,7 +31,7 @@ export default async function BrandsIndexPage() {
       {rest.length > 0 && <BrandGrid title="All brands" brands={rest} />}
       {brands.length === 0 && (
         <section className="mx-auto max-w-7xl px-6 pb-12">
-          <p className="rounded-2xl border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-500">
+          <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-content-soft">
             No brands yet.
           </p>
         </section>
@@ -58,7 +58,7 @@ function BrandGrid({
             <li key={b.slug} className={`bv-enter ${BRAND_STAGGER[i % BRAND_STAGGER.length] ?? ''}`}>
               <Link
                 href={`/brands/${b.slug}`}
-                className="group block rounded-xl border border-neutral-200 bg-white p-5 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-neutral-400 hover:shadow-md"
+                className="group block rounded-xl border border-line bg-surface p-5 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
               >
                 {b.logoUrl ? (
                   <div className="mb-3 flex h-14 items-center justify-center overflow-hidden">
@@ -72,12 +72,12 @@ function BrandGrid({
                     />
                   </div>
                 ) : (
-                  <div className="mb-3 flex h-14 items-center justify-center rounded bg-neutral-100">
-                    <span className="text-xs text-neutral-500">no logo</span>
+                  <div className="mb-3 flex h-14 items-center justify-center rounded bg-surface-muted">
+                    <span className="text-xs text-content-soft">no logo</span>
                   </div>
                 )}
                 <p className="text-sm font-medium">{b.name}</p>
-                <p className="text-xs text-neutral-500">
+                <p className="text-xs text-content-soft">
                   {b._count.products} {b._count.products === 1 ? 'product' : 'products'}
                 </p>
               </Link>

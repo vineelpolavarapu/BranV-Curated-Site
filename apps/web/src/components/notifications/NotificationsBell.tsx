@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { NotificationsPage } from '@/lib/phase8-types';
+import { Icon } from '../icons';
 
 const POLL_MS = 60_000;
 
@@ -77,69 +78,56 @@ export function NotificationsBell() {
             ? `Notifications (${unread} unread)`
             : 'Notifications'
         }
-        className="relative grid h-9 w-9 place-items-center rounded-full text-neutral-700 hover:bg-neutral-100"
+        className="relative grid h-9 w-9 place-items-center rounded-full text-content-soft hover:bg-surface-muted"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path
-            d="M5 17h14l-1.6-2.4A6 6 0 0 1 17 11V9a5 5 0 0 0-10 0v2a6 6 0 0 1-.4 3.6L5 17z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M10 20a2 2 0 0 0 4 0"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-          />
-        </svg>
+        <Icon.Notifications size={20} strokeWidth={1.5} aria-hidden />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-[1rem] place-items-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white">
+          <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-[1rem] place-items-center rounded-full bg-accent px-1 text-[10px] font-medium text-accent-fg">
             {unread > 9 ? '9+' : unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-30 mt-2 w-80 overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl">
-          <header className="flex items-center justify-between border-b border-neutral-200 px-4 py-2 text-xs">
-            <span className="font-medium uppercase tracking-wider text-neutral-500">
+        <div className="absolute right-0 top-full z-30 mt-2 w-80 overflow-hidden rounded-lg border border-line bg-surface shadow-xl">
+          <header className="flex items-center justify-between border-b border-line px-4 py-2 text-xs">
+            <span className="font-medium uppercase tracking-wider text-content-soft">
               Notifications
             </span>
             {unread > 0 && (
               <button
                 type="button"
                 onClick={onMarkAllRead}
-                className="font-medium text-neutral-700 hover:text-neutral-950"
+                className="font-medium text-content-soft hover:text-primary"
               >
                 Mark all read
               </button>
             )}
           </header>
           {!recent ? (
-            <div className="px-4 py-8 text-center text-sm text-neutral-500">
+            <div className="px-4 py-8 text-center text-sm text-content-soft">
               Loading…
             </div>
           ) : recent.data.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-neutral-500">
+            <div className="px-4 py-8 text-center text-sm text-content-soft">
               You&apos;re all caught up.
             </div>
           ) : (
-            <ul className="max-h-96 divide-y divide-neutral-100 overflow-auto text-sm">
+            <ul className="max-h-96 divide-y divide-line overflow-auto text-sm">
               {recent.data.map((n) => (
                 <li
                   key={n.id}
-                  className={n.readAt ? 'bg-white' : 'bg-blue-50/40'}
+                  className={n.readAt ? 'bg-surface' : 'bg-primary/5'}
                 >
                   <NotificationRow notification={n} />
                 </li>
               ))}
             </ul>
           )}
-          <div className="border-t border-neutral-200 bg-neutral-50 px-3 py-2 text-right">
+          <div className="border-t border-line bg-surface-muted px-3 py-2 text-right">
             <Link
               href="/account/notifications"
-              className="text-xs font-medium text-neutral-700 hover:text-neutral-950"
+              className="text-xs font-medium text-content-soft hover:text-primary"
               onClick={() => setOpen(false)}
             >
               See all →
@@ -161,11 +149,11 @@ function NotificationRow({
   const link = (notification.payload?.link as string) ?? null;
   const inner = (
     <div className="px-4 py-3">
-      <p className="font-medium text-neutral-900">{title}</p>
+      <p className="font-medium text-content">{title}</p>
       {body && (
-        <p className="mt-0.5 line-clamp-2 text-xs text-neutral-600">{body}</p>
+        <p className="mt-0.5 line-clamp-2 text-xs text-content-soft">{body}</p>
       )}
-      <p className="mt-1 text-[10px] uppercase tracking-wider text-neutral-400">
+      <p className="mt-1 text-[10px] uppercase tracking-wider text-content-muted">
         {new Date(notification.createdAt).toLocaleString()}
       </p>
     </div>

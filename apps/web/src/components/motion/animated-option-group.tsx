@@ -30,8 +30,8 @@ export function AnimatedOptionGroup<T extends string | number>({
             onClick={() => onChange(opt.value)}
             className={`relative rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ease-out-back ${
               isActive
-                ? 'bg-neutral-950 text-white scale-[1.04] shadow-sm'
-                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200 hover:text-neutral-900 hover:scale-[1.02]'
+                ? 'bg-primary text-primary-fg scale-[1.04] shadow-sm'
+                : 'bg-surface-muted text-content-soft hover:bg-line hover:text-content hover:scale-[1.02]'
             }`}
           >
             {opt.label}

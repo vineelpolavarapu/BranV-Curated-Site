@@ -15,11 +15,11 @@ export function BrandStorySection({ story }: { story: BrandStoryPublic }) {
   if (!story.bodyMd.trim()) return null;
   return (
     <section className="mx-auto max-w-3xl px-6 py-12">
-      <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+      <p className="mb-4 text-[10px] font-medium uppercase tracking-[0.18em] text-content-soft">
         Brand story
       </p>
       {story.heroUrl && (
-        <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100">
+        <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-surface-muted">
           <Image
             src={story.heroUrl}
             alt=""

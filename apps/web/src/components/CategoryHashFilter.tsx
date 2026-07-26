@@ -45,7 +45,7 @@ export function CategoryHashFilter({
 
   if (filtered.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+      <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
         No products match these filters.
       </div>
     );

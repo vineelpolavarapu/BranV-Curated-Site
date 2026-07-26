@@ -43,13 +43,13 @@ export default async function BrandDetailPage(props: {
           <Filters context={{}} />
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-neutral-500">
+              <p className="text-sm text-content-soft">
                 {list?.total ?? 0} products
               </p>
               <SortPicker />
             </div>
             {!list || list.data.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+              <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
                 No products under this brand match.
               </div>
             ) : (
@@ -68,10 +68,10 @@ export default async function BrandDetailPage(props: {
 
 function BrandHero({ brand }: { brand: BrandDetail }) {
   return (
-    <section className="border-b border-neutral-200 bg-neutral-50">
+    <section className="border-b border-line bg-surface-muted">
       <div className="mx-auto flex max-w-7xl flex-col items-start gap-6 px-6 py-10 md:flex-row md:items-center">
         {brand.logoUrl && (
-          <div className="flex h-20 w-32 items-center justify-center rounded-lg border border-neutral-200 bg-white">
+          <div className="flex h-20 w-32 items-center justify-center rounded-lg border border-line bg-surface">
             <Image
               src={brand.logoUrl}
               alt={brand.name}
@@ -83,21 +83,21 @@ function BrandHero({ brand }: { brand: BrandDetail }) {
           </div>
         )}
         <div className="flex-1">
-          <nav className="mb-2 text-xs text-neutral-500">
-            <Link href="/" className="hover:text-neutral-900">Home</Link>
+          <nav className="mb-2 text-xs text-content-soft">
+            <Link href="/" className="hover:text-primary">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/brands" className="hover:text-neutral-900">Brands</Link>
+            <Link href="/brands" className="hover:text-primary">Brands</Link>
             <span className="mx-2">/</span>
-            <span className="text-neutral-900">{brand.name}</span>
+            <span className="text-content">{brand.name}</span>
           </nav>
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
             {brand.name}
           </h1>
-          <p className="mt-1 text-sm text-neutral-600">
+          <p className="mt-1 text-sm text-content-soft">
             {brand._count.products} products on BranV
           </p>
           {brand.description && (
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-700">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-content-soft">
               {brand.description}
             </p>
           )}

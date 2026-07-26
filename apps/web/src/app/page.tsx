@@ -50,9 +50,9 @@ export default async function HomePage() {
 
 function DisclosureStrip() {
   return (
-    <section className="border-y border-neutral-200 bg-neutral-50">
-      <div className="mx-auto max-w-7xl px-6 py-6 text-center text-xs text-neutral-600">
-        <strong className="text-neutral-900">Affiliate disclosure:</strong>{' '}
+    <section className="border-y border-line bg-surface-muted">
+      <div className="mx-auto max-w-7xl px-6 py-6 text-center text-xs text-content-soft">
+        <strong className="text-content">Affiliate disclosure:</strong>{' '}
         BranV is a curated affiliate platform. Clicking Buy Now redirects you to
         the retailer. We earn a small commission on qualifying sales — at no
         extra cost to you.

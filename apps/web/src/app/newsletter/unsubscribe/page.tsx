@@ -51,14 +51,14 @@ function NewsletterUnsubscribePageInner() {
     <StorefrontShell>
       <section className="mx-auto max-w-xl px-6 py-16 text-center">
         {state === 'pending' && (
-          <p className="text-sm text-neutral-500">Unsubscribing…</p>
+          <p className="text-sm text-content-soft">Unsubscribing…</p>
         )}
         {state === 'ok' && (
           <>
             <h1 className="text-3xl font-semibold tracking-tight">
               You&apos;re unsubscribed
             </h1>
-            <p className="mt-3 text-neutral-600">
+            <p className="mt-3 text-content-soft">
               Sorry to see you go. You can resubscribe anytime.
             </p>
           </>
@@ -68,7 +68,7 @@ function NewsletterUnsubscribePageInner() {
             <h1 className="text-3xl font-semibold tracking-tight">
               Link invalid
             </h1>
-            <p className="mt-3 text-neutral-600">
+            <p className="mt-3 text-content-soft">
               The unsubscribe link couldn&apos;t be processed.
             </p>
           </>
@@ -76,7 +76,7 @@ function NewsletterUnsubscribePageInner() {
         <div className="mt-8">
           <Link
             href="/"
-            className="rounded-md border border-neutral-300 px-5 py-2 text-sm font-medium hover:bg-neutral-50"
+            className="rounded-md border border-line px-5 py-2 text-sm font-medium hover:bg-surface-muted"
           >
             Back to BranV
           </Link>

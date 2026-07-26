@@ -72,8 +72,8 @@ export default function BrandStoryAdminPage() {
 
   return (
     <AdminShell title={brand ? `${brand.name} — Story` : 'Brand story'}>
-      <p className="mb-4 text-sm text-neutral-500">
-        <Link href="/admin/brands" className="hover:text-neutral-900">
+      <p className="mb-4 text-sm text-content-soft">
+        <Link href="/admin/brands" className="hover:text-primary">
           ← Back to brands
         </Link>
       </p>
@@ -91,7 +91,7 @@ export default function BrandStoryAdminPage() {
                 <option value="DRAFT">Draft</option>
                 <option value="PUBLISHED">Published</option>
               </select>
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-content-soft">
                 Only PUBLISHED stories show on the brand page.
               </p>
             </div>
@@ -108,7 +108,7 @@ export default function BrandStoryAdminPage() {
         </div>
 
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Body (Markdown)
           </h2>
           <div className="grid gap-3 md:grid-cols-2">
@@ -120,7 +120,7 @@ export default function BrandStoryAdminPage() {
               className={`${adminInput} font-mono text-sm`}
               placeholder="# About the brand&#10;&#10;Founded in…"
             />
-            <div className="overflow-auto rounded-md border border-neutral-200 bg-white p-4">
+            <div className="overflow-auto rounded-md border border-line bg-surface p-4">
               <div className="prose prose-sm prose-neutral max-w-none">
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {bodyMd || '_Preview will appear here._'}
@@ -128,14 +128,14 @@ export default function BrandStoryAdminPage() {
               </div>
             </div>
           </div>
-          <p className="mt-2 text-xs text-neutral-500">
+          <p className="mt-2 text-xs text-content-soft">
             Raw HTML is stripped on the public page (XSS-safe). Use plain
             Markdown — headings, lists, links, bold, italic, tables.
           </p>
         </div>
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
-        {flash && <p className="text-sm text-emerald-700">{flash}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
+        {flash && <p className="text-sm text-success">{flash}</p>}
 
         <div className="flex items-center justify-between">
           {story && brand?.slug && (
@@ -143,7 +143,7 @@ export default function BrandStoryAdminPage() {
               href={`/brands/${brand.slug}`}
               target="_blank"
               rel="noreferrer"
-              className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+              className="text-sm font-medium text-content-soft hover:text-primary"
             >
               View public brand page ↗
             </a>

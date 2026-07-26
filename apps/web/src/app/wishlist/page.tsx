@@ -91,11 +91,11 @@ export default function WishlistPage() {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">My Wishlist</h1>
 
         {loading && (
-          <div className="mt-6 h-2 w-32 animate-pulse rounded bg-neutral-200" />
+          <div className="mt-6 h-2 w-32 animate-pulse rounded bg-line" />
         )}
 
         {data && data.items.length === 0 && (
-          <div className="mt-8 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-600">
+          <div className="mt-8 rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
             Your wishlist is empty. Tap the heart on any product to save it
             here.
           </div>
@@ -132,7 +132,7 @@ function WishlistCard({
     <article className="group flex flex-col">
       <Link
         href={`/products/${item.product.slug}`}
-        className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-neutral-100"
+        className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-muted"
       >
         {img ? (
           <Image
@@ -144,7 +144,7 @@ function WishlistCard({
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+          <div className="flex h-full w-full items-center justify-center text-content-muted">
             no image
           </div>
         )}
@@ -152,41 +152,41 @@ function WishlistCard({
       <div className="mt-3 flex flex-1 flex-col gap-1">
         <Link
           href={`/brands/${item.product.brand.slug}`}
-          className="text-[11px] font-medium uppercase tracking-wider text-neutral-500 hover:text-neutral-900"
+          className="text-[11px] font-medium uppercase tracking-wider text-content-soft hover:text-primary"
         >
           {item.product.brand.name}
         </Link>
         <Link
           href={`/products/${item.product.slug}`}
-          className="line-clamp-2 text-sm font-medium leading-snug text-neutral-900 hover:underline"
+          className="line-clamp-2 text-sm font-medium leading-snug text-content hover:underline"
         >
           {item.product.title}
         </Link>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-sm font-semibold text-neutral-900">
+          <span className="text-sm font-semibold text-content">
             ₹{formatINR(item.product.price)}
           </span>
           {item.product.mrp && item.product.mrp > item.product.price && (
-            <span className="text-xs text-neutral-400 line-through">
+            <span className="text-xs text-content-muted line-through">
               ₹{formatINR(item.product.mrp)}
             </span>
           )}
         </div>
-        <label className="mt-2 inline-flex items-center gap-2 text-xs text-neutral-600">
+        <label className="mt-2 inline-flex items-center gap-2 text-xs text-content-soft">
           <input
             type="checkbox"
             checked={item.notifyOnPriceDrop}
             onChange={() =>
               onToggleNotify(item.productId, item.notifyOnPriceDrop)
             }
-            className="h-3.5 w-3.5 rounded border-neutral-300"
+            className="h-3.5 w-3.5 rounded border-line"
           />
           Notify on price drop
         </label>
         <button
           type="button"
           onClick={() => onRemove(item.productId)}
-          className="mt-1 self-start text-xs text-neutral-500 underline hover:text-neutral-900"
+          className="mt-1 self-start text-xs text-content-soft underline hover:text-primary"
         >
           Remove
         </button>

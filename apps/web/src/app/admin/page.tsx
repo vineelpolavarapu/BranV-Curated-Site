@@ -24,7 +24,7 @@ export default function AdminDashboardPage() {
   if (loading || !data) {
     return (
       <AdminShell title="Dashboard">
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       </AdminShell>
     );
   }
@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
           </Link>
         )}
         {system.pendingAffiliateConversions > 0 && (
-          <span className="rounded-full border border-neutral-300 bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
+          <span className="rounded-full border border-line bg-surface-muted px-3 py-1 text-xs font-medium text-content-soft">
             {system.pendingAffiliateConversions} pending affiliate conversions
           </span>
         )}
@@ -107,7 +107,7 @@ export default function AdminDashboardPage() {
         {system.hiddenReviewCount > 0 && (
           <Link
             href="/admin/reviews"
-            className="rounded-full border border-neutral-300 bg-white px-3 py-1 text-xs font-medium hover:bg-neutral-50"
+            className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium hover:bg-surface-muted"
           >
             {system.hiddenReviewCount} hidden reviews
           </Link>
@@ -140,17 +140,17 @@ export default function AdminDashboardPage() {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <div className={`${adminCard} lg:col-span-2`}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Clicks · last 14 days
           </h2>
           <MiniBarChart data={trend} ariaLabel="Click events per day" />
         </div>
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Top products · 30d
           </h2>
           {topProducts.length === 0 ? (
-            <p className="text-sm text-neutral-500">No clicks yet.</p>
+            <p className="text-sm text-content-soft">No clicks yet.</p>
           ) : (
             <ul className="space-y-1.5 text-sm">
               {topProducts.slice(0, 6).map((p) => (
@@ -166,7 +166,7 @@ export default function AdminDashboardPage() {
                   >
                     {p.product.title}
                   </Link>
-                  <span className="font-mono text-xs text-neutral-600">
+                  <span className="font-mono text-xs text-content-soft">
                     {p.clicks}
                   </span>
                 </li>
@@ -178,11 +178,11 @@ export default function AdminDashboardPage() {
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Low-conversion alerts
           </h2>
           {lowConversionProducts.length === 0 ? (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-content-soft">
               Nothing flagged — every clicked product has at least one self-reported buy.
             </p>
           ) : (
@@ -197,20 +197,20 @@ export default function AdminDashboardPage() {
                   >
                     {p.title}
                   </Link>
-                  <span className="font-mono text-xs text-neutral-500">
+                  <span className="font-mono text-xs text-content-soft">
                     {p.clicks} clicks · 0 conversions
                   </span>
                 </li>
               ))}
             </ul>
           )}
-          <p className="mt-3 text-xs text-neutral-500">
+          <p className="mt-3 text-xs text-content-soft">
             ≥10 clicks in 30 days, zero self-reported conversions. Audit the
             scrape data or copy.
           </p>
         </div>
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             System
           </h2>
           <ul className="space-y-1 text-sm">
@@ -234,7 +234,7 @@ export default function AdminDashboardPage() {
               label="Hidden reviews"
               value={system.hiddenReviewCount}
             />
-            <li className="flex justify-between gap-2 text-neutral-500">
+            <li className="flex justify-between gap-2 text-content-soft">
               <span>API p95 · error rate</span>
               <span className="text-xs">tracked in Phase 13 (OTel)</span>
             </li>
@@ -256,11 +256,11 @@ function Kpi({
 }) {
   return (
     <div className={adminCard}>
-      <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+      <p className="text-xs font-medium uppercase tracking-wider text-content-soft">
         {label}
       </p>
       <p className="mt-2 text-3xl font-semibold tracking-tight">{value}</p>
-      {sub && <p className="mt-1 text-xs text-neutral-500">{sub}</p>}
+      {sub && <p className="mt-1 text-xs text-content-soft">{sub}</p>}
     </div>
   );
 }
@@ -268,8 +268,8 @@ function Kpi({
 function SystemRow({ label, value }: { label: string; value: number }) {
   return (
     <li className="flex justify-between gap-2">
-      <span className="text-neutral-700">{label}</span>
-      <span className={`font-mono text-xs ${value > 0 ? 'text-amber-700' : 'text-neutral-500'}`}>
+      <span className="text-content-soft">{label}</span>
+      <span className={`font-mono text-xs ${value > 0 ? 'text-amber-700' : 'text-content-soft'}`}>
         {value}
       </span>
     </li>

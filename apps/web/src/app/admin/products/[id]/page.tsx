@@ -75,7 +75,7 @@ export default function EditProductPage() {
   if (loading) {
     return (
       <AdminShell title="Loading product…">
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       </AdminShell>
     );
   }
@@ -91,7 +91,7 @@ export default function EditProductPage() {
 
   return (
     <AdminShell title={product.title}>
-      <p className="mb-6 text-sm text-neutral-500">
+      <p className="mb-6 text-sm text-content-soft">
         {product.brand.name} · {product.category.name}
         {product.subcategory && ` · ${product.subcategory.name}`} · /{product.slug}
       </p>
@@ -174,7 +174,7 @@ function BasicsForm({
 
   return (
     <form onSubmit={onSubmit} className={`${adminCard} space-y-4`}>
-      <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-content-soft">
         Basics
       </h2>
       <div>
@@ -238,7 +238,7 @@ function BasicsForm({
           className={adminInput}
         />
       </div>
-      <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3">
+      <div className="rounded-md border border-line bg-surface-muted p-3">
         <label className="flex items-center gap-2 text-sm font-medium">
           <input
             type="checkbox"
@@ -258,16 +258,16 @@ function BasicsForm({
               onChange={(e) => setFeatureDays(Number(e.target.value))}
               className={`${adminInput} w-20`}
             />
-            <span className="text-neutral-600">days from now</span>
+            <span className="text-content-soft">days from now</span>
             {featuredActive && (
-              <span className="ml-auto text-xs text-neutral-500">
+              <span className="ml-auto text-xs text-content-soft">
                 Currently featured until {new Date(product.featuredUntil!).toLocaleString()}
               </span>
             )}
           </div>
         )}
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
       <div className="flex justify-end">
         <button type="submit" disabled={submitting} className={adminButtonPrimary}>
           {submitting ? 'Saving…' : 'Save changes'}
@@ -321,11 +321,11 @@ function EditsPanel({
 
   return (
     <div className={adminCard}>
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-soft">
         Also show in these collections
       </h2>
       {allEdits.length === 0 ? (
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-content-soft">
           No collections yet — create one under{' '}
           <a href="/admin/edits/new" className="underline">
             The Edit
@@ -346,7 +346,7 @@ function EditsPanel({
           ))}
         </div>
       )}
-      {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
       <div className="mt-4 flex justify-end">
         <button
           type="button"
@@ -408,7 +408,7 @@ function ImagesPanel({
 
   return (
     <div className={adminCard}>
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-soft">
         Images ({product.images.length})
       </h2>
       {product.images.length > 0 && (
@@ -425,19 +425,19 @@ function ImagesPanel({
               />
               <div className="absolute left-1 top-1 flex flex-col gap-0.5">
                 {img.isPrimary && (
-                  <span className="rounded bg-neutral-900 px-1.5 py-0.5 text-[9px] font-medium uppercase text-white">
+                  <span className="rounded bg-primary px-1.5 py-0.5 text-[9px] font-medium uppercase text-primary-fg">
                     Primary
                   </span>
                 )}
                 {img.isAiGenerated && (
-                  <span className="rounded bg-purple-600 px-1.5 py-0.5 text-[9px] font-medium uppercase text-white">
+                  <span className="rounded bg-purple-600 px-1.5 py-0.5 text-[9px] font-medium uppercase text-primary-fg">
                     AI
                   </span>
                 )}
               </div>
               <button
                 onClick={() => onDelete(img.id)}
-                className="absolute right-1 top-1 rounded bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-red-700 hover:bg-white"
+                className="absolute right-1 top-1 rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-medium text-red-700 hover:bg-surface"
               >
                 ✕
               </button>
@@ -445,7 +445,7 @@ function ImagesPanel({
           ))}
         </ul>
       )}
-      <form onSubmit={onAdd} className="space-y-3 border-t border-neutral-200 pt-4">
+      <form onSubmit={onAdd} className="space-y-3 border-t border-line pt-4">
         <div>
           <label className={adminLabel}>Image URL</label>
           <input
@@ -538,7 +538,7 @@ function VariantsPanel({
 
   return (
     <div className={adminCard}>
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-soft">
         Variants ({product.variants.length})
       </h2>
       {product.variants.length > 0 && (
@@ -546,18 +546,18 @@ function VariantsPanel({
           {product.variants.map((v) => (
             <li
               key={v.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded border border-line px-3 py-2 text-sm"
             >
               <span className="min-w-0 break-words">
                 <strong>{v.color || '—'}</strong>
                 {v.size && ` · ${v.size}`}
                 {v.sku && (
-                  <span className="ml-2 text-xs text-neutral-500">
+                  <span className="ml-2 text-xs text-content-soft">
                     SKU {v.sku}
                   </span>
                 )}
                 {v.isDefault && (
-                  <span className="ml-2 rounded bg-neutral-900 px-1.5 py-0.5 text-[9px] font-medium uppercase text-white">
+                  <span className="ml-2 rounded bg-primary px-1.5 py-0.5 text-[9px] font-medium uppercase text-primary-fg">
                     Default
                   </span>
                 )}
@@ -572,7 +572,7 @@ function VariantsPanel({
           ))}
         </ul>
       )}
-      <form onSubmit={onAdd} className="space-y-3 border-t border-neutral-200 pt-4">
+      <form onSubmit={onAdd} className="space-y-3 border-t border-line pt-4">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div>
             <label className={adminLabel}>Color</label>
@@ -669,7 +669,7 @@ function RetailerListingsPanel({
 
   return (
     <div className={adminCard}>
-      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-content-soft">
         Retailer listings ({product.retailerListings.length})
       </h2>
       {product.retailerListings.length > 0 && (
@@ -677,19 +677,19 @@ function RetailerListingsPanel({
           {product.retailerListings.map((l) => (
             <li
               key={l.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded border border-neutral-200 px-3 py-2 text-sm"
+              className="flex flex-wrap items-center justify-between gap-2 rounded border border-line px-3 py-2 text-sm"
             >
               <div className="min-w-0 break-words">
                 <strong className="capitalize">{l.retailerDisplayName || l.retailer}</strong>
                 {l.rawPrice && <span className="ml-2">₹{l.rawPrice}</span>}
-                <span className="ml-2 text-xs text-neutral-500">
+                <span className="ml-2 text-xs text-content-soft">
                   {l.availabilityStatus.replaceAll('_', ' ').toLowerCase()}
                 </span>
                 <a
                   href={l.retailerProductUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="ml-2 text-xs text-neutral-500 underline"
+                  className="ml-2 text-xs text-content-soft underline"
                 >
                   open
                 </a>
@@ -704,7 +704,7 @@ function RetailerListingsPanel({
           ))}
         </ul>
       )}
-      <form onSubmit={onAdd} className="grid grid-cols-1 gap-3 border-t border-neutral-200 pt-4 md:grid-cols-2">
+      <form onSubmit={onAdd} className="grid grid-cols-1 gap-3 border-t border-line pt-4 md:grid-cols-2">
         <div>
           <label className={adminLabel}>Retailer</label>
           <select

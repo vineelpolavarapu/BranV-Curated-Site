@@ -63,9 +63,9 @@ function MemberLoginPageInner() {
       title="Sign in"
       subtitle="Welcome back. Sign in to your BranV account."
       footer={
-        <span className="text-neutral-600">
+        <span className="text-content-soft">
           New to BranV?{' '}
-          <Link href="/register" className="font-medium text-neutral-900 underline">
+          <Link href="/register" className="font-medium text-content underline">
             Create an account
           </Link>
         </span>
@@ -98,7 +98,7 @@ function MemberLoginPageInner() {
           />
           <Link
             href="/forgot-password"
-            className="mt-2 inline-block text-xs text-neutral-600 hover:text-neutral-900"
+            className="mt-2 inline-block text-xs text-content-soft hover:text-primary"
           >
             Forgot password?
           </Link>
@@ -121,7 +121,7 @@ function MemberLoginPageInner() {
           </div>
         )}
         {error && (
-          <p className="text-sm text-red-600" role="alert">{error}</p>
+          <p className="text-sm text-danger" role="alert">{error}</p>
         )}
         <button
           type="submit"

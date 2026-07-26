@@ -36,7 +36,7 @@ export default async function ArticlesIndexPage(props: {
           <h1 className="bv-enter text-3xl font-semibold tracking-tight md:text-4xl">
             Articles
           </h1>
-          <p className="bv-enter-fade bv-delay-1 mt-1 text-sm text-neutral-600">
+          <p className="bv-enter-fade bv-delay-1 mt-1 text-sm text-content-soft">
             {tag
               ? `Showing articles tagged "${tag}"`
               : 'Editorial, opinionated, and AI-illustrated.'}
@@ -46,7 +46,7 @@ export default async function ArticlesIndexPage(props: {
 
       <section className="mx-auto max-w-7xl px-6 pb-16">
         {!list || list.data.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+          <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
             No articles yet.
           </div>
         ) : (
@@ -67,10 +67,10 @@ export default async function ArticlesIndexPage(props: {
 
 function ArticleCard({ article }: { article: ArticleSummary }) {
   return (
-    <article className="group flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.08)] rounded-xl p-3 bg-white border border-transparent hover:border-neutral-100">
+    <article className="group flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.08)] rounded-xl p-3 bg-surface border border-transparent hover:border-neutral-100">
       <Link
         href={`/articles/${article.slug}`}
-        className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-neutral-100"
+        className="relative block aspect-[16/10] w-full overflow-hidden rounded-lg bg-surface-muted"
       >
         {article.heroUrl ? (
           <Image
@@ -82,7 +82,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
             className="object-cover transition-transform duration-400 ease-in-out group-hover:scale-[1.05]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-neutral-300">
+          <div className="flex h-full w-full items-center justify-center text-content-muted">
             no hero
           </div>
         )}
@@ -94,7 +94,7 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
               <Link
                 key={t}
                 href={`/articles?tag=${encodeURIComponent(t)}`}
-                className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-700 hover:bg-neutral-200"
+                className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-content-soft hover:bg-line"
               >
                 {t}
               </Link>
@@ -103,16 +103,16 @@ function ArticleCard({ article }: { article: ArticleSummary }) {
         )}
         <Link
           href={`/articles/${article.slug}`}
-          className="text-lg font-semibold leading-snug tracking-tight text-neutral-900 underline decoration-transparent hover:decoration-neutral-900 underline-offset-4 transition-[text-decoration-color] duration-200"
+          className="text-lg font-semibold leading-snug tracking-tight text-content underline decoration-transparent hover:decoration-neutral-900 underline-offset-4 transition-[text-decoration-color] duration-200"
         >
           {article.title}
         </Link>
         {article.excerpt && (
-          <p className="mt-2 line-clamp-3 text-sm text-neutral-600">
+          <p className="mt-2 line-clamp-3 text-sm text-content-soft">
             {article.excerpt}
           </p>
         )}
-        <p className="mt-3 text-xs text-neutral-500 opacity-70 transition-opacity duration-200 group-hover:opacity-100">
+        <p className="mt-3 text-xs text-content-soft opacity-70 transition-opacity duration-200 group-hover:opacity-100">
           {article.publishedAt &&
             new Date(article.publishedAt).toLocaleDateString(undefined, {
               year: 'numeric',

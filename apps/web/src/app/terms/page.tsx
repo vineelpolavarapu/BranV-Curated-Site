@@ -68,13 +68,13 @@ export default function TermsPage() {
     <StorefrontShell>
       <section className="mx-auto max-w-3xl px-6 py-10 md:py-14">
         <AnimateOnScroll>
-          <p className="bv-enter-fade text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
+          <p className="bv-enter-fade text-xs font-medium uppercase tracking-[0.18em] text-content-soft">
             Legal
           </p>
           <h1 className="bv-enter mt-2 text-3xl font-semibold tracking-tight md:text-4xl">
             Terms &amp; Conditions
           </h1>
-          <p className="bv-enter-fade mt-3 text-sm text-neutral-500">
+          <p className="bv-enter-fade mt-3 text-sm text-content-soft">
             Last updated {new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </AnimateOnScroll>
@@ -83,12 +83,12 @@ export default function TermsPage() {
           {SECTIONS.map((s, i) => (
             <AnimateOnScroll key={s.heading}>
               <div className={`bv-enter bv-delay-${Math.min(i + 1, 7)}`}>
-                <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
+                <h2 className="text-lg font-semibold tracking-tight text-content">
                   {s.heading}
                 </h2>
                 <div className="mt-2 space-y-3">
                   {s.body.map((p, pi) => (
-                    <p key={pi} className="text-sm leading-relaxed text-neutral-700">
+                    <p key={pi} className="text-sm leading-relaxed text-content-soft">
                       {p}
                     </p>
                   ))}
@@ -98,13 +98,13 @@ export default function TermsPage() {
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl border border-neutral-200 bg-neutral-50 p-6 text-sm text-neutral-600">
+        <div className="mt-12 rounded-2xl border border-line bg-surface-muted p-6 text-sm text-content-soft">
           Still have questions?{' '}
-          <Link href="/help" className="font-medium text-neutral-900 underline underline-offset-2">
+          <Link href="/help" className="font-medium text-content underline underline-offset-2">
             Visit the Help Center
           </Link>{' '}
           or check our{' '}
-          <Link href="/account" className="font-medium text-neutral-900 underline underline-offset-2">
+          <Link href="/account" className="font-medium text-content underline underline-offset-2">
             account settings
           </Link>
           .

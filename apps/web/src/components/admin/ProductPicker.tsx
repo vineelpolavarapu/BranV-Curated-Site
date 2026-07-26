@@ -53,19 +53,19 @@ export function ProductPicker({ open, onClose, onPick }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-24"
+      className="fixed inset-0 z-50 flex items-start justify-center bg-content/40 p-4 pt-24"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl">
-        <header className="flex items-center justify-between border-b border-neutral-200 px-5 py-3">
+      <div className="w-full max-w-2xl overflow-hidden rounded-2xl bg-surface shadow-2xl">
+        <header className="flex items-center justify-between border-b border-line px-5 py-3">
           <h2 className="text-sm font-semibold">Insert product embed</h2>
           <button
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-900"
+            className="text-content-muted hover:text-primary"
           >
             ✕
           </button>
@@ -81,10 +81,10 @@ export function ProductPicker({ open, onClose, onPick }: Props) {
           />
           <div className="mt-4 max-h-80 overflow-auto">
             {loading && (
-              <p className="text-sm text-neutral-500">Searching…</p>
+              <p className="text-sm text-content-soft">Searching…</p>
             )}
             {!loading && search.trim() && results.length === 0 && (
-              <p className="text-sm text-neutral-500">No matches.</p>
+              <p className="text-sm text-content-soft">No matches.</p>
             )}
             <ul className="space-y-1">
               {results.map((p) => {
@@ -94,7 +94,7 @@ export function ProductPicker({ open, onClose, onPick }: Props) {
                     <button
                       type="button"
                       onClick={() => onPick({ slug: p.slug, title: p.title })}
-                      className="flex w-full items-center gap-3 rounded-md border border-transparent px-2 py-2 text-left hover:border-neutral-300 hover:bg-neutral-50"
+                      className="flex w-full items-center gap-3 rounded-md border border-transparent px-2 py-2 text-left hover:border-primary/40 hover:bg-surface-muted"
                     >
                       {img ? (
                         <Image
@@ -106,15 +106,15 @@ export function ProductPicker({ open, onClose, onPick }: Props) {
                           className="h-12 w-9 rounded object-cover"
                         />
                       ) : (
-                        <div className="h-12 w-9 rounded bg-neutral-200" />
+                        <div className="h-12 w-9 rounded bg-line" />
                       )}
                       <div className="flex-1">
                         <p className="text-sm font-medium">{p.title}</p>
-                        <p className="text-xs text-neutral-500">
+                        <p className="text-xs text-content-soft">
                           {p.brand.name} · /{p.slug}
                         </p>
                       </div>
-                      <span className="text-xs font-medium text-emerald-700">
+                      <span className="text-xs font-medium text-success">
                         Insert
                       </span>
                     </button>
@@ -124,7 +124,7 @@ export function ProductPicker({ open, onClose, onPick }: Props) {
             </ul>
           </div>
         </div>
-        <footer className="flex justify-end gap-2 border-t border-neutral-200 bg-neutral-50 px-5 py-3">
+        <footer className="flex justify-end gap-2 border-t border-line bg-surface-muted px-5 py-3">
           <button
             type="button"
             onClick={onClose}

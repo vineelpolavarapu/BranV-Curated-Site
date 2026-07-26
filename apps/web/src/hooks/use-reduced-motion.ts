@@ -1,26 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+/* Stable import path for the reduced-motion preference (THEME_REDESIGN_PLAN §8).
+   Wraps Framer Motion's hook so every interactive component can gate its
+   animation from one place. Returns `true` when the user prefers reduced motion. */
 
-/**
- * Custom hook to detect if the user has requested reduced motion at the OS or browser level.
- */
-export function useReducedMotion() {
-  const [isReduced, setIsReduced] = useState(false);
+import { useReducedMotion as useFramerReducedMotion } from 'motion/react';
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setIsReduced(mediaQuery.matches);
-
-    const listener = (event: MediaQueryListEvent) => {
-      setIsReduced(event.matches);
-    };
-
-    mediaQuery.addEventListener('change', listener);
-    return () => {
-      mediaQuery.removeEventListener('change', listener);
-    };
-  }, []);
-
-  return isReduced;
+export function useReducedMotion(): boolean {
+  return useFramerReducedMotion() ?? false;
 }

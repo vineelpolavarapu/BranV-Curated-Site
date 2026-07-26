@@ -4,26 +4,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { apiFetch, CurrentUser } from '@/lib/api';
+import { Icon } from './icons';
 
 const MENU_ITEMS = [
   {
     label: 'Account Info',
     href: '/account',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
-        <circle cx="12" cy="8" r="3.5" />
-        <path d="M4.5 20c.8-3.5 4-5.5 7.5-5.5s6.7 2 7.5 5.5" />
-      </svg>
-    ),
+    icon: <Icon.Account size={16} strokeWidth={1.6} aria-hidden />,
   },
   {
     label: 'Wishlist',
     href: '/wishlist',
-    icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-        <path d="M12 21s-7-4.5-9-9.5C1 6 6 3 9 6c1 1 3 2 3 2s2-1 3-2c3-3 8 0 6 5.5C19 16.5 12 21 12 21z" />
-      </svg>
-    ),
+    icon: <Icon.Wishlist size={16} strokeWidth={1.6} aria-hidden />,
   },
 ];
 
@@ -77,24 +69,24 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
     : null;
 
   const triggerClasses = overlay
-    ? 'border-white/50 text-white hover:bg-white/10'
-    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100';
+    ? 'border-primary-fg/50 text-primary-fg hover:bg-primary-fg/10'
+    : 'border-line text-content-soft hover:bg-surface-muted';
 
   const panelClasses = overlay
-    ? 'border border-white/40 bg-transparent'
-    : 'border border-neutral-200 bg-white shadow-2xl';
+    ? 'border border-primary-fg/40 bg-transparent'
+    : 'border border-line bg-surface shadow-2xl';
 
-  const nameClasses = overlay ? 'text-white' : 'text-neutral-900';
-  const emailClasses = overlay ? 'text-white/60' : 'text-neutral-500';
-  const dividerClasses = overlay ? 'border-white/20' : 'border-neutral-100';
+  const nameClasses = overlay ? 'text-primary-fg' : 'text-content';
+  const emailClasses = overlay ? 'text-primary-fg/60' : 'text-content-soft';
+  const dividerClasses = overlay ? 'border-primary-fg/20' : 'border-line';
   const itemClasses = overlay
-    ? 'text-white hover:bg-white/10'
-    : 'text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900';
-  const iconClasses = overlay ? 'text-white/50' : 'text-neutral-400';
-  const skeletonClasses = overlay ? 'bg-white/20' : 'bg-neutral-200';
+    ? 'text-primary-fg hover:bg-primary-fg/10'
+    : 'text-content-soft hover:bg-surface-muted hover:text-content';
+  const iconClasses = overlay ? 'text-primary-fg/50' : 'text-content-muted';
+  const skeletonClasses = overlay ? 'bg-primary-fg/20' : 'bg-line';
   const signOutClasses = overlay
-    ? 'text-red-300 hover:bg-white/10'
-    : 'text-red-600 hover:bg-red-50';
+    ? 'text-red-300 hover:bg-primary-fg/10'
+    : 'text-danger hover:bg-red-50';
 
   return (
     <div ref={ref} className="relative">
@@ -104,10 +96,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
         aria-expanded={open}
         className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${triggerClasses}`}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M4.5 20c.8-3.5 4-5.5 7.5-5.5s6.7 2 7.5 5.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
+        <Icon.Account size={20} strokeWidth={1.6} aria-hidden />
       </button>
 
       {open && (
@@ -115,7 +104,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
           {/* User info */}
           <div className="flex items-center gap-3 px-4 py-3.5">
             {initials ? (
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold tracking-wide ${overlay ? 'bg-white/20 text-white' : 'bg-neutral-900 text-white'}`}>
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold tracking-wide ${overlay ? 'bg-primary-fg/20 text-primary-fg' : 'bg-primary text-primary-fg'}`}>
                 {initials}
               </div>
             ) : (
@@ -158,11 +147,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
               onClick={onSignOut}
               className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition ${signOutClasses}`}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
+              <Icon.Logout size={16} strokeWidth={1.6} aria-hidden />
               Sign out
             </button>
           </div>

@@ -66,35 +66,73 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   }, [lastScrollY]);
 
   const headerBaseClasses = overlay
-    ? 'fixed inset-x-0 top-0 z-30 text-white transition-all duration-300 ease-out'
-    : 'sticky top-0 z-30 border-b border-neutral-200 bg-white/95 text-neutral-700 backdrop-blur transition-all duration-300 ease-out';
+    ? 'fixed inset-x-0 top-0 z-30 text-primary-fg transition-all duration-300 ease-out'
+    : 'sticky top-0 z-30 border-b border-line bg-surface/95 text-content-soft backdrop-blur transition-all duration-300 ease-out';
 
   const visibilityClasses = visible
     ? 'translate-y-0 opacity-100'
     : '-translate-y-full opacity-0 pointer-events-none';
 
-  const linkHoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
+  const linkHoverClass = overlay ? 'hover:text-primary-fg/70' : 'hover:text-primary';
 
   return (
     <header className={`${headerBaseClasses} ${visibilityClasses}`}>
-      <div className="flex w-full items-center px-4 py-4 lg:pl-0 lg:pr-6">
-        <Link href="/" className="bv-nav-logo inline-flex items-center gap-0 text-l font-semibold tracking-tight leading-none">
-          <img src="/hero/logo.png" alt="BranV" className="h-10 w-10 object-contain translate-y-1" />
-          <span>BranV</span>
+      {/* Top Header Row */}
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 lg:py-4">
+        {/* Mobile Drawer Trigger (Mobile Only) */}
+        <div className="lg:hidden">
+          <MobileNavDrawer overlay={overlay} />
+        </div>
+
+        {/* Brand Logo */}
+        <Link href="/" className="bv-nav-logo inline-flex flex-col items-center user-select-none">
+          <div className="font-heading text-2xl font-extrabold tracking-tight leading-none text-content">
+            Bran<span className="text-primary">V</span>
+          </div>
+          <div className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.22em] text-content">
+            ALL FOR MEN
+          </div>
         </Link>
-        <nav className="bv-nav-links hidden items-center gap-6 text-sm font-medium lg:flex ml-12">
+
+        {/* Desktop Navigation Links (Desktop Only) */}
+        <nav className="bv-nav-links hidden items-center gap-7 text-sm font-semibold lg:flex">
           <ShopMegaMenu overlay={overlay} />
-          <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New</Link>
+          <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New Arrivals</Link>
           <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
           <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
         </nav>
-        <div className="bv-nav-actions ml-auto flex items-center gap-3">
-          <SearchBox overlay={overlay} />
+
+        {/* Header Action Buttons (Desktop Search + Badges) */}
+        <div className="bv-nav-actions flex items-center gap-3">
+          {/* Desktop SearchBox (Desktop Only) */}
+          <div className="hidden w-72 xl:w-96 lg:block">
+            <SearchBox overlay={overlay} />
+          </div>
+
+          {/* Wishlist Icon Button with Badge */}
+          <Link
+            href="/wishlist"
+            className="relative flex h-9 w-9 items-center justify-center rounded-full text-content hover:bg-surface-muted transition-colors"
+            aria-label="Wishlist"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span className="absolute -top-1 -right-1 grid h-4.5 w-4.5 place-items-center rounded-full bg-accent text-[10px] font-bold text-white shadow-sm">
+              3
+            </span>
+          </Link>
+
+          {/* Account Popup (Desktop) */}
           <div className="hidden lg:block">
             <AccountPopup overlay={overlay} />
           </div>
-          <MobileNavDrawer overlay={overlay} />
         </div>
+      </div>
+
+      {/* Dedicated Mobile Search Row (Mobile Only — Resolves Logo Collision Bug) */}
+      <div className="px-4 pb-3 lg:hidden">
+        <SearchBox overlay={overlay} />
       </div>
     </header>
   );
@@ -117,16 +155,16 @@ function ChevronRight() {
 }
 
 function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
-  const hoverClass = overlay ? 'hover:text-white/70' : 'hover:text-neutral-950';
+  const hoverClass = overlay ? 'hover:text-primary-fg/70' : 'hover:text-primary';
   const panelClasses = overlay
-    ? 'rounded-xl border border-white/20 bg-black/50 p-2 backdrop-blur-md'
-    : 'rounded-xl border border-neutral-200 bg-white p-2 shadow-xl';
+    ? 'rounded-xl border border-white/20 bg-content/50 p-2 backdrop-blur-md'
+    : 'rounded-xl border border-line bg-surface p-2 shadow-xl';
   const itemClasses = overlay
-    ? 'flex w-full items-center justify-between gap-6 whitespace-nowrap rounded-md px-3 py-1.5 text-sm text-white hover:bg-white/10'
-    : 'flex w-full items-center justify-between gap-6 whitespace-nowrap rounded-md px-3 py-1.5 text-sm hover:bg-neutral-100';
+    ? 'flex w-full items-center justify-between gap-6 whitespace-nowrap rounded-md px-3 py-1.5 text-sm text-primary-fg hover:bg-primary-fg/10'
+    : 'flex w-full items-center justify-between gap-6 whitespace-nowrap rounded-md px-3 py-1.5 text-sm hover:bg-surface-muted';
   const subItemClasses = overlay
-    ? 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm text-white transition-colors duration-150 hover:bg-white/10'
-    : 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors duration-150 hover:bg-neutral-100';
+    ? 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm text-primary-fg transition-colors duration-150 hover:bg-primary-fg/10'
+    : 'block whitespace-nowrap rounded-md px-3 py-1.5 text-sm transition-colors duration-150 hover:bg-surface-muted';
 
   return (
     <div className="group relative">
@@ -187,26 +225,33 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
 function SiteFooter() {
   return (
     <AnimateOnScroll>
-      <footer className="mt-20 border-t border-neutral-200 bg-neutral-50">
-        <div className="mx-auto max-w-7xl gap-10 px-6 py-10 text-sm text-neutral-600 md:grid md:grid-cols-[1.5fr_1fr]">
+      <footer className="mt-20 border-t border-slate-200 bg-[#F0F7FF]/60">
+        <div className="mx-auto max-w-7xl gap-10 px-6 py-12 text-sm text-slate-600 md:grid md:grid-cols-[1.5fr_1fr]">
           <div className="bv-enter">
-            <p className="mb-3 font-medium text-neutral-900">BranV</p>
-            <p className="max-w-2xl text-xs leading-relaxed">
+            <div className="mb-4 inline-flex flex-col items-start user-select-none">
+              <div className="font-heading text-xl font-extrabold tracking-tight text-slate-900">
+                Bran<span className="text-primary">V</span>
+              </div>
+              <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.22em] text-slate-500">
+                ALL FOR MEN
+              </div>
+            </div>
+            <p className="max-w-xl text-xs leading-relaxed text-slate-500">
               BranV is a curated affiliate platform. We never hold inventory, never
               process payments, never fulfill orders. When you click Buy Now, you
               are redirected to the retailer&apos;s site to complete your purchase.{' '}
-              <strong>We earn a small commission on qualifying sales, at no extra cost to you.</strong>
+              <strong className="font-semibold text-slate-700">We earn a small commission on qualifying sales, at no extra cost to you.</strong>
             </p>
-            <p className="mt-6 text-xs text-neutral-400">
+            <p className="mt-6 text-xs font-medium text-slate-400">
               © {new Date().getFullYear()} BranV. All rights reserved.
             </p>
           </div>
           <div className="bv-enter bv-delay-2 mt-8 md:mt-0">
-            <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-700">
+            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">
               Newsletter
             </p>
-            <p className="mb-3 text-xs text-neutral-600">
-              Weekly digest of new arrivals and articles.
+            <p className="mb-4 text-xs font-medium text-slate-500">
+              Weekly digest of curated new arrivals and style guides.
             </p>
             <NewsletterSignup source="footer" />
           </div>

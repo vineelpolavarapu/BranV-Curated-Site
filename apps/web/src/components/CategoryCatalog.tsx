@@ -63,15 +63,15 @@ function CategoryHeader({
   return (
     <AnimateOnScroll>
       <section className="mx-auto max-w-7xl px-6 pt-8">
-        <nav className="bv-enter-fade mb-2 text-xs text-neutral-500">
-          <Link href="/" className="hover:text-neutral-900">Home</Link>
+        <nav className="bv-enter-fade mb-2 text-xs text-content-soft">
+          <Link href="/" className="hover:text-primary">Home</Link>
           <span className="mx-2">/</span>
-          <span className="text-neutral-900">{category.name}</span>
+          <span className="text-content">{category.name}</span>
         </nav>
         <h1 className="bv-enter bv-delay-1 text-3xl font-semibold tracking-tight md:text-4xl">
           {category.name}
         </h1>
-        <p className="bv-enter-fade bv-delay-2 mt-1 text-sm text-neutral-600">
+        <p className="bv-enter-fade bv-delay-2 mt-1 text-sm text-content-soft">
           {total} {total === 1 ? 'product' : 'products'}
         </p>
         {category.children.length > 0 && (
@@ -115,7 +115,7 @@ function ListingShell({
         </AnimateOnScroll>
         <div>
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-content-soft">
               {list?.total ?? 0} results
             </p>
             <SortPicker />

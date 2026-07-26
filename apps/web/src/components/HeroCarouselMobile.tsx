@@ -239,7 +239,7 @@ export function HeroCarouselMobile() {
     <section
       aria-roledescription="carousel"
       aria-label="Featured collections"
-      className="relative h-[100svh] min-h-[480px] w-full touch-pan-y select-none overflow-hidden bg-neutral-900"
+      className="relative h-[100svh] min-h-[480px] w-full touch-pan-y select-none overflow-hidden bg-slate-950"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={endPointerDrag}
@@ -279,26 +279,28 @@ export function HeroCarouselMobile() {
                 className="absolute inset-0 h-full w-full select-none object-cover"
                 src={slide.imageUrl}
               />
-              <div className="absolute inset-x-0 bottom-0 px-5 pb-16">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 px-6 pb-20">
                 <div className={`text-white hero-slide-text ${
                   i - 1 === realIndex ? 'hero-slide-active' : ''
                 }`}>
-                  
-                  <h2 className="text-3xl font-semibold tracking-tight md:text-4xl lg:text-5xl">
+                  <h2 className="font-heading text-4xl font-extrabold tracking-tight leading-tight">
                     {slide.headline}
                   </h2>
                   {slide.subtext && (
-                    <p className="mt-3 text-sm leading-relaxed opacity-90 md:text-base md:max-w-lg">
+                    <p className="mt-3 text-sm font-normal leading-relaxed text-slate-200">
                       {slide.subtext}
                     </p>
                   )}
-                  <Link
-                    href={slide.ctaHref}
-                    tabIndex={isClone ? -1 : 0}
-                    className="mt-6 inline-flex items-center justify-center rounded-full border border-white px-6 py-2.5 text-xs font-medium uppercase tracking-[0.18em] text-white transition hover:bg-white hover:text-neutral-900"
-                  >
-                    {slide.ctaLabel}
-                  </Link>
+                  <div className="mt-6">
+                    <Link
+                      href={slide.ctaHref}
+                      tabIndex={isClone ? -1 : 0}
+                      className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3 text-xs font-extrabold uppercase tracking-[0.18em] text-primary shadow-lg transition-all duration-300 hover:bg-primary hover:text-white active:scale-95"
+                    >
+                      {slide.ctaLabel}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -309,7 +311,7 @@ export function HeroCarouselMobile() {
       <div
         role="tablist"
         aria-label="Select slide"
-        className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2"
+        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-2 z-20"
       >
         {SLIDES.map((s, i) => (
           <button
@@ -319,8 +321,8 @@ export function HeroCarouselMobile() {
             aria-selected={i === realIndex}
             aria-label={`Show slide ${i + 1}: ${s.headline}`}
             onClick={() => goTo(i)}
-            className={`h-1.5 rounded-full transition-all ${
-              i === realIndex ? 'w-8 bg-white' : 'w-4 bg-white/40'
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === realIndex ? 'w-8 bg-white shadow-sm' : 'w-2.5 bg-white/40'
             }`}
           />
         ))}

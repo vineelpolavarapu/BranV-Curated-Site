@@ -53,10 +53,10 @@ export default function AccountPage() {
     return (
       <StorefrontShell>
         <div className="mx-auto max-w-5xl px-6 py-16">
-          <div className="h-8 w-56 animate-pulse rounded bg-neutral-200" />
+          <div className="h-8 w-56 animate-pulse rounded bg-line" />
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-28 animate-pulse rounded-xl bg-neutral-100" />
+              <div key={i} className="h-28 animate-pulse rounded-xl bg-surface-muted" />
             ))}
           </div>
         </div>
@@ -80,25 +80,25 @@ export default function AccountPage() {
   return (
     <StorefrontShell>
       <section className="mx-auto max-w-5xl px-6 py-8 md:py-12">
-        {/* Profile header */}
+        {/* Profile header card */}
         <AnimateOnScroll>
-          <div className="bv-enter flex flex-col items-start justify-between gap-6 rounded-2xl border border-neutral-200 bg-white p-6 sm:flex-row sm:items-center md:p-8">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-neutral-900 text-xl font-semibold tracking-wide text-white md:h-20 md:w-20 md:text-2xl">
+          <div className="bv-enter flex flex-col items-start justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-center md:p-8 shadow-sm">
+            <div className="flex items-center gap-5">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-extrabold tracking-wide text-white shadow-md md:h-20 md:w-20 md:text-2xl">
                 {initials}
               </div>
               <div className="min-w-0">
-                <h1 className="truncate text-2xl font-semibold tracking-tight md:text-3xl">
+                <h1 className="truncate font-heading text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
                   {displayName}
                 </h1>
-                <p className="truncate text-sm text-neutral-500">{me.email}</p>
-                <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-neutral-400">
+                <p className="truncate text-sm font-medium text-slate-500">{me.email}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2.5">
+                  <span className="text-xs font-medium text-slate-400">
                     Member since {memberSince}
                   </span>
                   {!me.emailVerified && (
-                    <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
-                      Email unverified
+                    <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 border border-amber-200">
+                      EMAIL UNVERIFIED
                     </span>
                   )}
                 </div>
@@ -106,7 +106,7 @@ export default function AccountPage() {
             </div>
             <button
               onClick={onLogout}
-              className="w-full shrink-0 rounded-md border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50 sm:w-auto"
+              className="w-full shrink-0 rounded-full border border-slate-200 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-700 transition hover:bg-slate-50 hover:border-slate-300 sm:w-auto"
             >
               Sign out
             </button>
@@ -142,11 +142,11 @@ export default function AccountPage() {
         {/* Recently viewed */}
         <AnimateOnScroll>
           <div className="bv-enter mt-10">
-            <h2 className="mb-4 text-lg font-semibold tracking-tight text-neutral-900">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-content">
               Recently viewed
             </h2>
             {recentlyViewed.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-8 text-center text-sm text-neutral-600">
+              <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-8 text-center text-sm text-content-soft">
                 Products you view will show up here.
               </div>
             ) : (
@@ -154,7 +154,7 @@ export default function AccountPage() {
                 {recentlyViewed.map((item) => (
                   <li key={item.slug} className="w-32 shrink-0 sm:w-auto">
                     <Link href={`/products/${item.slug}`} className="group block">
-                      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-neutral-100">
+                      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-muted">
                         {item.imageUrl ? (
                           <Image
                             src={item.imageUrl}
@@ -165,14 +165,14 @@ export default function AccountPage() {
                             className="object-cover transition-transform duration-200 group-hover:scale-105"
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center text-xs text-neutral-300">
+                          <div className="flex h-full w-full items-center justify-center text-xs text-content-muted">
                             no image
                           </div>
                         )}
                       </div>
-                      <p className="mt-2 truncate text-xs text-neutral-500">{item.brandName}</p>
-                      <p className="truncate text-sm font-medium text-neutral-900">{item.title}</p>
-                      <p className="text-sm font-semibold text-neutral-900">
+                      <p className="mt-2 truncate text-xs text-content-soft">{item.brandName}</p>
+                      <p className="truncate text-sm font-medium text-content">{item.title}</p>
+                      <p className="text-sm font-semibold text-content">
                         ₹{formatINR(item.price)}
                       </p>
                     </Link>
@@ -186,7 +186,7 @@ export default function AccountPage() {
         {/* Help & legal */}
         <AnimateOnScroll>
           <div className="bv-enter mt-10">
-            <h2 className="mb-4 text-lg font-semibold tracking-tight text-neutral-900">
+            <h2 className="mb-4 text-lg font-semibold tracking-tight text-content">
               Support
             </h2>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -199,7 +199,7 @@ export default function AccountPage() {
         {/* Affiliate disclosure */}
         {disclosure && (
           <AnimateOnScroll>
-            <div className="bv-enter-fade mt-8 rounded-xl border border-neutral-200 bg-neutral-50 p-5 text-xs leading-relaxed text-neutral-600">
+            <div className="bv-enter-fade mt-8 rounded-xl border border-line bg-surface-muted p-5 text-xs leading-relaxed text-content-soft">
               {disclosure}
             </div>
           </AnimateOnScroll>
@@ -227,22 +227,22 @@ function NavCard({
   return (
     <Link
       href={href}
-      className={`bv-enter${delay ? ` bv-delay-${Math.min(delay, 7)}` : ''} group flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-4 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-neutral-400 hover:shadow-md ${
+      className={`bv-enter${delay ? ` bv-delay-${Math.min(delay, 7)}` : ''} group flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-white p-4.5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary hover:shadow-md ${
         wide ? 'justify-between' : 'flex-col text-center sm:flex-row sm:text-left'
       }`}
     >
-      <span className="flex items-center gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-700 transition-colors group-hover:bg-neutral-900 group-hover:text-white">
+      <span className="flex items-center gap-3.5">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
           <Icon className="h-5 w-5" />
         </span>
         <span className="flex flex-col">
-          <span className="text-sm font-medium text-neutral-900">{label}</span>
+          <span className="font-heading text-sm font-bold text-slate-800 group-hover:text-primary transition-colors">{label}</span>
           {value !== undefined && (
-            <span className="text-xs text-neutral-500">{value} saved</span>
+            <span className="text-xs font-medium text-slate-500">{value} saved</span>
           )}
         </span>
       </span>
-      <ChevronRightIcon className="hidden h-4 w-4 shrink-0 text-neutral-300 transition-transform group-hover:translate-x-0.5 group-hover:text-neutral-500 sm:block" />
+      <ChevronRightIcon className="hidden h-4 w-4 shrink-0 text-slate-400 transition-transform group-hover:translate-x-0.5 group-hover:text-primary sm:block" />
     </Link>
   );
 }

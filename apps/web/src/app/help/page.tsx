@@ -114,28 +114,28 @@ export default function HelpCenterPage() {
   return (
     <StorefrontShell>
       {/* Hero */}
-      <section className="border-b border-neutral-200 bg-neutral-50">
+      <section className="border-b border-line bg-surface-muted">
         <div className="mx-auto max-w-3xl px-6 py-14 text-center md:py-20">
           <AnimateOnScroll>
-            <p className="bv-enter-fade text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
+            <p className="bv-enter-fade text-xs font-medium uppercase tracking-[0.18em] text-content-soft">
               Help Center
             </p>
             <h1 className="bv-enter mt-2 text-3xl font-semibold tracking-tight md:text-5xl">
               How can we help?
             </h1>
-            <p className="bv-enter-fade mt-3 text-sm text-neutral-600 md:text-base">
+            <p className="bv-enter-fade mt-3 text-sm text-content-soft md:text-base">
               Search our FAQs, or browse by topic below.
             </p>
 
             <div className="bv-enter-fade mx-auto mt-7 max-w-lg">
               <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-content-muted" />
                 <input
                   type="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search for a topic, e.g. “returns” or “price drop”"
-                  className="w-full rounded-full border border-neutral-300 bg-white py-3 pl-11 pr-4 text-sm outline-none transition focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900"
+                  className="w-full rounded-full border border-line bg-surface py-3 pl-11 pr-4 text-sm outline-none transition focus:border-primary focus:ring-1 focus:ring-primary"
                 />
               </div>
             </div>
@@ -151,10 +151,10 @@ export default function HelpCenterPage() {
               <a
                 key={cat.key}
                 href={`#${cat.key}`}
-                className={`bv-enter bv-delay-${Math.min(i + 1, 7)} group flex flex-col items-center gap-2 rounded-xl border border-neutral-200 bg-white p-5 text-center transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-neutral-400 hover:shadow-md`}
+                className={`bv-enter bv-delay-${Math.min(i + 1, 7)} group flex flex-col items-center gap-2 rounded-xl border border-line bg-surface p-5 text-center transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md`}
               >
-                <cat.icon className="h-6 w-6 text-neutral-700 transition-colors group-hover:text-neutral-900" />
-                <span className="text-sm font-medium text-neutral-900">{cat.label}</span>
+                <cat.icon className="h-6 w-6 text-content-soft transition-colors group-hover:text-primary" />
+                <span className="text-sm font-medium text-content">{cat.label}</span>
               </a>
             ))}
           </div>
@@ -164,7 +164,7 @@ export default function HelpCenterPage() {
       {/* FAQ list */}
       <section className="mx-auto max-w-3xl px-6 pb-16">
         {filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-600">
+          <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
             No results for “{query}”. Try a different search, or contact us below.
           </div>
         ) : (
@@ -172,12 +172,12 @@ export default function HelpCenterPage() {
             {filtered.map((cat) => (
               <div key={cat.key} id={cat.key} className="scroll-mt-24">
                 <div className="mb-3 flex items-center gap-2">
-                  <cat.icon className="h-5 w-5 text-neutral-500" />
-                  <h2 className="text-lg font-semibold tracking-tight text-neutral-900">
+                  <cat.icon className="h-5 w-5 text-content-soft" />
+                  <h2 className="text-lg font-semibold tracking-tight text-content">
                     {cat.label}
                   </h2>
                 </div>
-                <div className="divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white">
+                <div className="divide-y divide-line rounded-xl border border-line bg-surface">
                   {cat.items.map((item) => {
                     const itemKey = `${cat.key}::${item.q}`;
                     const open = openKey === itemKey;
@@ -189,9 +189,9 @@ export default function HelpCenterPage() {
                           aria-expanded={open}
                           className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
                         >
-                          <span className="text-sm font-medium text-neutral-900">{item.q}</span>
+                          <span className="text-sm font-medium text-content">{item.q}</span>
                           <ChevronIcon
-                            className={`h-4 w-4 shrink-0 text-neutral-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+                            className={`h-4 w-4 shrink-0 text-content-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
                           />
                         </button>
                         <div
@@ -200,7 +200,7 @@ export default function HelpCenterPage() {
                           }`}
                         >
                           <div className="overflow-hidden">
-                            <p className="px-5 pb-4 text-sm leading-relaxed text-neutral-600">
+                            <p className="px-5 pb-4 text-sm leading-relaxed text-content-soft">
                               {item.a}
                             </p>
                           </div>
@@ -216,23 +216,23 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Contact */}
-      <section className="border-t border-neutral-200 bg-neutral-50">
+      <section className="border-t border-line bg-surface-muted">
         <div className="mx-auto max-w-3xl px-6 py-14 text-center">
           <AnimateOnScroll>
             <h2 className="bv-enter text-xl font-semibold tracking-tight">Still need help?</h2>
-            <p className="bv-enter-fade mt-2 text-sm text-neutral-600">
+            <p className="bv-enter-fade mt-2 text-sm text-content-soft">
               Our team is happy to help with anything not covered above.
             </p>
             <div className="bv-enter mt-6 flex flex-wrap items-center justify-center gap-3">
               <a
                 href="mailto:hello@branv.in"
-                className="rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
+                className="rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-fg transition hover:bg-primary-hover"
               >
                 Email hello@branv.in
               </a>
               <Link
                 href="/terms"
-                className="rounded-md border border-neutral-300 bg-white px-5 py-2.5 text-sm font-medium text-neutral-900 transition hover:bg-neutral-100"
+                className="rounded-md border border-line bg-surface px-5 py-2.5 text-sm font-medium text-content transition hover:bg-surface-muted"
               >
                 Read Terms &amp; Conditions
               </Link>

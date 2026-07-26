@@ -40,8 +40,8 @@ function NavLinks({
             onClick={onNavigate}
             className={`block rounded-md px-3 py-2 text-sm font-medium ${
               active
-                ? 'bg-neutral-900 text-white'
-                : 'text-neutral-700 hover:bg-neutral-100'
+                ? 'bg-primary text-primary-fg'
+                : 'text-content-soft hover:bg-surface-muted'
             }`}
           >
             {item.label}
@@ -85,21 +85,21 @@ function MobileDrawer({
     <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40"
+        className="absolute inset-0 bg-content/40"
         onClick={onClose}
       />
       {/* Drawer panel */}
-      <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-white shadow-xl">
+      <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col bg-surface shadow-xl">
         {/* Drawer header */}
-        <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-content-soft">
               BranV Admin
             </p>
             <Link
               href="/admin"
               onClick={onClose}
-              className="text-base font-semibold tracking-tight text-neutral-900"
+              className="text-base font-semibold tracking-tight text-content"
             >
               Console
             </Link>
@@ -108,7 +108,7 @@ function MobileDrawer({
             type="button"
             aria-label="Close menu"
             onClick={onClose}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-100"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-content-soft hover:bg-surface-muted"
           >
             <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden fill="none">
               <path
@@ -128,18 +128,18 @@ function MobileDrawer({
         </div>
 
         {/* Account section at bottom */}
-        <div className="border-t border-neutral-200 px-4 py-4">
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-500">
+        <div className="border-t border-line px-4 py-4">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-content-soft">
             Account
           </p>
-          <p className="mb-3 truncate text-sm text-neutral-700">{email}</p>
+          <p className="mb-3 truncate text-sm text-content-soft">{email}</p>
           <button
             type="button"
             onClick={() => {
               onClose();
               onLogout();
             }}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-100"
+            className="w-full rounded-md border border-line px-3 py-2 text-sm font-medium text-content hover:bg-surface-muted"
           >
             Sign out
           </button>
@@ -224,8 +224,8 @@ export function AdminShell({
   if (error) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="mb-2 text-2xl font-semibold text-neutral-900">403 — Forbidden</h1>
-        <p className="text-neutral-600">{error}</p>
+        <h1 className="mb-2 text-2xl font-semibold text-content">403 — Forbidden</h1>
+        <p className="text-content-soft">{error}</p>
       </main>
     );
   }
@@ -233,22 +233,22 @@ export function AdminShell({
   if (!me) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
+    <div className="min-h-screen bg-surface-muted">
       {/* ── Top header ─────────────────────────────────────────────────── */}
-      <header className="border-b border-neutral-200 bg-white">
+      <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-6">
           {/* Left: title */}
           <div>
-            <p className="text-[10px] uppercase tracking-[0.18em] text-neutral-500">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-content-soft">
               BranV Admin
             </p>
-            <Link href="/admin" className="text-lg font-semibold tracking-tight text-neutral-900">
+            <Link href="/admin" className="text-lg font-semibold tracking-tight text-content">
               Console
             </Link>
           </div>
@@ -259,7 +259,7 @@ export function AdminShell({
             aria-label="Open admin menu"
             aria-expanded={drawerOpen}
             onClick={() => setDrawerOpen(true)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-neutral-700 hover:bg-neutral-100 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-content-soft hover:bg-surface-muted md:hidden"
           >
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden>
               <path
@@ -279,12 +279,12 @@ export function AdminShell({
         <aside className="hidden w-56 shrink-0 md:flex md:flex-col md:gap-4">
           <NavLinks pathname={pathname} />
           {/* Account section at bottom of desktop sidebar */}
-          <div className="mt-auto border-t border-neutral-200 pt-4">
-            <p className="mb-2 truncate text-xs text-neutral-500">{me.email}</p>
+          <div className="mt-auto border-t border-line pt-4">
+            <p className="mb-2 truncate text-xs text-content-soft">{me.email}</p>
             <button
               type="button"
               onClick={onLogout}
-              className="w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-900 hover:bg-neutral-100"
+              className="w-full rounded-md border border-line px-3 py-1.5 text-sm font-medium text-content hover:bg-surface-muted"
             >
               Sign out
             </button>
@@ -294,7 +294,7 @@ export function AdminShell({
         {/* Page content */}
         <main className="min-w-0 flex-1">
           <div className="mb-6 flex items-end justify-between">
-            <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">{title}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-content">{title}</h1>
             <div className="flex gap-2">{actions}</div>
           </div>
           {children}
@@ -316,7 +316,7 @@ export function AdminShell({
         onClick={() => setQuickAddOpen(true)}
         aria-label="Quick Add product (N)"
         title="Quick Add (N)"
-        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-2xl font-light text-white shadow-lg transition hover:scale-105 hover:bg-neutral-800"
+        className="fixed bottom-6 right-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-2xl font-light text-primary-fg shadow-lg transition hover:scale-105 hover:bg-primary-hover"
       >
         +
       </button>
@@ -331,14 +331,14 @@ export function AdminShell({
 }
 
 export const adminButtonPrimary =
-  'rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50';
+  'rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50';
 export const adminButtonSecondary =
-  'rounded-md border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-900 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50';
+  'rounded-md border border-line bg-surface px-4 py-2 text-sm font-medium text-content hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-50';
 export const adminButtonDanger =
-  'rounded-md border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50';
+  'rounded-md border border-red-300 bg-surface px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-50';
 export const adminInput =
-  'w-full rounded-md border border-neutral-300 px-3 py-2 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+  'w-full rounded-md border border-line px-3 py-2 text-sm outline-none placeholder:text-content-muted focus:border-primary focus:ring-1 focus:ring-primary';
 export const adminLabel =
-  'mb-1.5 block text-xs font-medium uppercase tracking-wider text-neutral-700';
+  'mb-1.5 block text-xs font-medium uppercase tracking-wider text-content-soft';
 export const adminCard =
-  'rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm';
+  'rounded-2xl border border-line bg-surface p-6 shadow-sm';

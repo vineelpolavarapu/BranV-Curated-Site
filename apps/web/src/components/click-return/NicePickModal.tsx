@@ -63,7 +63,7 @@ export function NicePickModal({ open, onClose, onViewWardrobe }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-content/40 p-4"
       onClick={onClose}
     >
       <div
@@ -73,16 +73,16 @@ export function NicePickModal({ open, onClose, onViewWardrobe }: Props) {
         aria-labelledby="nicepick-headline"
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-2xl outline-none"
+        className="w-full max-w-md rounded-2xl bg-surface p-8 text-center shadow-2xl outline-none"
       >
         <AnimatedCheck />
         <h2
           id="nicepick-headline"
-          className="mt-6 text-2xl font-semibold tracking-tight text-neutral-900"
+          className="mt-6 text-2xl font-semibold tracking-tight text-content"
         >
           {headlineRef.current}
         </h2>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-content-soft">
           We&apos;ve saved this to My Wardrobe.
         </p>
         <div className="mt-6 flex items-center justify-center gap-3">
@@ -93,7 +93,7 @@ export function NicePickModal({ open, onClose, onViewWardrobe }: Props) {
                 onViewWardrobe();
                 onClose();
               }}
-              className="rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+              className="rounded-full bg-primary px-5 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover"
             >
               View My Wardrobe
             </button>
@@ -101,7 +101,7 @@ export function NicePickModal({ open, onClose, onViewWardrobe }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-neutral-300 px-5 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100"
+            className="rounded-full border border-line px-5 py-2 text-sm font-medium text-content-soft hover:bg-surface-muted"
           >
             Keep browsing
           </button>

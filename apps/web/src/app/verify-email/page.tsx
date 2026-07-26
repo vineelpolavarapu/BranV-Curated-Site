@@ -49,7 +49,7 @@ function VerifyEmailPageInner() {
   if (status === 'pending') {
     return (
       <AuthShell title="Verifying…" subtitle="Hang tight for a moment.">
-        <div className="h-2 w-full animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-full animate-pulse rounded bg-line" />
       </AuthShell>
     );
   }
@@ -60,12 +60,12 @@ function VerifyEmailPageInner() {
         title="Email verified"
         subtitle="Your email is now confirmed. You can sign in."
         footer={
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-content underline">
             Continue to sign in
           </Link>
         }
       >
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-content-soft">
           Welcome to BranV. We&apos;ll only email you about things you opt into.
         </p>
       </AuthShell>
@@ -77,12 +77,12 @@ function VerifyEmailPageInner() {
       title="Verification failed"
       subtitle="The link may have expired or already been used."
       footer={
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+        <Link href="/login" className="font-medium text-content underline">
           Back to sign in
         </Link>
       }
     >
-      <p className="text-sm text-red-600">{error}</p>
+      <p className="text-sm text-danger">{error}</p>
     </AuthShell>
   );
 }

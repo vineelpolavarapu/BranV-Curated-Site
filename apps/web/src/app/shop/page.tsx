@@ -36,14 +36,14 @@ export default async function ShopPage() {
                 <li key={c.slug} className={`bv-enter ${CATEGORY_STAGGER[i % CATEGORY_STAGGER.length] ?? ''}`}>
                   <Link
                     href={`/category/${c.slug}`}
-                    className="group flex flex-col items-center gap-3 rounded-xl border border-neutral-200 bg-white p-6 text-center transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-neutral-400 hover:shadow-md"
+                    className="group flex flex-col items-center gap-3 rounded-card border border-line bg-surface p-6 text-center transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
                   >
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-lg font-semibold text-neutral-700 transition-colors group-hover:bg-neutral-900 group-hover:text-white">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-muted text-lg font-semibold text-content-soft transition-colors group-hover:bg-primary group-hover:text-primary-fg">
                       {c.name.charAt(0).toUpperCase()}
                     </span>
                     <span>
-                      <p className="text-sm font-medium text-neutral-900">{c.name}</p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-sm font-medium text-content">{c.name}</p>
+                      <p className="text-xs text-content-soft">
                         {c._count.productsAsCategory}{' '}
                         {c._count.productsAsCategory === 1 ? 'product' : 'products'}
                       </p>
@@ -56,7 +56,7 @@ export default async function ShopPage() {
         </AnimateOnScroll>
       ) : (
         <section className="mx-auto max-w-7xl px-6 pb-12">
-          <p className="rounded-2xl border border-dashed border-neutral-300 p-10 text-center text-sm text-neutral-500">
+          <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-content-soft">
             No categories yet.
           </p>
         </section>

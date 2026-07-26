@@ -40,10 +40,10 @@ export function SubcategoryChips({ categorySlug, children }: SubcategoryChipsPro
           >
             <Link
               href={categoryHrefL2(categorySlug, subSuffix)}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition-all duration-200 ${
+              className={`rounded-full border px-4 py-1.5 text-xs transition-all duration-200 ${
                 isL2Active
-                  ? 'border-neutral-950 bg-neutral-950 text-white'
-                  : 'border-neutral-300 text-neutral-600 hover:bg-neutral-100'
+                  ? 'border-primary bg-primary text-white font-bold shadow-sm'
+                  : 'border-line bg-surface text-content hover:border-primary/40 hover:bg-surface-muted font-medium'
               }`}
             >
               {c.name}

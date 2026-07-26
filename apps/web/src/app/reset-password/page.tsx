@@ -51,7 +51,7 @@ function ResetPasswordPageInner() {
   if (!token) {
     return (
       <AuthShell title="Invalid link" subtitle="This reset link is malformed.">
-        <p className="text-sm text-red-600">Missing reset token.</p>
+        <p className="text-sm text-danger">Missing reset token.</p>
       </AuthShell>
     );
   }
@@ -62,16 +62,16 @@ function ResetPasswordPageInner() {
         title="Password reset"
         subtitle="Your password has been updated."
         footer={
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-content underline">
             Sign in
           </Link>
         }
       >
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-content-soft">
           For your security, all existing sessions have been signed out.
         </p>
         {doneMessage && (
-          <p className="mt-2 text-sm text-neutral-600">{doneMessage}</p>
+          <p className="mt-2 text-sm text-content-soft">{doneMessage}</p>
         )}
       </AuthShell>
     );
@@ -95,11 +95,11 @@ function ResetPasswordPageInner() {
             onChange={(e) => setPassword(e.target.value)}
             className={inputClass}
           />
-          <p className="mt-1 text-xs text-neutral-500">
+          <p className="mt-1 text-xs text-content-soft">
             At least 8 characters.
           </p>
         </div>
-        {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+        {error && <p className="text-sm text-danger" role="alert">{error}</p>}
         <button
           type="submit"
           disabled={submitting}

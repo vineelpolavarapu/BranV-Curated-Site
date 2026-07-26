@@ -54,7 +54,7 @@ export default function ReconciliationAdminPage() {
         </button>
       }
     >
-      <p className="mb-4 text-sm text-neutral-600">
+      <p className="mb-4 text-sm text-content-soft">
         Upload Amazon / EarnKaro / Meesho CSV exports. We parse, match each
         row to a tracked click within ±48h and the amount band, and surface
         anything unmatched for review. Re-uploads of the same file are skipped.
@@ -62,14 +62,14 @@ export default function ReconciliationAdminPage() {
 
       <VarianceCards variance={variance} />
 
-      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+      <h2 className="mb-3 mt-8 text-sm font-semibold uppercase tracking-wider text-content-soft">
         Upload history
       </h2>
       {loading ? (
-        <p className="text-sm text-neutral-500">Loading…</p>
+        <p className="text-sm text-content-soft">Loading…</p>
       ) : payouts.length === 0 ? (
         <div className={adminCard}>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-content-soft">
             No payouts yet. Click <strong>+ Upload CSV</strong>.
           </p>
         </div>
@@ -77,7 +77,7 @@ export default function ReconciliationAdminPage() {
         <div className={adminCard}>
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+              <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                 <th className="px-2 pb-3 font-medium">Partner</th>
                 <th className="px-2 pb-3 font-medium">File</th>
                 <th className="px-2 pb-3 font-medium">Period</th>
@@ -98,13 +98,13 @@ export default function ReconciliationAdminPage() {
                 return (
                   <tr key={p.id} className="border-b border-neutral-100">
                     <td className="px-2 py-3 font-medium">{p.partner}</td>
-                    <td className="px-2 py-3 text-xs text-neutral-600">
+                    <td className="px-2 py-3 text-xs text-content-soft">
                       {p.csvFilename ?? '—'}
-                      <p className="mt-0.5 text-[10px] text-neutral-400">
+                      <p className="mt-0.5 text-[10px] text-content-muted">
                         {new Date(p.createdAt).toLocaleString()}
                       </p>
                     </td>
-                    <td className="px-2 py-3 text-xs text-neutral-600">
+                    <td className="px-2 py-3 text-xs text-content-soft">
                       {p.reportedPeriodStart
                         ? new Date(p.reportedPeriodStart).toLocaleDateString()
                         : '—'}
@@ -114,7 +114,7 @@ export default function ReconciliationAdminPage() {
                         : '—'}
                     </td>
                     <td className="px-2 py-3">{p.rowCount}</td>
-                    <td className="px-2 py-3 text-emerald-700">
+                    <td className="px-2 py-3 text-success">
                       {p.matchedCount} ({matchRate}%)
                     </td>
                     <td className="px-2 py-3 text-amber-700">
@@ -137,7 +137,7 @@ export default function ReconciliationAdminPage() {
                           );
                           if (res.ok && res.data) setOpenDetail(res.data);
                         }}
-                        className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                        className="text-sm font-medium text-content-soft hover:text-primary"
                       >
                         View
                       </button>
@@ -191,18 +191,18 @@ function VarianceCards({ variance }: { variance: VarianceResponse | null }) {
         const tracked = variance.trackedByPartner[partner] ?? 0;
         return (
           <div key={partner} className={adminCard}>
-            <p className="text-xs font-medium uppercase tracking-wider text-neutral-500">
+            <p className="text-xs font-medium uppercase tracking-wider text-content-soft">
               {partner}
             </p>
-            <p className="mt-2 text-xs text-neutral-500">Tracked clicks</p>
+            <p className="mt-2 text-xs text-content-soft">Tracked clicks</p>
             <p className="text-2xl font-semibold tracking-tight">{tracked}</p>
-            <p className="mt-3 text-xs text-neutral-500">Reported commission</p>
+            <p className="mt-3 text-xs text-content-soft">Reported commission</p>
             <p className="text-base font-medium">
               {stats?.reported
                 ? `₹${stats.reported.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
                 : '—'}
             </p>
-            <p className="mt-2 text-[10px] text-neutral-500">
+            <p className="mt-2 text-[10px] text-content-soft">
               {stats ? `${stats.matched}/${stats.total} matched` : 'No uploads'}
             </p>
           </div>
@@ -269,11 +269,11 @@ function UploadModal({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-content/40 p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
           <h2 className="text-lg font-semibold">Upload affiliate CSV</h2>
-          <button onClick={onClose} className="text-neutral-400">✕</button>
+          <button onClick={onClose} className="text-content-muted">✕</button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
@@ -283,9 +283,9 @@ function UploadModal({
               type="file"
               accept=".csv,text/csv,application/vnd.ms-excel"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-neutral-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
+              className="block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-primary-fg"
             />
-            <p className="mt-1 text-xs text-neutral-500">
+            <p className="mt-1 text-xs text-content-soft">
               Amazon / EarnKaro / Meesho exports. Column headers vary by
               network — pick which one below.
             </p>
@@ -313,7 +313,7 @@ function UploadModal({
               className={adminInput}
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <button
               type="button"
@@ -345,29 +345,29 @@ function DetailModal({
 }) {
   return (
     <div
-      className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/40 p-4 pt-12"
+      className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-content/40 p-4 pt-12"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-5xl rounded-2xl bg-white p-6 shadow-xl">
+      <div className="w-full max-w-5xl rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h2 className="text-lg font-semibold">
               {payout.partner} · {payout.csvFilename ?? 'CSV'}
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-content-soft">
               Uploaded {new Date(payout.createdAt).toLocaleString()} ·{' '}
               {payout.matchedCount} matched / {payout.ambiguousCount} ambiguous /{' '}
               {payout.unmatchedCount} unmatched (of {payout.rowCount})
             </p>
           </div>
-          <button onClick={onClose} className="text-neutral-400">✕</button>
+          <button onClick={onClose} className="text-content-muted">✕</button>
         </div>
         <div className="max-h-[70vh] overflow-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-xs uppercase tracking-wider text-neutral-500">
+              <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
                 <th className="px-2 pb-3 font-medium">Status</th>
                 <th className="px-2 pb-3 font-medium">Date</th>
                 <th className="px-2 pb-3 font-medium">Order</th>
@@ -380,7 +380,7 @@ function DetailModal({
               {payout.items.map((item) => {
                 const tone =
                   item.status === 'MATCHED'
-                    ? 'bg-emerald-100 text-emerald-800'
+                    ? 'bg-emerald-100 text-success'
                     : item.status === 'AMBIGUOUS'
                       ? 'bg-amber-100 text-amber-800'
                       : 'bg-red-100 text-red-700';
@@ -393,7 +393,7 @@ function DetailModal({
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-2 py-2 text-xs text-neutral-600">
+                    <td className="px-2 py-2 text-xs text-content-soft">
                       {item.occurredAt
                         ? new Date(item.occurredAt).toLocaleString()
                         : '—'}
@@ -415,7 +415,7 @@ function DetailModal({
                           href={`/products/${item.matchedClickEvent.product.slug}`}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-neutral-700 underline hover:text-neutral-950"
+                          className="text-content-soft underline hover:text-primary"
                         >
                           {item.matchedClickEvent.product.title}
                         </a>

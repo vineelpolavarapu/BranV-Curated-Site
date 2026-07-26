@@ -180,7 +180,7 @@ export default function NewProductPage() {
         <div>
           <label className={adminLabel}>Also show in these collections</label>
           {edits.length === 0 ? (
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-content-soft">
               No collections yet — create one under{' '}
               <a href="/admin/edits/new" className="underline">
                 The Edit
@@ -188,7 +188,7 @@ export default function NewProductPage() {
               .
             </p>
           ) : (
-            <div className="flex flex-wrap gap-3 rounded-md border border-neutral-200 bg-neutral-50 p-3">
+            <div className="flex flex-wrap gap-3 rounded-md border border-line bg-surface-muted p-3">
               {edits.map((edit) => (
                 <label key={edit.id} className="flex items-center gap-2 text-sm">
                   <input
@@ -245,7 +245,7 @@ export default function NewProductPage() {
             className={adminInput}
           />
         </div>
-        <div className="rounded-md border border-neutral-200 bg-neutral-50 p-3">
+        <div className="rounded-md border border-line bg-surface-muted p-3">
           <label className="flex items-center gap-2 text-sm font-medium">
             <input
               type="checkbox"
@@ -265,11 +265,11 @@ export default function NewProductPage() {
                 onChange={(e) => setFeatureDays(Number(e.target.value))}
                 className={`${adminInput} w-20`}
               />
-              <span className="text-neutral-600">days from now</span>
+              <span className="text-content-soft">days from now</span>
             </div>
           )}
         </div>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-danger">{error}</p>}
         <div className="flex justify-end gap-2">
           <button
             type="button"
@@ -282,7 +282,7 @@ export default function NewProductPage() {
             {submitting ? 'Creating…' : 'Create product'}
           </button>
         </div>
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-content-soft">
           Next: add variants, images and retailer listings on the edit page.
         </p>
       </form>

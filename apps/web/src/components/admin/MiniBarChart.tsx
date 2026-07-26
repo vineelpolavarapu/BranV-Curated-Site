@@ -47,7 +47,7 @@ export function MiniBarChart({
           );
         })}
       </svg>
-      <div className="mt-1 flex justify-between text-[9px] uppercase tracking-wider text-neutral-400">
+      <div className="mt-1 flex justify-between text-[9px] uppercase tracking-wider text-content-muted">
         <span>{data[0]?.day.slice(5)}</span>
         <span>{data[data.length - 1]?.day.slice(5)}</span>
       </div>

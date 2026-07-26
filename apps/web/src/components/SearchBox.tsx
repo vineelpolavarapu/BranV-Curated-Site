@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { AutocompleteResult } from '@/lib/storefront-types';
+import { Icon } from './icons';
 
 export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
   const router = useRouter();
@@ -50,42 +51,39 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
     (hits.products.length > 0 || hits.brands.length > 0 || hits.categories.length > 0);
 
   const inputClasses = overlay
-    ? 'w-full rounded-full border border-white/40 bg-white/10 py-2 pl-10 pr-3 text-[16px] text-white outline-none placeholder:text-white/70 backdrop-blur focus:border-white focus:bg-white/20 focus:ring-1 focus:ring-white/60'
-    : 'w-full rounded-full border border-neutral-300 bg-white py-2 pl-10 pr-3 text-[16px] text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900';
+    ? 'w-full h-12 rounded-full border border-white/40 bg-primary-fg/10 pl-11 pr-12 text-sm text-primary-fg outline-none placeholder:text-primary-fg/70 backdrop-blur focus:border-primary-fg focus:bg-primary-fg/20 focus:ring-2 focus:ring-primary-fg/50 transition-all'
+    : 'w-full h-12 rounded-full border border-line bg-surface pl-11 pr-12 text-sm text-content outline-none placeholder:text-content-muted focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm transition-all';
   const iconClasses = overlay
-    ? 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-white/80'
-    : 'pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400';
+    ? 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-fg/80'
+    : 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-content-muted';
 
   return (
     <div ref={wrapperRef} className="relative w-full max-w-2xl">
-      <form onSubmit={onSubmit} className="relative">
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          aria-hidden
-          className={iconClasses}
-        >
-          <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.8" />
-          <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-        </svg>
+      <form onSubmit={onSubmit} className="relative flex items-center">
+        <Icon.Search size={18} strokeWidth={1.8} aria-hidden className={iconClasses} />
         <input
           ref={inputRef}
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => setOpen(true)}
-          placeholder="Search products, brands, categories…"
+          placeholder="Search for shirts, jeans, jackets…"
           className={inputClasses}
         />
+        <button
+          type="submit"
+          aria-label="Search"
+          className="absolute right-1.5 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-fg shadow-sm transition-all hover:bg-primary-hover hover:scale-105 active:scale-95"
+        >
+          <Icon.Search size={16} strokeWidth={2.5} aria-hidden />
+        </button>
       </form>
       {open && q.trim() && (
-        <div className="absolute left-0 right-0 top-full z-40 mt-1 overflow-hidden rounded-lg border border-neutral-200 bg-white text-neutral-900 shadow-xl">
+        <div className="absolute left-0 right-0 top-full z-40 mt-1.5 overflow-hidden rounded-xl border border-line bg-surface text-content shadow-xl">
           {!hasHits ? (
-            <p className="px-4 py-3 text-sm text-neutral-500">No matches.</p>
+            <p className="px-4 py-3 text-sm text-content-soft">No matches.</p>
           ) : (
-            <div className="max-h-96 divide-y divide-neutral-100 overflow-auto py-1 text-sm">
+            <div className="max-h-96 divide-y divide-line overflow-auto py-1 text-sm">
               {hits!.products.length > 0 && (
                 <Section title="Products">
                   {hits!.products.map((p) => (
@@ -126,11 +124,11 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
               )}
             </div>
           )}
-          <div className="border-t border-neutral-100 bg-neutral-50 px-3 py-2 text-right">
+          <div className="border-t border-line bg-surface-muted px-3 py-2 text-right">
             <button
               type="button"
               onClick={onSubmit}
-              className="text-xs font-medium text-neutral-700 hover:text-neutral-950"
+              className="text-xs font-medium text-content-soft hover:text-primary"
             >
               See all results →
             </button>
@@ -144,7 +142,7 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="py-1">
-      <p className="px-4 py-1 text-[10px] font-medium uppercase tracking-wider text-neutral-400">
+      <p className="px-4 py-1 text-[10px] font-medium uppercase tracking-wider text-content-muted">
         {title}
       </p>
       {children}
@@ -167,10 +165,10 @@ function SearchItem({
     <Link
       href={href}
       onClick={onClick}
-      className="block px-4 py-1.5 hover:bg-neutral-100"
+      className="block px-4 py-1.5 hover:bg-surface-muted"
     >
-      <p className="font-medium text-neutral-900">{title}</p>
-      {subtitle && <p className="text-xs text-neutral-500">{subtitle}</p>}
+      <p className="font-medium text-content">{title}</p>
+      {subtitle && <p className="text-xs text-content-soft">{subtitle}</p>}
     </Link>
   );
 }

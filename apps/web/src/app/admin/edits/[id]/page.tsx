@@ -23,7 +23,7 @@ export default function EditEditPage() {
   if (loading) {
     return (
       <AdminShell title="Loading…">
-        <div className="h-2 w-32 animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-32 animate-pulse rounded bg-line" />
       </AdminShell>
     );
   }
@@ -37,7 +37,7 @@ export default function EditEditPage() {
 
   return (
     <AdminShell title={edit.title}>
-      <p className="mb-4 text-sm text-neutral-500">/{edit.slug}</p>
+      <p className="mb-4 text-sm text-content-soft">/{edit.slug}</p>
       <EditEditor edit={edit} />
     </AdminShell>
   );

@@ -58,14 +58,14 @@ function NewsletterConfirmPageInner() {
     <StorefrontShell>
       <section className="mx-auto max-w-xl px-6 py-16 text-center">
         {state === 'pending' && (
-          <p className="text-sm text-neutral-500">Confirming…</p>
+          <p className="text-sm text-content-soft">Confirming…</p>
         )}
         {state === 'ok' && (
           <>
             <h1 className="text-3xl font-semibold tracking-tight">
               You&apos;re in.
             </h1>
-            <p className="mt-3 text-neutral-600">
+            <p className="mt-3 text-content-soft">
               Look out for the BranV weekly in your inbox.
             </p>
           </>
@@ -75,7 +75,7 @@ function NewsletterConfirmPageInner() {
             <h1 className="text-3xl font-semibold tracking-tight">
               Already subscribed
             </h1>
-            <p className="mt-3 text-neutral-600">No action needed.</p>
+            <p className="mt-3 text-content-soft">No action needed.</p>
           </>
         )}
         {state === 'error' && (
@@ -83,7 +83,7 @@ function NewsletterConfirmPageInner() {
             <h1 className="text-3xl font-semibold tracking-tight">
               Link invalid or expired
             </h1>
-            <p className="mt-3 text-neutral-600">
+            <p className="mt-3 text-content-soft">
               The confirmation link may have already been used.
             </p>
           </>
@@ -91,7 +91,7 @@ function NewsletterConfirmPageInner() {
         <div className="mt-8">
           <Link
             href="/"
-            className="rounded-md bg-neutral-900 px-5 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+            className="rounded-md bg-primary px-5 py-2 text-sm font-medium text-primary-fg hover:bg-primary-hover"
           >
             Continue to BranV →
           </Link>

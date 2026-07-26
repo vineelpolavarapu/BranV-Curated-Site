@@ -31,7 +31,7 @@ export function HeroCarousel() {
   // JS hydrates and the dynamic import resolves.
   if (isDesktop === null) {
     return (
-      <div className="h-[100svh] w-full bg-neutral-900" />
+      <div className="h-[100svh] w-full bg-hero-gradient" />
     );
   }
 

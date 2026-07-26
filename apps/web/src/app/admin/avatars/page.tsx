@@ -60,7 +60,7 @@ export default function AvatarsAdminPage() {
         </button>
       }
     >
-      <p className="mb-4 text-sm text-neutral-600">
+      <p className="mb-4 text-sm text-content-soft">
         Vineel&apos;s AI avatar reference library. Each entry stores a reference
         image and the prompt template used to recreate the look in Gemini /
         ChatGPT / Midjourney. Tap <strong>Copy Prompt</strong> on a card and
@@ -68,10 +68,10 @@ export default function AvatarsAdminPage() {
       </p>
 
       {loading ? (
-        <p className="text-sm text-neutral-500">Loading…</p>
+        <p className="text-sm text-content-soft">Loading…</p>
       ) : avatars.length === 0 ? (
         <div className={adminCard}>
-          <p className="text-sm text-neutral-500">
+          <p className="text-sm text-content-soft">
             No avatars yet. Add Vineel&apos;s base references to get started.
           </p>
         </div>
@@ -80,9 +80,9 @@ export default function AvatarsAdminPage() {
           {avatars.map((a) => (
             <article
               key={a.id}
-              className="overflow-hidden rounded-2xl border border-neutral-200 bg-white"
+              className="overflow-hidden rounded-2xl border border-line bg-surface"
             >
-              <div className="relative aspect-[3/4] bg-neutral-100">
+              <div className="relative aspect-[3/4] bg-surface-muted">
                 <Image
                   src={a.referenceImageUrl}
                   alt={a.name}
@@ -99,14 +99,14 @@ export default function AvatarsAdminPage() {
                     {a.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-700"
+                        className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-content-soft"
                       >
                         {t}
                       </span>
                     ))}
                   </div>
                 )}
-                <p className="line-clamp-3 text-xs text-neutral-600">
+                <p className="line-clamp-3 text-xs text-content-soft">
                   {a.promptTemplate}
                 </p>
                 <div className="flex items-center justify-between pt-2">
@@ -122,7 +122,7 @@ export default function AvatarsAdminPage() {
                         setEditing(a);
                         setShowForm(true);
                       }}
-                      className="text-sm font-medium text-neutral-700 hover:text-neutral-950"
+                      className="text-sm font-medium text-content-soft hover:text-primary"
                     >
                       Edit
                     </button> */}
@@ -204,13 +204,13 @@ function AvatarForm({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-white p-6 shadow-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-content/40 p-4">
+      <div className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-2xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-start justify-between">
           <h2 className="text-lg font-semibold">
             {avatar ? 'Edit avatar' : 'New avatar reference'}
           </h2>
-          <button onClick={onClose} className="text-neutral-400">✕</button>
+          <button onClick={onClose} className="text-content-muted">✕</button>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div>
@@ -254,7 +254,7 @@ function AvatarForm({
               className={adminInput}
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={onClose} className={adminButtonSecondary}>
               Cancel

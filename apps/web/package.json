@@ -7,13 +7,17 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "theme:audit": "node scripts/theme-audit.mjs",
+    "theme:audit:strict": "node scripts/theme-audit.mjs --strict"
   },
   "dependencies": {
     "@branv/shared": "workspace:*",
     "@tanstack/react-query": "^5.55.4",
     "canvas-confetti": "^1.9.3",
     "lenis": "^1.3.25",
+    "lucide-react": "^1.26.0",
+    "motion": "^12.42.2",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

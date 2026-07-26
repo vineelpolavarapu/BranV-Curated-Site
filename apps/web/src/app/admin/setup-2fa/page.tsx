@@ -84,16 +84,16 @@ export default function AdminSetupTwoFactorPage() {
       }
     >
       {!setup && !error && (
-        <div className="h-2 w-full animate-pulse rounded bg-neutral-200" />
+        <div className="h-2 w-full animate-pulse rounded bg-line" />
       )}
       {setup && (
         <div className="space-y-5">
-          <ol className="space-y-2 text-sm text-neutral-700">
+          <ol className="space-y-2 text-sm text-content-soft">
             <li>1. Open your authenticator app (1Password, Authy, Google Authenticator).</li>
             <li>2. Scan the QR below, or enter the URL manually.</li>
             <li>3. Enter the 6-digit code to confirm.</li>
           </ol>
-          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-4">
+          <div className="rounded-lg border border-line bg-surface-muted p-4">
             {/* QRCode renders as a data: URL, which next/image accepts as `unoptimized`. */}
             <Image
               src={setup.qrCodeDataUrl}
@@ -104,9 +104,9 @@ export default function AdminSetupTwoFactorPage() {
               className="mx-auto"
             />
           </div>
-          <details className="text-xs text-neutral-600">
+          <details className="text-xs text-content-soft">
             <summary className="cursor-pointer">Can&apos;t scan? Show URL</summary>
-            <code className="mt-2 block break-all rounded bg-neutral-100 p-2">
+            <code className="mt-2 block break-all rounded bg-surface-muted p-2">
               {setup.otpauthUrl}
             </code>
           </details>
@@ -126,7 +126,7 @@ export default function AdminSetupTwoFactorPage() {
                 placeholder="000000"
               />
             </div>
-            {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
+            {error && <p className="text-sm text-danger" role="alert">{error}</p>}
             <button
               type="submit"
               disabled={submitting}
@@ -137,7 +137,7 @@ export default function AdminSetupTwoFactorPage() {
           </form>
         </div>
       )}
-      {error && !setup && <p className="text-sm text-red-600">{error}</p>}
+      {error && !setup && <p className="text-sm text-danger">{error}</p>}
     </AuthShell>
   );
 }

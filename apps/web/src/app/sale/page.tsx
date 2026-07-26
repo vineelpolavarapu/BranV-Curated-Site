@@ -23,7 +23,7 @@ export default async function SalePage(props: {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
           Sale
         </h1>
-        <p className="mt-1 text-sm text-neutral-600">
+        <p className="mt-1 text-sm text-content-soft">
           All items currently discounted · {list?.total ?? 0} products
         </p>
       </section>
@@ -33,11 +33,11 @@ export default async function SalePage(props: {
           <Filters context={{ brands: brands ?? [] }} />
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-neutral-500">{list?.total ?? 0} results</p>
+              <p className="text-sm text-content-soft">{list?.total ?? 0} results</p>
               <SortPicker />
             </div>
             {!list || list.data.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center text-sm text-neutral-500">
+              <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
                 Nothing on sale right now.
               </div>
             ) : (

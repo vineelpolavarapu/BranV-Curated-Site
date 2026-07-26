@@ -32,12 +32,12 @@ export default function ForgotPasswordPage() {
         title="Check your email"
         subtitle="If that email is registered, we sent password-reset instructions."
         footer={
-          <Link href="/login" className="font-medium text-neutral-900 underline">
+          <Link href="/login" className="font-medium text-content underline">
             Back to sign in
           </Link>
         }
       >
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-content-soft">
           The reset link expires in 1 hour.
         </p>
       </AuthShell>
@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
       title="Forgot password"
       subtitle="Enter your email and we'll send a reset link."
       footer={
-        <Link href="/login" className="font-medium text-neutral-900 underline">
+        <Link href="/login" className="font-medium text-content underline">
           Back to sign in
         </Link>
       }

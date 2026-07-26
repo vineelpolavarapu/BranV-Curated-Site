@@ -186,7 +186,7 @@ export function ArticleEditor({ article }: Props) {
 
         <div className={adminCard}>
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-700">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-content-soft">
               Body (Markdown)
             </h2>
             <button
@@ -206,7 +206,7 @@ export function ArticleEditor({ article }: Props) {
               spellCheck
               className={`${adminInput} font-mono text-sm`}
             />
-            <div className="overflow-auto rounded-md border border-neutral-200 bg-white p-4">
+            <div className="overflow-auto rounded-md border border-line bg-surface p-4">
               <div className="prose prose-sm prose-neutral max-w-none">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -219,7 +219,7 @@ export function ArticleEditor({ article }: Props) {
                       const slug = rest['data-product'];
                       if (typeof slug === 'string') {
                         return (
-                          <div className="my-4 rounded-md border border-dashed border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-800">
+                          <div className="my-4 rounded-md border border-dashed border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-medium text-success">
                             🛍 product embed · <code>{slug}</code>
                           </div>
                         );
@@ -233,13 +233,13 @@ export function ArticleEditor({ article }: Props) {
               </div>
             </div>
           </div>
-          <p className="mt-2 text-xs text-neutral-500">
+          <p className="mt-2 text-xs text-content-soft">
             Embeds resolve to live shoppable cards on the public page.
           </p>
         </div>
 
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             SEO
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
@@ -274,7 +274,7 @@ export function ArticleEditor({ article }: Props) {
         </div>
 
         <div className={adminCard}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-700">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-content-soft">
             Publish
           </h2>
           <div className="grid gap-4 md:grid-cols-2">
@@ -299,13 +299,13 @@ export function ArticleEditor({ article }: Props) {
                 onChange={(e) => setScheduledAt(e.target.value)}
                 className={adminInput}
               />
-              <p className="mt-1 text-xs text-neutral-500">
+              <p className="mt-1 text-xs text-content-soft">
                 Scheduler flips SCHEDULED → PUBLISHED within ~60s of this time.
               </p>
             </div>
           </div>
-          {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-          {flash && <p className="mt-3 text-sm text-emerald-700">{flash}</p>}
+          {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+          {flash && <p className="mt-3 text-sm text-success">{flash}</p>}
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <button
               type="submit"

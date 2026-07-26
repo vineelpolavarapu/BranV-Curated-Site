@@ -60,7 +60,7 @@ export default async function ArticleDetailPage(props: {
         <Breadcrumbs title={article.title} />
         <Header article={article} />
         {article.heroUrl && (
-          <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-100">
+          <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-surface-muted">
             <Image
               src={article.heroUrl}
               alt={article.title}
@@ -85,7 +85,7 @@ export default async function ArticleDetailPage(props: {
               <Link
                 key={t}
                 href={`/articles?tag=${encodeURIComponent(t)}`}
-                className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-neutral-700 hover:bg-neutral-200"
+                className="rounded-full bg-surface-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-content-soft hover:bg-line"
               >
                 {t}
               </Link>
@@ -104,10 +104,10 @@ export default async function ArticleDetailPage(props: {
               <li key={r.id}>
                 <Link
                   href={`/articles/${r.slug}`}
-                  className="block rounded-xl border border-neutral-200 bg-white p-4 hover:border-neutral-400"
+                  className="block rounded-xl border border-line bg-surface p-4 hover:border-primary/40"
                 >
                   <p className="text-sm font-medium leading-snug">{r.title}</p>
-                  <p className="mt-1 text-[11px] text-neutral-500">
+                  <p className="mt-1 text-[11px] text-content-soft">
                     {r.readingMinutes !== null && `${r.readingMinutes} min read`}
                   </p>
                 </Link>
@@ -122,12 +122,12 @@ export default async function ArticleDetailPage(props: {
 
 function Breadcrumbs({ title }: { title: string }) {
   return (
-    <nav className="text-xs text-neutral-500">
-      <Link href="/" className="hover:text-neutral-900">Home</Link>
+    <nav className="text-xs text-content-soft">
+      <Link href="/" className="hover:text-primary">Home</Link>
       <span className="mx-2">/</span>
-      <Link href="/articles" className="hover:text-neutral-900">Articles</Link>
+      <Link href="/articles" className="hover:text-primary">Articles</Link>
       <span className="mx-2">/</span>
-      <span className="text-neutral-900">{title}</span>
+      <span className="text-content">{title}</span>
     </nav>
   );
 }
@@ -139,11 +139,11 @@ function Header({ article }: { article: ArticleDetail }) {
         {article.title}
       </h1>
       {article.excerpt && (
-        <p className="mt-3 text-lg leading-relaxed text-neutral-600">
+        <p className="mt-3 text-lg leading-relaxed text-content-soft">
           {article.excerpt}
         </p>
       )}
-      <p className="mt-4 text-xs text-neutral-500">
+      <p className="mt-4 text-xs text-content-soft">
         By Vineel
         {article.publishedAt && (
           <>
@@ -167,8 +167,8 @@ function Header({ article }: { article: ArticleDetail }) {
 
 function AffiliateDisclosure() {
   return (
-    <p className="not-prose mt-10 rounded-md bg-neutral-50 px-3 py-2 text-xs text-neutral-600">
-      <strong className="text-neutral-900">Affiliate disclosure:</strong>{' '}
+    <p className="not-prose mt-10 rounded-md bg-surface-muted px-3 py-2 text-xs text-content-soft">
+      <strong className="text-content">Affiliate disclosure:</strong>{' '}
       Product links on BranV are affiliate links. We earn a small commission on
       qualifying sales — at no extra cost to you.
     </p>

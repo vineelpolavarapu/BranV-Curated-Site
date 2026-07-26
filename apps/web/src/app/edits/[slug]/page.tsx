@@ -39,19 +39,19 @@ export default async function EditDetailPage(props: {
   return (
     <StorefrontShell>
       <AnimateOnScroll>
-        <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-neutral-500">
-          <Link href="/" className="hover:text-neutral-900">Home</Link>
+        <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
+          <Link href="/" className="hover:text-primary">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/shop" className="hover:text-neutral-900">Shop</Link>
+          <Link href="/shop" className="hover:text-primary">Shop</Link>
           <span className="mx-2">/</span>
-          <span className="text-neutral-900">{edit.title}</span>
+          <span className="text-content">{edit.title}</span>
         </nav>
       </AnimateOnScroll>
 
       <section className="mx-auto max-w-7xl px-6 pt-4 sm:pt-6">
         {edit.heroUrl && (
           <AnimateOnScroll>
-            <div className="bv-enter-fade relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-neutral-900 sm:aspect-[21/9]">
+            <div className="bv-enter-fade relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-primary sm:aspect-[21/9]">
               <Image
                 src={edit.heroUrl}
                 alt={edit.title}
@@ -63,10 +63,10 @@ export default async function EditDetailPage(props: {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-white/70">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary-fg/70">
                   The Edit
                 </p>
-                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-4xl md:text-5xl">
+                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-primary-fg sm:text-4xl md:text-5xl">
                   {edit.title}
                 </h1>
               </div>
@@ -78,7 +78,7 @@ export default async function EditDetailPage(props: {
           <div className="bv-enter mt-6 max-w-3xl sm:mt-8">
             {!edit.heroUrl && (
               <>
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-neutral-500">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-content-soft">
                   The Edit
                 </p>
                 <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl md:text-5xl">
@@ -87,7 +87,7 @@ export default async function EditDetailPage(props: {
               </>
             )}
             {edit.description && (
-              <p className="mt-3 text-base leading-relaxed text-neutral-600">
+              <p className="mt-3 text-base leading-relaxed text-content-soft">
                 {edit.description}
               </p>
             )}
@@ -98,21 +98,21 @@ export default async function EditDetailPage(props: {
       <section className="mx-auto max-w-7xl px-6 pb-16 pt-10">
         {edit.products.length === 0 ? (
           <AnimateOnScroll>
-            <div className="bv-enter flex flex-col items-center gap-4 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 p-10 text-center sm:p-16">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-200 text-neutral-500">
+            <div className="bv-enter flex flex-col items-center gap-4 rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center sm:p-16">
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-line text-content-soft">
                 <BagIcon className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-sm font-medium text-neutral-700">
+                <p className="text-sm font-medium text-content-soft">
                   This edit is being curated right now.
                 </p>
-                <p className="mt-1 text-sm text-neutral-500">
+                <p className="mt-1 text-sm text-content-soft">
                   Check back soon, or explore everything we have in the meantime.
                 </p>
               </div>
               <Link
                 href="/shop"
-                className="mt-1 rounded-md bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800"
+                className="mt-1 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-fg transition hover:bg-primary-hover"
               >
                 Browse all categories
               </Link>

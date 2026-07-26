@@ -7,6 +7,7 @@ import { LookbookPublicImage } from '@/lib/phase7-types';
 import { formatINR } from '@/lib/format';
 import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
+import { Icon } from '@/components/icons';
 
 interface Props {
   image: LookbookPublicImage;
@@ -21,7 +22,7 @@ export function ShoppableImage({ image }: Props) {
   const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <figure className="relative w-full overflow-hidden rounded-2xl bg-neutral-100">
+    <figure className="relative w-full overflow-hidden rounded-2xl bg-surface-muted">
       <Image
         src={image.imageUrl}
         alt=""
@@ -73,8 +74,8 @@ function Hotspot({
         aria-label={`Shop ${product.title}`}
         aria-expanded={open}
         className={`grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white shadow-lg transition ${
-          open ? 'bg-emerald-500 scale-110' : 'bg-neutral-900 hover:scale-110'
-        } text-xs font-semibold text-white`}
+          open ? 'bg-primary scale-110' : 'bg-content hover:scale-110'
+        } text-xs font-semibold text-primary-fg`}
       >
         {index}
       </button>
@@ -82,12 +83,12 @@ function Hotspot({
         <div
           role="dialog"
           aria-label={`${product.title} popover`}
-          className="absolute z-10 -translate-x-1/2 translate-y-2 w-64 rounded-xl border border-neutral-200 bg-white p-3 shadow-xl"
+          className="absolute z-10 -translate-x-1/2 translate-y-2 w-64 rounded-xl border border-line bg-surface p-3 shadow-xl"
         >
           <div className="flex gap-3">
             <Link
               href={`/products/${product.slug}`}
-              className="relative aspect-[4/5] w-16 flex-none overflow-hidden rounded-md bg-neutral-100"
+              className="relative aspect-[4/5] w-16 flex-none overflow-hidden rounded-md bg-surface-muted"
             >
               {product.primaryImage ? (
                 <Image
@@ -101,7 +102,7 @@ function Hotspot({
               ) : null}
             </Link>
             <div className="min-w-0 flex-1 text-sm">
-              <p className="truncate text-[10px] font-medium uppercase tracking-wider text-neutral-500">
+              <p className="truncate text-[10px] font-medium uppercase tracking-wider text-content-soft">
                 {product.brand.name}
               </p>
               <Link
@@ -113,7 +114,7 @@ function Hotspot({
               <p className="mt-1 text-xs font-semibold">
                 ₹{formatINR(product.price)}
                 {product.mrp && product.mrp > product.price && (
-                  <span className="ml-1.5 font-normal text-neutral-400 line-through">
+                  <span className="ml-1.5 font-normal text-content-muted line-through">
                     ₹{formatINR(product.mrp)}
                   </span>
                 )}
@@ -123,9 +124,9 @@ function Hotspot({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="text-neutral-400 hover:text-neutral-900"
+              className="text-content-muted hover:text-content"
             >
-              ✕
+              <Icon.Close size={14} strokeWidth={1.75} aria-hidden />
             </button>
           </div>
           {buyHref && product.buyNow && (
@@ -141,7 +142,7 @@ function Hotspot({
                   });
                 }
               }}
-              className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-800"
+              className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-fg hover:bg-primary-hover"
             >
               Buy on {resolveRetailerLabel(product.buyNow.retailer, product.buyNow.retailerDisplayName)}
               <span aria-hidden className="ml-1.5">↗</span>
