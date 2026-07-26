@@ -112,23 +112,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         >
           {product.title}
         </Link>
-        <div className="mt-1.5 flex items-baseline gap-2">
-          <span className="font-heading text-base font-extrabold text-primary">
-            ₹{formatINR(product.price)}
-          </span>
-          {product.mrp && product.mrp > product.price && (
-            <>
-              <span className="text-xs text-slate-400 line-through">
-                ₹{formatINR(product.mrp)}
-              </span>
-              {product.discountPct && (
-                <span className="text-xs font-bold text-emerald-600">
-                  {Math.round(product.discountPct)}% off
-                </span>
-              )}
-            </>
-          )}
-        </div>
+        {/* Amount visibility removed per Task 4 */}
 
         {product.buyNow && (
           <div className="mt-1 translate-y-1.5 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100">

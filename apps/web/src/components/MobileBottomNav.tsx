@@ -6,7 +6,7 @@ import { Icon, type LucideIcon } from './icons';
 
 const ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/', label: 'Home', icon: Icon.Home },
-  { href: '/shop', label: 'Shop', icon: Icon.Shop },
+  { href: '/shop', label: 'Categories', icon: Icon.Categories },
   { href: '/wishlist', label: 'Wishlist', icon: Icon.Wishlist },
   { href: '/help', label: 'Help', icon: Icon.Help },
   { href: '/account', label: 'Account', icon: Icon.Account },

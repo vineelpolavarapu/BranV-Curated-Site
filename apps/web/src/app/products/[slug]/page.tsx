@@ -46,10 +46,9 @@ export default async function ProductDetailPage(props: {
   return (
     <StorefrontShell>
       <RecordRecentlyViewed product={product} />
-      <Breadcrumbs product={product} />
       <ProductSchema product={product} />
       <AnimateOnScroll>
-        <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
+        <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
               <Gallery product={product} />
@@ -194,24 +193,7 @@ function Summary({ product }: { product: ProductCardData }) {
       <h1 className="mt-1 text-2xl font-semibold tracking-tight md:text-3xl">
         {product.title}
       </h1>
-
-      <div className="mt-4 flex items-baseline gap-3">
-        <span className="text-2xl font-semibold">
-          ₹{formatINR(product.price)}
-        </span>
-        {product.mrp && product.mrp > product.price && (
-          <>
-            <span className="text-base text-content-muted line-through">
-              ₹{formatINR(product.mrp)}
-            </span>
-            {product.discountPct && (
-              <span className="text-sm font-medium text-success">
-                {Math.round(product.discountPct)}% off
-              </span>
-            )}
-          </>
-        )}
-      </div>
+      {/* Amount visibility removed per Task 4 */}
 
       {(product.colors.length > 0 || product.sizes.length > 0) && (
         <div className="mt-5 space-y-3">

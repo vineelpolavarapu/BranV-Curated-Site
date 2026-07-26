@@ -279,9 +279,8 @@ export function HeroCarouselMobile() {
                 className="absolute inset-0 h-full w-full select-none object-cover"
                 src={slide.imageUrl}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 px-6 pb-20">
-                <div className={`text-white hero-slide-text ${
+                <div className={`text-white hero-slide-text drop-shadow-md ${
                   i - 1 === realIndex ? 'hero-slide-active' : ''
                 }`}>
                   <h2 className="font-heading text-4xl font-extrabold tracking-tight leading-tight">

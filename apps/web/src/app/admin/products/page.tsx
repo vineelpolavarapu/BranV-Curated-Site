@@ -187,12 +187,11 @@ export default function ProductsAdminPage() {
               <table className="w-full table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
-                    <th className="w-[34%] px-2 pb-3 font-medium">Product</th>
-                    <th className="w-[13%] px-2 pb-3 font-medium">Brand</th>
-                    <th className="w-[13%] px-2 pb-3 font-medium">Category</th>
-                    <th className="w-[14%] px-2 pb-3 font-medium">Price</th>
-                    <th className="w-[12%] px-2 pb-3 font-medium">Status</th>
-                    <th className="w-[14%] px-2 pb-3 font-medium" />
+                    <th className="w-[45%] px-2 pb-3 font-medium">Product</th>
+                    <th className="w-[18%] px-2 pb-3 font-medium">Brand</th>
+                    <th className="w-[18%] px-2 pb-3 font-medium">Category</th>
+                    <th className="w-[19%] px-2 pb-3 font-medium">Status</th>
+                    <th className="w-[20%] px-2 pb-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -225,22 +224,14 @@ export default function ProductsAdminPage() {
                         </td>
                         <td className="truncate px-2 py-3 text-content-soft">{p.brand.name}</td>
                         <td className="truncate px-2 py-3 text-content-soft">{p.category.name}</td>
-                        <td className="truncate px-2 py-3">
-                          <span className="font-medium">₹{p.price}</span>
-                          {p.mrp && (
-                            <span className="ml-2 text-xs text-content-muted line-through">
-                              ₹{p.mrp}
-                            </span>
-                          )}
-                        </td>
                         <td className="px-2 py-3">
                           <StatusPill status={p.status} />
                         </td>
                         <td className="px-2 py-3 text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="inline-flex items-center justify-end gap-2">
                             <Link
                               href={`/admin/products/${p.id}`}
-                              className="text-sm font-medium text-content-soft hover:text-primary"
+                              className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 hover:text-primary"
                             >
                               Edit
                             </Link>

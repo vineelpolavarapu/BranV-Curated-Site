@@ -276,9 +276,8 @@ export function HeroCarouselDesktop() {
                 fetchPriority={i === 1 ? 'high' : 'auto'}
                 className="absolute inset-0 h-full w-full select-none object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
               <div className="absolute inset-x-0 bottom-0 px-12 lg:px-20 pb-24 lg:pb-28">
-                <div className={`max-w-3xl text-white hero-slide-text ${
+                <div className={`max-w-3xl text-white hero-slide-text drop-shadow-md ${
                   i - 1 === realIndex ? 'hero-slide-active' : ''
                 }`}>
                   <h2 className="font-heading text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.08]">

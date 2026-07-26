@@ -35,43 +35,11 @@ export function StorefrontShell({
 }
 
 function SiteHeader({ overlay = false }: { overlay?: boolean }) {
-  const [visible, setVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-
-  useEffect(() => {
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
-
-        // Keep header visible at the top
-        if (currentScrollY <= 80) {
-          setVisible(true);
-        } else if (currentScrollY > lastScrollY) {
-          // Hide if scrolling down, show if scrolling up
-          setVisible(false);
-        } else {
-          setVisible(true);
-        }
-        setLastScrollY(currentScrollY);
-        ticking = false;
-      });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
-
   const headerBaseClasses = overlay
-    ? 'fixed inset-x-0 top-0 z-30 text-primary-fg transition-all duration-300 ease-out'
-    : 'sticky top-0 z-30 border-b border-line bg-surface/95 text-content-soft backdrop-blur transition-all duration-300 ease-out';
+    ? 'sticky top-0 z-30 bg-white/95 text-slate-800 backdrop-blur border-b border-slate-200 shadow-sm transition-all'
+    : 'sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-800 backdrop-blur shadow-sm transition-all';
 
-  const visibilityClasses = visible
-    ? 'translate-y-0 opacity-100'
-    : '-translate-y-full opacity-0 pointer-events-none';
+  const visibilityClasses = 'translate-y-0 opacity-100';
 
   const linkHoverClass = overlay ? 'hover:text-primary-fg/70' : 'hover:text-primary';
 
@@ -98,7 +66,6 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         <nav className="bv-nav-links hidden items-center gap-7 text-sm font-semibold lg:flex">
           <ShopMegaMenu overlay={overlay} />
           <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New Arrivals</Link>
-          <Link href="/brands" className={`bv-nav-link ${linkHoverClass}`}>Brands</Link>
           <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
         </nav>
 
@@ -173,8 +140,8 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
         <ChevronDown />
       </button>
 
-      {/* L1 dropdown panel — drops down from -6px on reveal */}
-      <div className="invisible absolute left-0 top-full -translate-y-1.5 pt-2 opacity-0 transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+      {/* L1 dropdown panel — smooth fade-in animation */}
+      <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition-all duration-300 ease-out transform -translate-y-2 scale-95 group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
         <div className={panelClasses}>
           <ul className="space-y-0.5">
             {SHOP_CATEGORIES.map((c) => {

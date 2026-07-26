@@ -103,25 +103,16 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
         <div className={`absolute right-0 top-full z-50 mt-2 w-[min(16rem,calc(100vw-2rem))] overflow-hidden rounded-xl ${panelClasses}`}>
           {/* User info */}
           <div className="flex items-center gap-3 px-4 py-3.5">
-            {initials ? (
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold tracking-wide ${overlay ? 'bg-primary-fg/20 text-primary-fg' : 'bg-primary text-primary-fg'}`}>
-                {initials}
-              </div>
-            ) : (
-              <div className={`h-10 w-10 shrink-0 animate-pulse rounded-full ${skeletonClasses}`} />
-            )}
+            <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold tracking-wide ${overlay ? 'bg-white/20 text-white' : 'bg-primary text-white shadow-sm'}`}>
+              {initials ? initials : <Icon.Account size={20} strokeWidth={1.8} />}
+            </div>
             <div className="min-w-0 flex-1">
-              {displayName ? (
-                <>
-                  <p className={`truncate text-sm font-semibold ${nameClasses}`}>{displayName}</p>
-                  <p className={`truncate text-xs ${emailClasses}`}>{me?.email}</p>
-                </>
-              ) : (
-                <>
-                  <div className={`h-3.5 w-24 animate-pulse rounded ${skeletonClasses}`} />
-                  <div className={`mt-1.5 h-3 w-32 animate-pulse rounded ${skeletonClasses}`} />
-                </>
-              )}
+              <p className={`truncate text-sm font-bold ${nameClasses}`}>
+                {displayName ? displayName : 'My Account'}
+              </p>
+              <p className={`truncate text-xs ${emailClasses}`}>
+                {me?.email ? me.email : 'Sign in to manage profile'}
+              </p>
             </div>
           </div>
 

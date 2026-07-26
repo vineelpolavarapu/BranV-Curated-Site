@@ -124,10 +124,15 @@ export function QuickAddModal({
     if (!open) return;
     void (async () => {
       const [b, c] = await Promise.all([
-        apiFetch<Page<Brand>>('/admin/brands?pageSize=200'),
+        apiFetch<any>('/admin/brands?pageSize=200'),
         apiFetch<CategoryNode[]>('/admin/categories'),
       ]);
-      if (b.ok && b.data) setBrands(b.data.data);
+      if (b.ok && b.data) {
+        const brandList = Array.isArray(b.data) ? b.data : b.data.data;
+        if (Array.isArray(brandList) && brandList.length > 0) {
+          setBrands(brandList);
+        }
+      }
       if (c.ok && c.data) setCategories(c.data);
     })();
   }, [open]);
@@ -554,29 +559,6 @@ export function QuickAddModal({
               </select>
             </div>
             <div>
-              <label className={adminLabel}>Price ₹</label>
-              <input
-                required
-                type="number"
-                min={0}
-                step="0.01"
-                value={form.price}
-                onChange={(e) => set('price', e.target.value)}
-                className={adminInput}
-              />
-            </div>
-            <div>
-              <label className={adminLabel}>MRP ₹</label>
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={form.mrp}
-                onChange={(e) => set('mrp', e.target.value)}
-                className={adminInput}
-              />
-            </div>
-            <div>
               <label className={adminLabel}>Color</label>
               <input
                 value={form.color}
@@ -614,6 +596,30 @@ export function QuickAddModal({
                 placeholder="casual, summer, linen"
                 className={adminInput}
               />
+            </div>
+          </div>
+
+          {/* Task 11: Product Visibility Checkbox Section */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+            <label className={`${adminLabel} text-slate-800 font-bold`}>
+              👁️ Product Visibility (Select all categories this product appears in)
+            </label>
+            <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
+                'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
+                'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
+                'Sweaters', 'Sweatshirts & Hoodies', 'Ethnic Wear'
+              ].map((cat) => (
+                <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <span>{cat}</span>
+                </label>
+              ))}
             </div>
           </div>
 

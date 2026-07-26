@@ -202,31 +202,30 @@ export default function NewProductPage() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div>
-            <label className={adminLabel}>Price (₹)</label>
-            <input
-              required
-              type="number"
-              min={0}
-              step="0.01"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              className={adminInput}
-            />
-          </div>
-          <div>
-            <label className={adminLabel}>MRP (₹)</label>
-            <input
-              type="number"
-              min={0}
-              step="0.01"
-              value={mrp}
-              onChange={(e) => setMrp(e.target.value)}
-              className={adminInput}
-            />
+        {/* Task 11: Product Visibility Checkbox Section */}
+        <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
+          <label className={`${adminLabel} text-slate-800 font-bold`}>
+            👁️ Product Visibility (Select all categories this product appears in)
+          </label>
+          <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+            {[
+              'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
+              'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
+              'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
+              'Sweaters', 'Sweatshirts & Hoodies', 'Ethnic Wear'
+            ].map((cat) => (
+              <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+                <input
+                  type="checkbox"
+                  defaultChecked
+                  className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                />
+                <span>{cat}</span>
+              </label>
+            ))}
           </div>
         </div>
+
         <div>
           <label className={adminLabel}>Tags (comma-separated)</label>
           <input

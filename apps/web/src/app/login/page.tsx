@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { apiFetch, AuthSummary } from '@/lib/api';
+import { Icon } from '@/components/icons';
 import {
   AuthShell,
   inputClass,
@@ -26,6 +27,7 @@ function MemberLoginPageInner() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [totpCode, setTotpCode] = useState('');
   const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,16 +88,30 @@ function MemberLoginPageInner() {
         </div>
         <div>
           <label className={labelClass} htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              required
+              minLength={8}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`${inputClass} pr-10`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors focus:outline-none"
+            >
+              {showPassword ? (
+                <Icon.EyeOff size={18} strokeWidth={1.8} />
+              ) : (
+                <Icon.Eye size={18} strokeWidth={1.8} />
+              )}
+            </button>
+          </div>
           <Link
             href="/forgot-password"
             className="mt-2 inline-block text-xs text-content-soft hover:text-primary"

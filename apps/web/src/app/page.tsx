@@ -13,6 +13,12 @@ const STATIC_CATEGORIES = [
   { title: 'Tracks', slug: 'tracks' },
   { title: 'Footwear', slug: 'footwear' },
   { title: 'Watches', slug: 'watches' },
+  { title: 'Trousers', slug: 'trousers' },
+  { title: 'Shorts', slug: 'shorts' },
+  { title: 'Jackets', slug: 'jackets' },
+  { title: 'Sweaters', slug: 'sweaters' },
+  { title: 'Sweatshirts & Hoodies', slug: 'sweatshirts-and-hoodies' },
+  { title: 'Ethnic Wear', slug: 'ethnic-wear' },
 ];
 
 export default async function HomePage() {

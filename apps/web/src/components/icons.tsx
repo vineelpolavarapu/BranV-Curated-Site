@@ -38,6 +38,8 @@ import {
   Flame,
   Trash2,
   LogOut,
+  Eye,
+  EyeOff,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -46,11 +48,16 @@ export const ICON_DEFAULTS = { size: 24, strokeWidth: 1.75 } as const;
 
 /** Semantic icon registry — key = meaning in the UI, value = Lucide glyph. */
 export const Icon = {
+  Eye,
+  EyeOff,
   Search,
   Wishlist: Heart,
   Heart,
   Cart: ShoppingBag,
   Bag: ShoppingBag,
+  Shop: LayoutGrid,
+  Categories: LayoutGrid,
+  Grid: LayoutGrid,
   Menu,
   Close: X,
   Filter: SlidersHorizontal,
@@ -62,10 +69,8 @@ export const Icon = {
   Account: User,
   User,
   Home,
-  Categories: LayoutGrid,
   Explore: Compass,
   Help: HelpCircle,
-  Shop: ShoppingBag,
   Notifications: Bell,
   Delivery: Truck,
   Secure: ShieldCheck,
