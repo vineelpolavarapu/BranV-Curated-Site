@@ -66,24 +66,27 @@ export function Filters({ context }: { context: FilterContext }) {
       {/* Mobile sheet */}
       {openMobile && (
         <div
-          className="fixed inset-0 z-40 flex lg:hidden"
+          className="fixed inset-0 z-50 flex flex-col justify-end bg-slate-900/60 backdrop-blur-xs lg:hidden"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpenMobile(false);
           }}
         >
-          <div className="absolute inset-0 bg-content/40" />
-          <div className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-surface p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-content">Filters</h2>
+          <div className="relative mt-16 flex max-h-[82vh] w-full flex-col rounded-t-2xl bg-white shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-3.5 shadow-xs">
+              <h2 className="text-base font-bold text-slate-800">Filters</h2>
               <button
                 onClick={() => setOpenMobile(false)}
                 aria-label="Close filters"
-                className="text-content-soft hover:text-content"
+                className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition"
               >
-                <Icon.Close size={20} strokeWidth={1.75} aria-hidden />
+                <Icon.Close size={20} strokeWidth={2} aria-hidden />
               </button>
             </div>
-            <FilterBody context={context} onApply={() => setOpenMobile(false)} />
+            {/* Scrollable Modal Content */}
+            <div className="overflow-y-auto px-5 py-4 pb-28 overscroll-contain space-y-5">
+              <FilterBody context={context} onApply={() => setOpenMobile(false)} />
+            </div>
           </div>
         </div>
       )}
@@ -420,10 +423,8 @@ export function SortPicker() {
       options={[
         { value: 'relevance', label: 'Relevance' },
         { value: 'newest', label: 'Newest' },
-        { value: 'price_asc', label: 'Price: low → high' },
-        { value: 'price_desc', label: 'Price: high → low' },
+        { value: 'oldest', label: 'Oldest' },
         { value: 'best_rated', label: 'Best rated' },
-        { value: 'popular', label: 'Most popular' },
       ]}
     />
   );

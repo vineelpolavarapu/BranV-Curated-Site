@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { ProductCard } from './ProductCard';
 import type { ProductCardData } from '@/lib/storefront-types';
 
@@ -10,28 +11,41 @@ export function CategoryHashFilter({
   categorySlug: string;
   allProducts: ProductCardData[];
 }) {
+  const searchParams = useSearchParams();
+  const sort = searchParams.get('sort') ?? 'relevance';
+
   const [filtered, setFiltered] = useState<ProductCardData[]>(allProducts);
   const [transitioning, setTransitioning] = useState(false);
   const [pendingProducts, setPendingProducts] = useState<ProductCardData[]>(allProducts);
 
-  function applyHash(rawHash: string) {
+  function applyFilterAndSort(rawHash: string, sortKey: string) {
     const sub = rawHash.replace(/^#/, '').trim();
-    let nextProducts = allProducts;
+    let list = [...allProducts];
+
     if (sub) {
       const fullSlug = `${categorySlug}-${sub}`;
-      nextProducts = allProducts.filter((p) => p.subcategory?.slug === fullSlug);
+      list = list.filter((p) => p.subcategory?.slug === fullSlug || p.subcategory?.slug?.endsWith(`-${sub}`));
     }
+
+    if (sortKey === 'newest') {
+      list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (sortKey === 'oldest') {
+      list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    } else if (sortKey === 'best_rated') {
+      list.sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0));
+    }
+
     setTransitioning(true);
-    setPendingProducts(nextProducts);
+    setPendingProducts(list);
   }
 
   useEffect(() => {
-    applyHash(window.location.hash);
-    const onHashChange = () => applyHash(window.location.hash);
+    applyFilterAndSort(window.location.hash, sort);
+    const onHashChange = () => applyFilterAndSort(window.location.hash, sort);
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allProducts, categorySlug]);
+  }, [allProducts, categorySlug, sort]);
 
   useEffect(() => {
     if (transitioning) {

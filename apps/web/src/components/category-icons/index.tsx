@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 
 export interface CategoryIconProps {
@@ -83,12 +81,17 @@ export function AccessoryCategoryIcon({ className = 'h-6 w-6', size = 26, stroke
 /** Dynamic resolver for category slug → custom SVG React component */
 export function getCategoryIconBySlug(slug: string, className?: string) {
   const lower = slug.toLowerCase();
-  if (lower.includes('shirt') && !lower.includes('t-shirt')) return <ShirtCategoryIcon className={className} />;
+  if (lower.includes('shirt') && !lower.includes('t-shirt') && !lower.includes('sweatshirt')) return <ShirtCategoryIcon className={className} />;
   if (lower.includes('t-shirt') || lower.includes('polo')) return <TShirtCategoryIcon className={className} />;
   if (lower.includes('jean') || lower.includes('denim') || lower.includes('pant') || lower.includes('track')) return <JeansCategoryIcon className={className} />;
   if (lower.includes('jacket') || lower.includes('outerwear') || lower.includes('coat')) return <JacketCategoryIcon className={className} />;
-  if (lower.includes('hoodie') || lower.includes('sweatshirt')) return <HoodieCategoryIcon className={className} />;
+  if (lower.includes('hoodie')) return <HoodieCategoryIcon className={className} />;
+  if (lower.includes('sweatshirt') || lower.includes('sweater')) return <HoodieCategoryIcon className={className} />;
   if (lower.includes('footwear') || lower.includes('shoe') || lower.includes('sneaker') || lower.includes('boot')) return <FootwearCategoryIcon className={className} />;
   if (lower.includes('watch')) return <WatchCategoryIcon className={className} />;
   return <AccessoryCategoryIcon className={className} />;
+}
+
+export function CategoryIcon({ slug, className }: { slug: string; className?: string }) {
+  return getCategoryIconBySlug(slug, className);
 }

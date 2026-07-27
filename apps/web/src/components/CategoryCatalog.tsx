@@ -85,46 +85,27 @@ function CategoryHeader({
 }
 
 function ListingShell({
-  filters,
-  brands,
   list,
   categorySlug,
 }: {
-  filters: FilterDefinition[];
-  brands: Array<{ slug: string; name: string }>;
+  filters?: FilterDefinition[];
+  brands?: Array<{ slug: string; name: string }>;
   list: ProductPage | null;
   categorySlug: string;
 }) {
-  const retailers = new Set<string>();
-  for (const p of list?.data ?? []) {
-    for (const r of p.retailers) retailers.add(r.retailer);
-  }
   return (
     <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
-      <div className="grid gap-6 lg:grid-cols-[220px_1fr]">
-        <AnimateOnScroll>
-          <div className="bv-enter">
-            <Filters
-              context={{
-                categoryFilters: filters,
-                brands,
-                retailers: Array.from(retailers),
-              }}
-            />
-          </div>
-        </AnimateOnScroll>
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm text-content-soft">
-              {list?.total ?? 0} results
-            </p>
-            <SortPicker />
-          </div>
-          <CategoryHashFilter
-            categorySlug={categorySlug}
-            allProducts={list?.data ?? []}
-          />
+      <div className="w-full space-y-6">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+          <p className="text-sm font-medium text-slate-500">
+            {list?.total ?? 0} {list?.total === 1 ? 'result' : 'results'}
+          </p>
+          <SortPicker />
         </div>
+        <CategoryHashFilter
+          categorySlug={categorySlug}
+          allProducts={list?.data ?? []}
+        />
       </div>
     </section>
   );

@@ -28,8 +28,8 @@ const CATEGORY_SLUGS = [
   'shorts',
   'jackets',
   'sweaters',
-  'sweatshirts-and-hoodies',
-  'ethnic-wear',
+  'sweatshirts',
+  'hoodies',
 ];
 
 interface LookbookListItem {

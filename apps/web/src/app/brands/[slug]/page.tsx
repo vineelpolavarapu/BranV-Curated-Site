@@ -38,28 +38,25 @@ export default async function BrandDetailPage(props: {
     <StorefrontShell>
       <BrandHero brand={brand} />
       {story && <BrandStorySection story={story} />}
-      <section className="mx-auto max-w-7xl px-6 pb-12 pt-2">
-        <div className="grid gap-6 md:grid-cols-[220px_1fr]">
-          <Filters context={{}} />
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <p className="text-sm text-content-soft">
-                {list?.total ?? 0} products
-              </p>
-              <SortPicker />
-            </div>
-            {!list || list.data.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
-                No products under this brand match.
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
-                {list.data.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
-            )}
+      <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
+        <div className="w-full space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+            <p className="text-sm font-medium text-slate-500">
+              {list?.total ?? 0} products
+            </p>
+            <SortPicker />
           </div>
+          {!list || list.data.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
+              No products under this brand match.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+              {list.data.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </StorefrontShell>

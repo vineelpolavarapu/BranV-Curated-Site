@@ -23,7 +23,7 @@ export function StorefrontShell({
   return (
     <WishlistProvider>
       <ClickReturnProvider>
-        <div className="min-h-[100dvh] pb-16 lg:pb-0">
+        <div className={`min-h-[100dvh] pb-16 lg:pb-0 ${heroOverlay ? 'pt-0' : 'pt-28 lg:pt-24'}`}>
           <SiteHeader overlay={heroOverlay} />
           {children}
           <SiteFooter />
@@ -35,13 +35,46 @@ export function StorefrontShell({
 }
 
 function SiteHeader({ overlay = false }: { overlay?: boolean }) {
-  const headerBaseClasses = overlay
-    ? 'sticky top-0 z-30 bg-white/95 text-slate-800 backdrop-blur border-b border-slate-200 shadow-sm transition-all'
-    : 'sticky top-0 z-30 border-b border-slate-200 bg-white/95 text-slate-800 backdrop-blur shadow-sm transition-all';
+  const [visible, setVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
-  const visibilityClasses = 'translate-y-0 opacity-100';
+  useEffect(() => {
+    let ticking = false;
 
-  const linkHoverClass = overlay ? 'hover:text-primary-fg/70' : 'hover:text-primary';
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY <= 40) {
+          setVisible(true);
+        } else if (currentScrollY > lastScrollY + 5) {
+          // Hide navbar when scrolling down
+          setVisible(false);
+        } else if (currentScrollY < lastScrollY - 5) {
+          // Show navbar when scrolling up
+          setVisible(true);
+        }
+
+        setLastScrollY(currentScrollY);
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
+
+  // 100% Transparent background at all times per Task 1
+  const headerBaseClasses =
+    'fixed inset-x-0 top-0 z-30 bg-transparent text-slate-900 transition-all duration-300 ease-out pointer-events-auto';
+
+  const visibilityClasses = visible
+    ? 'translate-y-0 opacity-100'
+    : '-translate-y-full opacity-0 pointer-events-none';
+
+  const linkHoverClass = 'hover:text-primary';
 
   return (
     <header className={`${headerBaseClasses} ${visibilityClasses}`}>

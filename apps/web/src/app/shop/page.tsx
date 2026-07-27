@@ -3,18 +3,32 @@ import { apiServer } from '@/lib/api-server';
 import { CategoryCard } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
-import { isCollectionSlug } from '@/lib/collections';
-import { getCategoryIconBySlug } from '@/components/category-icons';
+import { CategoryIcon } from '@/components/category-icons';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 
 export const dynamic = 'force-dynamic';
 
 const CATEGORY_STAGGER = ['bv-delay-1', 'bv-delay-2', 'bv-delay-3', 'bv-delay-4', 'bv-delay-5', 'bv-delay-6'];
 
 export default async function ShopPage() {
-  const categories = (await apiServer<CategoryCard[]>('/categories')) ?? [];
-  const topLevel = categories
-    .filter((c) => c.parentId === null && !isCollectionSlug(c.slug))
-    .sort((a, b) => a.displayOrder - b.displayOrder);
+  const apiCategories = (await apiServer<CategoryCard[]>('/categories')) ?? [];
+
+  const countMap = new Map<string, number>();
+  for (const c of apiCategories) {
+    if (c && c.slug) {
+      countMap.set(c.slug, c._count?.productsAsCategory ?? 0);
+    }
+  }
+
+  // SHOP_CATEGORIES is the single source of truth for top-level shop categories
+  const topLevel = SHOP_CATEGORIES.map((c, i) => ({
+    id: c.slug,
+    slug: c.slug,
+    name: c.name,
+    parentId: null,
+    displayOrder: i,
+    _count: { productsAsCategory: countMap.get(c.slug) ?? 0 },
+  }));
 
   return (
     <StorefrontShell>
@@ -26,43 +40,33 @@ export default async function ShopPage() {
         </section>
       </AnimateOnScroll>
 
-      {topLevel.length > 0 ? (
-        <AnimateOnScroll>
-          <section className="mx-auto max-w-7xl px-6 pb-12">
-            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-              {topLevel.map((c, i) => {
-                const icon = getCategoryIconBySlug(c.slug, 'h-6.5 w-6.5');
-                return (
-                  <li key={c.slug} className={`bv-enter ${CATEGORY_STAGGER[i % CATEGORY_STAGGER.length] ?? ''}`}>
-                    <Link
-                      href={`/category/${c.slug}`}
-                      className="group flex flex-col items-center gap-3 rounded-card border border-line bg-surface p-6 text-center transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-card-hover"
-                    >
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-100 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                        {icon}
-                      </span>
-                      <span>
-                        <p className="text-sm font-medium text-content">{c.name}</p>
-                        <p className="text-xs text-content-soft">
-                          {c._count.productsAsCategory}{' '}
-                          {c._count.productsAsCategory === 1 ? 'product' : 'products'}
-                        </p>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        </AnimateOnScroll>
-
-      ) : (
+      <AnimateOnScroll>
         <section className="mx-auto max-w-7xl px-6 pb-12">
-          <p className="rounded-2xl border border-dashed border-line p-10 text-center text-sm text-content-soft">
-            No categories yet.
-          </p>
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {topLevel.map((c, i) => {
+              const count = c._count?.productsAsCategory ?? 0;
+              return (
+                <li key={c.slug} className={`bv-enter ${CATEGORY_STAGGER[i % CATEGORY_STAGGER.length] ?? ''}`}>
+                  <Link
+                    href={`/category/${c.slug}`}
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
+                  >
+                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                      <CategoryIcon slug={c.slug} className="h-7 w-7" />
+                    </span>
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">{c.name}</p>
+                      <p className="mt-0.5 text-xs text-slate-500">
+                        {count} {count === 1 ? 'product' : 'products'}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </section>
-      )}
+      </AnimateOnScroll>
     </StorefrontShell>
   );
 }
