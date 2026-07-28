@@ -89,6 +89,16 @@ def verify_password(stored_hash: str, plaintext: str) -> bool:
         return False
 
 
+async def async_hash_password(plaintext: str) -> str:
+    import asyncio
+    return await asyncio.to_thread(hash_password, plaintext)
+
+
+async def async_verify_password(stored_hash: str, plaintext: str) -> bool:
+    import asyncio
+    return await asyncio.to_thread(verify_password, stored_hash, plaintext)
+
+
 # ───────────── JWT access tokens ─────────────────────────────────────────────
 
 

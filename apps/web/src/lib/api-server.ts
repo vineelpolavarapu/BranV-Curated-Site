@@ -2,10 +2,12 @@
  * Server-side fetcher for storefront pages. Returns parsed JSON or null on
  * error — pages handle the null case (404 / empty state). No cookies, no auth.
  */
+import { cache } from 'react';
+
 const BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
 
-export async function apiServer<T>(
+async function _apiServer<T>(
   path: string,
   init: RequestInit = {},
 ): Promise<T | null> {
@@ -17,13 +19,9 @@ export async function apiServer<T>(
         'Content-Type': 'application/json',
         ...(init.headers ?? {}),
       },
-      // Storefront pages are dynamic in dev; ISR added in Phase 11.
       cache: 'no-store',
     });
     if (!res.ok) {
-      // A non-2xx here is indistinguishable from "not found" to callers
-      // (they treat null as notFound()), so log it — otherwise a backend
-      // outage looks identical to a missing row with zero server-side trace.
       console.error(`[apiServer] ${url} -> HTTP ${res.status}`);
       return null;
     }
@@ -33,6 +31,8 @@ export async function apiServer<T>(
     return null;
   }
 }
+
+export const apiServer = cache(_apiServer) as typeof _apiServer;
 
 export function buildQuery(
   params: Record<string, string | number | boolean | string[] | undefined>,

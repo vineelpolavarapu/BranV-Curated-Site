@@ -76,7 +76,41 @@ FROM (VALUES
   ('watches', 'watches-luxury',                            'Luxury',             'watches/luxury',                     3),
   ('watches', 'watches-strap-watches',                     'Strap Watches',      'watches/strap-watches',               3),
   ('watches', 'watches-chained-watches',                   'Chained Watches',    'watches/chained-watches',             4),
-  ('watches', 'watches-chronographs',                      'Chronographs',       'watches/chronographs',                4)
+  ('watches', 'watches-chronographs',                      'Chronographs',       'watches/chronographs',                4),
+
+  ('trousers', 'trousers-chinos',                          'Chinos',             'trousers/chinos',                     0),
+  ('trousers', 'trousers-formal-trousers',                 'Formal Trousers',    'trousers/formal-trousers',            1),
+  ('trousers', 'trousers-cargo-trousers',                  'Cargo Trousers',     'trousers/cargo-trousers',             2),
+  ('trousers', 'trousers-cotton-trousers',                 'Cotton Trousers',    'trousers/cotton-trousers',            3),
+  ('trousers', 'trousers-slim-fit-trousers',               'Slim Fit Trousers',  'trousers/slim-fit-trousers',          4),
+
+  ('shorts', 'shorts-denim-shorts',                        'Denim Shorts',       'shorts/denim-shorts',                 0),
+  ('shorts', 'shorts-cargo-shorts',                        'Cargo Shorts',       'shorts/cargo-shorts',                 1),
+  ('shorts', 'shorts-sports-shorts',                       'Sports Shorts',      'shorts/sports-shorts',                2),
+  ('shorts', 'shorts-cotton-shorts',                       'Cotton Shorts',      'shorts/cotton-shorts',                3),
+  ('shorts', 'shorts-casual-shorts',                       'Casual Shorts',      'shorts/casual-shorts',                4),
+
+  ('jackets', 'jackets-denim-jackets',                      'Denim Jackets',      'jackets/denim-jackets',               0),
+  ('jackets', 'jackets-leather-jackets',                    'Leather Jackets',    'jackets/leather-jackets',             1),
+  ('jackets', 'jackets-bomber-jackets',                     'Bomber Jackets',     'jackets/bomber-jackets',              2),
+  ('jackets', 'jackets-puffer-jackets',                     'Puffer Jackets',     'jackets/puffer-jackets',              3),
+  ('jackets', 'jackets-windbreakers',                       'Windbreakers',       'jackets/windbreakers',                4),
+
+  ('sweaters', 'sweaters-v-neck-sweaters',                  'V-Neck Sweaters',    'sweaters/v-neck-sweaters',            0),
+  ('sweaters', 'sweaters-crew-neck-sweaters',               'Crew Neck Sweaters', 'sweaters/crew-neck-sweaters',       1),
+  ('sweaters', 'sweaters-cardigans',                        'Cardigans',          'sweaters/cardigans',                  2),
+  ('sweaters', 'sweaters-turtlenecks',                      'Turtlenecks',        'sweaters/turtlenecks',                3),
+  ('sweaters', 'sweaters-cable-knit',                       'Cable Knit',         'sweaters/cable-knit',                 4),
+
+  ('sweatshirts', 'sweatshirts-crew-neck-sweatshirts',      'Crew Neck Sweatshirts', 'sweatshirts/crew-neck-sweatshirts', 0),
+  ('sweatshirts', 'sweatshirts-oversized-sweatshirts',      'Oversized Sweatshirts', 'sweatshirts/oversized-sweatshirts', 1),
+  ('sweatshirts', 'sweatshirts-fleece-sweatshirts',         'Fleece Sweatshirts', 'sweatshirts/fleece-sweatshirts',    2),
+  ('sweatshirts', 'sweatshirts-printed-sweatshirts',        'Printed Sweatshirts', 'sweatshirts/printed-sweatshirts',   3),
+
+  ('hoodies', 'hoodies-pullover-hoodies',                   'Pullover Hoodies',   'hoodies/pullover-hoodies',            0),
+  ('hoodies', 'hoodies-zip-up-hoodies',                     'Zip-Up Hoodies',     'hoodies/zip-up-hoodies',              1),
+  ('hoodies', 'hoodies-oversized-hoodies',                  'Oversized Hoodies',  'hoodies/oversized-hoodies',           2),
+  ('hoodies', 'hoodies-fleece-hoodies',                     'Fleece Hoodies',     'hoodies/fleece-hoodies',              3)
 ) AS v(parent_slug, slug, name, path, display_order)
 JOIN categories p ON p.slug = v.parent_slug
 ON CONFLICT (slug) DO NOTHING;

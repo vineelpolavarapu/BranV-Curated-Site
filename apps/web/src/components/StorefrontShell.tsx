@@ -225,35 +225,23 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
 function SiteFooter() {
   return (
     <AnimateOnScroll>
-      <footer className="mt-20 border-t border-slate-200 bg-[#F0F7FF]/60">
-        <div className="mx-auto max-w-7xl gap-10 px-6 py-12 text-sm text-slate-600 md:grid md:grid-cols-[1.5fr_1fr]">
-          <div className="bv-enter">
-            <div className="mb-4 inline-flex flex-col items-start user-select-none">
-              <div className="font-heading text-xl font-extrabold tracking-tight text-slate-900">
+      <footer className="mt-8 border-t border-slate-200/80 bg-[#F0F7FF]/50 py-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-center text-sm text-slate-600 sm:flex-row sm:text-left">
+          <div>
+            <div className="mb-1.5 inline-flex items-center gap-2 user-select-none">
+              <span className="font-heading text-lg font-extrabold tracking-tight text-slate-900">
                 Bran<span className="text-primary">V</span>
-              </div>
-              <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.22em] text-slate-500">
-                ALL FOR MEN
-              </div>
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400">
+                • ALL FOR MEN
+              </span>
             </div>
-            <p className="max-w-xl text-xs leading-relaxed text-slate-500">
-              BranV is a curated affiliate platform. We never hold inventory, never
-              process payments, never fulfill orders. When you click Buy Now, you
-              are redirected to the retailer&apos;s site to complete your purchase.{' '}
-              <strong className="font-semibold text-slate-700">We earn a small commission on qualifying sales, at no extra cost to you.</strong>
-            </p>
-            <p className="mt-6 text-xs font-medium text-slate-400">
-              © {new Date().getFullYear()} BranV. All rights reserved.
+            <p className="max-w-2xl text-xs leading-normal text-slate-500">
+              BranV is a curated affiliate platform. We never hold inventory, process payments, or fulfill orders. Clicking Buy Now redirects you directly to the retailer&apos;s site.
             </p>
           </div>
-          <div className="bv-enter bv-delay-2 mt-8 md:mt-0">
-            <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.2em] text-slate-400">
-              Newsletter
-            </p>
-            <p className="mb-4 text-xs font-medium text-slate-500">
-              Weekly digest of curated new arrivals and style guides.
-            </p>
-            <NewsletterSignup source="footer" />
+          <div className="shrink-0 text-xs font-medium text-slate-400">
+            © {new Date().getFullYear()} BranV. All rights reserved.
           </div>
         </div>
       </footer>

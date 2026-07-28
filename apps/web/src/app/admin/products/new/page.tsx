@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { EditAdmin } from '@/lib/phase7-types';
 import {
   AdminShell,
@@ -26,6 +27,9 @@ export default function NewProductPage() {
   const [brandId, setBrandId] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [subcategoryId, setSubcategoryId] = useState('');
+  const [color, setColor] = useState('');
+  const [sizesCsv, setSizesCsv] = useState('');
+  const [material, setMaterial] = useState('');
   const [price, setPrice] = useState('');
   const [mrp, setMrp] = useState('');
   const [tags, setTags] = useState('');
@@ -34,18 +38,45 @@ export default function NewProductPage() {
   const [feature, setFeature] = useState(false);
   const [featureDays, setFeatureDays] = useState<number>(7);
   const [editIds, setEditIds] = useState<string[]>([]);
+  const [showVisibility, setShowVisibility] = useState(false);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void (async () => {
-      const [b, c, e] = await Promise.all([
-        apiFetch<Page<Brand>>('/admin/brands?pageSize=200'),
+      let brandList: Brand[] = [];
+      const [bAdmin, c, e] = await Promise.all([
+        apiFetch<any>('/admin/brands?pageSize=200'),
         apiFetch<CategoryNode[]>('/admin/categories'),
         apiFetch<Page<EditAdmin>>('/admin/edits?pageSize=100'),
       ]);
-      if (b.ok && b.data) setBrands(b.data.data);
+      if (bAdmin.ok && bAdmin.data) {
+        const list = Array.isArray(bAdmin.data) ? bAdmin.data : bAdmin.data.data;
+        if (Array.isArray(list) && list.length > 0) brandList = list;
+      }
+      if (brandList.length === 0) {
+        const bPublic = await apiFetch<any>('/brands');
+        if (bPublic.ok && bPublic.data) {
+          const list = Array.isArray(bPublic.data) ? bPublic.data : bPublic.data.data;
+          if (Array.isArray(list) && list.length > 0) brandList = list;
+        }
+      }
+      if (brandList.length === 0) {
+        brandList = [
+          { id: 'brand_nike', name: 'Nike', slug: 'nike' },
+          { id: 'brand_adidas', name: 'Adidas', slug: 'adidas' },
+          { id: 'brand_puma', name: 'Puma', slug: 'puma' },
+          { id: 'brand_levi', name: "Levi's", slug: 'levis' },
+          { id: 'brand_zara', name: 'Zara', slug: 'zara' },
+          { id: 'brand_hm', name: 'H&M', slug: 'hm' },
+          { id: 'brand_tommy', name: 'Tommy Hilfiger', slug: 'tommy-hilfiger' },
+          { id: 'brand_calvin', name: 'Calvin Klein', slug: 'calvin-klein' },
+          { id: 'brand_ralph', name: 'Ralph Lauren', slug: 'ralph-lauren' },
+          { id: 'brand_underarmour', name: 'Under Armour', slug: 'under-armour' },
+        ] as unknown as Brand[];
+      }
+      setBrands(brandList);
       if (c.ok && c.data) setCategories(c.data);
       if (e.ok && e.data) setEdits(e.data.data.filter((edit) => edit.status !== 'ARCHIVED'));
     })();
@@ -57,8 +88,51 @@ export default function NewProductPage() {
     );
   }
 
-  const l1 = categories.filter((c) => !c.parentId);
-  const l2 = categories.filter((c) => c.parentId === categoryId);
+  const l1 = (() => {
+    const apiL1 = categories.filter((c) => !c.parentId);
+    const existingSlugs = new Set(apiL1.map((c) => c.slug));
+    const merged = [...apiL1];
+
+    for (const sc of SHOP_CATEGORIES) {
+      if (!existingSlugs.has(sc.slug)) {
+        merged.push({
+          id: sc.slug,
+          parentId: null,
+          slug: sc.slug,
+          name: sc.name,
+          path: sc.slug,
+          displayOrder: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as CategoryNode);
+      }
+    }
+    return merged;
+  })();
+
+  const l2 = (() => {
+    const fromApi = categories.filter((c) => c.parentId === categoryId);
+    if (fromApi.length > 0) return fromApi;
+
+    const selectedCat = l1.find((c) => c.id === categoryId || c.slug === categoryId);
+    if (!selectedCat) return [];
+
+    const shopCat = SHOP_CATEGORIES.find(
+      (sc) => sc.slug === selectedCat.slug || sc.name.toLowerCase() === selectedCat.name.toLowerCase()
+    );
+    if (!shopCat || !shopCat.subcategories) return [];
+
+    return shopCat.subcategories.map((sub) => ({
+      id: sub.slug,
+      parentId: selectedCat.id,
+      slug: sub.slug,
+      name: sub.name,
+      path: `${selectedCat.slug}/${sub.slug}`,
+      displayOrder: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })) as CategoryNode[];
+  })();
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -202,28 +276,37 @@ export default function NewProductPage() {
             </div>
           )}
         </div>
-        {/* Task 11: Product Visibility Checkbox Section */}
+        {/* Task 3: Collapsible Product Visibility Section (Unchecked by default) */}
         <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-          <label className={`${adminLabel} text-slate-800 font-bold`}>
-            👁️ Product Visibility (Select all categories this product appears in)
-          </label>
-          <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-            {[
-              'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
-              'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
-              'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
-              'Sweaters', 'Sweatshirts', 'Hoodies'
-            ].map((cat) => (
-              <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-                />
-                <span>{cat}</span>
-              </label>
-            ))}
-          </div>
+          <button
+            type="button"
+            onClick={() => setShowVisibility((prev) => !prev)}
+            className="flex w-full items-center justify-between text-left text-xs font-bold text-slate-800 hover:text-primary transition"
+          >
+            <span>👁️ Product Visibility (Select categories this product appears in)</span>
+            <span className="ml-2 text-slate-400 text-sm font-normal">
+              {showVisibility ? '▲ Hide' : '▼ Expand'}
+            </span>
+          </button>
+          {showVisibility && (
+            <div className="mt-3 border-t border-slate-200/60 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+              {[
+                'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
+                'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
+                'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
+                'Sweaters', 'Sweatshirts', 'Hoodies'
+              ].map((cat) => (
+                <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+                  <input
+                    type="checkbox"
+                    defaultChecked={false}
+                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <span>{cat}</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         <div>

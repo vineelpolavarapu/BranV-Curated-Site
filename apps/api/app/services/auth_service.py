@@ -23,6 +23,7 @@ from typing import Any
 
 from fastapi import BackgroundTasks
 from sqlalchemy import select, update
+from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core import security
@@ -100,7 +101,7 @@ async def register(
             "If this email is available, you will receive a verification message",
         )
 
-    password_hash = security.hash_password(password)
+    password_hash = await security.async_hash_password(password)
     user_id = _mint_cuid()
     now = _utcnow_naive()
     db.add(
@@ -229,7 +230,7 @@ async def login(
         )
         raise AuthError(401, "Account temporarily locked. Try again later.")
 
-    if not security.verify_password(user.passwordHash, password):
+    if not await security.async_verify_password(user.passwordHash, password):
         await _record_failed_attempt(db, user, ip=ip, userAgent=userAgent, background=background)
         raise AuthError(401, "Invalid credentials")
 
@@ -443,7 +444,7 @@ async def reset_password(
     user = (await db.execute(select(User).where(User.id_ == row.userId))).scalar_one()
     had_totp = user.totpEnabled
 
-    new_hash = security.hash_password(newPassword)
+    new_hash = await security.async_hash_password(newPassword)
     now = _utcnow_naive()
     await db.execute(
         update(PasswordReset).where(PasswordReset.id_ == row.id_).values(usedAt=now)
@@ -555,7 +556,7 @@ async def disable_two_factor(
     user = (await db.execute(select(User).where(User.id_ == user_id))).scalar_one()
     if user.role == "ADMIN":
         raise AuthError(403, "Admins cannot disable 2FA")
-    if not security.verify_password(user.passwordHash, password):
+    if not await security.async_verify_password(user.passwordHash, password):
         raise AuthError(401, "Invalid password")
     if not user.totpEnabled or not user.totpSecret:
         raise AuthError(400, "2FA is not enabled")
@@ -580,10 +581,10 @@ async def disable_two_factor(
 
 
 async def me(db: AsyncSession, *, user_id: str) -> dict[str, Any]:
-    user = (await db.execute(select(User).where(User.id_ == user_id))).scalar_one()
-    profile = (await db.execute(
-        select(MemberProfile).where(MemberProfile.userId == user_id)
-    )).scalar_one_or_none()
+    user = (await db.execute(
+        select(User).options(joinedload(User.profile)).where(User.id_ == user_id)
+    )).scalar_one()
+    profile = user.profile
     return {
         "id": user.id_,
         "email": user.email,

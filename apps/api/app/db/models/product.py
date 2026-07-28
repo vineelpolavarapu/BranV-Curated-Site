@@ -46,6 +46,10 @@ class Product(Base):
         Index('ix_products_status', 'status'),
         Index('ix_products_brandId', 'brandId'),
         Index('ix_products_categoryId', 'categoryId'),
+        Index('ix_products_subcategoryId', 'subcategoryId'),
+        Index('ix_products_status_categoryId_createdAt', 'status', 'categoryId', 'createdAt'),
+        Index('ix_products_status_brandId_createdAt', 'status', 'brandId', 'createdAt'),
+        Index('ix_products_status_price', 'status', 'price'),
         Index('ix_products_createdAt', 'createdAt'),
         Index('ix_products_featuredUntil', 'featuredUntil'),
     )

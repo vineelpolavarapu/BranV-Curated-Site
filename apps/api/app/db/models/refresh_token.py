@@ -27,4 +27,5 @@ class RefreshToken(Base):
 
     __table_args__ = (
         Index('ix_refresh_tokens_userId', 'userId'),
+        Index('ix_refresh_tokens_userId_revokedAt', 'userId', 'revokedAt'),
     )

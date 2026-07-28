@@ -41,6 +41,10 @@ def _ensure_engine() -> None:
         settings = get_settings()
         _engine = create_async_engine(
             _to_async_url(settings.DATABASE_URL),
+            pool_size=20,
+            max_overflow=20,
+            pool_timeout=10,
+            pool_recycle=1800,
             pool_pre_ping=True,
             echo=False,
         )

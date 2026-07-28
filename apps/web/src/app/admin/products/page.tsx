@@ -66,11 +66,7 @@ export default function ProductsAdminPage() {
         </button>
       }
     >
-      <p className="mb-4 text-sm text-content-soft">
-        Click <strong>+ Quick Add</strong> (or press <kbd className="rounded border border-line bg-surface-muted px-1 text-[10px]">N</kbd>) to add
-        a product in under 60 seconds. For multi-variant or multi-retailer
-        management, open a product&apos;s edit page.
-      </p>
+      
 
       <div className={`${adminCard} mb-4`}>
         <div className="flex flex-wrap items-center gap-2">

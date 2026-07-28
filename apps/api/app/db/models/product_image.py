@@ -26,4 +26,5 @@ class ProductImage(Base):
 
     __table_args__ = (
         Index('ix_product_images_productId', 'productId'),
+        Index('ix_product_images_productId_isPrimary', 'productId', 'isPrimary'),
     )

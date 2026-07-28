@@ -42,133 +42,160 @@ def _iso_ms(dt: datetime | None) -> str | None:
     return dt.strftime("%Y-%m-%dT%H:%M:%S.") + f"{dt.microsecond // 1000:03d}Z"
 
 
-async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
-    """Build the storefront card payload — includes brand, category, images,
-    variants, in-stock retailer listings."""
-    brand = (await db.execute(
-        select(Brand.id_, Brand.name, Brand.slug).where(Brand.id_ == p.brandId)
-    )).first()
-    category = (await db.execute(
-        select(Category.id_, Category.name, Category.slug).where(Category.id_ == p.categoryId)
-    )).first()
-    subcategory = None
-    if p.subcategoryId:
-        subcategory = (await db.execute(
-            select(Category.id_, Category.name, Category.slug).where(Category.id_ == p.subcategoryId)
-        )).first()
+async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict[str, Any]]:
+    """Build storefront card payloads in bulk using batched queries — eliminates N+1 queries."""
+    if not products:
+        return []
+
+    product_ids = [p.id_ for p in products]
+    brand_ids = list({p.brandId for p in products if p.brandId})
+    cat_ids = list({p.categoryId for p in products if p.categoryId} | {p.subcategoryId for p in products if p.subcategoryId})
+
+    brands = (await db.execute(
+        select(Brand.id_, Brand.name, Brand.slug).where(Brand.id_.in_(brand_ids))
+    )).all() if brand_ids else []
+    brand_map = {b[0]: b for b in brands}
+
+    categories = (await db.execute(
+        select(Category.id_, Category.name, Category.slug).where(Category.id_.in_(cat_ids))
+    )).all() if cat_ids else []
+    cat_map = {c[0]: c for c in categories}
 
     images = (await db.execute(
-        select(ProductImage).where(ProductImage.productId == p.id_).order_by(ProductImage.position.asc())
+        select(ProductImage).where(ProductImage.productId.in_(product_ids)).order_by(ProductImage.position.asc())
     )).scalars().all()
+    image_map: dict[str, list[ProductImage]] = {}
+    for img in images:
+        image_map.setdefault(img.productId, []).append(img)
+
     variants = (await db.execute(
-        select(ProductVariant).where(ProductVariant.productId == p.id_).order_by(ProductVariant.createdAt.asc())
+        select(ProductVariant).where(ProductVariant.productId.in_(product_ids)).order_by(ProductVariant.createdAt.asc())
     )).scalars().all()
+    variant_map: dict[str, list[ProductVariant]] = {}
+    for v in variants:
+        variant_map.setdefault(v.productId, []).append(v)
+
     listings = (await db.execute(
-        select(ProductRetailerListing)
-        .where(
-            ProductRetailerListing.productId == p.id_,
+        select(ProductRetailerListing).where(
+            ProductRetailerListing.productId.in_(product_ids),
             ProductRetailerListing.availabilityStatus == "IN_STOCK",
         )
     )).scalars().all()
+    listing_map: dict[str, list[ProductRetailerListing]] = {}
+    for l in listings:
+        listing_map.setdefault(l.productId, []).append(l)
 
-    # Load affiliate links for listings
+    listing_ids = [l.id_ for l in listings]
     links = (await db.execute(
-        select(AffiliateLink).where(AffiliateLink.productRetailerListingId.in_([l.id_ for l in listings]))
-    )).scalars().all() if listings else []
+        select(AffiliateLink).where(AffiliateLink.productRetailerListingId.in_(listing_ids))
+    )).scalars().all() if listing_ids else []
     link_map = {link.productRetailerListingId: link for link in links}
 
-    ai_images = [i for i in images if i.isAiGenerated]
-    retailer_images = [i for i in images if not i.isAiGenerated]
-    primary = next((i for i in images if i.isPrimary), None) or (images[0] if images else None)
-    secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
+    cards = []
+    for p in products:
+        b_info = brand_map.get(p.brandId)
+        c_info = cat_map.get(p.categoryId)
+        sub_info = cat_map.get(p.subcategoryId) if p.subcategoryId else None
+        p_images = image_map.get(p.id_, [])
+        p_variants = variant_map.get(p.id_, [])
+        p_listings = listing_map.get(p.id_, [])
 
-    sorted_listings = sorted(
-        listings,
-        key=lambda x: float(x.rawPrice) if x.rawPrice is not None else float(p.price)
-    )
-    best_listing = sorted_listings[0] if sorted_listings else None
-    best_affiliate = link_map.get(best_listing.id_) if best_listing else None
+        ai_images = [i for i in p_images if i.isAiGenerated]
+        retailer_images = [i for i in p_images if not i.isAiGenerated]
+        primary = next((i for i in p_images if i.isPrimary), None) or (p_images[0] if p_images else None)
+        secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
 
-    sizes = sorted(list(set(v.size for v in variants if v.size)))
-    colors = sorted(list(set(v.color for v in variants if v.color)))
+        sorted_listings = sorted(
+            p_listings,
+            key=lambda x: float(x.rawPrice) if x.rawPrice is not None else float(p.price)
+        )
+        best_listing = sorted_listings[0] if sorted_listings else None
+        best_affiliate = link_map.get(best_listing.id_) if best_listing else None
 
-    return {
-        "id": p.id_,
-        "slug": p.slug,
-        "title": p.title,
-        "description": p.description,
-        "price": float(p.price) if p.price is not None else None,
-        "mrp": float(p.mrp) if p.mrp is not None else None,
-        "discountPct": float(p.discountPct) if p.discountPct is not None else None,
-        "currency": p.currency,
-        "primaryRetailer": p.primaryRetailer,
-        "status": p.status,
-        "tags": p.tags or [],
-        "avgRating": float(p.avgRating) if p.avgRating is not None else None,
-        "reviewCount": p.reviewCount,
-        "featuredUntil": _iso_ms(p.featuredUntil),
-        "createdAt": _iso_ms(p.createdAt),
-        "updatedAt": _iso_ms(p.updatedAt),
-        "brand": {"id": brand[0], "name": brand[1], "slug": brand[2]} if brand else None,
-        "category": {"id": category[0], "name": category[1], "slug": category[2]} if category else None,
-        "subcategory": (
-            {"id": subcategory[0], "name": subcategory[1], "slug": subcategory[2]} if subcategory else None
-        ),
-        "primaryImage": {
-            "url": primary.url,
-            "isAiGenerated": primary.isAiGenerated,
-            "altText": primary.altText,
-        } if primary else None,
-        "secondaryImage": {
-            "url": secondary.url,
-            "isAiGenerated": secondary.isAiGenerated,
-            "altText": secondary.altText,
-        } if secondary else None,
-        "gallery": [
-            {
-                "url": i.url,
-                "altText": i.altText,
-                "isAiGenerated": i.isAiGenerated,
-                "isPrimary": i.isPrimary,
-                "position": i.position,
-            }
-            for i in images
-        ],
-        "aiImageCount": len(ai_images),
-        "variants": [
-            {
-                "id": v.id_,
-                "sku": v.sku,
-                "attributes": v.attributes,
-                "color": v.color,
-                "size": v.size,
-                "isDefault": v.isDefault,
-            }
-            for v in variants
-        ],
-        "sizes": sizes,
-        "colors": colors,
-        "retailers": [
-            {
-                "retailer": l.retailer,
-                "retailerDisplayName": l.retailerDisplayName,
-                "rawPrice": float(l.rawPrice) if l.rawPrice is not None else None,
-                "availabilityStatus": l.availabilityStatus,
-                "affiliateUrl": link_map.get(l.id_).convertedUrl if link_map.get(l.id_) else l.retailerProductUrl,
-                "affiliatePartner": link_map.get(l.id_).partner if link_map.get(l.id_) else None,
-                "pending": link_map.get(l.id_).pendingConversion if link_map.get(l.id_) else True,
-            }
-            for l in listings
-        ],
-        "buyNow": {
-            "retailer": best_listing.retailer,
-            "retailerDisplayName": best_listing.retailerDisplayName,
-            "url": best_affiliate.convertedUrl if best_affiliate else best_listing.retailerProductUrl,
-            "partner": best_affiliate.partner if best_affiliate else None,
-            "pending": best_affiliate.pendingConversion if best_affiliate else True,
-            "trackingId": best_affiliate.partnerLinkId if best_affiliate else None,
-        } if best_listing else None,
-    }
+        sizes = sorted(list(set(v.size for v in p_variants if v.size)))
+        colors = sorted(list(set(v.color for v in p_variants if v.color)))
+
+        cards.append({
+            "id": p.id_,
+            "slug": p.slug,
+            "title": p.title,
+            "description": p.description,
+            "price": float(p.price) if p.price is not None else None,
+            "mrp": float(p.mrp) if p.mrp is not None else None,
+            "discountPct": float(p.discountPct) if p.discountPct is not None else None,
+            "currency": p.currency,
+            "primaryRetailer": p.primaryRetailer,
+            "status": p.status,
+            "tags": p.tags or [],
+            "avgRating": float(p.avgRating) if p.avgRating is not None else None,
+            "reviewCount": p.reviewCount,
+            "featuredUntil": _iso_ms(p.featuredUntil),
+            "createdAt": _iso_ms(p.createdAt),
+            "updatedAt": _iso_ms(p.updatedAt),
+            "brand": {"id": b_info[0], "name": b_info[1], "slug": b_info[2]} if b_info else None,
+            "category": {"id": c_info[0], "name": c_info[1], "slug": c_info[2]} if c_info else None,
+            "subcategory": {"id": sub_info[0], "name": sub_info[1], "slug": sub_info[2]} if sub_info else None,
+            "primaryImage": {
+                "url": primary.url,
+                "isAiGenerated": primary.isAiGenerated,
+                "altText": primary.altText,
+            } if primary else None,
+            "secondaryImage": {
+                "url": secondary.url,
+                "isAiGenerated": secondary.isAiGenerated,
+                "altText": secondary.altText,
+            } if secondary else None,
+            "gallery": [
+                {
+                    "url": i.url,
+                    "altText": i.altText,
+                    "isAiGenerated": i.isAiGenerated,
+                    "isPrimary": i.isPrimary,
+                    "position": i.position,
+                }
+                for i in p_images
+            ],
+            "aiImageCount": len(ai_images),
+            "variants": [
+                {
+                    "id": v.id_,
+                    "sku": v.sku,
+                    "attributes": v.attributes,
+                    "color": v.color,
+                    "size": v.size,
+                    "isDefault": v.isDefault,
+                }
+                for v in p_variants
+            ],
+            "sizes": sizes,
+            "colors": colors,
+            "retailers": [
+                {
+                    "retailer": l.retailer,
+                    "retailerDisplayName": l.retailerDisplayName,
+                    "rawPrice": float(l.rawPrice) if l.rawPrice is not None else None,
+                    "availabilityStatus": l.availabilityStatus,
+                    "affiliateUrl": link_map.get(l.id_).convertedUrl if link_map.get(l.id_) else l.retailerProductUrl,
+                    "affiliatePartner": link_map.get(l.id_).partner if link_map.get(l.id_) else None,
+                    "pending": link_map.get(l.id_).pendingConversion if link_map.get(l.id_) else True,
+                }
+                for l in p_listings
+            ],
+            "buyNow": {
+                "retailer": best_listing.retailer,
+                "retailerDisplayName": best_listing.retailerDisplayName,
+                "url": best_affiliate.convertedUrl if best_affiliate else best_listing.retailerProductUrl,
+                "partner": best_affiliate.partner if best_affiliate else None,
+                "pending": best_affiliate.pendingConversion if best_affiliate else True,
+                "trackingId": best_affiliate.partnerLinkId if best_affiliate else None,
+            } if best_listing else None,
+        })
+    return cards
+
+
+async def _hydrate_card(db: AsyncSession, p: Product) -> dict[str, Any]:
+    cards = await _hydrate_cards(db, [p])
+    return cards[0] if cards else {}
 
 
 async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
@@ -247,7 +274,7 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
         .offset((page - 1) * page_size)
         .limit(page_size)
     )).scalars().all()
-    data = [await _hydrate_card(db, p) for p in rows]
+    data = await _hydrate_cards(db, rows)
     return make_page(data, total, page, page_size)
 
 
@@ -281,6 +308,11 @@ async def related(db: AsyncSession, slug: str) -> list[dict[str, Any]]:
 
 async def home(db: AsyncSession) -> dict[str, Any]:
     """Composite payload for the home page — matches NestJS's overview()."""
+    from ..core.cache import cache_get, cache_set
+    cached = await cache_get("storefront:home")
+    if cached is not None:
+        return cached
+
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     new_cutoff = now - timedelta(days=NEW_ARRIVAL_DAYS)
 
@@ -297,22 +329,26 @@ async def home(db: AsyncSession) -> dict[str, Any]:
 
     category_sections = await _category_sections(db)
 
-    return {
-        "banners": [],  # TODO: port banners.listActiveForHome — stub for v1
+    result = {
         "featuredBrands": [
             {
-                "id": b.id_, "slug": b.slug, "name": b.name,
-                "logoUrl": b.logoUrl, "heroUrl": b.heroUrl,
+                "id": b.id_,
+                "slug": b.slug,
+                "name": b.name,
+                "logoUrl": b.logoUrl,
+                "heroUrl": b.heroUrl,
             }
             for b in featured_brands
         ],
         "newArrivals": new_arr["data"],
         "newArrivalsCount": new_arr["total"],
-        "featuredEdit": None,  # TODO: port edits.getFeaturedForHome
+        "featuredEdit": None,
         "latestArticles": latest_articles_rows,
         "categorySections": category_sections,
         "_newArrivalCutoff": _iso_ms(new_cutoff),
     }
+    await cache_set("storefront:home", result, ttl_seconds=30)
+    return result
 
 
 async def _latest_articles(db: AsyncSession, *, limit: int) -> list[dict[str, Any]]:

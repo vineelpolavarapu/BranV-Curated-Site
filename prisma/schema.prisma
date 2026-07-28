@@ -58,7 +58,6 @@ model User {
   uploadedPayouts         AffiliatePayout[]        @relation("PayoutUploadedBy")
   settingsUpdates         PlatformSetting[]        @relation("SettingsUpdatedBy")
 
-  @@index([email])
   @@map("users")
 }
 
@@ -91,6 +90,7 @@ model RefreshToken {
   createdAt    DateTime  @default(now())
 
   @@index([userId])
+  @@index([userId, revokedAt])
   @@map("refresh_tokens")
 }
 
@@ -269,6 +269,10 @@ model Product {
   @@index([status])
   @@index([brandId])
   @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([status, categoryId, createdAt])
+  @@index([status, brandId, createdAt])
+  @@index([status, price])
   @@index([createdAt])
   @@index([featuredUntil])
   @@map("products")
@@ -302,6 +306,7 @@ model ProductImage {
   createdAt     DateTime @default(now())
 
   @@index([productId])
+  @@index([productId, isPrimary])
   @@map("product_images")
 }
 
@@ -330,6 +335,7 @@ model ProductRetailerListing {
 
   @@unique([productId, retailer])
   @@index([retailer])
+  @@index([productId, availabilityStatus])
   @@map("product_retailer_listings")
 }
 

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, Enum as SAEnum, Index, Integer, TIMESTAMP, Text, text
+from sqlalchemy import Boolean, Enum as SAEnum, Integer, TIMESTAMP, Text, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..enums import UserRole, UserStatus
@@ -30,7 +30,3 @@ class User(Base):
     lastLoginAt: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='lastLoginAt')
     createdAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, server_default=text('CURRENT_TIMESTAMP'), name='createdAt')
     updatedAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, onupdate=text('CURRENT_TIMESTAMP'), name='updatedAt')
-
-    __table_args__ = (
-        Index('ix_users_email', 'email'),
-    )

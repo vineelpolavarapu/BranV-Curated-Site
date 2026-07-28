@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { apiFetch } from '@/lib/api';
 import { AffiliatePartner, Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import {
   adminButtonPrimary,
   adminButtonSecondary,
@@ -115,24 +116,48 @@ export function QuickAddModal({
   const [pendingAffiliate, setPendingAffiliate] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
   const [showNewBrand, setShowNewBrand] = useState(false);
+  const [showVisibility, setShowVisibility] = useState(false);
 
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+
+const DEFAULT_BRANDS = [
+  { id: 'brand_nike', name: 'Nike', slug: 'nike' },
+  { id: 'brand_adidas', name: 'Adidas', slug: 'adidas' },
+  { id: 'brand_puma', name: 'Puma', slug: 'puma' },
+  { id: 'brand_levi', name: "Levi's", slug: 'levis' },
+  { id: 'brand_zara', name: 'Zara', slug: 'zara' },
+  { id: 'brand_hm', name: 'H&M', slug: 'hm' },
+  { id: 'brand_tommy', name: 'Tommy Hilfiger', slug: 'tommy-hilfiger' },
+  { id: 'brand_calvin', name: 'Calvin Klein', slug: 'calvin-klein' },
+  { id: 'brand_ralph', name: 'Ralph Lauren', slug: 'ralph-lauren' },
+  { id: 'brand_underarmour', name: 'Under Armour', slug: 'under-armour' },
+] as unknown as Brand[];
 
   // ── Bootstrap brands + categories on open ──
   useEffect(() => {
     if (!open) return;
     void (async () => {
-      const [b, c] = await Promise.all([
+      let brandList: Brand[] = [];
+      const [bAdmin, c] = await Promise.all([
         apiFetch<any>('/admin/brands?pageSize=200'),
         apiFetch<CategoryNode[]>('/admin/categories'),
       ]);
-      if (b.ok && b.data) {
-        const brandList = Array.isArray(b.data) ? b.data : b.data.data;
-        if (Array.isArray(brandList) && brandList.length > 0) {
-          setBrands(brandList);
+      if (bAdmin.ok && bAdmin.data) {
+        const list = Array.isArray(bAdmin.data) ? bAdmin.data : bAdmin.data.data;
+        if (Array.isArray(list) && list.length > 0) brandList = list;
+      }
+      if (brandList.length === 0) {
+        const bPublic = await apiFetch<any>('/brands');
+        if (bPublic.ok && bPublic.data) {
+          const list = Array.isArray(bPublic.data) ? bPublic.data : bPublic.data.data;
+          if (Array.isArray(list) && list.length > 0) brandList = list;
         }
       }
+      if (brandList.length === 0) {
+        brandList = DEFAULT_BRANDS;
+      }
+      setBrands(brandList);
       if (c.ok && c.data) setCategories(c.data);
     })();
   }, [open]);
@@ -187,11 +212,51 @@ export function QuickAddModal({
   }, [open, onClose]);
 
   // ── Derived: subcategory options for selected category ──
-  const l1 = useMemo(() => categories.filter((c) => !c.parentId), [categories]);
-  const l2 = useMemo(
-    () => categories.filter((c) => c.parentId === form.categoryId),
-    [categories, form.categoryId],
-  );
+  const l1 = useMemo(() => {
+    const apiL1 = categories.filter((c) => !c.parentId);
+    const existingSlugs = new Set(apiL1.map((c) => c.slug));
+    const merged = [...apiL1];
+
+    for (const sc of SHOP_CATEGORIES) {
+      if (!existingSlugs.has(sc.slug)) {
+        merged.push({
+          id: sc.slug,
+          parentId: null,
+          slug: sc.slug,
+          name: sc.name,
+          path: sc.slug,
+          displayOrder: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as CategoryNode);
+      }
+    }
+    return merged;
+  }, [categories]);
+
+  const l2 = useMemo(() => {
+    const fromApi = categories.filter((c) => c.parentId === form.categoryId);
+    if (fromApi.length > 0) return fromApi;
+
+    const selectedCat = l1.find((c) => c.id === form.categoryId || c.slug === form.categoryId);
+    if (!selectedCat) return [];
+
+    const shopCat = SHOP_CATEGORIES.find(
+      (sc) => sc.slug === selectedCat.slug || sc.name.toLowerCase() === selectedCat.name.toLowerCase()
+    );
+    if (!shopCat || !shopCat.subcategories) return [];
+
+    return shopCat.subcategories.map((sub) => ({
+      id: sub.slug,
+      parentId: selectedCat.id,
+      slug: sub.slug,
+      name: sub.name,
+      path: `${selectedCat.slug}/${sub.slug}`,
+      displayOrder: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })) as CategoryNode[];
+  }, [categories, form.categoryId, l1]);
 
   function set<K extends keyof FormState>(k: K, v: FormState[K]) {
     setForm((prev) => ({ ...prev, [k]: v }));
@@ -410,10 +475,7 @@ export function QuickAddModal({
         <header className="flex items-center justify-between border-b border-line px-6 py-4">
           <div>
             <h2 className="text-lg font-semibold">Quick Add Product</h2>
-            <p className="text-xs text-content-soft">
-              Under 60 seconds. Paste retailer URL, autofill, paste avatar,
-              hit <kbd className="rounded border border-line bg-surface-muted px-1 text-[10px]">Cmd/Ctrl + Enter</kbd>.
-            </p>
+           
           </div>
           <button
             onClick={onClose}
@@ -568,16 +630,14 @@ export function QuickAddModal({
               />
             </div>
             <div>
-              <label className={adminLabel}>Sizes (comma-separated)</label>
+              <label className={adminLabel}>Sizes</label>
               <input
                 value={form.sizesCsv}
                 onChange={(e) => set('sizesCsv', e.target.value)}
                 placeholder="M, L, XL"
                 className={adminInput}
               />
-              <p className="mt-1 text-[10px] text-content-soft">
-                One variant per size. Leave blank for a single sizeless variant.
-              </p>
+              
             </div>
             <div>
               <label className={adminLabel}>Material</label>
@@ -599,28 +659,37 @@ export function QuickAddModal({
             </div>
           </div>
 
-          {/* Task 11: Product Visibility Checkbox Section */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4">
-            <label className={`${adminLabel} text-slate-800 font-bold`}>
-              👁️ Product Visibility (Select all categories this product appears in)
-            </label>
-            <div className="mt-2.5 grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {[
-                'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
-                'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
-                'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
-                'Sweaters', 'Sweatshirts', 'Hoodies'
-              ].map((cat) => (
-                <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
-                  <input
-                    type="checkbox"
-                    defaultChecked
-                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-                  />
-                  <span>{cat}</span>
-                </label>
-              ))}
-            </div>
+          {/* Task 3: Collapsible Product Visibility Section (Unchecked by default) */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-3.5">
+            <button
+              type="button"
+              onClick={() => setShowVisibility((prev) => !prev)}
+              className="flex w-full items-center justify-between text-left text-xs font-bold text-slate-800 hover:text-primary transition"
+            >
+              <span>👁️ Product Visibility</span>
+              <span className="ml-2 text-slate-400 text-sm font-normal">
+                {showVisibility ? '▲' : '▼'}
+              </span>
+            </button>
+            {showVisibility && (
+              <div className="mt-3 border-t border-slate-200/60 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {[
+                  'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
+                  'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
+                  'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
+                  'Sweaters', 'Sweatshirts', 'Hoodies'
+                ].map((cat) => (
+                  <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+                    <input
+                      type="checkbox"
+                      defaultChecked={false}
+                      className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                    />
+                    <span>{cat}</span>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
 
           <hr className="border-neutral-100" />
@@ -628,7 +697,7 @@ export function QuickAddModal({
           {/* Avatar image: drag + paste + pick */}
           <section>
             <label className={adminLabel}>
-              📸 Avatar Image (AI-rendered on Vineel)
+              📸 Product Image
             </label>
             <ImageDropPaste
               currentUrl={form.avatarImageUrl}
@@ -674,14 +743,14 @@ export function QuickAddModal({
             <label className={adminLabel}>🔗 Affiliate Link</label>
             {form.retailer === 'amazon' ? (
               <div className="rounded-lg border border-line bg-surface-muted p-3 text-sm text-content-soft">
-                Will route through <strong>Amazon Associates direct</strong> —
+                Will route through <strong>Amazon Associates direct</strong> 
                 your affiliate tag is appended automatically on submit.
               </div>
             ) : (
               <div className="space-y-2">
                 <p className="text-xs text-content-soft">
                   Paste the ready-to-use affiliate link above in{' '}
-                  <strong>Paste retailer URL</strong> — it's stored and used
+                  <strong>Paste retailer URL</strong>  it's stored and used
                   for redirects exactly as pasted, no conversion.
                 </p>
                 <select
@@ -875,8 +944,7 @@ function ImageDropPaste({
                   onChange={onFilePick}
                 />
               </label>
-              . The image will upload to S3 and an &ldquo;AI-rendered&rdquo;
-              tag will be added.
+              
             </p>
           </div>
         </>

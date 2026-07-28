@@ -34,5 +34,6 @@ class ProductRetailerListing(Base):
 
     __table_args__ = (
         Index('ix_product_retailer_listings_retailer', 'retailer'),
+        Index('ix_product_retailer_listings_productId_availabilityStatus', 'productId', 'availabilityStatus'),
         UniqueConstraint('productId', 'retailer', name='uq_product_retailer_listings_productId_retailer'),
     )
