@@ -28,28 +28,30 @@ export default async function HomePage() {
 
   return (
     <StorefrontShell heroOverlay>
-      <HeroCarousel />
-      {/* New Arrivals always first */}
-      <CategoryShowcase
-        title="New Arrivals"
-        slug="new"
-        href="/new"
-        products={home?.newArrivals ?? []}
-      />
-      {/* API-driven category sections (e.g. Clothing once seeded) */}
-      {(home?.categorySections ?? []).map((section) => (
+      <div className="grid grid-cols-1 gap-y-6 w-full">
+        <HeroCarousel />
+        {/* New Arrivals always first */}
         <CategoryShowcase
-          key={section.category.slug}
-          title={section.category.name}
-          slug={section.category.slug}
-          products={section.products}
+          title="New Arrivals"
+          slug="new"
+          href="/new"
+          products={home?.newArrivals ?? []}
         />
-      ))}
-      {/* Static category sections — show placeholders until seeded */}
-      {STATIC_CATEGORIES.filter((c) => !apiSlugs.has(c.slug)).map((c) => (
-        <CategoryShowcase key={c.slug} title={c.title} slug={c.slug} products={[]} />
-      ))}
-      <DisclosureStrip />
+        {/* API-driven category sections (e.g. Clothing once seeded) */}
+        {(home?.categorySections ?? []).map((section) => (
+          <CategoryShowcase
+            key={section.category.slug}
+            title={section.category.name}
+            slug={section.category.slug}
+            products={section.products}
+          />
+        ))}
+        {/* Static category sections — show placeholders until seeded */}
+        {STATIC_CATEGORIES.filter((c) => !apiSlugs.has(c.slug)).map((c) => (
+          <CategoryShowcase key={c.slug} title={c.title} slug={c.slug} products={[]} />
+        ))}
+        <DisclosureStrip />
+      </div>
     </StorefrontShell>
   );
 }

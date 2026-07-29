@@ -144,7 +144,7 @@ export default function HelpCenterPage() {
       </section>
 
       {/* Category quick-links */}
-      <section className="mx-auto max-w-5xl px-6 py-8">
+      <section className="mx-auto max-w-5xl px-6 py-8 grid grid-cols-1 gap-y-6">
         <AnimateOnScroll>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {CATEGORIES.map((cat, i) => (

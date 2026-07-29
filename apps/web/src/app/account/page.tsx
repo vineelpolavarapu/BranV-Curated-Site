@@ -79,10 +79,10 @@ export default function AccountPage() {
 
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-5xl px-6 py-8 md:py-12">
+      <section className="mx-auto max-w-5xl px-6 py-8 md:py-12 grid grid-cols-1 gap-y-6">
         {/* Profile header card */}
         <AnimateOnScroll>
-          <div className="bv-enter flex flex-col items-start justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6 sm:flex-row sm:items-center md:p-8 shadow-sm">
+          <div className="bv-enter grid grid-cols-1 sm:grid-cols-[1fr_auto] items-start sm:items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm">
             <div className="flex items-center gap-5">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-primary text-xl font-extrabold tracking-wide text-white shadow-md md:h-20 md:w-20 md:text-2xl">
                 {initials}

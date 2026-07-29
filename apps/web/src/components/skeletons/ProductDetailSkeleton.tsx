@@ -1,45 +1,70 @@
 export function ProductDetailSkeleton() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 animate-pulse">
-      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-12">
-        {/* Gallery Column Skeleton */}
-        <div className="flex flex-col-reverse gap-4 sm:flex-row">
-          <div className="flex sm:flex-col gap-3 overflow-x-auto sm:overflow-y-auto">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-20 w-20 shrink-0 rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-            ))}
-          </div>
-          <div className="aspect-4/5 w-full overflow-hidden rounded-2xl bg-zinc-200 dark:bg-zinc-800" />
-        </div>
+    <div className="animate-pulse">
+      {/* Breadcrumb Skeleton */}
+      <nav className="mx-auto max-w-7xl px-6 pt-6 flex items-center gap-2">
+        <div className="h-3 w-12 rounded bg-line" />
+        <span className="text-content-soft">/</span>
+        <div className="h-3 w-16 rounded bg-line" />
+        <span className="text-content-soft">/</span>
+        <div className="h-3 w-24 rounded bg-line" />
+      </nav>
 
-        {/* Product Meta Column Skeleton */}
-        <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0 space-y-6">
-          <div className="h-4 w-24 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-          <div className="h-8 w-3/4 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-          <div className="h-6 w-1/3 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-          <div className="space-y-2 pt-4">
-            <div className="h-4 w-full rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-4 w-5/6 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-4 w-4/6 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-          </div>
-
-          {/* Sizes Skeleton */}
-          <div className="pt-6 space-y-3">
-            <div className="h-4 w-20 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-            <div className="flex gap-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-10 w-12 rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+      {/* Main Grid */}
+      <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Gallery Column (6 cols) */}
+          <div className="lg:col-span-6">
+            <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted" />
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="aspect-[4/5] overflow-hidden rounded-md bg-surface-muted" />
               ))}
             </div>
           </div>
 
-          {/* CTAs Skeleton */}
-          <div className="flex gap-4 pt-8">
-            <div className="h-12 flex-1 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
-            <div className="h-12 w-12 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
+          {/* Summary Column (6 cols) */}
+          <div className="lg:col-span-6 flex flex-col">
+            <div className="h-3 w-20 rounded bg-line" />
+            <div className="mt-2 h-8 w-3/4 rounded bg-line" />
+
+            {/* Colors / Sizes Skeleton */}
+            <div className="mt-6 space-y-4">
+              <div>
+                <div className="h-3 w-16 rounded bg-line mb-2" />
+                <div className="flex gap-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="h-7 w-12 rounded-md bg-surface-muted" />
+                  ))}
+                </div>
+              </div>
+              <div>
+                <div className="h-3 w-14 rounded bg-line mb-2" />
+                <div className="flex gap-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="h-7 w-10 rounded-md bg-surface-muted" />
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Buy Now CTA */}
+            <div className="mt-8">
+              <div className="h-12 w-full rounded-md bg-surface-muted" />
+              <div className="mt-2 h-3 w-64 rounded bg-line" />
+            </div>
+
+            {/* Description Skeleton */}
+            <div className="mt-8 border-t border-line pt-6 space-y-2">
+              <div className="h-3.5 w-24 rounded bg-line mb-3" />
+              <div className="h-3.5 w-full rounded bg-line" />
+              <div className="h-3.5 w-5/6 rounded bg-line" />
+              <div className="h-3.5 w-2/3 rounded bg-line" />
+            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
+

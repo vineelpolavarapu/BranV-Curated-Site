@@ -28,6 +28,26 @@ body {
    so they match the "Confident Blue" theme. */
 :root {
   accent-color: rgb(var(--color-primary));
+  --site-grid-cols: 12;
+  --site-grid-gap: 1.5rem;
+  --site-max-width: 1440px;
+}
+
+/* Global 12-Column CSS Grid Layout System */
+.grid-site-container {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--site-grid-gap);
+  width: 100%;
+  max-width: var(--site-max-width);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid-site-shell {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
 }
 
 /* Prevent iOS Safari from zooming when an input receives focus.

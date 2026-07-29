@@ -95,12 +95,14 @@ function ListingShell({
 }) {
   return (
     <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
-      <div className="w-full space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-          <p className="text-sm font-medium text-slate-500">
+      <div className="grid grid-cols-1 gap-y-6 w-full">
+        <div className="grid grid-cols-2 items-center justify-between border-b border-slate-100 pb-4">
+          <p className="text-sm font-medium text-slate-500 col-span-1">
             {list?.total ?? 0} {list?.total === 1 ? 'result' : 'results'}
           </p>
-          <SortPicker />
+          <div className="col-span-1 justify-self-end">
+            <SortPicker />
+          </div>
         </div>
         <CategoryHashFilter
           categorySlug={categorySlug}

@@ -274,7 +274,7 @@ export function AdminShell({
       </header>
 
       {/* ── Body: sidebar + content ─────────────────────────────────────── */}
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-8 md:px-6">
+      <div className="mx-auto grid grid-cols-1 md:grid-cols-[224px_1fr] max-w-7xl gap-6 px-4 py-8 md:px-6">
         {/* Desktop sidebar — hidden on mobile */}
         <aside className="hidden w-56 shrink-0 md:flex md:flex-col md:gap-4">
           <NavLinks pathname={pathname} />
@@ -292,7 +292,7 @@ export function AdminShell({
         </aside>
 
         {/* Page content */}
-        <main className="min-w-0 flex-1">
+        <main className="min-w-0">
           <div className="mb-6 flex items-end justify-between">
             <h1 className="text-2xl font-semibold tracking-tight text-content">{title}</h1>
             <div className="flex gap-2">{actions}</div>

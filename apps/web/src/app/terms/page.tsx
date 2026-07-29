@@ -66,7 +66,7 @@ const SECTIONS: Array<{ heading: string; body: string[] }> = [
 export default function TermsPage() {
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-3xl px-6 py-10 md:py-14">
+      <section className="mx-auto max-w-3xl px-6 py-10 md:py-14 grid grid-cols-1 gap-y-6">
         <AnimateOnScroll>
           <p className="bv-enter-fade text-xs font-medium uppercase tracking-[0.18em] text-content-soft">
             Legal

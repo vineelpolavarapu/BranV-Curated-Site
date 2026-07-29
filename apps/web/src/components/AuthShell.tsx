@@ -13,7 +13,7 @@ export function AuthShell({
   footer?: ReactNode;
 }) {
   return (
-    <main className="flex min-h-[100dvh] items-center justify-center bg-canvas px-6 py-12">
+    <main className="grid min-h-[100dvh] place-items-center bg-canvas px-6 py-12">
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link

@@ -81,7 +81,7 @@ export default function PreferencesPage() {
 
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-3xl px-6 py-10">
+      <section className="mx-auto max-w-3xl px-6 py-10 grid grid-cols-1 gap-y-6">
         <h1 className="text-3xl font-semibold tracking-tight">Notification preferences</h1>
         <p className="mt-1 text-sm text-content-soft">
           Pick which notifications reach you, and how. Defaults are on for

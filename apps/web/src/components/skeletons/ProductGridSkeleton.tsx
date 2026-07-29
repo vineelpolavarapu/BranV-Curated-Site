@@ -1,18 +1,19 @@
 export function ProductCardSkeleton() {
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-200/80 bg-white p-3 shadow-xs dark:border-zinc-800 dark:bg-zinc-900 animate-pulse">
+    <div className="group flex flex-col overflow-hidden rounded-card bg-surface shadow-card animate-pulse">
       {/* Image Container Skeleton */}
-      <div className="relative aspect-4/5 w-full overflow-hidden rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-muted" />
 
-      {/* Content Skeleton */}
-      <div className="mt-3 flex flex-1 flex-col space-y-2">
-        <div className="h-3 w-1/3 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-        <div className="h-4 w-5/6 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-        <div className="h-4 w-1/2 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-        <div className="mt-auto flex items-center justify-between pt-2">
-          <div className="h-5 w-20 rounded-xs bg-zinc-200 dark:bg-zinc-800" />
-          <div className="h-8 w-24 rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-        </div>
+      {/* Content Skeleton matching ProductCard */}
+      <div className="flex flex-1 flex-col gap-1 p-3.5">
+        {/* Brand line */}
+        <div className="h-2.5 w-16 rounded bg-line" />
+        {/* Title line 1 */}
+        <div className="mt-1 h-3.5 w-full rounded bg-line" />
+        {/* Title line 2 */}
+        <div className="h-3.5 w-3/4 rounded bg-line" />
+        {/* CTA Button skeleton */}
+        <div className="mt-2 h-7 w-24 rounded-md bg-surface-muted" />
       </div>
     </div>
   );
@@ -20,10 +21,11 @@ export function ProductCardSkeleton() {
 
 export function ProductGridSkeleton({ count = 12 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:gap-6">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
         <ProductCardSkeleton key={i} />
       ))}
     </div>
   );
 }
+

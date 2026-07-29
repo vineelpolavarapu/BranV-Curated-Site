@@ -49,11 +49,11 @@ export default async function ProductDetailPage(props: {
       <ProductSchema product={product} />
       <AnimateOnScroll>
         <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-6">
               <Gallery product={product} />
             </div>
-            <div className="bv-enter bv-delay-2">
+            <div className="bv-enter bv-delay-2 lg:col-span-6">
               <Summary product={product} />
             </div>
           </div>

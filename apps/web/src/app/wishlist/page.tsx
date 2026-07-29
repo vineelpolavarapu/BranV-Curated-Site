@@ -7,6 +7,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { formatINR } from '@/lib/format';
+import { ProductGridSkeleton } from '@/components/skeletons/ProductGridSkeleton';
 
 interface WishlistItem {
   id: string;
@@ -39,6 +40,7 @@ interface WishlistPage {
 }
 
 export default function WishlistPage() {
+
   const router = useRouter();
   const [data, setData] = useState<WishlistPage | null>(null);
   const [loading, setLoading] = useState(true);
@@ -87,12 +89,15 @@ export default function WishlistPage() {
 
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-7xl px-6 py-8">
+      <section className="mx-auto max-w-7xl px-6 py-8 grid grid-cols-1 gap-y-6">
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">My Wishlist</h1>
 
         {loading && (
-          <div className="mt-6 h-2 w-32 animate-pulse rounded bg-line" />
+          <div className="mt-4">
+            <ProductGridSkeleton count={8} />
+          </div>
         )}
+
 
         {data && data.items.length === 0 && (
           <div className="mt-8 rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">

@@ -23,9 +23,9 @@ export function StorefrontShell({
   return (
     <WishlistProvider>
       <ClickReturnProvider>
-        <div className={`min-h-[100dvh] pb-16 lg:pb-0 ${heroOverlay ? 'pt-0' : 'pt-28 lg:pt-24'}`}>
+        <div className={`grid grid-rows-[auto_1fr_auto] min-h-[100dvh] pb-16 lg:pb-0 ${heroOverlay ? 'pt-0' : 'pt-28 lg:pt-24'}`}>
           <SiteHeader overlay={heroOverlay} />
-          {children}
+          <main className="w-full">{children}</main>
           <SiteFooter />
           <MobileBottomNav />
         </div>
@@ -79,7 +79,7 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   return (
     <header className={`${headerBaseClasses} ${visibilityClasses}`}>
       {/* Top Header Row */}
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 lg:py-4">
+      <div className="mx-auto grid grid-cols-[auto_auto] lg:grid-cols-[auto_1fr_auto] items-center justify-between px-4 py-3 lg:py-4 w-full max-w-7xl gap-4">
         {/* Mobile Drawer Trigger (Mobile Only) */}
         <div className="lg:hidden">
           <MobileNavDrawer overlay={overlay} />
@@ -226,7 +226,7 @@ function SiteFooter() {
   return (
     <AnimateOnScroll>
       <footer className="mt-8 border-t border-slate-200/80 bg-[#F0F7FF]/50 py-6">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 text-center text-sm text-slate-600 sm:flex-row sm:text-left">
+        <div className="mx-auto grid grid-cols-1 sm:grid-cols-[1fr_auto] items-center justify-between gap-4 max-w-7xl px-6 text-center text-sm text-slate-600 sm:text-left">
           <div>
             <div className="mb-1.5 inline-flex items-center gap-2 user-select-none">
               <span className="font-heading text-lg font-extrabold tracking-tight text-slate-900">

@@ -32,7 +32,7 @@ export default async function ArticlesIndexPage(props: {
   return (
     <StorefrontShell>
       <AnimateOnScroll>
-        <section className="mx-auto max-w-7xl px-6 py-10">
+        <section className="mx-auto max-w-7xl px-6 py-10 grid grid-cols-1 gap-y-6">
           <h1 className="bv-enter text-3xl font-semibold tracking-tight md:text-4xl">
             Articles
           </h1>

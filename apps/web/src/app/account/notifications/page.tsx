@@ -43,8 +43,8 @@ export default function NotificationsCenterPage() {
 
   return (
     <StorefrontShell>
-      <section className="mx-auto max-w-3xl px-6 py-10">
-        <div className="mb-6 flex items-center justify-between">
+      <section className="mx-auto max-w-3xl px-6 py-10 grid grid-cols-1 gap-y-6">
+        <div className="mb-6 grid grid-cols-1 sm:grid-cols-[1fr_auto] items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Notifications</h1>
             <p className="mt-1 text-sm text-content-soft">
