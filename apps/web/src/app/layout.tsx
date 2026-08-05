@@ -32,8 +32,8 @@ export const metadata: Metadata = {
   description:
     'Curated men\'s fashion from the retailers you trust. Styled on AI avatars. One click to buy.',
   icons: {
-    icon: '/hero/logo.png',
-    apple: '/hero/logo.png',
+    icon: '/hero/logo.webp',
+    apple: '/hero/logo.webp',
   },
 };
 

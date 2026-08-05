@@ -20,7 +20,7 @@ type HeroSlide = {
 const BASE_SLIDES: HeroSlide[] = [
   {
     key: 'formals',
-    imageUrl: '/hero/formals1.png',
+    imageUrl: '/hero/formals1.webp',
 
     headline: 'Sharp Formals',
     subtext: 'Tailored shirts and trousers for the office and beyond.',
@@ -29,7 +29,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'classic',
-    imageUrl: '/hero/easy_causal.png',
+    imageUrl: '/hero/easy_causal.webp',
 
     headline: 'Classic Essentials',
     subtext: 'The wardrobe staples that never go out of style.',
@@ -38,7 +38,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'trendy',
-    imageUrl: '/hero/latest_web.png',
+    imageUrl: '/hero/latest_web.webp',
 
     headline: 'Trendy Wear',
     subtext: 'The pieces everyone is reaching for right now.',
@@ -47,7 +47,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'sportswear',
-    imageUrl: '/hero/sports.png',
+    imageUrl: '/hero/sports.webp',
 
     headline: 'Sports Wear',
     subtext: 'Performance fits built for the gym, the run, and everything after.',
@@ -56,7 +56,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'fashion',
-    imageUrl: '/hero/fashoin.png',
+    imageUrl: '/hero/fashoin.webp',
 
     headline: 'Fashion Forward',
     subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
@@ -65,7 +65,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'casual',
-    imageUrl: '/hero/casual2.png',
+    imageUrl: '/hero/casual2.webp',
     headline: 'Easy Casuals',
     subtext: 'Weekend-ready tees, joggers, and overshirts.',
     ctaLabel: 'Explore Collection',
@@ -73,7 +73,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'footwear',
-    imageUrl: '/hero/footwear.png',
+    imageUrl: '/hero/footwear.webp',
     headline: 'Footwear',
     subtext: 'Sneakers, loafers, boots, the foundation of every outfit.',
     ctaLabel: 'Explore Collection',
@@ -81,7 +81,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'watches',
-    imageUrl: '/hero/watches.png',
+    imageUrl: '/hero/watches.webp',
     headline: 'Watches',
     subtext: 'Watches, belts, bags, the details that complete a look.',
     ctaLabel: 'Explore Collection',

@@ -20,7 +20,7 @@ type HeroSlide = {
 const BASE_SLIDES: HeroSlide[] = [
   {
     key: 'formals',
-    imageUrl: '/mobile-hero/mobile_formals.png',
+    imageUrl: '/mobile-hero/mobile_formals.webp',
     headline: 'Sharp Formals',
     subtext: 'Tailored shirts and trousers for the office and beyond.',
     ctaLabel: 'Explore Collection',
@@ -28,7 +28,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'classic',
-    imageUrl: '/mobile-hero/mobile_classic.png',
+    imageUrl: '/mobile-hero/mobile_classic.webp',
     headline: 'Classic Essentials',
     subtext: 'The wardrobe staples that never go out of style.',
     ctaLabel: 'Explore Collection',
@@ -36,7 +36,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'trendy',
-    imageUrl: '/mobile-hero/latest_trends.png',
+    imageUrl: '/mobile-hero/latest_trends.webp',
     headline: 'Trendy Wear',
     subtext: 'The pieces everyone is reaching for right now.',
     ctaLabel: 'Explore Collection',
@@ -44,7 +44,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'sportswear',
-    imageUrl: '/mobile-hero/mobile_sports.png',
+    imageUrl: '/mobile-hero/mobile_sports.webp',
     headline: 'Sports Wear',
     subtext: 'Performance fits built for the gym, the run, and everything after.',
     ctaLabel: 'Explore Collection',
@@ -52,7 +52,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'fashion',
-    imageUrl: '/mobile-hero/mobile_fashion.png',
+    imageUrl: '/mobile-hero/mobile_fashion.webp',
     headline: 'Fashion Forward',
     subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
     ctaLabel: 'Explore Collection',
@@ -60,7 +60,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'casual',
-    imageUrl: '/mobile-hero/mobile_casual.png',
+    imageUrl: '/mobile-hero/mobile_casual.webp',
     headline: 'Easy Casuals',
     subtext: 'Weekend-ready tees, joggers, and overshirts.',
     ctaLabel: 'Explore Collection',
@@ -68,7 +68,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'footwear',
-    imageUrl: '/mobile-hero/mobile_footwear.png',
+    imageUrl: '/mobile-hero/mobile_footwear.webp',
     headline: 'Footwear',
     subtext: 'Sneakers, loafers, boots, the foundation of every outfit.',
     ctaLabel: 'Explore Collection',
@@ -76,7 +76,7 @@ const BASE_SLIDES: HeroSlide[] = [
   },
   {
     key: 'watches',
-    imageUrl: '/mobile-hero/mobile_watches.png',
+    imageUrl: '/mobile-hero/mobile_watches.webp',
     headline: 'Watches',
     subtext: 'Watches, belts, bags, the details that complete a look.',
     ctaLabel: 'Explore Collection',
