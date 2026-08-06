@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { CategoryIcon } from '@/components/category-icons';
 import { categoryHrefL2 } from '@/lib/category-href';
 import { Icon } from './icons';
 
@@ -98,9 +99,10 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
                         <Link
                           href={`/category/${c.slug}`}
                           onClick={() => setOpen(false)}
-                          className="flex-1 rounded-md px-3 py-2.5 font-medium text-content hover:bg-surface-muted"
+                          className="flex-1 flex items-center gap-2.5 rounded-md px-3 py-2.5 font-medium text-content hover:bg-surface-muted"
                         >
-                          {c.name}
+                          <CategoryIcon slug={c.slug} className="h-6 w-6 rounded-md object-cover flex-shrink-0" />
+                          <span>{c.name}</span>
                         </Link>
                         {hasSubs && (
                           <button

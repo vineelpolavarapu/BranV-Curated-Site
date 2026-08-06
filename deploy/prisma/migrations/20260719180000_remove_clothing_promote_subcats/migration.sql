@@ -5,7 +5,7 @@
 -- (1) The 7 products filed directly under Clothing are deleted along with it
 --     (owner's choice), same cascade the suits-and-formal / accessories
 --     removals relied on.
--- (2) Add Trousers, Shorts, Jackets, Sweaters, Sweatshirts & Hoodies, and
+-- (2) Add Trousers, Shorts, Jackets, Inners, Sweatshirts & Hoodies, and
 --     Ethnic Wear as new top-level categories (clean slugs, no parent). These
 --     previously existed only as clothing-* subcategories, which are removed
 --     with Clothing in step 1.
@@ -30,7 +30,8 @@ INSERT INTO categories (id, "parentId", slug, name, path, "displayOrder", "creat
   ('cat_trousers',                NULL, 'trousers',                'Trousers',              'trousers',                6,  now(), now()),
   ('cat_shorts',                  NULL, 'shorts',                  'Shorts',                'shorts',                  7,  now(), now()),
   ('cat_jackets',                 NULL, 'jackets',                 'Jackets',               'jackets',                 8,  now(), now()),
-  ('cat_sweaters',                NULL, 'sweaters',                'Sweaters',              'sweaters',                9,  now(), now()),
-  ('cat_sweatshirts-and-hoodies', NULL, 'sweatshirts-and-hoodies', 'Sweatshirts & Hoodies', 'sweatshirts-and-hoodies', 10, now(), now()),
-  ('cat_ethnic-wear',             NULL, 'ethnic-wear',             'Ethnic Wear',           'ethnic-wear',             11, now(), now())
+  ('cat_inners',                  NULL, 'inners',                  'Inners',                'inners',                  9,  now(), now()),
+  ('cat_sweatshirts',             NULL, 'sweatshirts',             'Sweatshirts',           'sweatshirts',             10, now(), now()),
+  ('cat_hoodies',                 NULL, 'hoodies',                 'Hoodies',               'hoodies',                 11, now(), now()),
+  ('cat_ethnic-wear',             NULL, 'ethnic-wear',             'Ethnic Wear',           'ethnic-wear',             12, now(), now())
 ON CONFLICT (slug) DO NOTHING;

@@ -9,6 +9,8 @@ import { LenisProvider } from '@/components/motion/lenis-provider';
 import { MotionProvider } from '@/components/motion/motion-provider';
 import { PageTransitionShell } from '@/components/motion/page-transition-shell';
 
+import { QueryProvider } from '@/providers/query-provider';
+
 // Prototype typography: Plus Jakarta Sans for Headings, Inter for Body UI
 const fontDisplay = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -45,11 +47,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${fontDisplay.variable} ${fontBody.variable}`} suppressHydrationWarning>
       <body className="font-sans" suppressHydrationWarning>
-        <LenisProvider>
-          <MotionProvider>
-            <PageTransitionShell>{children}</PageTransitionShell>
-          </MotionProvider>
-        </LenisProvider>
+        <QueryProvider>
+          <LenisProvider>
+            <MotionProvider>
+              <PageTransitionShell>{children}</PageTransitionShell>
+            </MotionProvider>
+          </LenisProvider>
+        </QueryProvider>
       </body>
     </html>
   );

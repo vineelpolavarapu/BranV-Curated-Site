@@ -1,97 +1,129 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 
 export interface CategoryIconProps {
   className?: string;
   size?: number;
   strokeWidth?: number;
+  slug?: string;
 }
 
-export function ShirtCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M6 3h12l3 5v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8l3-5z" />
-      <line x1="12" y1="3" x2="12" y2="22" />
-      <polyline points="9 8 12 10 15 8" />
-    </svg>
-  );
-}
-
-export function TShirtCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z" />
-    </svg>
-  );
-}
-
-export function JeansCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M4 2h16v4l-2 16h-4l-2-10-2 10H6L4 6V2z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-    </svg>
-  );
-}
-
-export function JacketCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M4 4l4-2h8l4 2v16H4V4z" />
-      <line x1="12" y1="2" x2="12" y2="20" />
-      <polyline points="8 4 12 7 16 4" />
-    </svg>
-  );
-}
-
-export function HoodieCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M4 6l8-4 8 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6z" />
-      <circle cx="12" cy="11" r="3" />
-    </svg>
-  );
-}
-
-export function FootwearCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M2 17h20v2H2zM4 17l2-7h6l4 3h6v4H4z" />
-    </svg>
-  );
-}
-
-export function WatchCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <circle cx="12" cy="12" r="6" />
-      <polyline points="12 9 12 12 14 14" />
-      <path d="M9 3h6v3H9zM9 18h6v3H9z" />
-    </svg>
-  );
-}
-
-export function AccessoryCategoryIcon({ className = 'h-6 w-6', size = 26, strokeWidth = 1.8 }: CategoryIconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} className={className}>
-      <path d="M2 14h20M5 14A7 7 0 0 1 19 14M2 14c0 2 2 4 5 4h10c3 0 5-2 5-4" />
-    </svg>
-  );
-}
-
-/** Dynamic resolver for category slug → custom SVG React component */
-export function getCategoryIconBySlug(slug: string, className?: string) {
+export function getCategoryIconImageBySlug(slug?: string): string {
+  if (!slug || typeof slug !== 'string') return '/category-icons/tshirt.png';
   const lower = slug.toLowerCase();
-  if (lower.includes('shirt') && !lower.includes('t-shirt') && !lower.includes('sweatshirt')) return <ShirtCategoryIcon className={className} />;
-  if (lower.includes('t-shirt') || lower.includes('polo')) return <TShirtCategoryIcon className={className} />;
-  if (lower.includes('jean') || lower.includes('denim') || lower.includes('pant') || lower.includes('track')) return <JeansCategoryIcon className={className} />;
-  if (lower.includes('jacket') || lower.includes('outerwear') || lower.includes('coat')) return <JacketCategoryIcon className={className} />;
-  if (lower.includes('hoodie')) return <HoodieCategoryIcon className={className} />;
-  if (lower.includes('sweatshirt') || lower.includes('sweater')) return <HoodieCategoryIcon className={className} />;
-  if (lower.includes('footwear') || lower.includes('shoe') || lower.includes('sneaker') || lower.includes('boot')) return <FootwearCategoryIcon className={className} />;
-  if (lower.includes('watch')) return <WatchCategoryIcon className={className} />;
-  return <AccessoryCategoryIcon className={className} />;
+
+  if (lower.includes('t-shirt') || lower.includes('tshirt') || lower.includes('polo') || lower.includes('tee')) {
+    return '/category-icons/tshirt.png';
+  }
+  if (lower.includes('inner') || lower === 'inners') {
+    return '/category-icons/inner.png';
+  }
+  if (lower.includes('sweatshirt')) {
+    return '/category-icons/sweatshirts.png';
+  }
+  if (lower.includes('hoodie')) {
+    return '/category-icons/hoodies.png';
+  }
+  if (lower.includes('jacket')) {
+    return '/category-icons/jackets.png';
+  }
+  if (lower.includes('jean')) {
+    return '/category-icons/jeans.png';
+  }
+  if (lower.includes('footwear') || lower.includes('shoe') || lower.includes('sneaker') || lower.includes('boot')) {
+    return '/category-icons/footwear.png';
+  }
+  if (lower.includes('watch')) {
+    return '/category-icons/watches.png';
+  }
+  if (lower.includes('trouser') || lower.includes('chino')) {
+    return '/category-icons/trousers.png';
+  }
+  if (lower.includes('track') || lower.includes('jogger')) {
+    return '/category-icons/tracks.png';
+  }
+  if (lower.includes('shirt')) {
+    return '/category-icons/shirts.png';
+  }
+  if (lower.includes('short')) {
+    return '/category-icons/shorts.png';
+  }
+
+  return `/category-icons/${lower}.png`;
 }
 
-export function CategoryIcon({ slug, className }: { slug: string; className?: string }) {
-  return getCategoryIconBySlug(slug, className);
+export function CategoryIcon({ slug, className = 'h-full w-full object-cover rounded-md' }: { slug?: string; className?: string }) {
+  const targetSrc = getCategoryIconImageBySlug(slug);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+
+  const finalSrc = failedSrc === targetSrc ? '/category-icons/tshirt.png' : targetSrc;
+
+  return (
+    <img
+      src={finalSrc}
+      alt={slug || 'Category'}
+      className={className}
+      onError={() => {
+        if (finalSrc !== '/category-icons/tshirt.png') {
+          setFailedSrc(targetSrc);
+        }
+      }}
+    />
+  );
 }
+
+export function ShirtCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="shirts" className={className} />;
+}
+
+export function TShirtCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="t-shirts" className={className} />;
+}
+
+export function JeansCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="jeans" className={className} />;
+}
+
+export function JacketCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="jackets" className={className} />;
+}
+
+export function HoodieCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="hoodies" className={className} />;
+}
+
+export function FootwearCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="footwear" className={className} />;
+}
+
+export function WatchCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="watches" className={className} />;
+}
+
+export function InnerCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="inners" className={className} />;
+}
+
+export function SweatshirtCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="sweatshirts" className={className} />;
+}
+
+export function TrouserCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="trousers" className={className} />;
+}
+
+export function TrackCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="tracks" className={className} />;
+}
+
+export function AccessoryCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
+  return <CategoryIcon slug="watches" className={className} />;
+}
+
+export function getCategoryIconBySlug(slug?: string, className?: string) {
+  return <CategoryIcon slug={slug} className={className} />;
+}
+
+
+

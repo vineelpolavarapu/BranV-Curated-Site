@@ -19,7 +19,7 @@ INSERT INTO categories (id, "parentId", slug, name, path, "displayOrder", "creat
   ('cat_trousers',                NULL, 'trousers',                'Trousers',              'trousers',                6,  now(), now()),
   ('cat_shorts',                  NULL, 'shorts',                  'Shorts',                'shorts',                  7,  now(), now()),
   ('cat_jackets',                 NULL, 'jackets',                 'Jackets',               'jackets',                 8,  now(), now()),
-  ('cat_sweaters',    NULL, 'sweaters',    'Sweaters',    'sweaters',    9,  now(), now()),
+  ('cat_inners',      NULL, 'inners',      'Inners',        'inners',      9,  now(), now()),
   ('cat_sweatshirts', NULL, 'sweatshirts', 'Sweatshirts', 'sweatshirts', 10, now(), now()),
   ('cat_hoodies',     NULL, 'hoodies',     'Hoodies',     'hoodies',     11, now(), now()),
   -- Collection categories (banner landing pages). Real categories so products
@@ -96,11 +96,11 @@ FROM (VALUES
   ('jackets', 'jackets-puffer-jackets',                     'Puffer Jackets',     'jackets/puffer-jackets',              3),
   ('jackets', 'jackets-windbreakers',                       'Windbreakers',       'jackets/windbreakers',                4),
 
-  ('sweaters', 'sweaters-v-neck-sweaters',                  'V-Neck Sweaters',    'sweaters/v-neck-sweaters',            0),
-  ('sweaters', 'sweaters-crew-neck-sweaters',               'Crew Neck Sweaters', 'sweaters/crew-neck-sweaters',       1),
-  ('sweaters', 'sweaters-cardigans',                        'Cardigans',          'sweaters/cardigans',                  2),
-  ('sweaters', 'sweaters-turtlenecks',                      'Turtlenecks',        'sweaters/turtlenecks',                3),
-  ('sweaters', 'sweaters-cable-knit',                       'Cable Knit',         'sweaters/cable-knit',                 4),
+  ('inners', 'inners-banniens', 'Banniens / Vests', 'inners/banniens', 0),
+  ('inners', 'inners-briefs',   'Briefs',           'inners/briefs',   1),
+  ('inners', 'inners-trunks',   'Trunks',           'inners/trunks',   2),
+  ('inners', 'inners-boxers',   'Boxers',           'inners/boxers',   3),
+  ('inners', 'inners-thermals', 'Thermals',         'inners/thermals', 4),
 
   ('sweatshirts', 'sweatshirts-crew-neck-sweatshirts',      'Crew Neck Sweatshirts', 'sweatshirts/crew-neck-sweatshirts', 0),
   ('sweatshirts', 'sweatshirts-oversized-sweatshirts',      'Oversized Sweatshirts', 'sweatshirts/oversized-sweatshirts', 1),

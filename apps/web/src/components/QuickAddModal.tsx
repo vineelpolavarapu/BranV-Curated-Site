@@ -677,7 +677,7 @@ const DEFAULT_BRANDS = [
                   'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
                   'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
                   'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
-                  'Sweaters', 'Sweatshirts', 'Hoodies'
+                  'Inners', 'Sweatshirts', 'Hoodies'
                 ].map((cat) => (
                   <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
                     <input

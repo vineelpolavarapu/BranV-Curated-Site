@@ -31,6 +31,29 @@ def test_legacy_bcrypt_verification():
     assert security.needs_rehash(bcrypt_hash) is True
 
 
+def test_legacy_hash_formats_all_strategies():
+    import hashlib
+    # 1. Raw SHA-256 hex string (64 chars)
+    raw_pw = "my-secret-pass-123"
+    sha256_hash = hashlib.sha256(raw_pw.encode("utf-8")).hexdigest()
+    assert security.verify_password(sha256_hash, raw_pw) is True
+    assert security.verify_password(sha256_hash, "wrong") is False
+    assert security.needs_rehash(sha256_hash) is True
+
+    # 2. Raw MD5 hex string (32 chars)
+    md5_hash = hashlib.md5(raw_pw.encode("utf-8")).hexdigest()
+    assert security.verify_password(md5_hash, raw_pw) is True
+    assert security.verify_password(md5_hash, "wrong") is False
+    assert security.needs_rehash(md5_hash) is True
+
+    # 3. SHA256 pre-hashed Bcrypt
+    import bcrypt
+    prehash_digest = hashlib.sha256(raw_pw.encode("utf-8")).hexdigest().encode("utf-8")
+    bcrypt_prehash = bcrypt.hashpw(prehash_digest, bcrypt.gensalt()).decode("ascii")
+    assert security.verify_password(bcrypt_prehash, raw_pw) is True
+    assert security.verify_password(bcrypt_prehash, "wrong") is False
+
+
 def test_argon2_verify_wrong_hash_format_returns_false():
     # Defensive parity with Nest's `.catch(() => false)` on argon2.verify.
     assert security.verify_password("not-an-argon2-hash", "anything") is False

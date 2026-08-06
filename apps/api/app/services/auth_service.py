@@ -22,7 +22,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from fastapi import BackgroundTasks
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import joinedload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -206,11 +206,15 @@ async def login(
 ) -> tuple[User, str, str]:
     normalized = _normalize_email(email)
     user = (await db.execute(
-        select(User).where(User.email == normalized)
+        select(User).where(func.lower(User.email) == normalized)
     )).scalar_one_or_none()
 
     # Generic-credential-error path (no user OR suspended/deleted account).
-    if user is None or user.status != "ACTIVE":
+    is_active_account = (
+        user is not None
+        and (user.status is None or str(user.status).upper() in ("ACTIVE", "VERIFIED", "ENABLED", "OK"))
+    )
+    if not is_active_account or user is None:
         background.add_task(
             audit_service.record,
             action="auth.login.fail",

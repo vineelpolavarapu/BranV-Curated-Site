@@ -126,14 +126,13 @@ One backend, one design system, shared auth, separate IA.
 
 | L1 Category | L2 Subcategories |
 |---|---|
-| **Clothing** | T-Shirts, Shirts, Polos, Jeans, Trousers, Shorts, Jackets, Sweaters, Sweatshirts & Hoodies, Ethnic Wear |
+| **Clothing** | T-Shirts, Shirts, Polos, Jeans, Trousers, Shorts, Jackets, Inners, Sweatshirts & Hoodies, Ethnic Wear |
 | **Footwear** | Sneakers, Loafers, Formal Shoes, Boots, Sandals & Slippers, Sports Shoes |
 | **Watches** | Analog, Digital, Smartwatches, Luxury, Chronographs |
 | **Eyewear** | Sunglasses, Optical Frames, Blue-Light Glasses |
 | **Watches** | Belts, Wallets, Bags & Backpacks, Cufflinks, Caps & Hats, Scarves & Stoles, Jewelry, Keychains |
 | **Grooming** | Fragrances, Beard Care, Hair Care, Skincare, Shaving, Gift Sets |
-
-Excluded: innerwear.
+| **Inners** | Banniens / Vests, Briefs, Trunks, Boxers, Thermals |
 
 ### 6.2 Brand as a First-Class Entity
 

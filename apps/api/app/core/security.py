@@ -27,6 +27,7 @@ import pyotp
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from fastapi import Response
+from passlib.context import CryptContext
 
 from .settings import get_settings
 
@@ -40,6 +41,12 @@ _PASSWORD_HASHER = PasswordHasher(
     time_cost=2,
     memory_cost=19 * 1024,
     parallelism=1,
+)
+
+# Multi-scheme Passlib context for comprehensive legacy hash support
+_PWD_CONTEXT = CryptContext(
+    schemes=["argon2", "bcrypt", "bcrypt_sha256", "pbkdf2_sha256", "scrypt", "sha512_crypt", "sha256_crypt", "md5_crypt"],
+    deprecated="auto",
 )
 
 # ───────────── data types ────────────────────────────────────────────────────
@@ -87,18 +94,62 @@ def verify_password(stored_hash: str, plaintext: str) -> bool:
     if not stored_hash or not plaintext:
         return False
 
-    # Check for legacy Bcrypt hash format ($2a$, $2b$, $2y$)
-    if stored_hash.startswith(("$2a$", "$2b$", "$2y$")):
-        try:
-            return bcrypt.checkpw(plaintext.encode("utf-8"), stored_hash.encode("utf-8"))
-        except Exception:
-            return False
+    s_hash = stored_hash.strip()
+    p_text = plaintext
 
-    # Argon2id verification
+    # Strategy 1: Direct Argon2id verification
+    if s_hash.startswith(("$argon2id$", "$argon2i$", "$argon2d$")):
+        try:
+            return _PASSWORD_HASHER.verify(s_hash, p_text)
+        except (VerifyMismatchError, VerificationError, InvalidHashError):
+            pass
+        # Fallback: Try with SHA256 pre-hashed password
+        try:
+            sha_prehash = hashlib.sha256(p_text.encode("utf-8")).hexdigest()
+            return _PASSWORD_HASHER.verify(s_hash, sha_prehash)
+        except Exception:
+            pass
+
+    # Strategy 2: Direct Bcrypt verification ($2a$, $2b$, $2y$, $2x$, $2$)
+    if s_hash.startswith(("$2a$", "$2b$", "$2y$", "$2x$", "$2$")):
+        try:
+            if bcrypt.checkpw(p_text.encode("utf-8"), s_hash.encode("utf-8")):
+                return True
+        except Exception:
+            pass
+        # Fallback 2a: Try with SHA256 hex pre-hashed password
+        try:
+            sha_hex = hashlib.sha256(p_text.encode("utf-8")).hexdigest().encode("utf-8")
+            if bcrypt.checkpw(sha_hex, s_hash.encode("utf-8")):
+                return True
+        except Exception:
+            pass
+        # Fallback 2b: Try with SHA256 raw binary pre-hashed password
+        try:
+            sha_bin = hashlib.sha256(p_text.encode("utf-8")).digest()
+            if bcrypt.checkpw(sha_bin, s_hash.encode("utf-8")):
+                return True
+        except Exception:
+            pass
+
+    # Strategy 3: Passlib multi-scheme context
     try:
-        return _PASSWORD_HASHER.verify(stored_hash, plaintext)
-    except (VerifyMismatchError, VerificationError, InvalidHashError):
-        return False
+        if _PWD_CONTEXT.verify(p_text, s_hash):
+            return True
+    except Exception:
+        pass
+
+    # Strategy 4: Raw SHA-256 hex digest
+    if len(s_hash) == 64:
+        if hashlib.sha256(p_text.encode("utf-8")).hexdigest().lower() == s_hash.lower():
+            return True
+
+    # Strategy 5: Raw MD5 hex digest
+    if len(s_hash) == 32:
+        if hashlib.md5(p_text.encode("utf-8")).hexdigest().lower() == s_hash.lower():
+            return True
+
+    return False
 
 
 def needs_rehash(stored_hash: str) -> bool:

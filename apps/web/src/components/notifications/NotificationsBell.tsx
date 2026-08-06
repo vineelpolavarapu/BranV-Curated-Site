@@ -2,42 +2,57 @@
 
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { NotificationsPage } from '@/lib/phase8-types';
 import { Icon } from '../icons';
 
-const POLL_MS = 60_000;
-
 export function NotificationsBell() {
-  const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
-  const [recent, setRecent] = useState<NotificationsPage | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let active = true;
-    async function tick() {
+  const { data: unreadData, isError: unreadError } = useQuery({
+    queryKey: ['notifications', 'unread-count'],
+    queryFn: async () => {
       const res = await apiFetch<{ count: number }>(
         '/notifications/unread-count',
       );
-      if (!active) return;
-      if (res.status === 401 || res.status === 403) {
-        setSignedIn(false);
-        return;
-      }
-      if (res.ok && res.data) {
-        setSignedIn(true);
-        setUnread(res.data.count);
-      }
-    }
-    void tick();
-    const id = setInterval(tick, POLL_MS);
-    return () => {
-      active = false;
-      clearInterval(id);
-    };
-  }, []);
+      if (res.status === 401 || res.status === 403) return null;
+      if (!res.ok || !res.data) return null;
+      return res.data;
+    },
+    refetchInterval: 60_000,
+    staleTime: 30_000,
+  });
+
+  const signedIn = unreadData !== null && !unreadError;
+  const unread = unreadData?.count ?? 0;
+
+  const { data: recent } = useQuery({
+    queryKey: ['notifications', 'recent'],
+    queryFn: async () => {
+      const res = await apiFetch<NotificationsPage>(
+        '/notifications?pageSize=8',
+      );
+      if (!res.ok || !res.data) throw new Error('Failed to fetch notifications');
+      return res.data;
+    },
+    enabled: open && signedIn,
+    staleTime: 30_000,
+  });
+
+  const markAllReadMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiFetch('/notifications/read-all', { method: 'POST' });
+      if (!res.ok) throw new Error('Failed to mark read');
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(['notifications', 'unread-count'], { count: 0 });
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+  });
 
   useEffect(() => {
     function handler(e: MouseEvent) {
@@ -48,31 +63,13 @@ export function NotificationsBell() {
     return () => window.removeEventListener('click', handler);
   }, []);
 
-  async function toggle() {
-    const next = !open;
-    setOpen(next);
-    if (next && !recent) {
-      const res = await apiFetch<NotificationsPage>(
-        '/notifications?pageSize=8',
-      );
-      if (res.ok && res.data) setRecent(res.data);
-    }
-  }
-
-  async function onMarkAllRead() {
-    await apiFetch('/notifications/read-all', { method: 'POST' });
-    setUnread(0);
-    const res = await apiFetch<NotificationsPage>('/notifications?pageSize=8');
-    if (res.ok && res.data) setRecent(res.data);
-  }
-
   if (!signedIn) return null;
 
   return (
     <div ref={wrapperRef} className="relative">
       <button
         type="button"
-        onClick={toggle}
+        onClick={() => setOpen((prev) => !prev)}
         aria-label={
           unread > 0
             ? `Notifications (${unread} unread)`
@@ -97,10 +94,11 @@ export function NotificationsBell() {
             {unread > 0 && (
               <button
                 type="button"
-                onClick={onMarkAllRead}
-                className="font-medium text-content-soft hover:text-primary"
+                onClick={() => markAllReadMutation.mutate()}
+                disabled={markAllReadMutation.isPending}
+                className="font-medium text-content-soft hover:text-primary disabled:opacity-50"
               >
-                Mark all read
+                {markAllReadMutation.isPending ? 'Marking...' : 'Mark all read'}
               </button>
             )}
           </header>

@@ -13,14 +13,16 @@ import {
   adminLabel,
 } from '@/components/AdminShell';
 
+import { useAdminCategories } from '@/hooks/use-admin-data';
+
 const FILTER_TYPES: FilterType[] = ['SELECT', 'MULTI_SELECT', 'RANGE', 'TOGGLE'];
 
 export default function CategoriesAdminPage() {
-  const [categories, setCategories] = useState<CategoryNode[]>([]);
+  const { data: catData, isLoading: loading } = useAdminCategories();
+  const categories = useMemo(() => (catData ?? []) as CategoryNode[], [catData]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [expandedL1s, setExpandedL1s] = useState<Set<string>>(new Set());
   const [schemas, setSchemas] = useState<AttributeSchema[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<AttributeSchema | null>(null);
 
@@ -29,18 +31,6 @@ export default function CategoriesAdminPage() {
     () => categories.find((c) => c.id === selectedId) ?? null,
     [categories, selectedId],
   );
-
-  useEffect(() => {
-    void (async () => {
-      const result = await apiFetch<CategoryNode[]>('/admin/categories');
-      if (result.ok && result.data) {
-        setCategories(result.data);
-      }
-      // Don't auto-expand or auto-select — landing shows only L1 names so the
-      // admin can pick which one to drill into.
-      setLoading(false);
-    })();
-  }, []);
 
   function toggleL1(id: string) {
     setExpandedL1s((prev) => {

@@ -27,7 +27,7 @@ const CATEGORY_SLUGS = [
   'trousers',
   'shorts',
   'jackets',
-  'sweaters',
+  'inners',
   'sweatshirts',
   'hoodies',
 ];

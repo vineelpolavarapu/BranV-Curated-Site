@@ -5,10 +5,10 @@ import {
   ReactNode,
   useCallback,
   useContext,
-  useEffect,
-  useState,
+  useMemo,
 } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 
 interface WishlistContextValue {
@@ -23,48 +23,38 @@ interface WishlistContextValue {
 
 const WishlistContext = createContext<WishlistContextValue | null>(null);
 
+export const WISHLIST_IDS_QUERY_KEY = ['wishlist', 'ids'];
+
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  const [productIds, setProductIds] = useState<Set<string>>(new Set());
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: WISHLIST_IDS_QUERY_KEY,
+    queryFn: async () => {
       const res = await apiFetch<string[]>('/me/wishlist/ids');
-      if (cancelled) return;
       if (res.status === 401 || res.status === 403) {
-        setSignedIn(false);
-        setProductIds(new Set());
-        return;
+        return null;
       }
-      if (res.ok && res.data) {
-        setSignedIn(true);
-        setProductIds(new Set(res.data));
-      } else {
-        // Network blip or other — assume unsigned so the UI doesn't lie.
-        setSignedIn(false);
+      if (!res.ok || !res.data) {
+        return null;
       }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+      return res.data;
+    },
+    staleTime: Infinity, // 0ms latency for repetitive wishlist queries
+  });
 
-  const toggle = useCallback(
-    async (productId: string): Promise<boolean> => {
-      if (signedIn === false) {
-        router.push('/login?next=/');
-        return false;
-      }
-      const currentlyIn = productIds.has(productId);
-      // Optimistic update.
-      setProductIds((prev) => {
-        const next = new Set(prev);
-        if (currentlyIn) next.delete(productId);
-        else next.add(productId);
-        return next;
-      });
+  const signedIn = isLoading ? null : Array.isArray(data);
+  const productIds = useMemo(() => new Set(data ?? []), [data]);
+
+  const toggleMutation = useMutation({
+    mutationFn: async ({
+      productId,
+      currentlyIn,
+    }: {
+      productId: string;
+      currentlyIn: boolean;
+    }) => {
       const path = currentlyIn
         ? `/wishlist/items/${productId}`
         : '/wishlist/items';
@@ -73,21 +63,59 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
         body: currentlyIn ? undefined : JSON.stringify({ productId }),
       });
       if (!res.ok) {
-        // Roll back optimistic update on failure.
-        setProductIds((prev) => {
-          const next = new Set(prev);
-          if (currentlyIn) next.add(productId);
-          else next.delete(productId);
-          return next;
-        });
-        if (res.status === 401 || res.status === 403) {
+        throw res;
+      }
+      return { productId, currentlyIn };
+    },
+    onMutate: async ({ productId, currentlyIn }) => {
+      await queryClient.cancelQueries({ queryKey: WISHLIST_IDS_QUERY_KEY });
+      const previousIds =
+        queryClient.getQueryData<string[] | null>(WISHLIST_IDS_QUERY_KEY) ??
+        null;
+
+      queryClient.setQueryData<string[] | null>(
+        WISHLIST_IDS_QUERY_KEY,
+        (old) => {
+          if (!old) return currentlyIn ? [] : [productId];
+          if (currentlyIn) return old.filter((id) => id !== productId);
+          return [...old, productId];
+        },
+      );
+
+      return { previousIds };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousIds !== undefined) {
+        queryClient.setQueryData(
+          WISHLIST_IDS_QUERY_KEY,
+          context.previousIds,
+        );
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: WISHLIST_IDS_QUERY_KEY });
+    },
+  });
+
+  const toggle = useCallback(
+    async (productId: string): Promise<boolean> => {
+      if (signedIn === false) {
+        router.push('/login?next=/');
+        return false;
+      }
+      const currentlyIn = productIds.has(productId);
+      try {
+        await toggleMutation.mutateAsync({ productId, currentlyIn });
+        return !currentlyIn;
+      } catch (err: unknown) {
+        const errorRes = err as { status?: number };
+        if (errorRes?.status === 401 || errorRes?.status === 403) {
           router.push('/login?next=/');
         }
         return currentlyIn;
       }
-      return !currentlyIn;
     },
-    [signedIn, productIds, router],
+    [signedIn, productIds, router, toggleMutation],
   );
 
   const isInWishlist = useCallback(
@@ -107,8 +135,6 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 export function useWishlist(): WishlistContextValue {
   const ctx = useContext(WishlistContext);
   if (!ctx) {
-    // No provider in tree — return a no-op so admin routes (which don't mount
-    // the storefront shell) don't crash.
     return {
       signedIn: false,
       productIds: new Set(),

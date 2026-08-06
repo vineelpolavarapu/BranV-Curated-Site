@@ -7,6 +7,8 @@ import { Filters, SortPicker, FilterDefinition } from '@/components/Filters';
 import { CategoryHashFilter } from '@/components/CategoryHashFilter';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { SubcategoryChips } from '@/components/SubcategoryChips';
+import { CategoryIcon } from '@/components/category-icons';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 
 export interface CategoryDetail {
   id: string;
@@ -60,6 +62,11 @@ function CategoryHeader({
   category: CategoryDetail;
   total: number;
 }) {
+  const subcategories =
+    category.children && category.children.length > 0
+      ? category.children
+      : (SHOP_CATEGORIES.find((c) => c.slug === category.slug)?.subcategories ?? []);
+
   return (
     <AnimateOnScroll>
       <section className="mx-auto max-w-7xl px-6 pt-8">
@@ -68,15 +75,22 @@ function CategoryHeader({
           <span className="mx-2">/</span>
           <span className="text-content">{category.name}</span>
         </nav>
-        <h1 className="bv-enter bv-delay-1 text-3xl font-semibold tracking-tight md:text-4xl">
-          {category.name}
-        </h1>
-        <p className="bv-enter-fade bv-delay-2 mt-1 text-sm text-content-soft">
-          {total} {total === 1 ? 'product' : 'products'}
-        </p>
-        {category.children.length > 0 && (
+        <div className="flex items-center gap-3.5">
+          <span className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 p-1 shadow-xs shrink-0 border border-slate-200">
+            <CategoryIcon slug={category.slug} className="h-full w-full object-cover rounded-full" />
+          </span>
+          <div>
+            <h1 className="bv-enter bv-delay-1 text-3xl font-semibold tracking-tight md:text-4xl">
+              {category.name}
+            </h1>
+            <p className="bv-enter-fade bv-delay-2 mt-0.5 text-sm text-content-soft">
+              {total} {total === 1 ? 'product' : 'products'}
+            </p>
+          </div>
+        </div>
+        {subcategories.length > 0 && (
           <SubcategoryChips categorySlug={category.slug}>
-            {category.children}
+            {subcategories}
           </SubcategoryChips>
         )}
       </section>

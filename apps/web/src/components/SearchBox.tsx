@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { AutocompleteResult } from '@/lib/storefront-types';
 import { Icon } from './icons';
@@ -11,23 +12,24 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
   const router = useRouter();
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
-  const [hits, setHits] = useState<AutocompleteResult | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (!q.trim()) {
-      setHits(null);
-      return;
-    }
-    const timeout = setTimeout(async () => {
+  const queryTerm = q.trim().toLowerCase();
+
+  const { data: hits } = useQuery({
+    queryKey: ['search', 'autocomplete', queryTerm],
+    queryFn: async () => {
+      if (!queryTerm) return null;
       const result = await apiFetch<AutocompleteResult>(
-        `/search/autocomplete?q=${encodeURIComponent(q)}`,
+        `/search/autocomplete?q=${encodeURIComponent(queryTerm)}`,
       );
-      if (result.ok) setHits(result.data);
-    }, 150);
-    return () => clearTimeout(timeout);
-  }, [q]);
+      if (!result.ok || !result.data) return null;
+      return result.data;
+    },
+    enabled: Boolean(queryTerm),
+    staleTime: Infinity, // 0ms latency for repetitive autocomplete queries
+  });
 
   // Close on outside click
   useEffect(() => {

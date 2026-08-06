@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { apiFetch, CurrentUser } from '@/lib/api';
+import { useCurrentUser, useLogout } from '@/hooks/use-auth';
 import { Icon } from './icons';
 
 const MENU_ITEMS = [
@@ -21,16 +22,11 @@ const MENU_ITEMS = [
 
 export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [me, setMe] = useState<CurrentUser | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!open) return;
-    apiFetch<CurrentUser>('/auth/me').then((result) => {
-      if (result.ok && result.data) setMe(result.data);
-    });
-  }, [open]);
+  const { data: me } = useCurrentUser({ enabled: open });
+  const logoutMutation = useLogout();
 
   useEffect(() => {
     if (!open) return;
@@ -49,7 +45,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
   }, [open]);
 
   async function onSignOut() {
-    await apiFetch('/auth/logout', { method: 'POST' });
+    await logoutMutation.mutateAsync().catch(() => {});
     setOpen(false);
     router.replace('/');
     router.refresh();

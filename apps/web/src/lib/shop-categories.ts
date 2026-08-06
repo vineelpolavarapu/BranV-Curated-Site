@@ -113,14 +113,14 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
     ],
   },
   {
-    name: 'Sweaters',
-    slug: 'sweaters',
+    name: 'Inners',
+    slug: 'inners',
     subcategories: [
-      { name: 'V-Neck Sweaters', slug: 'sweaters-v-neck-sweaters' },
-      { name: 'Crew Neck Sweaters', slug: 'sweaters-crew-neck-sweaters' },
-      { name: 'Cardigans', slug: 'sweaters-cardigans' },
-      { name: 'Turtlenecks', slug: 'sweaters-turtlenecks' },
-      { name: 'Cable Knit', slug: 'sweaters-cable-knit' },
+      { name: 'Banniens / Vests', slug: 'inners-banniens' },
+      { name: 'Briefs', slug: 'inners-briefs' },
+      { name: 'Trunks', slug: 'inners-trunks' },
+      { name: 'Boxers', slug: 'inners-boxers' },
+      { name: 'Thermals', slug: 'inners-thermals' },
     ],
   },
   {

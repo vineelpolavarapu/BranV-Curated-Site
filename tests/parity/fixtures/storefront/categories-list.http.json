@@ -259,9 +259,9 @@
       {
         "id": "<cuid>",
         "parentId": "<cuid>",
-        "slug": "clothing-sweaters",
-        "name": "Sweaters",
-        "path": "clothing/sweaters",
+        "slug": "inners",
+        "name": "Inners",
+        "path": "inners",
         "displayOrder": 7,
         "createdAt": "<iso-datetime>",
         "updatedAt": "<iso-datetime>",

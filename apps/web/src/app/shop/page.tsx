@@ -51,8 +51,8 @@ export default async function ShopPage() {
                     href={`/category/${c.slug}`}
                     className="group flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
                   >
-                    <span className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                      <CategoryIcon slug={c.slug} className="h-7 w-7" />
+                    <span className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-slate-100 p-1 shadow-inner transition-transform group-hover:scale-105">
+                      <CategoryIcon slug={c.slug} className="h-full w-full object-cover rounded-full" />
                     </span>
                     <div>
                       <p className="text-sm font-bold text-slate-900">{c.name}</p>

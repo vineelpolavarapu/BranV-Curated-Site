@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { apiFetch, CurrentUser } from '@/lib/api';
+import { useCurrentUser, useLogout } from '@/hooks/use-auth';
 import { QuickAddModal } from './QuickAddModal';
 
 const NAV = [
@@ -149,7 +150,6 @@ function MobileDrawer({
     document.body,
   );
 }
-
 export function AdminShell({
   title,
   actions,
@@ -161,10 +161,12 @@ export function AdminShell({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [me, setMe] = useState<CurrentUser | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [quickAddOpen, setQuickAddOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const { data: me, isLoading } = useCurrentUser();
+  const logoutMutation = useLogout();
 
   // Keyboard shortcut: N opens Quick Add
   useEffect(() => {
@@ -197,26 +199,19 @@ export function AdminShell({
   }, [pathname]);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const result = await apiFetch<CurrentUser>('/auth/me');
-      if (cancelled) return;
-      if (!result.ok || !result.data) {
-        router.replace('/admin/login');
-        return;
-      }
-      if (result.data.role !== 'ADMIN') {
-        setError('You do not have admin access.');
-        setTimeout(() => router.replace('/account'), 1500);
-        return;
-      }
-      setMe(result.data);
-    })();
-    return () => { cancelled = true; };
-  }, [router]);
+    if (isLoading) return;
+    if (!me) {
+      router.replace('/admin/login');
+      return;
+    }
+    if (me.role !== 'ADMIN') {
+      setError('You do not have admin access.');
+      setTimeout(() => router.replace('/account'), 1500);
+    }
+  }, [me, isLoading, router]);
 
   async function onLogout() {
-    await apiFetch('/auth/logout', { method: 'POST' });
+    await logoutMutation.mutateAsync().catch(() => {});
     router.replace('/admin/login');
     router.refresh();
   }

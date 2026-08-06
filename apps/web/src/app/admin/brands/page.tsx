@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-import { apiFetch } from '@/lib/api';
-import { Brand, Page } from '@/lib/admin-types';
+import { useQueryClient } from '@tanstack/react-query';
+import { Brand } from '@/lib/admin-types';
+import { useAdminBrands, useDeleteAdminBrand } from '@/hooks/use-admin-data';
 import {
   AdminShell,
   adminButtonDanger,
@@ -15,36 +16,30 @@ import {
 import { BrandFormModal } from '@/components/BrandFormModal';
 
 export default function BrandsAdminPage() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Brand | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const queryClient = useQueryClient();
 
-  async function refresh() {
-    setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set('search', search);
-    params.set('pageSize', '50');
-    const result = await apiFetch<Page<Brand>>(`/admin/brands?${params}`);
-    if (result.ok && result.data) {
-      setBrands(result.data.data);
-      setTotal(result.data.total);
-    }
-    setLoading(false);
-  }
+  const { data, isLoading } = useAdminBrands(search);
+  const deleteBrandMutation = useDeleteAdminBrand();
 
-  useEffect(() => {
-    void refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const brands = data?.data ?? [];
+  const total = data?.total ?? 0;
 
   async function onDelete(id: string) {
     if (!confirm('Archive this brand? It will be hidden but click history preserved.')) return;
-    const result = await apiFetch(`/admin/brands/${id}`, { method: 'DELETE' });
-    if (result.ok) await refresh();
-    else alert(result.error ?? 'Failed to archive');
+    try {
+      await deleteBrandMutation.mutateAsync(id);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Failed to archive';
+      alert(message);
+    }
+  }
+
+  function handleSaveSuccess() {
+    setShowForm(false);
+    queryClient.invalidateQueries({ queryKey: ['admin', 'brands'] });
   }
 
   return (
@@ -58,104 +53,88 @@ export default function BrandsAdminPage() {
           }}
           className={adminButtonPrimary}
         >
-          + New brand
+          + Add brand
         </button>
       }
     >
-      <div className="mb-4 flex items-center gap-2">
-        <input
-          type="search"
-          placeholder="Search brands…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') void refresh();
-          }}
-          className={`${adminInput} max-w-sm`}
-        />
-        <button onClick={refresh} className={adminButtonSecondary}>
-          Search
-        </button>
-        <span className="ml-auto text-sm text-content-soft">{total} total</span>
-      </div>
-
-      <div className={adminCard}>
-        {loading ? (
-          <p className="text-sm text-content-soft">Loading…</p>
-        ) : brands.length === 0 ? (
-          <p className="text-sm text-content-soft">
-            No brands yet. Click <strong>+ New brand</strong> to add one.
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <input
+            type="text"
+            placeholder="Search brands…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`${adminInput} max-w-xs`}
+          />
+          <p className="text-xs text-content-soft">
+            Total: <span className="font-semibold text-content">{total}</span>
           </p>
+        </div>
+
+        {isLoading ? (
+          <p className="py-8 text-center text-sm text-content-soft">Loading brands…</p>
+        ) : brands.length === 0 ? (
+          <p className="py-8 text-center text-sm text-content-soft">No brands found.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] text-sm">
-              <thead>
-                <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
-                  <th className="px-2 pb-3 font-medium">Brand</th>
-                  <th className="px-2 pb-3 font-medium">Products</th>
-                  <th className="px-2 pb-3 font-medium">Status</th>
-                  <th className="px-2 pb-3 font-medium" />
+          <div className={`${adminCard} overflow-hidden`}>
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-line bg-surface-muted text-xs font-semibold uppercase tracking-wider text-content-soft">
+                <tr>
+                  <th className="px-4 py-3">Brand</th>
+                  <th className="px-4 py-3">Slug</th>
+                  <th className="px-4 py-3">Tier</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-line">
                 {brands.map((b) => (
-                  <tr key={b.id} className="border-b border-neutral-100">
-                    <td className="px-2 py-3">
+                  <tr key={b.id} className="hover:bg-surface-muted/50">
+                    <td className="px-4 py-3 font-medium text-content">
                       <div className="flex items-center gap-3">
                         {b.logoUrl ? (
                           <Image
                             src={b.logoUrl}
-                            alt=""
-                            width={32}
-                            height={32}
-                            unoptimized
-                            className="h-8 w-8 shrink-0 rounded object-cover"
+                            alt={b.name}
+                            width={28}
+                            height={28}
+                            className="h-7 w-7 rounded-full object-cover"
                           />
                         ) : (
-                          <div className="h-8 w-8 shrink-0 rounded bg-line" />
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-muted text-xs font-bold text-content-soft">
+                            {b.name[0]}
+                          </div>
                         )}
-                        <div className="min-w-0">
-                          <p className="truncate font-medium">{b.name}</p>
-                          <p className="truncate text-xs text-content-soft">{b.slug}</p>
-                        </div>
-                        {b.isFeatured && (
-                          <span className="ml-1 shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-800">
-                            Featured
-                          </span>
-                        )}
+                        <span>{b.name}</span>
                       </div>
                     </td>
-                    <td className="px-2 py-3 text-content-soft">
-                      {b._count?.products ?? 0}
+                    <td className="px-4 py-3 text-content-soft">{b.slug}</td>
+                    <td className="px-4 py-3 text-content-soft">{b.isFeatured ? 'Featured' : 'Standard'}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                          b.status === 'ACTIVE'
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                        }`}
+                      >
+                        {b.status}
+                      </span>
                     </td>
-                    <td className="px-2 py-3">
-                      <StatusPill status={b.status} />
-                    </td>
-                    <td className="px-2 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <a
-                          href={`/admin/brands/${b.id}/story`}
-                          aria-label="Brand story"
-                          title="Story"
-                          className="inline-flex h-8 w-8 items-center justify-center rounded text-content-soft hover:bg-surface-muted hover:text-primary"
-                        >
-                          <svg width="14" height="14" viewBox="0 0 4 16" fill="currentColor" aria-hidden>
-                            <circle cx="2" cy="2" r="1.5" />
-                            <circle cx="2" cy="8" r="1.5" />
-                            <circle cx="2" cy="14" r="1.5" />
-                          </svg>
-                        </a>
-                        {/* <button
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
                           onClick={() => {
                             setEditing(b);
                             setShowForm(true);
                           }}
-                          className="text-sm font-medium text-content-soft hover:text-primary"
+                          className={adminButtonSecondary}
                         >
                           Edit
-                        </button> */}
+                        </button>
                         <button
                           onClick={() => onDelete(b.id)}
+                          disabled={deleteBrandMutation.isPending}
                           className={adminButtonDanger}
                         >
                           Archive
@@ -173,34 +152,10 @@ export default function BrandsAdminPage() {
       {showForm && (
         <BrandFormModal
           brand={editing}
-          onClose={() => {
-            setShowForm(false);
-            setEditing(null);
-          }}
-          onSaved={async () => {
-            setShowForm(false);
-            setEditing(null);
-            await refresh();
-          }}
+          onClose={() => setShowForm(false)}
+          onSaved={handleSaveSuccess}
         />
       )}
     </AdminShell>
   );
 }
-
-function StatusPill({ status }: { status: Brand['status'] }) {
-  const tone =
-    status === 'ACTIVE'
-      ? 'bg-green-100 text-green-800'
-      : status === 'HIDDEN'
-        ? 'bg-line text-content-soft'
-        : 'bg-red-100 text-red-700';
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${tone}`}
-    >
-      {status}
-    </span>
-  );
-}
-
