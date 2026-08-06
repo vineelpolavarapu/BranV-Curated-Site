@@ -19,6 +19,16 @@ def test_argon2_roundtrip():
     assert h.startswith("$argon2id$")
     assert security.verify_password(h, "hunter2-very-strong-PW") is True
     assert security.verify_password(h, "wrong") is False
+    assert security.needs_rehash(h) is False
+
+
+def test_legacy_bcrypt_verification():
+    import bcrypt
+    bcrypt_hash = bcrypt.hashpw(b"legacy-secret-password", bcrypt.gensalt()).decode("ascii")
+    assert bcrypt_hash.startswith(("$2a$", "$2b$", "$2y$"))
+    assert security.verify_password(bcrypt_hash, "legacy-secret-password") is True
+    assert security.verify_password(bcrypt_hash, "wrong-password") is False
+    assert security.needs_rehash(bcrypt_hash) is True
 
 
 def test_argon2_verify_wrong_hash_format_returns_false():

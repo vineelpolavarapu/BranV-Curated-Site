@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
+import bcrypt
 import jwt
 import pyotp
 from argon2 import PasswordHasher
@@ -83,10 +84,28 @@ def hash_password(plaintext: str) -> str:
 
 
 def verify_password(stored_hash: str, plaintext: str) -> bool:
+    if not stored_hash or not plaintext:
+        return False
+
+    # Check for legacy Bcrypt hash format ($2a$, $2b$, $2y$)
+    if stored_hash.startswith(("$2a$", "$2b$", "$2y$")):
+        try:
+            return bcrypt.checkpw(plaintext.encode("utf-8"), stored_hash.encode("utf-8"))
+        except Exception:
+            return False
+
+    # Argon2id verification
     try:
         return _PASSWORD_HASHER.verify(stored_hash, plaintext)
     except (VerifyMismatchError, VerificationError, InvalidHashError):
         return False
+
+
+def needs_rehash(stored_hash: str) -> bool:
+    """Returns True if stored_hash is from a legacy algorithm (e.g. bcrypt) and should be updated to Argon2id upon successful authentication."""
+    if not stored_hash:
+        return False
+    return not stored_hash.startswith(("$argon2id$", "$argon2i$", "$argon2d$"))
 
 
 async def async_hash_password(plaintext: str) -> str:

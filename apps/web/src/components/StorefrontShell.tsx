@@ -12,6 +12,7 @@ import { AccountPopup } from './AccountPopup';
 import { AnimateOnScroll } from './AnimateOnScroll';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { categoryHrefL2 } from '@/lib/category-href';
+import { Icon } from './icons';
 
 export function StorefrontShell({
   children,
@@ -79,48 +80,53 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
   return (
     <header className={`${headerBaseClasses} ${visibilityClasses}`}>
       {/* Top Header Row */}
-      <div className="mx-auto grid grid-cols-[auto_auto] lg:grid-cols-[auto_1fr_auto] items-center justify-between px-4 py-3 lg:py-4 w-full max-w-7xl gap-4">
-        {/* Mobile Drawer Trigger (Mobile Only) */}
-        <div className="lg:hidden">
-          <MobileNavDrawer overlay={overlay} />
+      <div className="mx-auto grid grid-cols-[auto_1fr_auto] items-center px-4 py-3 lg:py-4 w-full max-w-7xl gap-3 lg:gap-6">
+        {/* Left Section: Mobile Drawer Trigger (Mobile) OR Desktop Logo + Nav (Desktop) */}
+        <div className="flex items-center gap-6">
+          <div className="lg:hidden">
+            <MobileNavDrawer overlay={overlay} />
+          </div>
+          <Link href="/" className="hidden lg:inline-flex bv-nav-logo flex-col items-center user-select-none">
+            <div className={`font-heading text-2xl font-extrabold tracking-tight leading-none ${overlay ? 'text-white' : 'text-content'}`}>
+              Bran<span className="text-primary">V</span>
+            </div>
+            <div className={`mt-0.5 text-[9px] font-bold uppercase tracking-[0.22em] ${overlay ? 'text-white/80' : 'text-content'}`}>
+              ALL FOR MEN
+            </div>
+          </Link>
+          <nav className="bv-nav-links hidden items-center gap-7 text-sm font-semibold lg:flex">
+            <ShopMegaMenu overlay={overlay} />
+            <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New Arrivals</Link>
+            <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
+          </nav>
         </div>
 
-        {/* Brand Logo */}
-        <Link href="/" className="bv-nav-logo inline-flex flex-col items-center user-select-none">
-          <div className="font-heading text-2xl font-extrabold tracking-tight leading-none text-content">
-            Bran<span className="text-primary">V</span>
-          </div>
-          <div className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.22em] text-content">
-            ALL FOR MEN
-          </div>
-        </Link>
-
-        {/* Desktop Navigation Links (Desktop Only) */}
-        <nav className="bv-nav-links hidden items-center gap-7 text-sm font-semibold lg:flex">
-          <ShopMegaMenu overlay={overlay} />
-          <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New Arrivals</Link>
-          <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
-        </nav>
-
-        {/* Header Action Buttons (Desktop Search + Badges) */}
-        <div className="bv-nav-actions flex items-center gap-3">
-          {/* Desktop SearchBox (Desktop Only) */}
+        {/* Center Section: Centered Mobile Logo (Mobile) OR Desktop Search (Desktop) */}
+        <div className="flex items-center justify-center text-center">
+          <Link href="/" className="lg:hidden bv-nav-logo inline-flex flex-col items-center user-select-none">
+            <div className={`font-heading text-2xl font-extrabold tracking-tight leading-none ${overlay ? 'text-white' : 'text-content'}`}>
+              Bran<span className="text-primary">V</span>
+            </div>
+            <div className={`mt-0.5 text-[9px] font-bold uppercase tracking-[0.22em] ${overlay ? 'text-white/80' : 'text-content'}`}>
+              ALL FOR MEN
+            </div>
+          </Link>
           <div className="hidden w-72 xl:w-96 lg:block">
             <SearchBox overlay={overlay} />
           </div>
+        </div>
 
-          {/* Wishlist Icon Button with Badge */}
+        {/* Right Section: Header Actions (Wishlist on Mobile; Wishlist + Account on Desktop) */}
+        <div className="bv-nav-actions flex items-center justify-end gap-3">
+          {/* Wishlist Icon Button */}
           <Link
             href="/wishlist"
-            className="relative flex h-9 w-9 items-center justify-center rounded-full text-content hover:bg-surface-muted transition-colors"
+            className={`flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
+              overlay ? 'text-white hover:bg-white/10' : 'text-content hover:bg-surface-muted'
+            }`}
             aria-label="Wishlist"
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l8.78-8.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            <span className="absolute -top-1 -right-1 grid h-4.5 w-4.5 place-items-center rounded-full bg-accent text-[10px] font-bold text-white shadow-sm">
-              3
-            </span>
+            <Icon.Wishlist size={22} strokeWidth={1.8} aria-hidden />
           </Link>
 
           {/* Account Popup (Desktop) */}

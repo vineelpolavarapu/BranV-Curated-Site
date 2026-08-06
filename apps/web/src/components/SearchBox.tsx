@@ -51,10 +51,10 @@ export function SearchBox({ overlay = false }: { overlay?: boolean } = {}) {
     (hits.products.length > 0 || hits.brands.length > 0 || hits.categories.length > 0);
 
   const inputClasses = overlay
-    ? 'w-full h-12 rounded-full border border-white/40 bg-primary-fg/10 pl-11 pr-12 text-sm text-primary-fg outline-none placeholder:text-primary-fg/70 backdrop-blur focus:border-primary-fg focus:bg-primary-fg/20 focus:ring-2 focus:ring-primary-fg/50 transition-all'
-    : 'w-full h-12 rounded-full border border-line bg-surface pl-11 pr-12 text-sm text-content outline-none placeholder:text-content-muted focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm transition-all';
+    ? 'w-full h-12 rounded-full border border-white/50 bg-transparent pl-11 pr-12 text-sm text-white outline-none placeholder:text-white/70 focus:border-white focus:ring-2 focus:ring-white/30 transition-all'
+    : 'w-full h-12 rounded-full border border-line bg-transparent pl-11 pr-12 text-sm text-content outline-none placeholder:text-content-muted focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all';
   const iconClasses = overlay
-    ? 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-primary-fg/80'
+    ? 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-white/80'
     : 'pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-content-muted';
 
   return (

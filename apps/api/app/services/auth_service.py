@@ -244,12 +244,21 @@ async def login(
         )
         raise AuthError(403, "Wrong sign-in portal for this account")
 
-    # Success — reset counters, stamp last login.
+    # Success — reset counters, stamp last login (and upgrade legacy hash to Argon2id if needed).
     now = _utcnow_naive()
+    update_values: dict[str, Any] = {
+        "failedLoginCount": 0,
+        "lockedUntil": None,
+        "lastLoginAt": now,
+        "updatedAt": now,
+    }
+    if security.needs_rehash(user.passwordHash):
+        update_values["passwordHash"] = await security.async_hash_password(password)
+
     await db.execute(
         update(User)
         .where(User.id_ == user.id_)
-        .values(failedLoginCount=0, lockedUntil=None, lastLoginAt=now, updatedAt=now)
+        .values(**update_values)
     )
 
     # Re-load with the fresh values so the token reflects current state.
