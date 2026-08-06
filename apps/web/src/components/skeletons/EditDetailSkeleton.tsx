@@ -1,14 +1,6 @@
 export function EditDetailSkeleton() {
   return (
     <div className="animate-pulse">
-      <nav className="mx-auto max-w-7xl px-6 pt-6 flex items-center gap-2">
-        <div className="h-3 w-12 rounded bg-line" />
-        <span className="text-content-soft">/</span>
-        <div className="h-3 w-12 rounded bg-line" />
-        <span className="text-content-soft">/</span>
-        <div className="h-3 w-24 rounded bg-line" />
-      </nav>
-
       <section className="mx-auto max-w-7xl px-6 pt-6">
         <div className="aspect-[16/9] sm:aspect-[21/9] w-full rounded-2xl bg-surface-muted" />
         <div className="mt-6 max-w-3xl space-y-2">

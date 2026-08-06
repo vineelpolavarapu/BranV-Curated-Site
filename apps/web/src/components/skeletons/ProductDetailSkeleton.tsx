@@ -1,15 +1,6 @@
 export function ProductDetailSkeleton() {
   return (
     <div className="animate-pulse">
-      {/* Breadcrumb Skeleton */}
-      <nav className="mx-auto max-w-7xl px-6 pt-6 flex items-center gap-2">
-        <div className="h-3 w-12 rounded bg-line" />
-        <span className="text-content-soft">/</span>
-        <div className="h-3 w-16 rounded bg-line" />
-        <span className="text-content-soft">/</span>
-        <div className="h-3 w-24 rounded bg-line" />
-      </nav>
-
       {/* Main Grid */}
       <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

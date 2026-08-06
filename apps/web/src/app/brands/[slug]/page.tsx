@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { apiServer, buildQuery } from '@/lib/api-server';
@@ -80,13 +79,6 @@ function BrandHero({ brand }: { brand: BrandDetail }) {
           </div>
         )}
         <div className="flex-1">
-          <nav className="mb-2 text-xs text-content-soft">
-            <Link href="/" className="hover:text-primary">Home</Link>
-            <span className="mx-2">/</span>
-            <Link href="/brands" className="hover:text-primary">Brands</Link>
-            <span className="mx-2">/</span>
-            <span className="text-content">{brand.name}</span>
-          </nav>
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
             {brand.name}
           </h1>

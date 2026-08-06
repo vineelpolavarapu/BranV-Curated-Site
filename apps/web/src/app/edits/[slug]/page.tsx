@@ -38,16 +38,6 @@ export default async function EditDetailPage(props: {
 
   return (
     <StorefrontShell>
-      <AnimateOnScroll>
-        <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
-          <Link href="/" className="hover:text-primary">Home</Link>
-          <span className="mx-2">/</span>
-          <Link href="/shop" className="hover:text-primary">Shop</Link>
-          <span className="mx-2">/</span>
-          <span className="text-content">{edit.title}</span>
-        </nav>
-      </AnimateOnScroll>
-
       <section className="mx-auto max-w-7xl px-6 pt-4 sm:pt-6">
         {edit.heroUrl && (
           <AnimateOnScroll>

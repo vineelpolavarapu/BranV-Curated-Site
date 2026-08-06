@@ -10,7 +10,6 @@ import { ProductCard, BuyNowButton } from '@/components/ProductCard';
 import { formatINR } from '@/lib/format';
 import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
-import { categoryHrefL2 } from '@/lib/category-href';
 import { RecordRecentlyViewed } from '@/components/RecordRecentlyViewed';
 
 export const dynamic = 'force-dynamic';
@@ -85,36 +84,6 @@ export default async function ProductDetailPage(props: {
         </AnimateOnScroll>
       )}
     </StorefrontShell>
-  );
-}
-
-function Breadcrumbs({ product }: { product: ProductCardData }) {
-  return (
-    <AnimateOnScroll>
-      <nav className="bv-enter-fade mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
-        <Link href="/" className="hover:text-primary">Home</Link>
-        <span className="mx-2">/</span>
-        <Link
-          href={`/category/${product.category.slug}`}
-          className="hover:text-primary"
-        >
-          {product.category.name}
-        </Link>
-        {product.subcategory && (
-          <>
-            <span className="mx-2">/</span>
-            <Link
-              href={categoryHrefL2(product.category.slug, product.subcategory.slug)}
-              className="hover:text-primary"
-            >
-              {product.subcategory.name}
-            </Link>
-          </>
-        )}
-        <span className="mx-2">/</span>
-        <span className="text-content">{product.title}</span>
-      </nav>
-    </AnimateOnScroll>
   );
 }
 

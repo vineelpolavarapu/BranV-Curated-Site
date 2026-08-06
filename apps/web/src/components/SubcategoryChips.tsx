@@ -49,7 +49,7 @@ export function SubcategoryChips({ categorySlug, children }: SubcategoryChipsPro
           onChange={(e) => handleSelect(e.target.value)}
           className="appearance-none rounded-lg border border-slate-300 bg-white py-2 pl-3.5 pr-8 text-xs font-semibold text-slate-800 shadow-sm transition hover:border-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
         >
-          <option value="">All Subcategories</option>
+          <option value="">Browse Collections</option>
           {children.map((c) => {
             const subSuffix = c.slug.startsWith(`${categorySlug}-`)
               ? c.slug.substring(categorySlug.length + 1)

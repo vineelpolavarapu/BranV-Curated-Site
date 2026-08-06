@@ -57,7 +57,6 @@ export default async function ArticleDetailPage(props: {
     <StorefrontShell>
       <ArticleSchema article={article} />
       <article className="mx-auto max-w-3xl px-6 pb-12 pt-6">
-        <Breadcrumbs title={article.title} />
         <Header article={article} />
         {article.heroUrl && (
           <div className="relative mt-6 aspect-[16/9] w-full overflow-hidden rounded-2xl bg-surface-muted">
@@ -117,18 +116,6 @@ export default async function ArticleDetailPage(props: {
         </section>
       )}
     </StorefrontShell>
-  );
-}
-
-function Breadcrumbs({ title }: { title: string }) {
-  return (
-    <nav className="text-xs text-content-soft">
-      <Link href="/" className="hover:text-primary">Home</Link>
-      <span className="mx-2">/</span>
-      <Link href="/articles" className="hover:text-primary">Articles</Link>
-      <span className="mx-2">/</span>
-      <span className="text-content">{title}</span>
-    </nav>
   );
 }
 

@@ -242,11 +242,10 @@ function DiscountFilter() {
           <button
             key={d}
             onClick={() => set('discount', current === d ? undefined : d)}
-            className={`rounded-md border px-2 py-1 text-xs ${
-              current === d
-                ? 'border-primary bg-primary text-primary-fg'
-                : 'border-line hover:bg-surface-muted'
-            }`}
+            className={`rounded-md border px-2 py-1 text-xs ${current === d
+              ? 'border-primary bg-primary text-primary-fg'
+              : 'border-line hover:bg-surface-muted'
+              }`}
           >
             {d}%+
           </button>
@@ -369,11 +368,10 @@ function CategoryFilter({ filter }: { filter: FilterDefinition }) {
               key={o}
               type="button"
               onClick={() => toggleArrayValue(paramName, o)}
-              className={`rounded-md border px-2 py-1 text-xs ${
-                active
-                  ? 'border-primary bg-primary text-primary-fg'
-                  : 'border-line hover:bg-surface-muted'
-              }`}
+              className={`rounded-md border px-2 py-1 text-xs ${active
+                ? 'border-primary bg-primary text-primary-fg'
+                : 'border-line hover:bg-surface-muted'
+                }`}
             >
               {o}
             </button>
@@ -414,7 +412,7 @@ function Group({ title, children }: { title: string; children: React.ReactNode }
 
 export function SortPicker() {
   const { search, set } = useUrlParam();
-  const value = search.get('sort') ?? 'relevance';
+  const value = search.get('sort') ?? 'Filter';
   return (
     <CustomSelect
       value={value}

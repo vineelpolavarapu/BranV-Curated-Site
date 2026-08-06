@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiServer, buildQuery } from '@/lib/api-server';
 import { ProductPage, BrandCard } from '@/lib/storefront-types';
@@ -70,11 +69,6 @@ function CategoryHeader({
   return (
     <AnimateOnScroll>
       <section className="mx-auto max-w-7xl px-6 pt-8">
-        <nav className="bv-enter-fade mb-2 text-xs text-content-soft">
-          <Link href="/" className="hover:text-primary">Home</Link>
-          <span className="mx-2">/</span>
-          <span className="text-content">{category.name}</span>
-        </nav>
         <div className="flex items-center gap-3.5">
           <span className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 p-1 shadow-xs shrink-0 border border-slate-200">
             <CategoryIcon slug={category.slug} className="h-full w-full object-cover rounded-full" />

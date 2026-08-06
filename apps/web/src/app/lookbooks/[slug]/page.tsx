@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
@@ -35,12 +34,6 @@ export default async function LookbookDetailPage(props: {
 
   return (
     <StorefrontShell>
-      <nav className="mx-auto max-w-7xl px-6 pt-6 text-xs text-content-soft">
-        <Link href="/" className="hover:text-primary">Home</Link>
-        <span className="mx-2">/</span>
-        <span className="text-content">{lb.title}</span>
-      </nav>
-
       {lb.heroUrl && (
         <section className="mx-auto max-w-7xl px-6 pt-4">
           <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-surface-muted">
