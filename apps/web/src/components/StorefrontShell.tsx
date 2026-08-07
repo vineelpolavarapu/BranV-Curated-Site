@@ -97,6 +97,7 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
           <nav className="bv-nav-links hidden items-center gap-7 text-sm font-semibold lg:flex">
             <ShopMegaMenu overlay={overlay} />
             <Link href="/new" className={`bv-nav-link ${linkHoverClass}`}>New Arrivals</Link>
+            <Link href="/shop" className={`bv-nav-link ${linkHoverClass}`}>Categories</Link>
             <Link href="/articles" className={`bv-nav-link ${linkHoverClass}`}>Articles</Link>
           </nav>
         </div>
