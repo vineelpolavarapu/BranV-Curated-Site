@@ -3,6 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
 import { apiFetch, AuthSummary } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
 import {
   AuthShell,
   inputClass,
@@ -12,6 +14,7 @@ import {
 
 export default function AdminLoginPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +33,7 @@ export default function AdminLoginPage() {
       setError(result.error ?? 'Login failed');
       return;
     }
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace('/admin');
     router.refresh();
   }

@@ -6,11 +6,15 @@ Do NOT edit by hand — re-run scripts/generate_sa_models.py.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import TIMESTAMP, Text, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .user import User
 
 
 class MemberProfile(Base):
@@ -25,3 +29,12 @@ class MemberProfile(Base):
     tier: Mapped[str | None] = mapped_column(Text, nullable=True, name='tier')
     createdAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, server_default=text('CURRENT_TIMESTAMP'), name='createdAt')
     updatedAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, onupdate=text('CURRENT_TIMESTAMP'), name='updatedAt')
+
+    # ── Relationships (hand-added; the generator emits scalar columns only) ──
+    user: Mapped[User | None] = relationship(
+        "User",
+        primaryjoin="foreign(MemberProfile.userId) == User.id_",
+        uselist=False,
+        back_populates="profile",
+    )
+

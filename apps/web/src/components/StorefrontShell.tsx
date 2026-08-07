@@ -101,7 +101,7 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
           </nav>
         </div>
 
-        {/* Center Section: Centered Mobile Logo (Mobile) OR Desktop Search (Desktop) */}
+        {/* Center Section: Mobile Logo only */}
         <div className="flex items-center justify-center text-center">
           <Link href="/" className="lg:hidden bv-nav-logo inline-flex flex-col items-center user-select-none">
             <div className={`font-heading text-2xl font-extrabold tracking-tight leading-none ${overlay ? 'text-white' : 'text-content'}`}>
@@ -111,13 +111,15 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
               ALL FOR MEN
             </div>
           </Link>
-          <div className="hidden w-72 xl:w-96 lg:block">
-            <SearchBox overlay={overlay} />
-          </div>
         </div>
 
-        {/* Right Section: Header Actions (Wishlist on Mobile; Wishlist + Account on Desktop) */}
+        {/* Right Section: Desktop Search + Wishlist + Account */}
         <div className="bv-nav-actions flex items-center justify-end gap-3">
+          {/* Desktop Search — beside wishlist */}
+          <div className="hidden w-60 xl:w-72 lg:block">
+            <SearchBox overlay={overlay} />
+          </div>
+
           {/* Wishlist Icon Button */}
           <Link
             href="/wishlist"

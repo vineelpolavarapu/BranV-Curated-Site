@@ -229,14 +229,19 @@ textarea {
   transform: translate3d(0, 5px, 0);
   transition: opacity 0.18s ease-in, transform 0.18s ease-in;
 }
-/* Exit stagger: top item first, 15 ms apart — all done within ~190 ms */
-.bv-dropdown-item:nth-child(1) { transition-delay:  0ms; }
-.bv-dropdown-item:nth-child(2) { transition-delay: 15ms; }
-.bv-dropdown-item:nth-child(3) { transition-delay: 30ms; }
-.bv-dropdown-item:nth-child(4) { transition-delay: 45ms; }
-.bv-dropdown-item:nth-child(5) { transition-delay: 60ms; }
-.bv-dropdown-item:nth-child(6) { transition-delay: 75ms; }
-.bv-dropdown-item:nth-child(7) { transition-delay: 90ms; }
+/* Exit stagger: top item first, 15 ms apart */
+.bv-dropdown-item:nth-child(1)  { transition-delay:   0ms; }
+.bv-dropdown-item:nth-child(2)  { transition-delay:  15ms; }
+.bv-dropdown-item:nth-child(3)  { transition-delay:  30ms; }
+.bv-dropdown-item:nth-child(4)  { transition-delay:  45ms; }
+.bv-dropdown-item:nth-child(5)  { transition-delay:  60ms; }
+.bv-dropdown-item:nth-child(6)  { transition-delay:  75ms; }
+.bv-dropdown-item:nth-child(7)  { transition-delay:  90ms; }
+.bv-dropdown-item:nth-child(8)  { transition-delay: 105ms; }
+.bv-dropdown-item:nth-child(9)  { transition-delay: 120ms; }
+.bv-dropdown-item:nth-child(10) { transition-delay: 135ms; }
+.bv-dropdown-item:nth-child(11) { transition-delay: 150ms; }
+.bv-dropdown-item:nth-child(12) { transition-delay: 165ms; }
 
 /* Enter: slow smooth ease-out, 50 ms stagger, first item waits 80 ms */
 .group:hover .bv-dropdown-item {
@@ -245,13 +250,18 @@ textarea {
   transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
               transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.group:hover .bv-dropdown-item:nth-child(1) { transition-delay:  80ms; }
-.group:hover .bv-dropdown-item:nth-child(2) { transition-delay: 130ms; }
-.group:hover .bv-dropdown-item:nth-child(3) { transition-delay: 180ms; }
-.group:hover .bv-dropdown-item:nth-child(4) { transition-delay: 230ms; }
-.group:hover .bv-dropdown-item:nth-child(5) { transition-delay: 280ms; }
-.group:hover .bv-dropdown-item:nth-child(6) { transition-delay: 330ms; }
-.group:hover .bv-dropdown-item:nth-child(7) { transition-delay: 380ms; }
+.group:hover .bv-dropdown-item:nth-child(1)  { transition-delay:  80ms; }
+.group:hover .bv-dropdown-item:nth-child(2)  { transition-delay: 130ms; }
+.group:hover .bv-dropdown-item:nth-child(3)  { transition-delay: 180ms; }
+.group:hover .bv-dropdown-item:nth-child(4)  { transition-delay: 230ms; }
+.group:hover .bv-dropdown-item:nth-child(5)  { transition-delay: 280ms; }
+.group:hover .bv-dropdown-item:nth-child(6)  { transition-delay: 330ms; }
+.group:hover .bv-dropdown-item:nth-child(7)  { transition-delay: 380ms; }
+.group:hover .bv-dropdown-item:nth-child(8)  { transition-delay: 430ms; }
+.group:hover .bv-dropdown-item:nth-child(9)  { transition-delay: 480ms; }
+.group:hover .bv-dropdown-item:nth-child(10) { transition-delay: 530ms; }
+.group:hover .bv-dropdown-item:nth-child(11) { transition-delay: 580ms; }
+.group:hover .bv-dropdown-item:nth-child(12) { transition-delay: 630ms; }
 
 /* L2 flyout items
    BASE  = exit state  (fast ease-in, short stagger, slides back left)

@@ -11,8 +11,12 @@ import { useWishlist } from '@/components/wishlist/WishlistProvider';
 import { getRecentlyViewed, RecentlyViewedItem } from '@/lib/recently-viewed';
 import { formatINR } from '@/lib/format';
 
+import { useQueryClient } from '@tanstack/react-query';
+import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
+
 export default function AccountPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { productIds } = useWishlist();
   const [me, setMe] = useState<CurrentUser | null>(null);
   const [disclosure, setDisclosure] = useState<string | null>(null);
@@ -45,6 +49,8 @@ export default function AccountPage() {
 
   async function onLogout() {
     await apiFetch('/auth/logout', { method: 'POST' });
+    queryClient.setQueryData(AUTH_QUERY_KEY, null);
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace('/');
     router.refresh();
   }

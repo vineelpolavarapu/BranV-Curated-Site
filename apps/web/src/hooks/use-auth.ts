@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch, CurrentUser } from '@/lib/api';
+import { apiFetch, AuthSummary, CurrentUser } from '@/lib/api';
 
 export const AUTH_QUERY_KEY = ['auth', 'me'];
 
@@ -12,8 +12,25 @@ export function useCurrentUser(options?: { enabled?: boolean }) {
       if (!res.ok) throw new Error(res.error || 'Failed to fetch current user');
       return res.data;
     },
-    staleTime: Infinity, // 0ms latency for repetitive session queries
+    staleTime: 1000 * 60, // 1 minute stale time so session updates rapidly across navigations
     enabled: options?.enabled ?? true,
+  });
+}
+
+export function useLogin() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: { email: string; password: string; totpCode?: string }) => {
+      const res = await apiFetch<AuthSummary>('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw res;
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+    },
   });
 }
 
@@ -27,7 +44,8 @@ export function useLogout() {
     },
     onSuccess: () => {
       queryClient.setQueryData(AUTH_QUERY_KEY, null);
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     },
   });
 }
+

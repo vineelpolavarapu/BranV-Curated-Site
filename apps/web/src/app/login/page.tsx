@@ -5,6 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
 import { apiFetch, AuthSummary } from '@/lib/api';
 import { Icon } from '@/components/icons';
+import { useQueryClient } from '@tanstack/react-query';
+import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
 import {
   AuthShell,
   inputClass,
@@ -23,6 +25,7 @@ export default function MemberLoginPage() {
 function MemberLoginPageInner() {
   const router = useRouter();
   const search = useSearchParams();
+  const queryClient = useQueryClient();
   const next = search.get('next') || '/account';
 
   const [email, setEmail] = useState('');
@@ -56,6 +59,7 @@ function MemberLoginPageInner() {
       setError(result.error ?? 'Login failed');
       return;
     }
+    await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace(next);
     router.refresh();
   }

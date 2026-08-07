@@ -212,7 +212,7 @@ async def login(
     # Generic-credential-error path (no user OR suspended/deleted account).
     is_active_account = (
         user is not None
-        and (user.status is None or str(user.status).upper() in ("ACTIVE", "VERIFIED", "ENABLED", "OK"))
+        and (user.status is None or (user.status.value if hasattr(user.status, 'value') else str(user.status)).upper() in ("ACTIVE", "VERIFIED", "ENABLED", "OK"))
     )
     if not is_active_account or user is None:
         background.add_task(
@@ -515,7 +515,7 @@ async def begin_two_factor_setup(db: AsyncSession, *, user_id: str) -> tuple[str
     # QR as data URL — match Nest's qrcode.toDataURL() output shape.
     img = qrcode.make(otpauth)
     buf = io.BytesIO()
-    img.save(buf, format="PNG")
+    img.save(buf)
     qr_data_url = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
 
     await db.execute(

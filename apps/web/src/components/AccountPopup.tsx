@@ -25,7 +25,7 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const { data: me } = useCurrentUser({ enabled: open });
+  const { data: me } = useCurrentUser();
   const logoutMutation = useLogout();
 
   useEffect(() => {
@@ -79,7 +79,6 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
     ? 'text-primary-fg hover:bg-primary-fg/10'
     : 'text-content-soft hover:bg-surface-muted hover:text-content';
   const iconClasses = overlay ? 'text-primary-fg/50' : 'text-content-muted';
-  const skeletonClasses = overlay ? 'bg-primary-fg/20' : 'bg-line';
   const signOutClasses = overlay
     ? 'text-red-300 hover:bg-primary-fg/10'
     : 'text-danger hover:bg-red-50';
@@ -92,7 +91,11 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
         aria-expanded={open}
         className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${triggerClasses}`}
       >
-        <Icon.Account size={20} strokeWidth={1.6} aria-hidden />
+        {initials ? (
+          <span className="text-xs font-bold tracking-wider">{initials}</span>
+        ) : (
+          <Icon.Account size={20} strokeWidth={1.6} aria-hidden />
+        )}
       </button>
 
       {open && (
@@ -130,13 +133,24 @@ export function AccountPopup({ overlay = false }: { overlay?: boolean }) {
           </nav>
 
           <div className={`border-t ${dividerClasses} p-1.5`}>
-            <button
-              onClick={onSignOut}
-              className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition ${signOutClasses}`}
-            >
-              <Icon.Logout size={16} strokeWidth={1.6} aria-hidden />
-              Sign out
-            </button>
+            {me ? (
+              <button
+                onClick={onSignOut}
+                className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${signOutClasses}`}
+              >
+                <Icon.Logout size={16} strokeWidth={1.6} aria-hidden />
+                Sign out
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition ${itemClasses}`}
+              >
+                <Icon.Account size={16} strokeWidth={1.6} aria-hidden />
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       )}
