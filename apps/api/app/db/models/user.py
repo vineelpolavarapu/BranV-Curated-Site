@@ -36,6 +36,12 @@ class User(Base):
     updatedAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, onupdate=text('CURRENT_TIMESTAMP'), name='updatedAt')
 
     # ── Relationships (hand-added; the generator emits scalar columns only) ──
-    
+    profile: Mapped[MemberProfile | None] = relationship(
+        "MemberProfile",
+        primaryjoin="User.id_ == foreign(MemberProfile.userId)",
+        uselist=False,
+        lazy="noload",
+        back_populates="user",
     )
+
 

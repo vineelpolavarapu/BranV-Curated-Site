@@ -20,6 +20,9 @@ RUN uv sync --frozen --no-dev || uv sync --no-dev
 
 COPY . .
 
+# Verify Python source compiles to catch syntax errors early during Docker image build
+RUN uv run python -m compileall -q app
+
 ENV API_INTERNAL_PORT=5000
 EXPOSE 5000
 

@@ -93,6 +93,15 @@ jobs:
         with:
           ref: ${{ steps.vars.outputs.checkout_ref }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify API Python syntax
+        shell: bash
+        run: python -m compileall -q apps/api/app
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
