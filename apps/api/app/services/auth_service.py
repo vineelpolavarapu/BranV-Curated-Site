@@ -106,7 +106,7 @@ async def register(
         # Don't leak existence — same generic 400 NestJS returns.
         raise AuthError(
             400,
-            "If this email is available, you will receive a verification message",
+            "Account created successfully",
         )
 
     password_hash = await security.async_hash_password(password)
