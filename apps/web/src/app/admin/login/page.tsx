@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
-import { apiFetch, AuthSummary } from '@/lib/api';
+import { apiFetch, AuthSummary, setStoredToken } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
 import {
@@ -32,6 +32,9 @@ export default function AdminLoginPage() {
     if (!result.ok) {
       setError(result.error ?? 'Login failed');
       return;
+    }
+    if (result.data?.accessToken) {
+      setStoredToken(result.data.accessToken);
     }
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace('/admin');

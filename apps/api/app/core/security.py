@@ -287,9 +287,10 @@ def _cookie_opts(max_age_seconds: int) -> dict[str, Any]:
         Nest maxAge ms → max_age seconds  (FastAPI takes seconds, not ms)
     """
     s = get_settings()
+    is_secure = s.COOKIE_SECURE or (s.COOKIE_SAMESITE == "none")
     opts: dict[str, Any] = {
         "httponly": True,
-        "secure": s.COOKIE_SECURE,
+        "secure": is_secure,
         "samesite": s.COOKIE_SAMESITE,
         "path": "/",
         "max_age": max_age_seconds,

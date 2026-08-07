@@ -69,9 +69,10 @@ def create_app() -> FastAPI:
     # ---- Middleware (order matters: outer → inner) ----
     # Correlation must wrap CORS so the request_id is bound before CORS handlers run.
     app.add_middleware(CorrelationIdMiddleware)
+    web_origins = [origin.strip() for origin in settings.WEB_ORIGIN.split(",") if origin.strip()]
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[settings.WEB_ORIGIN],
+        allow_origins=web_origins if web_origins else [settings.WEB_ORIGIN],
         allow_credentials=True,
         allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
         allow_headers=["*"],

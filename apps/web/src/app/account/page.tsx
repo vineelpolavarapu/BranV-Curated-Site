@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { apiFetch, CurrentUser } from '@/lib/api';
+import { apiFetch, CurrentUser, setStoredToken } from '@/lib/api';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { useWishlist } from '@/components/wishlist/WishlistProvider';
@@ -49,6 +49,7 @@ export default function AccountPage() {
 
   async function onLogout() {
     await apiFetch('/auth/logout', { method: 'POST' });
+    setStoredToken(null);
     queryClient.setQueryData(AUTH_QUERY_KEY, null);
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace('/');

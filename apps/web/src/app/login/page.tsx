@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useState } from 'react';
-import { apiFetch, AuthSummary } from '@/lib/api';
+import { apiFetch, AuthSummary, setStoredToken } from '@/lib/api';
 import { Icon } from '@/components/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
@@ -58,6 +58,9 @@ function MemberLoginPageInner() {
       }
       setError(result.error ?? 'Login failed');
       return;
+    }
+    if (result.data?.accessToken) {
+      setStoredToken(result.data.accessToken);
     }
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace(next);

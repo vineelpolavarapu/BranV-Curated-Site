@@ -72,6 +72,8 @@ class PublicUser(ApiModel):
     role: Literal["MEMBER", "ADMIN"]
     totpEnabled: bool
     emailVerified: bool
+    accessToken: str | None = None
+    refreshToken: str | None = None
 
 
 class StatusOk(ApiModel):

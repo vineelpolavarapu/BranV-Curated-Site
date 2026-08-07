@@ -58,6 +58,14 @@ def _utcnow_naive() -> datetime:
     return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
+def _to_naive_utc(dt: datetime | None) -> datetime | None:
+    if dt is None:
+        return None
+    if dt.tzinfo is not None:
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+    return dt
+
+
 def _sha256(s: str) -> str:
     return hashlib.sha256(s.encode("utf-8")).hexdigest()
 
@@ -224,7 +232,8 @@ async def login(
         )
         raise AuthError(401, "Invalid credentials")
 
-    if user.lockedUntil is not None and user.lockedUntil > _utcnow_naive():
+    locked_until_utc = _to_naive_utc(user.lockedUntil)
+    if locked_until_utc is not None and locked_until_utc > _utcnow_naive():
         background.add_task(
             audit_service.record,
             actorId=user.id_,
@@ -294,8 +303,10 @@ async def _record_failed_attempt(
     s = get_settings()
     now = _utcnow_naive()
     window_start = now - timedelta(minutes=s.AUTH_LOCKOUT_WINDOW_MIN)
-    lockout_just_expired = user.lockedUntil is not None and user.lockedUntil < now
-    counter_stale = user.updatedAt < window_start
+    user_locked_utc = _to_naive_utc(user.lockedUntil)
+    user_updated_utc = _to_naive_utc(user.updatedAt)
+    lockout_just_expired = user_locked_utc is not None and user_locked_utc < now
+    counter_stale = user_updated_utc is not None and user_updated_utc < window_start
     should_reset = lockout_just_expired or counter_stale
     next_count = 1 if should_reset else user.failedLoginCount + 1
     should_lock = next_count >= s.AUTH_LOCKOUT_MAX_ATTEMPTS

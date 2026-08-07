@@ -61,13 +61,17 @@ def _client_ip_and_ua(request: Request) -> tuple[str | None, str | None]:
     return ip, request.headers.get("user-agent")
 
 
-def _to_public_user(u) -> PublicUser:
+def _to_public_user(
+    u, access_token: str | None = None, refresh_token: str | None = None
+) -> PublicUser:
     return PublicUser(
         id=u.id_,
         email=u.email,
         role=u.role,
         totpEnabled=u.totpEnabled,
         emailVerified=u.emailVerifiedAt is not None,
+        accessToken=access_token,
+        refreshToken=refresh_token,
     )
 
 
@@ -143,7 +147,7 @@ async def login(
     except AuthError as e:
         _raise_auth_error(e)
     set_auth_cookies(response, access, refresh)
-    return _to_public_user(user)
+    return _to_public_user(user, access_token=access, refresh_token=refresh)
 
 
 # ───────────── LOGIN (admin) ─────────────────────────────────────────────────
@@ -177,7 +181,7 @@ async def admin_login(
     except AuthError as e:
         _raise_auth_error(e)
     set_auth_cookies(response, access, refresh)
-    return _to_public_user(user)
+    return _to_public_user(user, access_token=access, refresh_token=refresh)
 
 
 # ───────────── REFRESH ───────────────────────────────────────────────────────
@@ -200,7 +204,7 @@ async def refresh(
     except AuthError as e:
         _raise_auth_error(e)
     set_auth_cookies(response, access, new_refresh)
-    return _to_public_user(user)
+    return _to_public_user(user, access_token=access, refresh_token=new_refresh)
 
 
 # ───────────── LOGOUT ────────────────────────────────────────────────────────

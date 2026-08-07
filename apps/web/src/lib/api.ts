@@ -1,9 +1,23 @@
 /**
- * Tiny fetch wrapper. Always sends cookies. Never throws — returns the parsed
- * body and a typed error string when the response is non-2xx.
+ * Tiny fetch wrapper. Always sends cookies + Authorization header if available.
+ * Never throws — returns the parsed body and a typed error string when non-2xx.
  */
 const BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
+
+export function getStoredToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('branv_access_token');
+}
+
+export function setStoredToken(token: string | null) {
+  if (typeof window === 'undefined') return;
+  if (token) {
+    localStorage.setItem('branv_access_token', token);
+  } else {
+    localStorage.removeItem('branv_access_token');
+  }
+}
 
 export interface ApiResult<T> {
   ok: boolean;
@@ -19,14 +33,18 @@ export async function apiFetch<T>(
   init: RequestInit = {},
 ): Promise<ApiResult<T>> {
   let res: Response;
+  const token = getStoredToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...((init.headers as Record<string, string>) ?? {}),
+  };
+
   try {
     res = await fetch(`${BASE}${path}`, {
       ...init,
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(init.headers ?? {}),
-      },
+      headers,
     });
   } catch (err) {
     return {
@@ -89,4 +107,6 @@ export interface AuthSummary {
   role: Role;
   totpEnabled: boolean;
   emailVerified: boolean;
+  accessToken?: string;
+  refreshToken?: string;
 }
