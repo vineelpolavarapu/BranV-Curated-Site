@@ -111,14 +111,16 @@ function Hotspot({
               >
                 {product.title}
               </Link>
-              <p className="mt-1 text-xs font-semibold">
-                ₹{formatINR(product.price)}
-                {product.mrp && product.mrp > product.price && (
-                  <span className="ml-1.5 font-normal text-content-muted line-through">
-                    ₹{formatINR(product.mrp)}
-                  </span>
-                )}
-              </p>
+              {product.price > 0 && (
+                <p className="mt-1 text-xs font-semibold">
+                  ₹{formatINR(product.price)}
+                  {product.mrp && product.mrp > product.price && (
+                    <span className="ml-1.5 font-normal text-content-muted line-through">
+                      ₹{formatINR(product.mrp)}
+                    </span>
+                  )}
+                </p>
+              )}
             </div>
             <button
               type="button"

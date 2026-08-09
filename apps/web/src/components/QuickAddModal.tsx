@@ -183,7 +183,7 @@ const DEFAULT_BRANDS = [
     try {
       // Don't persist if form is essentially empty.
       const hasContent =
-        form.rawUrl || form.title || form.price || form.avatarImageUrl;
+        form.rawUrl || form.title || form.avatarImageUrl;
       if (hasContent) {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(form));
       }
@@ -289,7 +289,6 @@ const DEFAULT_BRANDS = [
       ...prev,
       retailer: scrapedRetailer,
       title: prev.title || s.title || '',
-      price: prev.price || (s.price ? String(s.price) : ''),
       mrp: prev.mrp || (s.mrp ? String(s.mrp) : ''),
       retailerImageUrl: prev.retailerImageUrl || s.primaryImageUrl || '',
     }));
@@ -381,9 +380,9 @@ const DEFAULT_BRANDS = [
       setError('Pick a category');
       return;
     }
-    if (!form.title || !form.rawUrl || !form.price) {
+    if (!form.title || !form.rawUrl) {
       setSubmitting(false);
-      setError('Title, URL and price are required');
+      setError('Title and URL are required');
       return;
     }
 
@@ -396,7 +395,7 @@ const DEFAULT_BRANDS = [
       brandId: form.brandId,
       categoryId: form.categoryId,
       subcategoryId: form.subcategoryId || undefined,
-      price: Number(form.price),
+      price: form.price ? Number(form.price) : 0,
       mrp: form.mrp ? Number(form.mrp) : undefined,
       color: form.color || undefined,
       sizes: form.sizesCsv

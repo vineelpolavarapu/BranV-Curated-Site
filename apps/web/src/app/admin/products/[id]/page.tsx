@@ -188,9 +188,8 @@ function BasicsForm({
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
-          <label className={adminLabel}>Price (₹)</label>
+          <label className={adminLabel}>Price (₹) (optional)</label>
           <input
-            required
             type="number"
             step="0.01"
             value={price}

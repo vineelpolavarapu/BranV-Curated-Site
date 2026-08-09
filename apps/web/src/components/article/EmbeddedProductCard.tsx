@@ -61,16 +61,18 @@ export function EmbeddedProductCard({ product }: { product: EmbeddedProduct }) {
         >
           {product.title}
         </Link>
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-base font-semibold">
-            ₹{formatINR(product.price)}
-          </span>
-          {product.mrp && product.mrp > product.price && (
-            <span className="text-xs text-content-muted line-through">
-              ₹{formatINR(product.mrp)}
+        {product.price > 0 && (
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-base font-semibold">
+              ₹{formatINR(product.price)}
             </span>
-          )}
-        </div>
+            {product.mrp && product.mrp > product.price && (
+              <span className="text-xs text-content-muted line-through">
+                ₹{formatINR(product.mrp)}
+              </span>
+            )}
+          </div>
+        )}
         {buyHref && (
           <a
             href={buyHref}

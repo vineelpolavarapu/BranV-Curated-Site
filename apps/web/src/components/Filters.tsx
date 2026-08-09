@@ -24,8 +24,6 @@ export interface FilterContext {
 }
 
 const UNIVERSAL_FILTERS = [
-  { key: 'minPrice', type: 'price-min', label: 'Price' },
-  { key: 'discount', type: 'discount', label: 'Discount' },
   { key: 'brand', type: 'brand', label: 'Brand' },
   { key: 'retailer', type: 'retailer', label: 'Retailer' },
 ] as const;
@@ -105,8 +103,6 @@ function FilterBody({
     <div className="space-y-6 text-sm">
       <ActiveFilterChips onCleared={onApply} />
       {UNIVERSAL_FILTERS.map((f) => {
-        if (f.type === 'price-min') return <PriceFilter key={f.key} />;
-        if (f.type === 'discount') return <DiscountFilter key={f.key} />;
         if (f.type === 'brand' && context.brands?.length) {
           return <BrandFilter key={f.key} brands={context.brands} />;
         }

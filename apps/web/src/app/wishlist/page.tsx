@@ -167,16 +167,18 @@ function WishlistCard({
         >
           {item.product.title}
         </Link>
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-sm font-semibold text-content">
-            ₹{formatINR(item.product.price)}
-          </span>
-          {item.product.mrp && item.product.mrp > item.product.price && (
-            <span className="text-xs text-content-muted line-through">
-              ₹{formatINR(item.product.mrp)}
+        {item.product.price > 0 && (
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-sm font-semibold text-content">
+              ₹{formatINR(item.product.price)}
             </span>
-          )}
-        </div>
+            {item.product.mrp && item.product.mrp > item.product.price && (
+              <span className="text-xs text-content-muted line-through">
+                ₹{formatINR(item.product.mrp)}
+              </span>
+            )}
+          </div>
+        )}
         <label className="mt-2 inline-flex items-center gap-2 text-xs text-content-soft">
           <input
             type="checkbox"

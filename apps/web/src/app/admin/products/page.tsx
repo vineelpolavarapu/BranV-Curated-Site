@@ -154,14 +154,16 @@ export default function ProductsAdminPage() {
                           {primaryImage?.isAiGenerated && ' · AI hero'}
                         </p>
                         <div className="mt-1 flex items-center justify-between gap-2">
-                          <p>
-                            <span className="font-medium">₹{p.price}</span>
-                            {p.mrp && (
-                              <span className="ml-2 text-xs text-content-muted line-through">
-                                ₹{p.mrp}
-                              </span>
-                            )}
-                          </p>
+                          {Number(p.price) > 0 ? (
+                            <p>
+                              <span className="font-medium">₹{p.price}</span>
+                              {p.mrp && (
+                                <span className="ml-2 text-xs text-content-muted line-through">
+                                  ₹{p.mrp}
+                                </span>
+                              )}
+                            </p>
+                          ) : <div />}
                           {p.status !== 'ARCHIVED' && (
                             <button
                               onClick={() => onArchive(p.id)}

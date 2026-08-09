@@ -98,7 +98,7 @@ class RetailerListingInput(ApiModel):
     retailerDisplayName: str | None = Field(default=None, max_length=60)
     retailerProductUrl: str
     retailerImageUrl: str | None = None
-    rawPrice: float
+    rawPrice: float | None = Field(default=None)
     availabilityStatus: AvailabilityLit | None = None
 
 
@@ -109,7 +109,7 @@ class ProductBase(ApiModel):
     subcategoryId: str | None = None
     slug: str | None = Field(default=None, max_length=200)
     description: str | None = Field(default=None, max_length=20_000)
-    price: float
+    price: float | None = Field(default=0.0)
     mrp: float | None = None
     primaryRetailer: str | None = None
     status: ProductStatusLit | None = None
@@ -317,7 +317,7 @@ class QuickAddRequest(ApiModel):
     retailerDisplayName: str | None = Field(default=None, max_length=60)
     categoryId: str
     subcategoryId: str | None = None
-    price: float
+    price: float | None = Field(default=0.0)
     brandId: str | None = None
     newBrandName: str | None = Field(default=None, max_length=120)
     color: str | None = None
@@ -382,7 +382,7 @@ async def quick_add(
         slug=p_slug,
         title=payload.title,
         description=payload.description,
-        price=Decimal(str(payload.price)),
+        price=Decimal(str(payload.price if payload.price is not None else 0)),
         mrp=Decimal(str(payload.mrp)) if payload.mrp is not None else None,
         discountPct=Decimal(str(discount)) if discount is not None else None,
         currency="INR",
@@ -417,7 +417,7 @@ async def quick_add(
         id_=listing_id, productId=pid, retailer=payload.retailer,
         retailerDisplayName=payload.retailerDisplayName,
         retailerProductUrl=payload.rawUrl, retailerImageUrl=payload.retailerImageUrl,
-        rawPrice=Decimal(str(payload.price)),
+        rawPrice=Decimal(str(payload.price)) if payload.price is not None else None,
         availabilityStatus="IN_STOCK",
         syncFailedCount=0,
         createdAt=now, updatedAt=now,
@@ -544,7 +544,7 @@ async def admin_create(
         slug=slug,
         title=payload.title,
         description=payload.description,
-        price=Decimal(str(payload.price)),
+        price=Decimal(str(payload.price if payload.price is not None else 0)),
         mrp=Decimal(str(payload.mrp)) if payload.mrp is not None else None,
         discountPct=Decimal(str(d)) if (d := _calc_discount(payload.price, payload.mrp)) is not None else None,
         currency="INR",
@@ -580,7 +580,7 @@ async def admin_create(
             id_=_cuid(), productId=pid, retailer=l.retailer,
             retailerDisplayName=l.retailerDisplayName,
             retailerProductUrl=l.retailerProductUrl, retailerImageUrl=l.retailerImageUrl,
-            rawPrice=Decimal(str(l.rawPrice)),
+            rawPrice=Decimal(str(l.rawPrice)) if l.rawPrice is not None else None,
             availabilityStatus=l.availabilityStatus or "IN_STOCK",
             syncFailedCount=0,
             createdAt=now, updatedAt=now,
