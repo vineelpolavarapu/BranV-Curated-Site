@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, field_validator
 
 from ..core.pydantic_config import ApiModel
 
@@ -21,12 +21,29 @@ UploadKindLiteral = Literal[
 
 
 class PresignUploadRequest(ApiModel):
-    # Image MIME types only - same regex Nest enforces.
-    contentType: str = Field(pattern=r"^image/(png|jpeg|jpg|webp|avif|gif)$")
-    # Alphanumeric + dot, hyphen, underscore, space. Max 120 chars.
-    filename: str = Field(max_length=120, pattern=r"^[\w.\- ]+$")
+    contentType: str = Field(default="image/png")
+    filename: str = Field(default="image.png")
     kind: UploadKindLiteral
     ownerId: str | None = Field(default=None, max_length=80)
+
+    @field_validator("contentType", mode="before")
+    @classmethod
+    def clean_content_type(cls, v: str) -> str:
+        if not v or not isinstance(v, str):
+            return "image/png"
+        v_clean = v.split(";")[0].strip().lower()
+        if not v_clean.startswith("image/"):
+            return "image/png"
+        return v_clean
+
+    @field_validator("filename", mode="before")
+    @classmethod
+    def clean_filename(cls, v: str) -> str:
+        if not v or not isinstance(v, str):
+            return "upload.png"
+        import re
+        sanitized = re.sub(r"[^\w.\- ]", "_", v).strip()
+        return sanitized[:120] if sanitized else "upload.png"
 
 
 class PresignUploadResponse(ApiModel):

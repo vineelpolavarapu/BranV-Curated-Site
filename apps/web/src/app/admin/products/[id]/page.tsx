@@ -373,63 +373,100 @@ function ImagesPanel({
   const [isPrimary, setIsPrimary] = useState(product.images.length === 0);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [stagedUploadUrl, setStagedUploadUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function uploadFiles(files: File[]) {
-    if (files.length === 0) return;
+  async function uploadSingleFile(file: File) {
     setUploading(true);
     setError(null);
     try {
-      const uploadedUrls: string[] = [];
-      await Promise.all(
-        files.map(async (file) => {
-          const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
-            '/uploads/presign',
-            {
-              method: 'POST',
-              body: JSON.stringify({
-                contentType: file.type || 'image/png',
-                filename: file.name,
-                kind: 'product-avatar',
-              }),
-            },
-          );
-          if (!presign.ok || !presign.data) return;
-          const put = await fetch(presign.data.uploadUrl, {
-            method: 'PUT',
-            body: file,
-            headers: { 'Content-Type': file.type || 'image/png' },
-          });
-          if (put.ok) {
-            uploadedUrls.push(presign.data.publicUrl);
-          }
-        }),
-      );
-
-      if (uploadedUrls.length > 0) {
-        const batchRes = await apiFetch(`/admin/products/${product.id}/images/batch`, {
+      let publicUrl = '';
+      const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
+        '/uploads/presign',
+        {
           method: 'POST',
-          body: JSON.stringify({ urls: uploadedUrls }),
+          body: JSON.stringify({
+            contentType: file.type || 'image/png',
+            filename: file.name,
+            kind: 'product-avatar',
+          }),
+        },
+      );
+      if (presign.ok && presign.data) {
+        const put = await fetch(presign.data.uploadUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type || 'image/png' },
         });
-        if (batchRes.ok) {
-          onChanged();
-        } else {
-          setError(batchRes.error ?? 'Failed to save uploaded images');
+        if (put.ok) {
+          publicUrl = presign.data.publicUrl;
         }
+      }
+
+      // Direct upload fallback if presign/PUT isn't supported
+      if (!publicUrl) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const directRes = await fetch('http://localhost:5000/api/uploads/file', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('branv_access_token') || ''}`,
+          },
+          body: formData,
+        });
+        if (directRes.ok) {
+          const directData = await directRes.json();
+          publicUrl = directData.publicUrl;
+        }
+      }
+
+      if (publicUrl) {
+        setStagedUploadUrl(publicUrl);
+        setUrl(publicUrl);
       } else {
-        setError('Failed to upload selected image files');
+        setError('Upload to storage failed');
       }
     } catch (err: any) {
-      setError(err?.message ?? 'Multi-file upload failed');
+      setError(err?.message ?? 'Storage upload failed');
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function saveStagedImageToDatabase(overridePrimary: boolean) {
+    const targetUrl = stagedUploadUrl || url;
+    if (!targetUrl) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await apiFetch(`/admin/products/${product.id}/images`, {
+        method: 'POST',
+        body: JSON.stringify({
+          url: targetUrl,
+          altText: altText || undefined,
+          isAiGenerated: isAi,
+          isPrimary: overridePrimary || product.images.length === 0,
+        }),
+      });
+      if (!result.ok) {
+        setError(result.error ?? 'Failed to save image to main database');
+        return;
+      }
+      setStagedUploadUrl(null);
+      setUrl('');
+      setAltText('');
+      setIsAi(false);
+      setIsPrimary(false);
+      onChanged();
+    } finally {
+      setSubmitting(false);
     }
   }
 
   function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     e.target.value = '';
-    if (files.length > 0) void uploadFiles(files);
+    if (files.length > 0) void uploadSingleFile(files[0]);
   }
 
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
@@ -438,37 +475,8 @@ function ImagesPanel({
       f.type.startsWith('image/'),
     );
     if (files.length > 0) {
-      void uploadFiles(files);
+      void uploadSingleFile(files[0]);
     }
-  }
-
-  async function onAdd(e: FormEvent) {
-    e.preventDefault();
-    if (!url) {
-      setError('Upload an image file or enter an image URL');
-      return;
-    }
-    setSubmitting(true);
-    setError(null);
-    const result = await apiFetch(`/admin/products/${product.id}/images`, {
-      method: 'POST',
-      body: JSON.stringify({
-        url,
-        altText: altText || undefined,
-        isAiGenerated: isAi,
-        isPrimary: isPrimary || product.images.length === 0,
-      }),
-    });
-    setSubmitting(false);
-    if (!result.ok) {
-      setError(result.error ?? 'Failed to add image');
-      return;
-    }
-    setUrl('');
-    setAltText('');
-    setIsAi(false);
-    setIsPrimary(false);
-    onChanged();
   }
 
   async function onDelete(id: string) {
@@ -519,7 +527,7 @@ function ImagesPanel({
         </ul>
       )}
 
-      {/* File Dropzone & Picker */}
+      {/* Upload Zone */}
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={onDrop}
@@ -528,14 +536,13 @@ function ImagesPanel({
         <div className="flex flex-col items-center justify-center gap-2">
           <span className="text-2xl">📸</span>
           <p className="text-xs font-semibold text-slate-700">
-            Upload Image File (Drag & drop or browse from device)
+            Upload Image File (Drag & drop or choose from device)
           </p>
           <label className={`${adminButtonSecondary} cursor-pointer text-xs`}>
-            {uploading ? 'Uploading images…' : '📁 Choose Image Files'}
+            {uploading ? 'Uploading to storage account…' : '📁 Choose Image File'}
             <input
               type="file"
               accept="image/*"
-              multiple
               disabled={uploading}
               onChange={onFilePick}
               className="hidden"
@@ -543,84 +550,122 @@ function ImagesPanel({
           </label>
           {uploading && (
             <p className="text-xs font-medium text-primary animate-pulse">
-              Uploading image file to storage…
+              Uploading image file to storage account…
             </p>
           )}
         </div>
       </div>
 
-      <form onSubmit={onAdd} className="space-y-3 border-t border-line pt-4">
-        {url && (
-          <div className="flex items-center gap-3 rounded-lg border border-line bg-surface-muted p-2">
-            <div className="relative h-14 w-12 shrink-0 overflow-hidden rounded border border-line bg-surface">
+      {/* Staged Upload Decision Panel: 2 Options */}
+      {stagedUploadUrl && (
+        <div className="mb-4 rounded-xl border-2 border-primary/40 bg-slate-50 p-4 shadow-sm space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="relative h-16 w-14 overflow-hidden rounded-lg border border-line bg-surface shrink-0">
               <Image
-                src={url}
-                alt="Upload preview"
+                src={stagedUploadUrl}
+                alt="Uploaded to storage"
                 fill
                 unoptimized
                 className="object-cover"
               />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-success">✓ Image ready to add</p>
-              <p className="truncate text-[10px] text-content-soft">{url}</p>
+              <p className="text-xs font-bold text-emerald-700">✓ Image Stored in Storage Account</p>
+              <p className="truncate text-[10px] text-slate-500">{stagedUploadUrl}</p>
             </div>
             <button
               type="button"
-              onClick={() => setUrl('')}
-              className="text-xs text-content-muted hover:text-red-600"
+              onClick={() => {
+                setStagedUploadUrl(null);
+                setUrl('');
+              }}
+              className="text-xs text-slate-400 hover:text-red-600"
             >
-              Clear
+              Cancel
             </button>
           </div>
-        )}
 
-        <div>
-          <label className={adminLabel}>Image URL (or uploaded file URL above)</label>
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://… or upload file above"
-            className={adminInput}
-          />
+          <p className="text-xs font-semibold text-slate-800">
+            Select database storage option for this product:
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => void saveStagedImageToDatabase(true)}
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2.5 text-xs font-bold text-white hover:bg-amber-700 transition shadow-sm"
+            >
+              🔄 Override Primary Image
+            </button>
+            <button
+              type="button"
+              disabled={submitting}
+              onClick={() => void saveStagedImageToDatabase(false)}
+              className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3.5 py-2.5 text-xs font-bold text-primary-fg hover:bg-primary-hover transition shadow-sm"
+            >
+              ➕ Add as Additional Image
+            </button>
+          </div>
         </div>
-        <div>
-          <label className={adminLabel}>Alt text</label>
-          <input
-            value={altText}
-            onChange={(e) => setAltText(e.target.value)}
-            placeholder="Product hero image description"
-            className={adminInput}
-          />
-        </div>
-        <div className="flex gap-4 text-sm">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isAi}
-              onChange={(e) => setIsAi(e.target.checked)}
-            />
-            AI-generated
-          </label>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isPrimary || product.images.length === 0}
-              onChange={(e) => setIsPrimary(e.target.checked)}
-            />
-            Primary image
-          </label>
-        </div>
-        {error && <p className="text-xs font-medium text-danger">{error}</p>}
-        <button
-          type="submit"
-          disabled={submitting || uploading || !url}
-          className={adminButtonPrimary}
+      )}
+
+      {/* Manual URL Form */}
+      {!stagedUploadUrl && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void saveStagedImageToDatabase(isPrimary);
+          }}
+          className="space-y-3 border-t border-line pt-4"
         >
-          {submitting ? 'Adding image…' : 'Add image'}
-        </button>
-      </form>
+          <div>
+            <label className={adminLabel}>Image URL (or upload image file above)</label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="https://… or upload file above"
+              className={adminInput}
+            />
+          </div>
+          <div>
+            <label className={adminLabel}>Alt text</label>
+            <input
+              value={altText}
+              onChange={(e) => setAltText(e.target.value)}
+              placeholder="Product hero image description"
+              className={adminInput}
+            />
+          </div>
+          <div className="flex gap-4 text-sm">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isAi}
+                onChange={(e) => setIsAi(e.target.checked)}
+              />
+              AI-generated
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isPrimary || product.images.length === 0}
+                onChange={(e) => setIsPrimary(e.target.checked)}
+              />
+              Primary image
+            </label>
+          </div>
+          {error && <p className="text-xs font-medium text-danger">{error}</p>}
+          <button
+            type="submit"
+            disabled={submitting || uploading || !url}
+            className={adminButtonPrimary}
+          >
+            {submitting ? 'Saving to database…' : 'Save to database'}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
