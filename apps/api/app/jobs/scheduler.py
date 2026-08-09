@@ -6,7 +6,6 @@ PG advisory lock guarantees only one FastAPI worker executes each job tick.
 
 from __future__ import annotations
 
-import logging
 import typing
 from typing import Any, Callable, Coroutine
 
@@ -14,12 +13,13 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
+from ..core.logging import get_logger
 from ..core.settings import get_settings
 
 if typing.TYPE_CHECKING:
     from apscheduler.triggers.base import BaseTrigger
 
-log = logging.getLogger("branv.scheduler")
+log = get_logger("branv.scheduler")
 
 _scheduler: AsyncIOScheduler | None = None
 
