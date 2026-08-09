@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
+import { uploadFileToStorage } from '@/lib/upload-helper';
 import { Page, ProductStatus } from '@/lib/admin-types';
 import { EditAdmin } from '@/lib/phase7-types';
 import {
@@ -380,46 +381,7 @@ function ImagesPanel({
     setUploading(true);
     setError(null);
     try {
-      let publicUrl = '';
-      const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
-        '/uploads/presign',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            contentType: file.type || 'image/png',
-            filename: file.name,
-            kind: 'product-avatar',
-          }),
-        },
-      );
-      if (presign.ok && presign.data) {
-        const put = await fetch(presign.data.uploadUrl, {
-          method: 'PUT',
-          body: file,
-          headers: { 'Content-Type': file.type || 'image/png' },
-        });
-        if (put.ok) {
-          publicUrl = presign.data.publicUrl;
-        }
-      }
-
-      // Direct upload fallback if presign/PUT isn't supported
-      if (!publicUrl) {
-        const formData = new FormData();
-        formData.append('file', file);
-        const directRes = await fetch('http://localhost:5000/api/uploads/file', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('branv_access_token') || ''}`,
-          },
-          body: formData,
-        });
-        if (directRes.ok) {
-          const directData = await directRes.json();
-          publicUrl = directData.publicUrl;
-        }
-      }
-
+      const publicUrl = await uploadFileToStorage(file, 'product-avatar');
       if (publicUrl) {
         setStagedUploadUrl(publicUrl);
         setUrl(publicUrl);
@@ -430,6 +392,67 @@ function ImagesPanel({
       setError(err?.message ?? 'Storage upload failed');
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function uploadMultipleFiles(files: File[]) {
+    if (files.length === 0) return;
+    if (files.length === 1) return uploadSingleFile(files[0]);
+
+    setUploading(true);
+    setError(null);
+    try {
+      const uploadedUrls: string[] = [];
+      await Promise.all(
+        files.map(async (f) => {
+          try {
+            const u = await uploadFileToStorage(f, 'product-avatar');
+            if (u) uploadedUrls.push(u);
+          } catch {
+            // continue other uploads
+          }
+        }),
+      );
+
+      if (uploadedUrls.length > 0) {
+        const batchRes = await apiFetch(`/admin/products/${product.id}/images/batch`, {
+          method: 'POST',
+          body: JSON.stringify({ urls: uploadedUrls }),
+        });
+        if (batchRes.ok) {
+          onChanged();
+        } else {
+          setError(batchRes.error ?? 'Failed to save uploaded images to database');
+        }
+      } else {
+        setError('Failed to upload selected image files to storage');
+      }
+    } catch (err: any) {
+      setError(err?.message ?? 'Batch upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (files.length === 1) {
+      void uploadSingleFile(files[0]);
+    } else if (files.length > 1) {
+      void uploadMultipleFiles(files);
+    }
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
+      f.type.startsWith('image/'),
+    );
+    if (files.length === 1) {
+      void uploadSingleFile(files[0]);
+    } else if (files.length > 1) {
+      void uploadMultipleFiles(files);
     }
   }
 
@@ -463,21 +486,7 @@ function ImagesPanel({
     }
   }
 
-  function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []);
-    e.target.value = '';
-    if (files.length > 0) void uploadSingleFile(files[0]);
-  }
 
-  function onDrop(e: React.DragEvent<HTMLDivElement>) {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
-      f.type.startsWith('image/'),
-    );
-    if (files.length > 0) {
-      void uploadSingleFile(files[0]);
-    }
-  }
 
   async function onDelete(id: string) {
     if (!confirm('Remove this image?')) return;

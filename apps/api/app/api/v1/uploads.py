@@ -60,21 +60,46 @@ async def presign(payload: PresignUploadRequest) -> PresignUploadResponse:
         Depends(require_roles("ADMIN")),
     ],
 )
-async def upload_direct_file(file: UploadFile = File(...)) -> dict[str, str]:
-    """Direct file upload via multipart/form-data. Stores file locally or in S3."""
+async def upload_direct_file(
+    file: UploadFile = File(...),
+    kind: str = Form(default="product-avatar"),
+) -> dict[str, str]:
+    """Direct file upload via multipart/form-data. Uploads to S3/R2 server-side (bypassing browser CORS) or falls back to local storage."""
+    from ...integrations.s3 import _client, _build_key
+    s = get_settings()
     ext = file.filename.rsplit(".", 1)[-1].lower() if file.filename and "." in file.filename else "png"
     filename = f"{uuid.uuid4().hex}.{ext}"
-    target_path = UPLOAD_DIR / filename
     content = await file.read()
-    with open(target_path, "wb") as f:
-        f.write(content)
 
-    s = get_settings()
-    public_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{filename}"
+    public_url = ""
+    key = _build_key(kind, file.filename or filename, None)
+
+    # Server-side upload to R2/S3 bucket (no browser CORS restriction!)
+    if s.S3_ACCESS_KEY and s.S3_SECRET_KEY and not s.USE_MOCK_INTEGRATIONS:
+        try:
+            client = await run_in_threadpool(_client)
+            await run_in_threadpool(
+                client.put_object,
+                Bucket=s.S3_BUCKET,
+                Key=key,
+                Body=content,
+                ContentType=file.content_type or f"image/{ext}",
+            )
+            public_base = (s.S3_ENDPOINT or "").rstrip("/") + f"/{s.S3_BUCKET}"
+            public_url = f"{public_base}/{key}"
+        except Exception:
+            pass
+
+    if not public_url:
+        target_path = UPLOAD_DIR / filename
+        with open(target_path, "wb") as f:
+            f.write(content)
+        public_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{filename}"
+
     return {
         "uploadUrl": public_url,
         "publicUrl": public_url,
-        "key": filename,
+        "key": key,
     }
 
 

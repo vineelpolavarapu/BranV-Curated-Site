@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react';
 import Image from 'next/image';
 import { apiFetch } from '@/lib/api';
+import { uploadFileToStorage } from '@/lib/upload-helper';
 import { Brand } from '@/lib/admin-types';
 import { adminButtonPrimary, adminButtonSecondary, adminInput, adminLabel } from './AdminShell';
 
@@ -33,31 +34,13 @@ export function BrandFormModal({
     file: File,
     kind: 'brand-logo' | 'brand-hero',
   ): Promise<string | null> {
-    const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
-      '/uploads/presign',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          contentType: file.type,
-          filename: file.name,
-          kind,
-        }),
-      },
-    );
-    if (!presign.ok || !presign.data) {
-      setError(presign.error ?? 'Could not get upload URL');
+    try {
+      const url = await uploadFileToStorage(file, kind);
+      return url;
+    } catch (err: any) {
+      setError(err?.message ?? 'Could not upload brand image');
       return null;
     }
-    const put = await fetch(presign.data.uploadUrl, {
-      method: 'PUT',
-      body: file,
-      headers: { 'Content-Type': file.type },
-    });
-    if (!put.ok) {
-      setError(`Upload failed (${put.status})`);
-      return null;
-    }
-    return presign.data.publicUrl;
   }
 
   async function onPickLogo(e: React.ChangeEvent<HTMLInputElement>) {

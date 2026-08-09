@@ -13,6 +13,7 @@ import {
   useState,
 } from 'react';
 import { apiFetch } from '@/lib/api';
+import { uploadFileToStorage } from '@/lib/upload-helper';
 import { AffiliatePartner, Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import {
@@ -306,7 +307,7 @@ const DEFAULT_BRANDS = [
     setAutofillSource(s.source);
   }
 
-  // ── Image upload (presign → PUT to S3) ──
+  // ── Image upload (direct multipart with presign fallback) ──
   async function uploadImages(files: File[]) {
     if (files.length === 0) return;
     setUploading(true);
@@ -315,22 +316,11 @@ const DEFAULT_BRANDS = [
       const uploaded: string[] = [];
       await Promise.all(
         files.map(async (file) => {
-          const presign = await apiFetch<PresignResult>('/uploads/presign', {
-            method: 'POST',
-            body: JSON.stringify({
-              contentType: file.type || 'image/png',
-              filename: file.name,
-              kind: 'product-avatar',
-            }),
-          });
-          if (!presign.ok || !presign.data) return;
-          const put = await fetch(presign.data.uploadUrl, {
-            method: 'PUT',
-            body: file,
-            headers: { 'Content-Type': file.type || 'image/png' },
-          });
-          if (put.ok) {
-            uploaded.push(presign.data.publicUrl);
+          try {
+            const url = await uploadFileToStorage(file, 'product-avatar');
+            if (url) uploaded.push(url);
+          } catch {
+            // continue other uploads
           }
         }),
       );
