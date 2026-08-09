@@ -189,7 +189,7 @@ async def _send_verification_email_safe(email: str, raw_token: str) -> None:
         link = f"{s.WEB_ORIGIN}/verify-email?token={raw_token}"
         await get_mail_service().send_email_verification(email, link)
     except Exception as e:  # noqa: BLE001
-        log.warning("verification_email_send_failed", email=email, error=str(e))
+        log.warning("verification_email_send_failed", extra={"email": email, "error": str(e)})
 
 
 def _nanoid(length: int) -> str:

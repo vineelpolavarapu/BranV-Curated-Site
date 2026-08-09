@@ -227,6 +227,6 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
     try:
         return parser(tree)
     except Exception as e:  # noqa: BLE001
-        log.warning("retailer_parser_failed", retailer=retailer, error=str(e), url=url)
+        log.warning("retailer_parser_failed", extra={"retailer": retailer, "error": str(e), "url": url})
         # Fall back to generic - better some data than none.
         return _parse_generic(tree, retailer)

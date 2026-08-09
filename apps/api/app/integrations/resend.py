@@ -26,4 +26,4 @@ async def send(*, to: str, subject: str, text: str, html: str | None = None) -> 
             json={"from": s.MAIL_FROM, "to": [to], "subject": subject, "text": text, "html": html},
         )
         r.raise_for_status()
-        log.info("mail_sent", to=to, subject=subject, id=r.json().get("id"))
+        log.info("mail_sent", extra={"to": to, "subject": subject, "id": r.json().get("id")})

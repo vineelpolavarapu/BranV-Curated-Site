@@ -42,7 +42,7 @@ async def cache_set(key: str, value: Any, ttl_seconds: int = 60) -> None:
         serialized = json.dumps(value)
         _MEMORY_CACHE[key] = (time.time() + ttl_seconds, serialized)
     except Exception as e:
-        log.warning("cache_set_failed", key=key, error=str(e))
+        log.warning("cache_set_failed", extra={"key": key, "error": str(e)})
 
 
 async def cache_invalidate(prefix: str) -> None:

@@ -123,10 +123,12 @@ def create_app() -> FastAPI:
 
     log.info(
         "fastapi_booted",
-        port=settings.API_INTERNAL_PORT,
-        web_origin=settings.WEB_ORIGIN,
-        node_env=settings.NODE_ENV,
-        scheduler_owner=settings.SCHEDULER_OWNER,
+        extra={
+            "port": settings.API_INTERNAL_PORT,
+            "web_origin": settings.WEB_ORIGIN,
+            "node_env": settings.NODE_ENV,
+            "scheduler_owner": settings.SCHEDULER_OWNER,
+        },
     )
     return app
 

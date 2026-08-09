@@ -70,7 +70,7 @@ async def record(
                 )
             )
     except Exception as e:  # noqa: BLE001  - explicit; mirrors Nest's catch-all
-        log.error("audit_write_failed", action=action, error=str(e))
+        log.error("audit_write_failed", extra={"action": action, "error": str(e)})
 
 
 async def list_audit_logs(db: AsyncSession, q: AuditListQuery) -> dict[str, Any]:

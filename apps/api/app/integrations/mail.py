@@ -44,7 +44,7 @@ class MailService:
             # against either backend.
             log.info(
                 "mock_mail",
-                **{
+                extra={
                     "from": self.from_addr,
                     "to": message.to,
                     "subject": message.subject,
@@ -61,9 +61,11 @@ class MailService:
             # not break registration or password-reset.
             log.warning(
                 "mail_no_api_key",
-                to=message.to,
-                subject=message.subject,
-                text=message.text,
+                extra={
+                    "to": message.to,
+                    "subject": message.subject,
+                    "text": message.text,
+                },
             )
             return
 
@@ -73,8 +75,10 @@ class MailService:
         else:
             log.warning(
                 "mail_provider_unsupported",
-                provider=s.MAIL_PROVIDER,
-                to=message.to,
+                extra={
+                    "provider": s.MAIL_PROVIDER,
+                    "to": message.to,
+                },
             )
 
     async def _send_via_resend(self, api_key: str, message: MailMessage) -> None:
@@ -93,7 +97,7 @@ class MailService:
                 json=body,
             )
             r.raise_for_status()
-        log.info("mail_sent", provider="resend", to=message.to, subject=message.subject)
+        log.info("mail_sent", extra={"provider": "resend", "to": message.to, "subject": message.subject})
 
     async def send_email_verification(self, to: str, link: str) -> None:
         await self.send(

@@ -93,7 +93,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 
 
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    log.exception("unhandled_exception", path=str(request.url), error=str(exc))
+    log.exception("unhandled_exception", extra={"path": str(request.url), "error": str(exc)})
     body = {
         "statusCode": 500,
         "message": "Internal server error",

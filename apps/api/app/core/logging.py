@@ -31,7 +31,15 @@ def _redact_headers(_: Any, __: str, event_dict: dict[str, Any]) -> dict[str, An
     return event_dict
 
 
+_configured = False
+
+
 def configure_logging() -> None:
+    global _configured
+    if _configured:
+        return
+    _configured = True
+
     settings = get_settings()
     level = getattr(logging, settings.PY_LOG_LEVEL.upper(), logging.INFO)
 
@@ -61,4 +69,6 @@ def configure_logging() -> None:
 
 
 def get_logger(name: str | None = None) -> structlog.stdlib.BoundLogger:
+    if not _configured:
+        configure_logging()
     return structlog.get_logger(name)

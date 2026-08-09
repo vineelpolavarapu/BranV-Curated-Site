@@ -39,13 +39,13 @@ async def _wrap(job_name: str, fn: Callable[[], Coroutine[Any, Any, None]]) -> N
         res = await conn.execute(text(f"SELECT pg_try_advisory_xact_lock({lock_id})"))
         locked = res.scalar_one()
         if not locked:
-            log.debug("job_skipped.lock_busy", job=job_name)
+            log.debug("job_skipped.lock_busy", extra={"job": job_name})
             return
-        log.info("job_executing", job=job_name)
+        log.info("job_executing", extra={"job": job_name})
         try:
             await fn()
         except Exception:
-            log.exception("job_failed", job=job_name)
+            log.exception("job_failed", extra={"job": job_name})
 
 
 async def articles_publisher() -> None:
@@ -71,7 +71,7 @@ async def articles_publisher() -> None:
         )
         await db.commit()
         if res.rowcount > 0:
-            log.info("articles_published", count=res.rowcount)
+            log.info("articles_published", extra={"count": res.rowcount})
 
 
 async def notifications_dispatcher() -> None:
@@ -123,7 +123,7 @@ async def notifications_dispatcher() -> None:
                     )
                 )
         await db.commit()
-        log.info("notifications_processed", total=len(items), sent=sent, failed=failed)
+        log.info("notifications_processed", extra={"total": len(items), "sent": sent, "failed": failed})
 
 
 async def analytics_rollup() -> None:
@@ -177,7 +177,7 @@ async def analytics_rollup() -> None:
                   "updatedAt"             = EXCLUDED."updatedAt"
         """), {"cutoff": cutoff})
         await db.commit()
-    log.info("analytics_rollup.completed", days=30)
+    log.info("analytics_rollup.completed", extra={"days": 30})
 
 
 async def affiliate_retry() -> None:
@@ -222,7 +222,7 @@ async def affiliate_retry() -> None:
             )
             success += 1
         await db.commit()
-        log.info("affiliate_retry.processed", total=len(rows), succeeded=success)
+        log.info("affiliate_retry.processed", extra={"total": len(rows), "succeeded": success})
 
 
 JOBS: list[tuple[str, Any, Callable[[], Coroutine[Any, Any, None]]]] = [
@@ -238,7 +238,7 @@ def start_scheduler() -> None:
     global _scheduler
     s = get_settings()
     if s.SCHEDULER_OWNER != "fastapi":
-        log.info("scheduler_disabled", reason=f"SCHEDULER_OWNER={s.SCHEDULER_OWNER!r}")
+        log.info("scheduler_disabled", extra={"reason": f"SCHEDULER_OWNER={s.SCHEDULER_OWNER!r}"})
         return
     if _scheduler is not None:
         return
@@ -246,7 +246,7 @@ def start_scheduler() -> None:
     for name, trigger, fn in JOBS:
         _scheduler.add_job(_wrap, trigger, args=[f"branv:{name}", fn], id=name, replace_existing=True)
     _scheduler.start()
-    log.info("scheduler_started", jobs=[j[0] for j in JOBS])
+    log.info("scheduler_started", extra={"jobs": [j[0] for j in JOBS]})
 
 
 def stop_scheduler() -> None:
