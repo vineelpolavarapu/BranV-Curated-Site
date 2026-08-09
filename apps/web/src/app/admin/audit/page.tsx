@@ -69,7 +69,7 @@ export default function AuditAdminPage() {
             <input
               value={actorEmail}
               onChange={(e) => setActorEmail(e.target.value)}
-              placeholder="—"
+              placeholder="-"
               className={adminInput}
               disabled
             />
@@ -147,7 +147,7 @@ export default function AuditAdminPage() {
                       ? `${row.actor.email}`
                       : row.actorId
                         ? '(deleted)'
-                        : '—'}
+                        : '-'}
                   </td>
                   <td className="px-2 py-2 font-mono text-xs">{row.action}</td>
                   <td className="px-2 py-2 text-xs text-content-soft">
@@ -161,7 +161,7 @@ export default function AuditAdminPage() {
                         )}
                       </>
                     ) : (
-                      '—'
+                      '-'
                     )}
                   </td>
                   <td className="max-w-[480px] px-2 py-2 text-xs text-content-soft">
@@ -170,7 +170,7 @@ export default function AuditAdminPage() {
                         {JSON.stringify(row.metadata)}
                       </code>
                     ) : (
-                      '—'
+                      '-'
                     )}
                   </td>
                 </tr>

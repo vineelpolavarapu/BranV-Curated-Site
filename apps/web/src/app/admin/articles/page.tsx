@@ -138,7 +138,7 @@ export default function ArticlesAdminPage() {
                       ? `→ ${new Date(a.scheduledAt).toLocaleString()}`
                       : a.publishedAt
                         ? new Date(a.publishedAt).toLocaleString()
-                        : '—'}
+                        : '-'}
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">

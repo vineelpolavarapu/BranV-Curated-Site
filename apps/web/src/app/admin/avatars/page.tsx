@@ -219,7 +219,7 @@ function AvatarForm({
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g. Vineel — studio front"
+              placeholder="e.g. Vineel - studio front"
               className={adminInput}
             />
           </div>

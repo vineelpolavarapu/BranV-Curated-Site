@@ -1,10 +1,10 @@
 """
-Brands business logic — port of `apps/api/src/brands/brands.service.ts` +
+Brands business logic - port of `apps/api/src/brands/brands.service.ts` +
 the public read endpoints in `apps/api/src/storefront/brands-public.controller.ts`.
 
 Parity rules:
   * Soft-delete: if a brand has any products, DELETE flips status→ARCHIVED
-    instead of removing the row (PRD §21 — click history must not break).
+    instead of removing the row (PRD §21 - click history must not break).
   * Slug generation: slugify the input, then suffix `-2`, `-3`, ... until unique.
   * Public listing returns only ACTIVE brands, featured first then A→Z, with
     `_count.products` scoped to status=ACTIVE products.
@@ -84,7 +84,7 @@ async def list_admin(
     if not rows:
         return make_page([], total, page, page_size)
 
-    # _count.products (status filter NOT applied for the admin view — matches Nest).
+    # _count.products (status filter NOT applied for the admin view - matches Nest).
     counts = dict(
         (await db.execute(
             select(Product.brandId, func.count(Product.id_))

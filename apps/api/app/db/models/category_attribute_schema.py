@@ -1,7 +1,7 @@
 """
 Auto-generated from Prisma model `CategoryAttributeSchema`.
 Source: migration/contract/prisma-schema.snapshot.prisma
-Do NOT edit by hand — re-run scripts/generate_sa_models.py.
+Do NOT edit by hand - re-run scripts/generate_sa_models.py.
 """
 from __future__ import annotations
 

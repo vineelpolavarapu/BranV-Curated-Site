@@ -1,7 +1,7 @@
 """
-POST /api/clicks/track         — public, mint tracking id
-POST /api/clicks/{id}/report   — public + optional-auth, record outcome
-(GET /go/{tracking_id} lives in clicks_redirect.py — mounted OUTSIDE /api.)
+POST /api/clicks/track         - public, mint tracking id
+POST /api/clicks/{id}/report   - public + optional-auth, record outcome
+(GET /go/{tracking_id} lives in clicks_redirect.py - mounted OUTSIDE /api.)
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ async def report(
     payload: ReportClickRequest,
     request: Request,
     db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL auth — must not 401
+    user=Depends(current_user_optional),  # OPTIONAL auth - must not 401
 ) -> Response:
     await clicks_service.report_outcome(
         db,

@@ -22,7 +22,7 @@ from typing import Annotated, Any
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
 
-# Permissive regex matching validator.js / class-validator's @IsEmail() —
+# Permissive regex matching validator.js / class-validator's @IsEmail() -
 # Pydantic's default EmailStr (via email-validator) rejects reserved TLDs
 # like `.local`, but NestJS accepts them so we must too during dev parity.
 # Pattern: `local@domain.tld` where the domain has at least one dot and
@@ -50,9 +50,9 @@ class ApiModel(BaseModel):
     """
     Base class for request and response schemas.
 
-    `extra='forbid'`            — reject unknown fields (= Nest forbidNonWhitelisted)
-    `str_strip_whitespace=True` — class-validator's @IsString implicit trim
-    `populate_by_name=True`     — allow both alias and python attribute names on input
+    `extra='forbid'`            - reject unknown fields (= Nest forbidNonWhitelisted)
+    `str_strip_whitespace=True` - class-validator's @IsString implicit trim
+    `populate_by_name=True`     - allow both alias and python attribute names on input
     """
 
     model_config = ConfigDict(

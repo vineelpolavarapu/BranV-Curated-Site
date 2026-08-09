@@ -1,5 +1,5 @@
 """
-In-process fixed-window rate limiter — port of `apps/api/src/common/guards/rate-limit.guard.ts`.
+In-process fixed-window rate limiter - port of `apps/api/src/common/guards/rate-limit.guard.ts`.
 
 Wire as a FastAPI dependency factory:
 
@@ -15,10 +15,10 @@ Behaviour (parity with Nest):
   * IP comes from the connection's remote address; `::ffff:` IPv4-mapping prefix stripped.
   * Window is fixed (resets on edge), not sliding.
   * 429 body: `{statusCode: 429, message: 'Too many requests', retryAfterSeconds: N}`
-    — exception_handlers.py preserves dict bodies on HTTPException.
+    - exception_handlers.py preserves dict bodies on HTTPException.
   * Bucket map is bounded at 10 000 entries with on-overflow eviction of expired
     buckets (same logic as Nest).
-  * No Redis. The dev/prod parity here is "one bucket per process" — same as
+  * No Redis. The dev/prod parity here is "one bucket per process" - same as
     Nest today. If we ever scale horizontally we'll need Redis, but that is a
     deliberate later decision per the playbook's "no new infra" rule.
 """
@@ -38,7 +38,7 @@ _MAX_BUCKETS = 10_000
 @dataclass(slots=True)
 class _Bucket:
     count: int
-    reset_at_monotonic: float  # seconds since arbitrary epoch — monotonic time
+    reset_at_monotonic: float  # seconds since arbitrary epoch - monotonic time
 
 
 _buckets: dict[str, _Bucket] = {}
@@ -98,6 +98,6 @@ def rate_limit(*, limit: int, window: int, prefix: str | None = None) -> Callabl
 
 
 def reset_for_tests() -> None:
-    """Test helper — clears all buckets so per-test state stays isolated."""
+    """Test helper - clears all buckets so per-test state stays isolated."""
     with _lock:
         _buckets.clear()

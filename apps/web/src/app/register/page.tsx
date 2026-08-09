@@ -52,7 +52,7 @@ export default function RegisterPage() {
         }
       >
         <p className="text-sm text-content-soft">
-          In development with mock email, the link is logged to the API stdout —
+          In development with mock email, the link is logged to the API stdout -
           check the <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs">pnpm dev</code> console.
         </p>
       </AuthShell>

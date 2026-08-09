@@ -1,4 +1,4 @@
-"""Unit tests for app.core.rate_limit — 6th request in window must be 429."""
+"""Unit tests for app.core.rate_limit - 6th request in window must be 429."""
 
 from __future__ import annotations
 

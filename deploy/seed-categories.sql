@@ -4,7 +4,7 @@
 -- local dev (created there via the admin panel or an earlier manual step).
 -- Values below are pulled directly from the local dev database so slugs,
 -- names, paths, and ordering match what the frontend already links to.
--- Idempotent — ON CONFLICT (slug) DO NOTHING, safe to re-run.
+-- Idempotent - ON CONFLICT (slug) DO NOTHING, safe to re-run.
 
 BEGIN;
 
@@ -33,7 +33,7 @@ INSERT INTO categories (id, "parentId", slug, name, path, "displayOrder", "creat
   ('cat_easy-casuals',       NULL, 'easy-casuals',       'Easy Casuals',       'easy-casuals',       55, now(), now())
 ON CONFLICT (slug) DO NOTHING;
 
--- Phase 2: subcategories — parent resolved by slug lookup, so this only
+-- Phase 2: subcategories - parent resolved by slug lookup, so this only
 -- needs to run after phase 1 (or any prior run) has created the parents.
 INSERT INTO categories (id, "parentId", slug, name, path, "displayOrder", "createdAt", "updatedAt")
 SELECT 'cat_' || v.slug, p.id, v.slug, v.name, v.path, v.display_order, now(), now()

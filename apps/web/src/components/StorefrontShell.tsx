@@ -116,7 +116,7 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
 
         {/* Right Section: Desktop Search + Wishlist + Account */}
         <div className="bv-nav-actions flex items-center justify-end gap-3">
-          {/* Desktop Search — beside wishlist */}
+          {/* Desktop Search - beside wishlist */}
           <div className="hidden w-60 xl:w-72 lg:block">
             <SearchBox overlay={overlay} />
           </div>
@@ -139,7 +139,7 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
         </div>
       </div>
 
-      {/* Dedicated Mobile Search Row (Mobile Only — Resolves Logo Collision Bug) */}
+      {/* Dedicated Mobile Search Row (Mobile Only - Resolves Logo Collision Bug) */}
       <div className="px-4 pb-3 lg:hidden">
         <SearchBox overlay={overlay} />
       </div>
@@ -182,7 +182,7 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
         <ChevronDown />
       </button>
 
-      {/* L1 dropdown panel — smooth fade-in animation */}
+      {/* L1 dropdown panel - smooth fade-in animation */}
       <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition-all duration-300 ease-out transform -translate-y-2 scale-95 group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
         <div className={panelClasses}>
           <ul className="space-y-0.5">
@@ -199,7 +199,7 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
                     )}
                   </Link>
 
-                  {/* L2 flyout — slides in from left by 6px, fixed w-48 for consistency */}
+                  {/* L2 flyout - slides in from left by 6px, fixed w-48 for consistency */}
                   {hasSubs && (
                     <div className="invisible absolute left-full top-0 -translate-x-1.5 pl-1.5 opacity-0 transition duration-150 group-hover/cat:visible group-hover/cat:translate-x-0 group-hover/cat:opacity-100">
                       <div className={`${panelClasses} w-48`}>

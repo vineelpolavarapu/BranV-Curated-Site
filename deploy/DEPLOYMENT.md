@@ -4,7 +4,7 @@ End-to-end runbook for migrating BranV from Railway to **Vercel (web) + Oracle C
 
 **Target cost:** $0/month recurring (domain renewal excluded).
 
-Each step has a **What** (goal), **How** (exact commands / clicks), and **Verify** (proof it worked). Do them in order — every later step assumes earlier ones succeeded.
+Each step has a **What** (goal), **How** (exact commands / clicks), and **Verify** (proof it worked). Do them in order - every later step assumes earlier ones succeeded.
 
 ---
 
@@ -37,7 +37,7 @@ Accounts needed: **GitHub**, **Cloudflare**, **Oracle Cloud**, **Vercel**, **Res
 
 ---
 
-## STEP 1 — Finalize the repo locally
+## STEP 1 - Finalize the repo locally
 
 **What:** Refresh the lockfile after removing `ioredis` + `bullmq`, generate the Prisma migration for `ClickIntent`, commit, push.
 
@@ -65,7 +65,7 @@ git push origin BranV-main
 
 ---
 
-## STEP 2 — Point your domain at Cloudflare
+## STEP 2 - Point your domain at Cloudflare
 
 **What:** Move DNS to Cloudflare so you get free DNS, TLS, and DDoS in front of both the VM and Vercel.
 
@@ -81,7 +81,7 @@ git push origin BranV-main
 
 ---
 
-## STEP 3 — Create the Oracle Cloud Always Free VM
+## STEP 3 - Create the Oracle Cloud Always Free VM
 
 **What:** Provision the Ubuntu ARM VM that will run API + Postgres + Caddy.
 
@@ -94,7 +94,7 @@ git push origin BranV-main
 5. **Networking:** create a new VCN (defaults are fine). Public IPv4: **Assign a public IPv4 address**.
 6. **SSH keys:** select **Generate a key pair for me** → **Download both** (private + public). Save the private key somewhere safe (e.g., `C:\Users\Lenovo\.ssh\branv-prod.key`).
 7. **Create.** Wait ~2 min for state = Running.
-8. Copy the **Public IP address** from the instance page — you need it in the next steps.
+8. Copy the **Public IP address** from the instance page - you need it in the next steps.
 
 **Verify:** From your laptop, you can SSH in:
 
@@ -108,18 +108,18 @@ You should land in an Ubuntu shell.
 
 ---
 
-## STEP 4 — Open the VM's firewall
+## STEP 4 - Open the VM's firewall
 
 **What:** Oracle blocks everything except port 22 by default. You need 80 + 443 open both at the cloud level and at the OS level (Oracle Ubuntu images have stricter iptables than typical Ubuntu).
 
-**How — at the cloud level:**
+**How - at the cloud level:**
 
 1. In the Oracle console → your instance → **Subnet** link → **Default security list** → **Add Ingress Rules**.
 2. Add two rules, both with **Source CIDR `0.0.0.0/0`**, **Protocol TCP**:
    - Destination port **80**
    - Destination port **443**
 
-**How — at the OS level** (on the VM via SSH):
+**How - at the OS level** (on the VM via SSH):
 
 ```bash
 sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
@@ -127,11 +127,11 @@ sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
 sudo netfilter-persistent save
 ```
 
-**Verify:** From your laptop, `curl -v http://<VM_PUBLIC_IP>` should connect (it will return "connection refused" until Caddy starts — that's fine — but it must not time out).
+**Verify:** From your laptop, `curl -v http://<VM_PUBLIC_IP>` should connect (it will return "connection refused" until Caddy starts - that's fine - but it must not time out).
 
 ---
 
-## STEP 5 — Install Docker on the VM
+## STEP 5 - Install Docker on the VM
 
 **What:** The compose stack needs Docker Engine + the compose plugin.
 
@@ -157,7 +157,7 @@ docker ps                 # should not error (empty list is fine)
 
 ---
 
-## STEP 6 — Clone the repo onto the VM
+## STEP 6 - Clone the repo onto the VM
 
 **What:** Pull the code so the compose `build` can run.
 
@@ -177,7 +177,7 @@ If your repo is private, use a GitHub deploy key or a Personal Access Token in t
 
 ---
 
-## STEP 7 — Fill in production secrets
+## STEP 7 - Fill in production secrets
 
 **What:** Create `deploy/.env` with real values.
 
@@ -187,7 +187,7 @@ If your repo is private, use a GitHub deploy key or a Personal Access Token in t
 cd /opt/branv/repo/deploy
 cp .env.production.example .env
 
-# Generate strong secrets — copy each output line into the .env
+# Generate strong secrets - copy each output line into the .env
 echo "DB_PASSWORD=$(openssl rand -hex 32)"
 echo "JWT_ACCESS_SECRET=$(openssl rand -hex 64)"
 echo "JWT_REFRESH_SECRET=$(openssl rand -hex 64)"
@@ -201,9 +201,9 @@ Fill in (at minimum) the values above, plus:
 - `ACME_EMAIL=you@yourdomain.com`
 - `COOKIE_DOMAIN=.yourdomain.com` (leading dot covers subdomains)
 - `WEB_ORIGIN=https://www.yourdomain.com`
-- **Cloudflare R2** — Create 2 R2 buckets in Cloudflare → R2 (`branv-uploads`, `branv-pg-backups`). Create an R2 API token with read/write on both. Paste keys + your R2 account ID.
-- **Amazon** — leave blank if you don't have Associates keys yet; Amazon URLs pass through untagged until you fill them. Other retailers (EarnKaro, Meesho, etc.) don't need keys at all — the admin pastes the already affiliate-wrapped URL directly.
-- **Resend** — sign up at resend.com (free), verify your domain, paste API key, set `MAIL_FROM=hello@yourdomain.com`.
+- **Cloudflare R2** - Create 2 R2 buckets in Cloudflare → R2 (`branv-uploads`, `branv-pg-backups`). Create an R2 API token with read/write on both. Paste keys + your R2 account ID.
+- **Amazon** - leave blank if you don't have Associates keys yet; Amazon URLs pass through untagged until you fill them. Other retailers (EarnKaro, Meesho, etc.) don't need keys at all - the admin pastes the already affiliate-wrapped URL directly.
+- **Resend** - sign up at resend.com (free), verify your domain, paste API key, set `MAIL_FROM=hello@yourdomain.com`.
 
 Save and exit nano (Ctrl+O, Enter, Ctrl+X).
 
@@ -211,7 +211,7 @@ Save and exit nano (Ctrl+O, Enter, Ctrl+X).
 
 ---
 
-## STEP 8 — Point DNS at the VM
+## STEP 8 - Point DNS at the VM
 
 **What:** Create the `api.yourdomain.com` DNS record so Caddy can get a TLS cert.
 
@@ -221,7 +221,7 @@ Save and exit nano (Ctrl+O, Enter, Ctrl+X).
    - Type: **A**
    - Name: **api**
    - IPv4 address: `<VM_PUBLIC_IP>`
-   - Proxy status: **DNS only** (grey cloud) — *critical for the first TLS issuance*
+   - Proxy status: **DNS only** (grey cloud) - *critical for the first TLS issuance*
    - Save.
 
 You'll switch to Proxied/orange after Caddy gets its cert in Step 10.
@@ -236,7 +236,7 @@ Should resolve to the VM's IP within a few minutes.
 
 ---
 
-## STEP 9 — Start the stack
+## STEP 9 - Start the stack
 
 **What:** Build the API image and bring everything up.
 
@@ -272,7 +272,7 @@ The Caddy log (`docker compose logs caddy`) should show a successful Let's Encry
 
 ---
 
-## STEP 10 — Switch DNS to Proxied
+## STEP 10 - Switch DNS to Proxied
 
 **What:** Now that Caddy has its origin cert, flip Cloudflare to Proxied to get the CDN, DDoS, and WAF.
 
@@ -291,7 +291,7 @@ Response headers now include `Server: cloudflare` and `CF-RAY: ...`. Body is sti
 
 ---
 
-## STEP 11 — Seed the admin account
+## STEP 11 - Seed the admin account
 
 **What:** Create your first admin user so you can log into `/admin` from the web app once it's deployed.
 
@@ -318,7 +318,7 @@ Lists your admin row.
 
 ---
 
-## STEP 12 — Deploy the web app on Vercel
+## STEP 12 - Deploy the web app on Vercel
 
 **What:** Hook the GitHub repo into Vercel so every push to `BranV-main` redeploys the storefront.
 
@@ -327,7 +327,7 @@ Lists your admin row.
 1. **vercel.com/new** → Import the GitHub repo.
 2. **Root Directory:** `apps/web` (click Edit → pick the folder).
 3. **Framework Preset:** Next.js (auto-detected).
-4. Leave Build/Install commands as the defaults — your `apps/web/vercel.json` already overrides them for the monorepo.
+4. Leave Build/Install commands as the defaults - your `apps/web/vercel.json` already overrides them for the monorepo.
 5. **Environment Variables** → add:
    - `NEXT_PUBLIC_API_BASE_URL` = `https://api.yourdomain.com/api`
    - `NEXT_PUBLIC_SITE_NAME` = `BranV`
@@ -339,13 +339,13 @@ Lists your admin row.
 - Type **CNAME**, Name **www**, Target **`cname.vercel-dns.com`**, Proxy status **DNS only** (grey).
 - Type **A**, Name **@** (apex), IPv4 **`76.76.21.21`**, Proxy status **DNS only** (grey).
 
-Vercel's TLS handshake doesn't tolerate Cloudflare's proxy on these records — keep them grey. You still get Vercel's CDN.
+Vercel's TLS handshake doesn't tolerate Cloudflare's proxy on these records - keep them grey. You still get Vercel's CDN.
 
 **Verify:** Visit `https://www.yourdomain.com` → home page loads, product images render, "Buy now" redirects to the affiliate URL.
 
 ---
 
-## STEP 13 — End-to-end smoke test
+## STEP 13 - End-to-end smoke test
 
 Run through these in a browser / shell:
 
@@ -366,7 +366,7 @@ If any of these fail, fix before continuing. Don't move to Step 14 until all 6 a
 
 ---
 
-## STEP 14 — Add a Cloudflare WAF rate-limit rule
+## STEP 14 - Add a Cloudflare WAF rate-limit rule
 
 **What:** Defence-in-depth in front of `/auth/*` since the in-app rate limiter is now per-process (no shared store).
 
@@ -377,11 +377,11 @@ If any of these fail, fix before continuing. Don't move to Step 14 until all 6 a
 - When rate exceeds **5 requests** per **1 minute** per **IP address**
 - Then: **Block** for **1 minute**.
 
-**Verify:** Hit `https://api.yourdomain.com/auth/login` 10 times in a row from one IP — Cloudflare blocks the 6th onwards.
+**Verify:** Hit `https://api.yourdomain.com/auth/login` 10 times in a row from one IP - Cloudflare blocks the 6th onwards.
 
 ---
 
-## STEP 15 — Decommission Railway
+## STEP 15 - Decommission Railway
 
 **What:** Stop paying for Railway and remove the unused config from the repo.
 
@@ -400,7 +400,7 @@ If any of these fail, fix before continuing. Don't move to Step 14 until all 6 a
 
 ---
 
-## STEP 16 — Keep-alive so Oracle doesn't reclaim the VM
+## STEP 16 - Keep-alive so Oracle doesn't reclaim the VM
 
 **What:** Oracle reclaims Always-Free VMs that look idle. A 5-minute uptime ping prevents that.
 
@@ -439,7 +439,7 @@ The `api` DNS record must be **grey-cloud (DNS only)** during initial issuance. 
 Run `docker compose exec api prisma generate` once, then `docker compose restart api`. Happens if the build skipped client generation.
 
 **`502 Bad Gateway` from Cloudflare:**
-Caddy is up but the API container is down. `docker compose ps` — bring back any exited containers with `docker compose up -d`. Check API logs for the crash reason.
+Caddy is up but the API container is down. `docker compose ps` - bring back any exited containers with `docker compose up -d`. Check API logs for the crash reason.
 
 **Wishlist / wardrobe / 2FA / member features look broken:**
 Member auth is wired but those flows weren't part of the catalog+affiliate MVP scope. They'll function once the seed data and email-sending are configured. Not blockers for launch.

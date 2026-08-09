@@ -1,5 +1,5 @@
 """
-S3 / MinIO presign — port of `apps/api/src/uploads/uploads.service.ts`.
+S3 / MinIO presign - port of `apps/api/src/uploads/uploads.service.ts`.
 
 The presign call is CPU-bound (HMAC + SHA256 over headers); use sync boto3 and
 run it in a threadpool via FastAPI's default executor when called from async
@@ -32,7 +32,7 @@ UploadKind = Literal[
     "banner",
 ]
 
-_PRESIGN_EXPIRES = 60 * 10  # 10 minutes — must match Nest
+_PRESIGN_EXPIRES = 60 * 10  # 10 minutes - must match Nest
 
 _FOLDER_MAP: dict[str, str] = {
     "brand-logo": "brands/logos",

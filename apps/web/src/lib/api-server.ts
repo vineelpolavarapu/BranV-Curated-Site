@@ -1,6 +1,6 @@
 /**
  * Server-side fetcher for storefront pages. Returns parsed JSON or null on
- * error — pages handle the null case (404 / empty state). No cookies, no auth.
+ * error - pages handle the null case (404 / empty state). No cookies, no auth.
  */
 import { cache } from 'react';
 

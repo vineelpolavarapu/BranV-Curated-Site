@@ -2,9 +2,9 @@
 Step 3 generator: Prisma schema → SQLAlchemy 2.x async models.
 
 Reads `migration/contract/prisma-schema.snapshot.prisma` and emits:
-  app/db/enums.py                — one Python Enum per Prisma enum
-  app/db/models/<snake>.py       — one SQLAlchemy class per Prisma model
-  app/db/models/__init__.py      — re-exports everything
+  app/db/enums.py                - one Python Enum per Prisma enum
+  app/db/models/<snake>.py       - one SQLAlchemy class per Prisma model
+  app/db/models/__init__.py      - re-exports everything
 
 Hard rules from the playbook:
   - Prisma owns the schema. NO Alembic migrations.
@@ -16,7 +16,7 @@ Hard rules from the playbook:
     string happens in Pydantic schemas, not at the ORM layer.
   - This first pass emits **scalar columns only** (plus relation FKs).
     Bidirectional `relationship()` declarations are added on demand as each
-    domain is ported in Step 6 — they're not required for the parity gate.
+    domain is ported in Step 6 - they're not required for the parity gate.
 
 Re-run after every schema change:
   1. Update apps/api/prisma/schema.prisma + run db:migrate
@@ -91,7 +91,7 @@ class FieldDef:
 
     def is_orm_only(self, enum_names: set[str]) -> bool:
         # A field whose type is a model name (not scalar, not enum) is a pure
-        # ORM relationship declaration — both sides of @relation are skipped
+        # ORM relationship declaration - both sides of @relation are skipped
         # by this scalar-only generator. The actual FK column is a separate
         # scalar field on the owning side (e.g. `userId String` next to
         # `user User @relation(fields:[userId], ...)`).
@@ -107,7 +107,7 @@ class ModelDef:
     name: str
     fields: list[FieldDef] = field(default_factory=list)
     table_name: str = ""       # from @@map; falls back to plural snake_case of name
-    indexes: list[list[str]] = field(default_factory=list)   # @@index([...]) — fields per index
+    indexes: list[list[str]] = field(default_factory=list)   # @@index([...]) - fields per index
     uniques: list[list[str]] = field(default_factory=list)   # @@unique([...])
     compound_id: list[str] = field(default_factory=list)     # @@id([...])
 
@@ -148,7 +148,7 @@ def _parse_model(name: str, body: str) -> ModelDef:
             _parse_block_attr(model, line)
             continue
         # Field line: `<name> <type> [@attributes...]`
-        # Split tokens carefully — attributes can contain parentheses + spaces.
+        # Split tokens carefully - attributes can contain parentheses + spaces.
         tokens = re.match(r"^(\w+)\s+([\w\[\]\?]+)\s*(.*)$", line)
         if not tokens:
             continue
@@ -156,7 +156,7 @@ def _parse_model(name: str, body: str) -> ModelDef:
         is_list = raw_type.endswith("[]")
         optional = raw_type.endswith("?")
         base_type = raw_type.rstrip("[]").rstrip("?")
-        # Attributes — split on top-level whitespace between @ markers.
+        # Attributes - split on top-level whitespace between @ markers.
         attrs = _split_attrs(attr_blob)
         db_native = None
         for a in attrs:
@@ -221,7 +221,7 @@ def _parse_block_attr(model: ModelDef, line: str) -> None:
 
 
 def _default_table_name(model_name: str) -> str:
-    # Prisma's default pluralization isn't enforced — @@map is required when
+    # Prisma's default pluralization isn't enforced - @@map is required when
     # they want it. If @@map missing, fall back to camelCase→snake_case.
     s1 = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", model_name)
     return re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
@@ -233,7 +233,7 @@ def emit_enums(enums: list[EnumDef]) -> str:
     lines: list[str] = [
         '"""',
         "Generated from migration/contract/prisma-schema.snapshot.prisma.",
-        "Do NOT edit by hand — re-run scripts/generate_sa_models.py.",
+        "Do NOT edit by hand - re-run scripts/generate_sa_models.py.",
         '"""',
         "from __future__ import annotations",
         "",
@@ -379,7 +379,7 @@ def emit_model(model: ModelDef, enum_names: set[str], model_names: set[str]) -> 
         '"""\n'
         f"Auto-generated from Prisma model `{model.name}`.\n"
         "Source: migration/contract/prisma-schema.snapshot.prisma\n"
-        "Do NOT edit by hand — re-run scripts/generate_sa_models.py.\n"
+        "Do NOT edit by hand - re-run scripts/generate_sa_models.py.\n"
         '"""'
     )
 
@@ -393,12 +393,12 @@ def _resolve_types(f: FieldDef, enum_names: set[str]) -> tuple[str, str, list[st
     raw = f.raw_type
 
     if f.is_list:
-        # Only Prisma scalar arrays land here — model[] back-relations are filtered out earlier.
+        # Only Prisma scalar arrays land here - model[] back-relations are filtered out earlier.
         if raw in PRISMA_SCALAR_TO_SA:
             inner = PRISMA_SCALAR_TO_SA[raw]
             imports.extend(["ARRAY", inner])
             return f"ARRAY({inner})", f"list[{PRISMA_SCALAR_TO_PY[raw]}]", imports
-        # Enum array — Prisma syntax allows this; treat as ARRAY(String) (Postgres enum arrays
+        # Enum array - Prisma syntax allows this; treat as ARRAY(String) (Postgres enum arrays
         # would require a Postgres enum type which Prisma doesn't usually emit).
         if raw in enum_names:
             imports.extend(["ARRAY", "String"])
@@ -434,7 +434,7 @@ def _resolve_types(f: FieldDef, enum_names: set[str]) -> tuple[str, str, list[st
         # Prisma generates a native PostgreSQL ENUM type (verified in
         # migration SQL: `CREATE TYPE "UserRole" AS ENUM (...)`). Mirror it
         # with SAEnum, create_type=False so SQLAlchemy never tries to issue
-        # CREATE TYPE — Prisma owns DDL.
+        # CREATE TYPE - Prisma owns DDL.
         imports.append("SAEnum")
         sa_expr = f'SAEnum({raw}, name="{raw}", create_type=False, native_enum=True)'
         return sa_expr, raw, imports
@@ -460,7 +460,7 @@ def _extract_default(f: FieldDef, sa_type: str) -> str | None:
         if val == "true" or val == "false":
             return f"server_default=text({val!r})"
         if val.startswith("["):
-            # Array default like `@default([])` — emit empty array literal.
+            # Array default like `@default([])` - emit empty array literal.
             return "server_default=text(\"'{}'\")"
         # Numeric or enum literal
         return f"server_default=text({val!r})"
@@ -504,7 +504,7 @@ def main() -> int:
 
     MODELS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Base declarative class — shared by all models.
+    # Base declarative class - shared by all models.
     base_path = MODELS_DIR / "base.py"
     base_path.write_text(
         '"""Auto-generated. Do not edit."""\n'
@@ -519,7 +519,7 @@ def main() -> int:
 
     model_names = {m.name for m in models}
     init_lines = [
-        '"""Auto-generated. Do not edit — re-run scripts/generate_sa_models.py."""',
+        '"""Auto-generated. Do not edit - re-run scripts/generate_sa_models.py."""',
         "from .base import Base",
         "",
     ]

@@ -219,7 +219,7 @@ export function AdminShell({
   if (error) {
     return (
       <main className="mx-auto max-w-3xl px-6 py-16">
-        <h1 className="mb-2 text-2xl font-semibold text-content">403 — Forbidden</h1>
+        <h1 className="mb-2 text-2xl font-semibold text-content">403 - Forbidden</h1>
         <p className="text-content-soft">{error}</p>
       </main>
     );
@@ -270,7 +270,7 @@ export function AdminShell({
 
       {/* ── Body: sidebar + content ─────────────────────────────────────── */}
       <div className="mx-auto grid grid-cols-1 md:grid-cols-[224px_1fr] max-w-7xl gap-6 px-4 py-8 md:px-6">
-        {/* Desktop sidebar — hidden on mobile */}
+        {/* Desktop sidebar - hidden on mobile */}
         <aside className="hidden w-56 shrink-0 md:flex md:flex-col md:gap-4">
           <NavLinks pathname={pathname} />
           {/* Account section at bottom of desktop sidebar */}

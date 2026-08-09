@@ -47,7 +47,7 @@ export function ReviewsSection({ productId, avgRating, reviewCount }: Props) {
           <h2 className="text-xl font-semibold tracking-tight">Reviews</h2>
           <p className="mt-1 text-sm text-content-soft">
             {reviewCount > 0
-              ? `★ ${avgRating?.toFixed(2) ?? '—'} · ${reviewCount} review${reviewCount === 1 ? '' : 's'}`
+              ? `★ ${avgRating?.toFixed(2) ?? '-'} · ${reviewCount} review${reviewCount === 1 ? '' : 's'}`
               : 'No reviews yet.'}
           </p>
         </div>

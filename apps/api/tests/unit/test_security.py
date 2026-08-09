@@ -1,4 +1,4 @@
-"""Unit tests for app.core.security — Argon2, JWT, refresh tokens, TOTP."""
+"""Unit tests for app.core.security - Argon2, JWT, refresh tokens, TOTP."""
 
 from __future__ import annotations
 
@@ -142,7 +142,7 @@ def test_totp_secret_and_verify():
 
 def test_totp_window_tolerance():
     # ±1 30-second window should be honored. Generate a code one step in the
-    # past and confirm it still verifies — matches `authenticator.options = {window:1}`.
+    # past and confirm it still verifies - matches `authenticator.options = {window:1}`.
     secret = security.generate_totp_secret()
     totp = pyotp.TOTP(secret)
     prev_code = totp.at(int(time.time()) - 30)
@@ -166,7 +166,7 @@ def test_set_auth_cookies_emits_both_with_expected_attrs():
     assert security.ACCESS_COOKIE in by_name
     assert security.REFRESH_COOKIE in by_name
     for c in cookies:
-        # HttpOnly + Path=/ + SameSite present — exact parity with Nest's clearCookie/setCookie.
+        # HttpOnly + Path=/ + SameSite present - exact parity with Nest's clearCookie/setCookie.
         assert "HttpOnly" in c
         assert "Path=/" in c
         assert "SameSite=" in c
@@ -183,12 +183,12 @@ def test_clear_auth_cookies_sets_both_with_max_age_zero():
         assert "Path=/" in c
 
 
-def test_extract_access_token_prefers_cookie_over_bearer():
+def test_extract_access_token_prefers_bearer_over_cookie():
     tok = security.extract_access_token(
         cookies={security.ACCESS_COOKIE: "from-cookie"},
         authorization_header="Bearer from-header",
     )
-    assert tok == "from-cookie"
+    assert tok == "from-header"
 
 
 def test_extract_access_token_falls_back_to_bearer():

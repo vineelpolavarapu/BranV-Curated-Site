@@ -326,7 +326,7 @@ function EditsPanel({
       </h2>
       {allEdits.length === 0 ? (
         <p className="text-sm text-content-soft">
-          No collections yet — create one under{' '}
+          No collections yet - create one under{' '}
           <a href="/admin/edits/new" className="underline">
             The Edit
           </a>
@@ -549,7 +549,7 @@ function VariantsPanel({
               className="flex flex-wrap items-center justify-between gap-2 rounded border border-line px-3 py-2 text-sm"
             >
               <span className="min-w-0 break-words">
-                <strong>{v.color || '—'}</strong>
+                <strong>{v.color || '-'}</strong>
                 {v.size && ` · ${v.size}`}
                 {v.sku && (
                   <span className="ml-2 text-xs text-content-soft">

@@ -1,6 +1,6 @@
 """
-/api/admin/brands  — admin CRUD
-/api/brands        — public list + slug detail
+/api/admin/brands  - admin CRUD
+/api/brands        - public list + slug detail
 
 Mirrors apps/api/src/brands/brands.controller.ts and
 apps/api/src/storefront/brands-public.controller.ts.

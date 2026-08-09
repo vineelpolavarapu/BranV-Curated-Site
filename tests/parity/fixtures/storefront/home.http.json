@@ -22,7 +22,7 @@
         {
           "id": "<cuid>",
           "slug": "sample-footwear-5",
-          "title": "Chelsea Boots — Black",
+          "title": "Chelsea Boots - Black",
           "description": null,
           "price": 5990,
           "mrp": 6990,
@@ -50,17 +50,17 @@
           "primaryImage": {
             "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
             "isAiGenerated": false,
-            "altText": "Chelsea Boots — Black"
+            "altText": "Chelsea Boots - Black"
           },
           "secondaryImage": {
             "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
             "isAiGenerated": false,
-            "altText": "Chelsea Boots — Black"
+            "altText": "Chelsea Boots - Black"
           },
           "gallery": [
             {
               "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
-              "altText": "Chelsea Boots — Black",
+              "altText": "Chelsea Boots - Black",
               "isAiGenerated": false,
               "isPrimary": true,
               "position": 0
@@ -1141,7 +1141,7 @@
             {
               "id": "<cuid>",
               "slug": "sample-suits-and-formal-4",
-              "title": "Silk Necktie — Solid",
+              "title": "Silk Necktie - Solid",
               "description": null,
               "price": 1290,
               "mrp": 1690,
@@ -1169,17 +1169,17 @@
               "primaryImage": {
                 "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
                 "isAiGenerated": false,
-                "altText": "Silk Necktie — Solid"
+                "altText": "Silk Necktie - Solid"
               },
               "secondaryImage": {
                 "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
                 "isAiGenerated": false,
-                "altText": "Silk Necktie — Solid"
+                "altText": "Silk Necktie - Solid"
               },
               "gallery": [
                 {
                   "url": "https://images.unsplash.com/photo-1589363460779-cd717a8e26a8?auto=format&fit=crop&w=1000&q=80",
-                  "altText": "Silk Necktie — Solid",
+                  "altText": "Silk Necktie - Solid",
                   "isAiGenerated": false,
                   "isPrimary": true,
                   "position": 0
@@ -1394,7 +1394,7 @@
             {
               "id": "<cuid>",
               "slug": "sample-footwear-5",
-              "title": "Chelsea Boots — Black",
+              "title": "Chelsea Boots - Black",
               "description": null,
               "price": 5990,
               "mrp": 6990,
@@ -1422,17 +1422,17 @@
               "primaryImage": {
                 "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
                 "isAiGenerated": false,
-                "altText": "Chelsea Boots — Black"
+                "altText": "Chelsea Boots - Black"
               },
               "secondaryImage": {
                 "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
                 "isAiGenerated": false,
-                "altText": "Chelsea Boots — Black"
+                "altText": "Chelsea Boots - Black"
               },
               "gallery": [
                 {
                   "url": "https://images.unsplash.com/photo-1608256246200-53e635b5b65f?auto=format&fit=crop&w=1000&q=80",
-                  "altText": "Chelsea Boots — Black",
+                  "altText": "Chelsea Boots - Black",
                   "isAiGenerated": false,
                   "isPrimary": true,
                   "position": 0

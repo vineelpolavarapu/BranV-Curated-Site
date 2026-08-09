@@ -1,5 +1,5 @@
 """
-Refresh-token issuance + rotation — port of `apps/api/src/auth/token.service.ts`.
+Refresh-token issuance + rotation - port of `apps/api/src/auth/token.service.ts`.
 
 Reuse-detection rule (critical): if a revoked token is replayed, EVERY
 refresh token belonging to that user is revoked. The replay-attacker and
@@ -26,7 +26,7 @@ from ..core.settings import get_settings
 from ..db.models import RefreshToken, User
 
 
-# cuid prefix matches Prisma's `@default(cuid())` — they're sortable, URL-safe,
+# cuid prefix matches Prisma's `@default(cuid())` - they're sortable, URL-safe,
 # 25 chars total ("c" + 24 lowercase alnum). Used for newly-minted refresh-token
 # row ids since the DB has no auto-generation trigger.
 _CUID_ALPHABET = string.ascii_lowercase + string.digits
@@ -89,7 +89,7 @@ async def rotate(
         raise ValueError("Invalid refresh token")
 
     if row.revokedAt is not None:
-        # Reuse detection — revoke the entire family.
+        # Reuse detection - revoke the entire family.
         await db.execute(
             update(RefreshToken)
             .where(RefreshToken.userId == row.userId, RefreshToken.revokedAt.is_(None))
@@ -101,7 +101,7 @@ async def rotate(
     if row.expiresAt < _utcnow_naive():
         raise ValueError("Refresh token expired")
 
-    # Load the user — needed to mint the new access token.
+    # Load the user - needed to mint the new access token.
     user_row = (await db.execute(
         select(User).where(User.id_ == row.userId)
     )).scalar_one()

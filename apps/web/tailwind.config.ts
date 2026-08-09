@@ -5,7 +5,7 @@ import typography from '@tailwindcss/typography';
 //   base          → phone (0–639px)
 //   sm: 640px     → large phone / phablet
 //   md: 768px     → tablet  (tablet-specific tweaks only)
-//   lg: 1080px    → desktop (primary layout split point — covers all handheld below desktop)
+//   lg: 1080px    → desktop (primary layout split point - covers all handheld below desktop)
 //   xl: 1280px    → wide desktop
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
@@ -21,7 +21,7 @@ const config: Config = {
         serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
       colors: {
-        // Legacy black/white theme token — left intact so existing `text-ink`/
+        // Legacy black/white theme token - left intact so existing `text-ink`/
         // `bg-ink` usages render identically until migrated per THEME_REDESIGN_PLAN §9.
         ink: {
           DEFAULT: '#0a0a0a',

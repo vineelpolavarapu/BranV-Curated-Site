@@ -1,8 +1,8 @@
 """
-SQLAlchemy 2.x async models — read-shaped, mirroring the Prisma schema in
+SQLAlchemy 2.x async models - read-shaped, mirroring the Prisma schema in
 `apps/api/prisma/schema.prisma`.
 
-HARD RULE — Prisma owns the database schema. Do NOT generate Alembic migrations.
+HARD RULE - Prisma owns the database schema. Do NOT generate Alembic migrations.
 
 When the schema changes:
   1. Update apps/api/prisma/schema.prisma

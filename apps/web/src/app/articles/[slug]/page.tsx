@@ -14,12 +14,12 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { slug } = await props.params;
   const article = await apiServer<ArticleDetail>(`/articles/${slug}`);
-  if (!article) return { title: 'BranV — Article' };
+  if (!article) return { title: 'BranV - Article' };
   const title = article.metaTitle ?? `${article.title} · BranV`;
   const desc =
     article.metaDescription ??
     article.excerpt ??
-    `${article.title} — BranV editorial.`;
+    `${article.title} - BranV editorial.`;
   return {
     title,
     description: desc,
@@ -157,7 +157,7 @@ function AffiliateDisclosure() {
     <p className="not-prose mt-10 rounded-md bg-surface-muted px-3 py-2 text-xs text-content-soft">
       <strong className="text-content">Affiliate disclosure:</strong>{' '}
       Product links on BranV are affiliate links. We earn a small commission on
-      qualifying sales — at no extra cost to you.
+      qualifying sales - at no extra cost to you.
     </p>
   );
 }
@@ -192,7 +192,7 @@ function ArticleSchema({ article }: { article: ArticleDetail }) {
 }
 
 function getBase(): string {
-  // Best-effort canonical base for schema URLs — falls back to localhost in dev.
+  // Best-effort canonical base for schema URLs - falls back to localhost in dev.
   return (
     process.env.NEXT_PUBLIC_SITE_URL ??
     process.env.WEB_ORIGIN ??

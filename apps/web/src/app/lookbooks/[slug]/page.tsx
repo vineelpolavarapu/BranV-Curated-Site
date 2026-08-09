@@ -13,7 +13,7 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { slug } = await props.params;
   const lb = await apiServer<LookbookPublic>(`/lookbooks/${slug}`);
-  if (!lb) return { title: 'BranV — Lookbook' };
+  if (!lb) return { title: 'BranV - Lookbook' };
   return {
     title: `${lb.title} · BranV Lookbook`,
     description: lb.description ?? undefined,

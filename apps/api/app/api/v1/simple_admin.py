@@ -7,10 +7,10 @@ one is small (~50 lines of logic).
 
 Domains:
   - /api/admin/avatars               (avatars)
-  - /api/admin/banners               (home_banners — with start/end time window)
-  - /api/admin/brands/{id}/story     (brand_stories — PUT upsert)
+  - /api/admin/banners               (home_banners - with start/end time window)
+  - /api/admin/brands/{id}/story     (brand_stories - PUT upsert)
   - /api/brands/{slug}/story         (public read of published story)
-  - /api/admin/settings              (platform_setting — PUT upsert, in-process cache)
+  - /api/admin/settings              (platform_setting - PUT upsert, in-process cache)
 """
 
 from __future__ import annotations

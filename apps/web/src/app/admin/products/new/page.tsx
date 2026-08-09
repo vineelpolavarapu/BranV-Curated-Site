@@ -142,7 +142,7 @@ export default function NewProductPage() {
       brandId || brands.find((b) => b.slug === FALLBACK_BRAND_SLUG)?.id;
     if (!resolvedBrandId) {
       setSubmitting(false);
-      setError('Pick a brand — fallback "Unbranded" brand not found');
+      setError('Pick a brand - fallback "Unbranded" brand not found');
       return;
     }
     const body = {
@@ -186,13 +186,13 @@ export default function NewProductPage() {
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label className={adminLabel}>Brand (optional — defaults to Unbranded)</label>
+            <label className={adminLabel}>Brand (optional - defaults to Unbranded)</label>
             <select
               value={brandId}
               onChange={(e) => setBrandId(e.target.value)}
               className={adminInput}
             >
-              <option value="">— Unbranded —</option>
+              <option value="">- Unbranded -</option>
               {brands
                 .filter((b) => b.slug !== FALLBACK_BRAND_SLUG)
                 .map((b) => (
@@ -226,7 +226,7 @@ export default function NewProductPage() {
               }}
               className={adminInput}
             >
-              <option value="">— select —</option>
+              <option value="">- select -</option>
               {l1.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -242,7 +242,7 @@ export default function NewProductPage() {
               disabled={!categoryId}
               className={adminInput}
             >
-              <option value="">— none —</option>
+              <option value="">- none -</option>
               {l2.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -255,7 +255,7 @@ export default function NewProductPage() {
           <label className={adminLabel}>Also show in these collections</label>
           {edits.length === 0 ? (
             <p className="text-xs text-content-soft">
-              No collections yet — create one under{' '}
+              No collections yet - create one under{' '}
               <a href="/admin/edits/new" className="underline">
                 The Edit
               </a>

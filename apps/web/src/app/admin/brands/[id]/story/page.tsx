@@ -71,7 +71,7 @@ export default function BrandStoryAdminPage() {
   }
 
   return (
-    <AdminShell title={brand ? `${brand.name} — Story` : 'Brand story'}>
+    <AdminShell title={brand ? `${brand.name} - Story` : 'Brand story'}>
       <p className="mb-4 text-sm text-content-soft">
         <Link href="/admin/brands" className="hover:text-primary">
           ← Back to brands
@@ -130,7 +130,7 @@ export default function BrandStoryAdminPage() {
           </div>
           <p className="mt-2 text-xs text-content-soft">
             Raw HTML is stripped on the public page (XSS-safe). Use plain
-            Markdown — headings, lists, links, bold, italic, tables.
+            Markdown - headings, lists, links, bold, italic, tables.
           </p>
         </div>
 

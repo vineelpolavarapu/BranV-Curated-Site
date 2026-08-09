@@ -1,4 +1,4 @@
-# BranV ó Lenis UI Transition Implementation Plan
+# BranV - Lenis UI Transition Implementation Plan
 
 **Owner:** UX Engineering / UI Motion
 **Date:** 2026-07-06
@@ -99,7 +99,7 @@ When `prefers-reduced-motion: reduce` is enabled:
 
 ### 4.1 Recommended implementation layers
 
-#### Layer A ó Scroll foundation
+#### Layer A - Scroll foundation
 
 Create a single app-level Lenis provider for the storefront experience.
 
@@ -111,7 +111,7 @@ Create a single app-level Lenis provider for the storefront experience.
 - Disable/adjust behavior for reduced motion
 - Pause when overlays or modals lock the page
 
-#### Layer B ó UI transition tokens
+#### Layer B - UI transition tokens
 
 Create a shared motion token file for durations, easing, distances, and opacity patterns.
 
@@ -124,7 +124,7 @@ Suggested token groups:
 - Stagger intervals
 - Selection feedback timings
 
-#### Layer C ó Reusable primitives
+#### Layer C - Reusable primitives
 
 Create reusable wrappers/hooks such as:
 
@@ -137,7 +137,7 @@ Create reusable wrappers/hooks such as:
 - `AnimatedDrawer`
 - `AnimatedModal`
 
-#### Layer D ó Component-specific choreography
+#### Layer D - Component-specific choreography
 
 Apply the shared primitives to:
 
@@ -154,7 +154,7 @@ Apply the shared primitives to:
 
 ## 5. Recommended Lenis Configuration Strategy
 
-The exact values can be tuned during implementation, but this is the recommended starting strategy based on BranVís premium editorial positioning.
+The exact values can be tuned during implementation, but this is the recommended starting strategy based on BranV‚Äôs premium editorial positioning.
 
 ### 5.1 Desktop baseline
 
@@ -190,7 +190,7 @@ Mobile should feel lighter than desktop.
 **Intent:**
 
 - Preserve OS-native expectations
-- Avoid ìfightingî touch scrolling
+- Avoid ‚Äúfighting‚Äù touch scrolling
 - Keep performance stable on lower-end devices
 
 ### 5.3 Reduced motion mode
@@ -548,7 +548,7 @@ apps/web/src/
 
 ## 9. Rollout Plan by Phase
 
-## Phase 1 ó Foundation
+## Phase 1 - Foundation
 
 ### Deliverables
 
@@ -567,7 +567,7 @@ apps/web/src/
 
 ---
 
-## Phase 2 ó Core UI interactions
+## Phase 2 - Core UI interactions
 
 ### Deliverables
 
@@ -584,7 +584,7 @@ apps/web/src/
 
 ---
 
-## Phase 3 ó In-view reveals
+## Phase 3 - In-view reveals
 
 ### Deliverables
 
@@ -600,7 +600,7 @@ apps/web/src/
 
 ---
 
-## Phase 4 ó Route/page transitions
+## Phase 4 - Route/page transitions
 
 ### Deliverables
 
@@ -615,7 +615,7 @@ apps/web/src/
 
 ---
 
-## Phase 5 ó Refinement and QA
+## Phase 5 - Refinement and QA
 
 ### Deliverables
 
@@ -710,7 +710,7 @@ Before shipping, validate the following.
 
 ---
 
-## 12. Implementation Do / Donít
+## 12. Implementation Do / Don‚Äôt
 
 ### Do
 
@@ -720,13 +720,13 @@ Before shipping, validate the following.
 - Test desktop trackpad, mouse wheel, and mobile touch separately
 - Respect reduced-motion from day one
 
-### Donít
+### Don‚Äôt
 
-- Donít animate everything just because smoothing exists
-- Donít over-smooth mobile scrolling
-- Donít create long blocking page transitions
-- Donít animate layout properties in hot UI paths
-- Donít let motion compete with product content
+- Don‚Äôt animate everything just because smoothing exists
+- Don‚Äôt over-smooth mobile scrolling
+- Don‚Äôt create long blocking page transitions
+- Don‚Äôt animate layout properties in hot UI paths
+- Don‚Äôt let motion compete with product content
 
 ---
 

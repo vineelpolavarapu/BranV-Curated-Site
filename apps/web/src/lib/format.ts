@@ -1,4 +1,4 @@
-// Plain utility — no React, no 'use client'. Safe to import from both
+// Plain utility - no React, no 'use client'. Safe to import from both
 // server and client components.
 
 export function formatINR(n: number): string {

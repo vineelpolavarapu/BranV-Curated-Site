@@ -66,16 +66,9 @@ export function EmbeddedProductCard({ product }: { product: EmbeddedProduct }) {
             ₹{formatINR(product.price)}
           </span>
           {product.mrp && product.mrp > product.price && (
-            <>
-              <span className="text-xs text-content-muted line-through">
-                ₹{formatINR(product.mrp)}
-              </span>
-              {product.discountPct && (
-                <span className="text-xs font-medium text-success">
-                  {Math.round(product.discountPct)}% off
-                </span>
-              )}
-            </>
+            <span className="text-xs text-content-muted line-through">
+              ₹{formatINR(product.mrp)}
+            </span>
           )}
         </div>
         {buyHref && (

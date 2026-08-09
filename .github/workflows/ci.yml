@@ -34,7 +34,7 @@ jobs:
       - name: Build shared package
         run: pnpm --filter @branv/shared build
 
-      # prisma generate writes TypeScript types to node_modules — required
+      # prisma generate writes TypeScript types to node_modules - required
       # before the API can typecheck. No DB connection is made here.
       - name: Generate Prisma client
         run: pnpm --filter @branv/api exec prisma generate
@@ -61,7 +61,7 @@ jobs:
   deploy-web:
     name: Deploy Web (Vercel)
     needs: typecheck-and-lint
-    # Only deploy on push to BranV-main — never from PRs (forks have no secret access)
+    # Only deploy on push to BranV-main - never from PRs (forks have no secret access)
     if: github.event_name == 'push' && github.ref == 'refs/heads/BranV-main'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v4
 
       # Emit a job-summary card so the commit SHA, branch, and production URL
-      # are always visible at the top of the Actions run — no more guessing
+      # are always visible at the top of the Actions run - no more guessing
       # whether "the pipeline ran" actually deployed the commit you just pushed.
       - name: Log deployment context
         env:
@@ -103,7 +103,7 @@ jobs:
 
       # Every later step in this job (`vercel pull`, `vercel build`, `vercel
       # deploy`) relies on these three being set. A missing or
-      # environment-scoped secret does NOT fail here with an auth error —
+      # environment-scoped secret does NOT fail here with an auth error -
       # GitHub Actions silently substitutes an empty string, so the actual
       # failure only shows up several steps later as a cryptic Vercel CLI
       # error (e.g. "You defined "--token", but it's missing a value").
@@ -183,7 +183,7 @@ jobs:
       # exits 0 but the edge network is still propagating (or the deploy
       # silently targeted the wrong project). Retries with back-off so a cold
       # Vercel edge doesn't produce a false alarm. A warning (not a hard
-      # failure) is emitted if the URL is still non-200 after all retries —
+      # failure) is emitted if the URL is still non-200 after all retries -
       # this avoids blocking the pipeline on transient CDN latency.
       - name: Verify deployment is live
         env:
@@ -205,8 +205,8 @@ jobs:
             sleep 8
           done
           if [ "$STATUS" = "200" ]; then
-            echo "Deployment smoke-test PASSED — $DEPLOY_URL is live." | tee -a "$GITHUB_STEP_SUMMARY"
+            echo "Deployment smoke-test PASSED - $DEPLOY_URL is live." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "::warning::Smoke-test returned HTTP $STATUS after 8 attempts. The deploy URL ($DEPLOY_URL) may still be propagating, or the wrong project was targeted. Verify $SITE_URL manually."
-            echo "**Warning**: smoke-test returned HTTP $STATUS — verify $SITE_URL manually." >> "$GITHUB_STEP_SUMMARY"
+            echo "**Warning**: smoke-test returned HTTP $STATUS - verify $SITE_URL manually." >> "$GITHUB_STEP_SUMMARY"
           fi

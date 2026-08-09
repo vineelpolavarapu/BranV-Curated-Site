@@ -8,6 +8,7 @@ import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { SubcategoryChips } from '@/components/SubcategoryChips';
 import { CategoryIcon } from '@/components/category-icons';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { isCollectionSlug } from '@/lib/collections';
 
 export interface CategoryDetail {
   id: string;
@@ -61,6 +62,7 @@ function CategoryHeader({
   category: CategoryDetail;
   total: number;
 }) {
+  const isBannerCollection = isCollectionSlug(category.slug);
   const subcategories =
     category.children && category.children.length > 0
       ? category.children
@@ -70,9 +72,11 @@ function CategoryHeader({
     <AnimateOnScroll>
       <section className="mx-auto max-w-7xl px-6 pt-8">
         <div className="flex items-center gap-3.5">
-          <span className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 p-1 shadow-xs shrink-0 border border-slate-200">
-            <CategoryIcon slug={category.slug} className="h-full w-full object-cover rounded-full" />
-          </span>
+          {!isBannerCollection && (
+            <span className="flex h-12 w-12 md:h-14 md:w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 p-1 shadow-xs shrink-0 border border-slate-200">
+              <CategoryIcon slug={category.slug} className="h-full w-full object-cover rounded-full" />
+            </span>
+          )}
           <div>
             <h1 className="bv-enter bv-delay-1 text-3xl font-semibold tracking-tight md:text-4xl">
               {category.name}

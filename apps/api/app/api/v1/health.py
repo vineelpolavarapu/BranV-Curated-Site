@@ -58,7 +58,7 @@ async def readiness(response: Response) -> dict[str, Any]:
 
 async def _check_db() -> dict[str, Any]:
     # Step 3 wires a real SQLAlchemy ping. Until then, attempt asyncpg connect
-    # so /ready means something even pre-ORM. Best-effort — failures are reported,
+    # so /ready means something even pre-ORM. Best-effort - failures are reported,
     # not raised.
     started = time.monotonic()
     try:

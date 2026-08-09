@@ -1,5 +1,5 @@
 """
-Auth business logic — port of `apps/api/src/auth/auth.service.ts`.
+Auth business logic - port of `apps/api/src/auth/auth.service.ts`.
 
 Each public method maps 1:1 to a Nest service method. Behavior parity rules:
 
@@ -75,7 +75,7 @@ def _normalize_email(e: str) -> str:
 
 
 class AuthError(Exception):
-    """Internal — raised by services, mapped to HTTP errors in the router."""
+    """Internal - raised by services, mapped to HTTP errors in the router."""
 
     def __init__(self, code: int, message: str, extra: dict[str, Any] | None = None):
         self.code = code
@@ -103,7 +103,7 @@ async def register(
         select(User).where(User.email == normalized)
     )).scalar_one_or_none()
     if existing is not None:
-        # Don't leak existence — same generic 400 NestJS returns.
+        # Don't leak existence - same generic 400 NestJS returns.
         raise AuthError(
             400,
             "Account created successfully",
@@ -123,7 +123,7 @@ async def register(
             updatedAt=now,
         )
     )
-    # Flush before the dependent insert — the SQLAlchemy models don't carry
+    # Flush before the dependent insert - the SQLAlchemy models don't carry
     # ForeignKey() metadata (the generator emits scalar columns only), so the
     # unit-of-work would otherwise re-order these inserts and trip the
     # member_profiles_userId_fkey constraint.
@@ -148,7 +148,7 @@ async def register(
 
     # Send the verification email AFTER commit, best-effort. A mail failure
     # (provider outage, missing key, transient error) must never roll back or
-    # fail a completed signup — the token is already stored, so the user can
+    # fail a completed signup - the token is already stored, so the user can
     # request a resend. Runs as a background task so it never blocks the
     # response either.
     background.add_task(_send_verification_email_safe, normalized, raw)
@@ -182,7 +182,7 @@ async def _issue_verification_token(db: AsyncSession, *, user_id: str) -> str:
 
 
 async def _send_verification_email_safe(email: str, raw_token: str) -> None:
-    """Best-effort verification email — swallows and logs any failure so it can
+    """Best-effort verification email - swallows and logs any failure so it can
     never break a signup that already committed."""
     try:
         s = get_settings()
@@ -257,7 +257,7 @@ async def login(
         )
         raise AuthError(403, "Wrong sign-in portal for this account")
 
-    # Success — reset counters, stamp last login (and upgrade legacy hash to Argon2id if needed).
+    # Success - reset counters, stamp last login (and upgrade legacy hash to Argon2id if needed).
     now = _utcnow_naive()
     update_values: dict[str, Any] = {
         "failedLoginCount": 0,
@@ -400,7 +400,7 @@ async def resend_verification(db: AsyncSession, *, email: str) -> None:
     if user and user.emailVerifiedAt is None:
         raw = await _issue_verification_token(db, user_id=user.id_)
         await db.commit()
-        # Best-effort send after commit — the token is already persisted.
+        # Best-effort send after commit - the token is already persisted.
         await _send_verification_email_safe(user.email, raw)
     # else: silent success to avoid enumeration
 
@@ -523,7 +523,7 @@ async def begin_two_factor_setup(db: AsyncSession, *, user_id: str) -> tuple[str
     secret_b32 = security.generate_totp_secret()
     otpauth = security.totp_uri(user.email, secret_b32)
 
-    # QR as data URL — match Nest's qrcode.toDataURL() output shape.
+    # QR as data URL - match Nest's qrcode.toDataURL() output shape.
     img = qrcode.make(otpauth)
     buf = io.BytesIO()
     img.save(buf)
@@ -637,7 +637,7 @@ async def me(db: AsyncSession, *, user_id: str) -> dict[str, Any]:
 
 
 def _iso_ms(dt: datetime) -> str:
-    """ISO 8601 with millisecond precision + 'Z' suffix — matches Nest's
+    """ISO 8601 with millisecond precision + 'Z' suffix - matches Nest's
     `new Date().toISOString()` exactly. Python's `.isoformat()` would emit
     microseconds (`.319000`), which would cause a one-character parity diff."""
     # Strip to milliseconds and append Z.

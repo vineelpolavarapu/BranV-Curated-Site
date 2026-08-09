@@ -1,14 +1,14 @@
 """
-Pydantic settings — reads the **exact** env var names from `apps/api`'s `.env.example`.
+Pydantic settings - reads the **exact** env var names from `apps/api`'s `.env.example`.
 
 Hard rule from the migration playbook: **no renames**. Every name the NestJS app
 already uses must work as-is so dev `.env` files and future deployment secrets
 stay portable between the two backends during the parallel-run period.
 
 The only names this Python service introduces:
-    SCHEDULER_OWNER (fastapi|nest|none) — playbook §8 leader gate
-    PY_LOG_LEVEL                        — structlog level
-    API_INTERNAL_PORT                   — uvicorn port (Nest uses API_PORT for 4000)
+    SCHEDULER_OWNER (fastapi|nest|none) - playbook §8 leader gate
+    PY_LOG_LEVEL                        - structlog level
+    API_INTERNAL_PORT                   - uvicorn port (Nest uses API_PORT for 4000)
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Repo-root .env for local dev. In the monorepo layout, this file lives at
 # apps/api/app/core/settings.py so parents[4] is the repo root. In the Docker
-# container it lives at /app/app/core/settings.py — fewer parents — and env vars
+# container it lives at /app/app/core/settings.py - fewer parents - and env vars
 # come from Compose's `environment:` block instead, so falling back to no .env
 # file is the correct behavior there.
 _parents = Path(__file__).resolve().parents

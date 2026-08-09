@@ -5,7 +5,7 @@
 ALTER TABLE "product_retailer_listings" ADD COLUMN "retailerDisplayName" TEXT;
 
 -- Seed a fallback Brand so "brandId" can stay a required, non-null FK while
--- the New Product admin form allows leaving Brand blank. Idempotent — safe
+-- the New Product admin form allows leaving Brand blank. Idempotent - safe
 -- to re-run across environments.
 INSERT INTO "brands" ("id", "slug", "name", "status", "isFeatured", "createdAt", "updatedAt")
 VALUES ('brand_unbranded_fallback', 'unbranded', 'Unbranded', 'ACTIVE', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)

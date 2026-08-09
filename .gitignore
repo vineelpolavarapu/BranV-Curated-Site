@@ -45,7 +45,7 @@ test-results/
 .turbo/
 .cache/
 
-# Claude Code (local only — do not expose)
+# Claude Code (local only - do not expose)
 .claude/
 .agents/
 CLAUDE.md

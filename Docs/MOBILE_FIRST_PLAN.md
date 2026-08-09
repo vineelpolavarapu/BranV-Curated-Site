@@ -1,8 +1,8 @@
-# Mobile-First Responsive Implementation Plan — BranV
+# Mobile-First Responsive Implementation Plan - BranV
 
 > **Date:** 2026-07-03
 > **Author:** Senior Frontend Architecture Review
-> **Scope:** `apps/web` — Next.js 15 / React 19 / Tailwind CSS 3.4
+> **Scope:** `apps/web` - Next.js 15 / React 19 / Tailwind CSS 3.4
 
 ---
 
@@ -18,9 +18,9 @@ This plan migrates the site to a true **three-tier mobile-first architecture** u
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Primary split point | `lg:` 1024px | Phones + tablets share the mobile layout; desktop kicks in at laptop size — used by Myntra, ASOS, most fashion e-commerce |
+| Primary split point | `lg:` 1024px | Phones + tablets share the mobile layout; desktop kicks in at laptop size - used by Myntra, ASOS, most fashion e-commerce |
 | Tablet hero | Portrait mobile hero with `max-h-[80vh]` cap | Keeps existing portrait art, prevents overflow on wide tablets |
-| Interior page navigation | Fix the bug — add mega menu to all desktop pages | Desktop users on category/product pages currently have no way to navigate |
+| Interior page navigation | Fix the bug - add mega menu to all desktop pages | Desktop users on category/product pages currently have no way to navigate |
 
 ---
 
@@ -32,7 +32,7 @@ All responsive logic uses only `md:` (768px). No tablet range is addressed. The 
 | Element | Current | Impact |
 |---|---|---|
 | Mobile bottom nav | `md:hidden` | Disappears on iPad (768px), leaving no navigation |
-| Desktop hero | `hidden md:block` | Landscape hero appears at 768px — too early |
+| Desktop hero | `hidden md:block` | Landscape hero appears at 768px - too early |
 | Mega menu | `hidden md:flex` + `overlay &&` guard | Never appears on interior pages |
 | Filter sidebar | `hidden md:block` | 220px sidebar on 768px tablet consumes 30% of screen |
 | Product detail layout | `md:grid-cols-2` | Side-by-side layout forces onto tablet |
@@ -43,7 +43,7 @@ All responsive logic uses only `md:` (768px). No tablet range is addressed. The 
 `HeroCarousel.tsx` renders **both** `<HeroCarouselMobile />` and `<HeroCarouselDesktop />` in the DOM simultaneously. One is hidden via CSS, but both components initialise and **all 16 images load** regardless of viewport. On mobile this downloads 8 unnecessary landscape images.
 
 ### 3. Interior page navigation broken
-The `<nav>` block containing `ShopMegaMenu` is wrapped in `{overlay && (...)}` in `StorefrontShell.tsx`. It only renders on the home page (which passes `heroOverlay={true}`). Desktop users on `/category`, `/products`, `/brands` have **no navigation links** — only a search icon and account icon.
+The `<nav>` block containing `ShopMegaMenu` is wrapped in `{overlay && (...)}` in `StorefrontShell.tsx`. It only renders on the home page (which passes `heroOverlay={true}`). Desktop users on `/category`, `/products`, `/brands` have **no navigation links** - only a search icon and account icon.
 
 ### 4. Hero image scale typos
 `HeroCarouselMobile.tsx` line 248 applies `scale-15` (15× zoom) and `scale-125` (12.5× zoom) to specific slides. These are typographic errors for `scale-[1.15]` and `scale-[1.25]`. Also contains a space: `object-[center_110 %]` → `object-[center_110%]`.
@@ -67,12 +67,12 @@ Components use `sizes` hints based on 640px/768px breakpoints while actual layou
 
 ---
 
-## Phase 1 — Tailwind Config: Document Breakpoint Semantics
+## Phase 1 - Tailwind Config: Document Breakpoint Semantics
 
 **File:** `apps/web/tailwind.config.ts`
 **Effort:** 15 min | **Risk:** None
 
-No custom screens needed — Tailwind defaults align exactly with the target. Add a comment block documenting semantic intent so future contributors use breakpoints correctly.
+No custom screens needed - Tailwind defaults align exactly with the target. Add a comment block documenting semantic intent so future contributors use breakpoints correctly.
 
 ```ts
 const config: Config = {
@@ -90,14 +90,14 @@ const config: Config = {
 
 ---
 
-## Phase 2 — StorefrontShell: Fix Navigation + Split Point
+## Phase 2 - StorefrontShell: Fix Navigation + Split Point
 
 **File:** `apps/web/src/components/StorefrontShell.tsx`
-**Effort:** 1 hour | **Risk:** Medium — touches every page's header
+**Effort:** 1 hour | **Risk:** Medium - touches every page's header
 
 This is the highest-impact change. Three separate fixes in one file.
 
-### 2a — Fix interior page navigation (bug fix)
+### 2a - Fix interior page navigation (bug fix)
 
 The `<nav>` block is gated behind `{overlay && (...)}` at line 48. Remove the guard. The `overlay` prop now only controls **styling** (white vs dark text), not **visibility**.
 
@@ -123,11 +123,11 @@ The `<nav>` block is gated behind `{overlay && (...)}` at line 48. Remove the gu
 </nav>
 ```
 
-### 2b — Fix header padding
+### 2b - Fix header padding
 
 Line 42: `md:pl-0 md:pr-6` → `lg:pl-0 lg:pr-6`
 
-### 2c — Fix body bottom padding for bottom nav
+### 2c - Fix body bottom padding for bottom nav
 
 Line 24: `pb-16 md:pb-0` → `pb-16 lg:pb-0`
 
@@ -142,7 +142,7 @@ Line 24: `pb-16 md:pb-0` → `pb-16 lg:pb-0`
 
 ---
 
-## Phase 3 — MobileBottomNav: Extend Visibility to Tablet
+## Phase 3 - MobileBottomNav: Extend Visibility to Tablet
 
 **File:** `apps/web/src/components/MobileBottomNav.tsx`
 **Effort:** 5 min | **Risk:** None
@@ -153,19 +153,19 @@ The 5-tab bottom nav now appears on phones **and tablets** (0–1023px), disappe
 
 ---
 
-## Phase 4 — HeroCarousel: Fix Split Point + Dual Image Loading
+## Phase 4 - HeroCarousel: Fix Split Point + Dual Image Loading
 
 **File:** `apps/web/src/components/HeroCarousel.tsx`
-**Effort:** 2 hours | **Risk:** Medium — test hydration / SSR boundary
+**Effort:** 2 hours | **Risk:** Medium - test hydration / SSR boundary
 
-### 4a — Change swap breakpoint
+### 4a - Change swap breakpoint
 
 Line 12: `md:hidden` → `lg:hidden`
 Line 15: `hidden md:block` → `hidden lg:block`
 
 Tablets (768–1023px) now correctly display the portrait mobile hero.
 
-### 4b — Eliminate dual image loading
+### 4b - Eliminate dual image loading
 
 Replace the always-render pattern with a `useMediaQuery`-gated dynamic import. This ensures only the active carousel's images are downloaded.
 
@@ -209,12 +209,12 @@ export function HeroCarousel() {
 
 ---
 
-## Phase 5 — HeroCarouselMobile: Fix Bugs + Tablet Height Cap
+## Phase 5 - HeroCarouselMobile: Fix Bugs + Tablet Height Cap
 
 **File:** `apps/web/src/components/HeroCarouselMobile.tsx`
 **Effort:** 30 min | **Risk:** Low
 
-### 5a — Fix scale typos and spacing error (line 248)
+### 5a - Fix scale typos and spacing error (line 248)
 
 ```tsx
 // Before
@@ -229,7 +229,7 @@ Changes:
 - `scale-125` → `scale-[1.25]` (was 12.5× zoom, now 125% scale)
 - Remove space in `110 %` → `110%`
 
-### 5b — Add portrait height cap for tablet
+### 5b - Add portrait height cap for tablet
 
 On a 768px-wide tablet in portrait, `aspect-[9/16]` produces an intrinsic height of 1365px. The existing `max-h-screen` caps this, but can cause side black bars. Use a tighter cap:
 
@@ -245,7 +245,7 @@ className="relative aspect-[9/16] max-h-[80vh] w-full touch-pan-y ..."
 
 ---
 
-## Phase 6 — Category Showcase: 3-Tier Grid
+## Phase 6 - Category Showcase: 3-Tier Grid
 
 **File:** `apps/web/src/components/CategoryShowcase.tsx`
 **Effort:** 1.5 hours | **Risk:** Low
@@ -271,12 +271,12 @@ Replace the 2-state (scroll/grid) pattern with a 3-tier pattern:
 
 ---
 
-## Phase 7 — Category Page Layout
+## Phase 7 - Category Page Layout
 
 **File:** `apps/web/src/app/category/[slug]/page.tsx`
 **Effort:** 1 hour | **Risk:** Low
 
-### 7a — Filter sidebar grid: shift trigger from `md:` to `lg:`
+### 7a - Filter sidebar grid: shift trigger from `md:` to `lg:`
 
 ```tsx
 // Before
@@ -286,9 +286,9 @@ Replace the 2-state (scroll/grid) pattern with a 3-tier pattern:
 <div className="lg:grid-cols-[220px_1fr]">
 ```
 
-Tablets (768–1023px) no longer have a 220px sidebar — they use the bottom sheet filter (see Phase 8).
+Tablets (768–1023px) no longer have a 220px sidebar - they use the bottom sheet filter (see Phase 8).
 
-### 7b — Product grid column counts
+### 7b - Product grid column counts
 
 | Viewport | Columns | Class |
 |---|---|---|
@@ -298,7 +298,7 @@ Tablets (768–1023px) no longer have a 220px sidebar — they use the bottom sh
 
 ---
 
-## Phase 8 — Filters: Extend Bottom Sheet to Tablet
+## Phase 8 - Filters: Extend Bottom Sheet to Tablet
 
 **File:** `apps/web/src/components/Filters.tsx`
 **Effort:** 20 min | **Risk:** Low
@@ -315,12 +315,12 @@ Since tablets now use the mobile layout (Phase 7 removes the sidebar), the filte
 
 ---
 
-## Phase 9 — Product Detail Page
+## Phase 9 - Product Detail Page
 
 **File:** `apps/web/src/app/products/[slug]/page.tsx`
 **Effort:** 30 min | **Risk:** Low
 
-### 9a — Layout split
+### 9a - Layout split
 
 ```tsx
 // Before
@@ -332,7 +332,7 @@ Since tablets now use the mobile layout (Phase 7 removes the sidebar), the filte
 
 Tablets (768–1023px) stack vertically (image → details), which is the expected mobile-first PDP behavior.
 
-### 9b — Correct `sizes` attribute
+### 9b - Correct `sizes` attribute
 
 ```tsx
 // Before
@@ -344,25 +344,25 @@ sizes="(max-width: 1023px) 100vw, 50vw"
 
 ---
 
-## Phase 10 — Header Overlay Styling Audit
+## Phase 10 - Header Overlay Styling Audit
 
 **File:** `apps/web/src/components/StorefrontShell.tsx`
 **Effort:** 30 min testing | **Risk:** Low (audit only)
 
 After Phase 2a (nav always visible), verify that `overlay=false` styling is correct on all interior pages:
 
-- [ ] `ShopMegaMenu` — `panelClasses`: `border-neutral-200 bg-white shadow-xl` ✓
-- [ ] `ShopMegaMenu` — hover: `hover:bg-neutral-100` ✓
-- [ ] `SiteHeader` — link color: `text-neutral-700` on sticky white header ✓
-- [ ] `SiteHeader` — on scroll: `bg-white/95 backdrop-blur` persists ✓
+- [ ] `ShopMegaMenu` - `panelClasses`: `border-neutral-200 bg-white shadow-xl` ✓
+- [ ] `ShopMegaMenu` - hover: `hover:bg-neutral-100` ✓
+- [ ] `SiteHeader` - link color: `text-neutral-700` on sticky white header ✓
+- [ ] `SiteHeader` - on scroll: `bg-white/95 backdrop-blur` persists ✓
 
 No code changes expected; this is a visual verification pass.
 
 ---
 
-## Phase 11 — Responsive Image `sizes` Alignment
+## Phase 11 - Responsive Image `sizes` Alignment
 
-**Effort:** 1 hour | **Risk:** None (no visual change — only changes which resolution variant the browser downloads)
+**Effort:** 1 hour | **Risk:** None (no visual change - only changes which resolution variant the browser downloads)
 
 Align `sizes` props with actual layout breakpoints across all product-displaying components:
 
@@ -376,30 +376,30 @@ Align `sizes` props with actual layout breakpoints across all product-displaying
 
 ---
 
-## Phase 12 — Typography Fluid Scaling
+## Phase 12 - Typography Fluid Scaling
 
 **Effort:** 1.5 hours | **Risk:** Low
 
-Apply consistent 3-tier text scaling. Current pattern uses only base + occasional `md:` / `lg:` — add `sm:` and `md:` intermediate steps.
+Apply consistent 3-tier text scaling. Current pattern uses only base + occasional `md:` / `lg:` - add `sm:` and `md:` intermediate steps.
 
 | Element | Mobile (base) | Phablet (`sm:`) | Tablet (`md:`) | Desktop (`lg:`) |
 |---|---|---|---|---|
-| Hero headline | `text-3xl` | — | `text-3xl` | `text-4xl xl:text-5xl` |
-| Section heading | `text-xl` | — | `text-2xl` | `text-3xl` |
-| Product card title | `text-sm` | — | `text-base` | `text-base` |
-| Eyebrow | `text-[10px]` | — | `text-[11px]` | `text-[11px]` |
-| Page heading (H1) | `text-2xl` | — | `text-3xl` | `text-4xl` |
+| Hero headline | `text-3xl` | - | `text-3xl` | `text-4xl xl:text-5xl` |
+| Section heading | `text-xl` | - | `text-2xl` | `text-3xl` |
+| Product card title | `text-sm` | - | `text-base` | `text-base` |
+| Eyebrow | `text-[10px]` | - | `text-[11px]` | `text-[11px]` |
+| Page heading (H1) | `text-2xl` | - | `text-3xl` | `text-4xl` |
 
 **Files to update:** `HeroCarouselMobile.tsx`, `HeroCarouselDesktop.tsx`, `ProductCard.tsx`, category/product page headings.
 
 ---
 
-## Phase 13 — MobileNavDrawer: Tablet Width Adjustment
+## Phase 13 - MobileNavDrawer: Tablet Width Adjustment
 
 **File:** `apps/web/src/components/MobileNavDrawer.tsx`
 **Effort:** 15 min | **Risk:** None
 
-Current drawer is `82vw` wide. On a 1023px tablet, 82vw = 840px — almost full screen.
+Current drawer is `82vw` wide. On a 1023px tablet, 82vw = 840px - almost full screen.
 
 ```tsx
 // Before
@@ -409,7 +409,7 @@ className="... w-[82vw] ..."
 className="... w-[82vw] max-w-sm md:max-w-md ..."
 ```
 
-`max-w-md` = 448px — comfortable on a 768px tablet without covering the full screen.
+`max-w-md` = 448px - comfortable on a 768px tablet without covering the full screen.
 
 ---
 
@@ -419,8 +419,8 @@ These are isolated one-line fixes. Do these first regardless of phase order.
 
 | # | Bug | File | Line | Fix |
 |---|---|---|---|---|
-| 1 | `scale-15` — 15× zoom | `HeroCarouselMobile.tsx` | 248 | → `scale-[1.15]` |
-| 2 | `scale-125` — 12.5× zoom | `HeroCarouselMobile.tsx` | 248 | → `scale-[1.25]` |
+| 1 | `scale-15` - 15× zoom | `HeroCarouselMobile.tsx` | 248 | → `scale-[1.15]` |
+| 2 | `scale-125` - 12.5× zoom | `HeroCarouselMobile.tsx` | 248 | → `scale-[1.25]` |
 | 3 | Space in `110 %` | `HeroCarouselMobile.tsx` | 248 | → `object-[center_110%]` |
 | 4 | Interior desktop nav hidden | `StorefrontShell.tsx` | 48 | Remove `overlay &&` guard |
 
@@ -463,7 +463,7 @@ Run after each phase against these 7 checkpoints in Chrome DevTools (or real dev
 | iPhone SE | 375px | Bottom nav visible, portrait hero full-height, 2-col product grid, hamburger menu |
 | Pixel 7 / Galaxy S24 | 412px | Same + swipe carousel, filter bottom sheet |
 | iPad Mini (portrait) | 768px | Bottom nav visible, portrait hero with 80vh cap, 3-col grid, no mega menu, filter sheet |
-| iPad Pro 11" (portrait) | 834px | Same as 768px — confirm mobile layout throughout |
+| iPad Pro 11" (portrait) | 834px | Same as 768px - confirm mobile layout throughout |
 | iPad Pro / desktop boundary | 1024px | Desktop layout begins: mega menu appears, desktop hero, sidebar filter, bottom nav gone |
 | MacBook 13" | 1280px | Full desktop: mega menu, desktop hero, sidebar filters, 4-col grid |
 | Desktop 1440px | 1440px | Wide desktop: `xl:` column counts, max-width centering |
@@ -515,8 +515,8 @@ Run after each phase against these 7 checkpoints in Chrome DevTools (or real dev
 
 ## Reference: Industry Patterns Consulted
 
-- Myntra, ASOS, H&M — bottom nav visible on tablet, `lg:` desktop split
-- Flipkart — 3-col tablet grid, filter sheet on mobile and tablet
-- Zara — minimal header on interior pages, mega menu on hover
-- ASOS — `<picture>` element with art direction for hero images
-- MDN responsive images guide — `srcset` + `sizes` strategy for resolution switching
+- Myntra, ASOS, H&M - bottom nav visible on tablet, `lg:` desktop split
+- Flipkart - 3-col tablet grid, filter sheet on mobile and tablet
+- Zara - minimal header on interior pages, mega menu on hover
+- ASOS - `<picture>` element with art direction for hero images
+- MDN responsive images guide - `srcset` + `sizes` strategy for resolution switching

@@ -1,9 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   BranV icon set — Lucide (THEME_REDESIGN_PLAN §4.5).
+   BranV icon set - Lucide (THEME_REDESIGN_PLAN §4.5).
 
    Central 1:1 map of icon *meaning* → Lucide glyph. Components import from here
    so the icon family stays consistent (single stroke width / size tokens) and
-   every swap is a like-for-like replacement of an existing icon's meaning —
+   every swap is a like-for-like replacement of an existing icon's meaning -
    no new features implied, no functions removed (Scope Contract §2.4).
 
    Usage:  import { Icon } from '@/components/icons';
@@ -46,7 +46,7 @@ import {
 /** Default presentation for BranV icons: 24px base, 1.75 stroke (§4.5). */
 export const ICON_DEFAULTS = { size: 24, strokeWidth: 1.75 } as const;
 
-/** Semantic icon registry — key = meaning in the UI, value = Lucide glyph. */
+/** Semantic icon registry - key = meaning in the UI, value = Lucide glyph. */
 export const Icon = {
   Eye,
   EyeOff,

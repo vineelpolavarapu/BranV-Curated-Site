@@ -1,5 +1,5 @@
 /**
- * @branv/shared — types shared between apps/web and apps/api.
+ * @branv/shared - types shared between apps/web and apps/api.
  *
  * Phase 0: empty. Domain types (User, Product, Brand, etc.) land in later phases.
  */

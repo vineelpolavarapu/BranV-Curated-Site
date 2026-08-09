@@ -1,5 +1,5 @@
 """
-POST /api/uploads/presign — admin-only S3 presigned-URL generator.
+POST /api/uploads/presign - admin-only S3 presigned-URL generator.
 
 Mirrors apps/api/src/uploads/uploads.controller.ts.
 """
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
     ],
 )
 async def presign(payload: PresignUploadRequest) -> PresignUploadResponse:
-    # boto3's presign is sync + CPU-bound — push it to the threadpool so the
+    # boto3's presign is sync + CPU-bound - push it to the threadpool so the
     # event loop stays responsive under load.
     result = await run_in_threadpool(
         presign_upload,

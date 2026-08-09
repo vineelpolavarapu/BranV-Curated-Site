@@ -1,6 +1,6 @@
 /**
  * Tiny fetch wrapper. Always sends cookies + Authorization header if available.
- * Never throws — returns the parsed body and a typed error string when non-2xx.
+ * Never throws - returns the parsed body and a typed error string when non-2xx.
  */
 const BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
@@ -10,13 +10,37 @@ export function getStoredToken(): string | null {
   return localStorage.getItem('branv_access_token');
 }
 
-export function setStoredToken(token: string | null) {
+export function getStoredRefreshToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('branv_refresh_token');
+}
+
+export function setStoredTokens(
+  accessToken: string | null,
+  refreshToken: string | null = null,
+) {
   if (typeof window === 'undefined') return;
-  if (token) {
-    localStorage.setItem('branv_access_token', token);
+  if (accessToken) {
+    localStorage.setItem('branv_access_token', accessToken);
   } else {
     localStorage.removeItem('branv_access_token');
   }
+
+  if (refreshToken) {
+    localStorage.setItem('branv_refresh_token', refreshToken);
+  } else if (accessToken === null) {
+    localStorage.removeItem('branv_refresh_token');
+  }
+}
+
+export function setStoredToken(token: string | null) {
+  setStoredTokens(token, null);
+}
+
+export function clearStoredTokens() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('branv_access_token');
+  localStorage.removeItem('branv_refresh_token');
 }
 
 export interface ApiResult<T> {
@@ -28,9 +52,65 @@ export interface ApiResult<T> {
   details: Record<string, unknown> | null;
 }
 
+let refreshPromise: Promise<boolean> | null = null;
+
+async function performTokenRefresh(): Promise<boolean> {
+  const refreshToken = getStoredRefreshToken();
+  if (!refreshToken) {
+    clearStoredTokens();
+    return false;
+  }
+
+  try {
+    const res = await fetch(`${BASE}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Refresh-Token': refreshToken,
+      },
+      body: JSON.stringify({ refreshToken }),
+    });
+
+    if (!res.ok) {
+      clearStoredTokens();
+      return false;
+    }
+
+    const body = await res.json().catch(() => null);
+    const newAccess = body?.accessToken || body?.data?.accessToken;
+    const newRefresh =
+      body?.refreshToken || body?.data?.refreshToken || refreshToken;
+
+    if (newAccess) {
+      setStoredTokens(newAccess, newRefresh);
+      return true;
+    }
+
+    clearStoredTokens();
+    return false;
+  } catch {
+    clearStoredTokens();
+    return false;
+  }
+}
+
+function isAuthBypassPath(path: string): boolean {
+  const p = path.toLowerCase();
+  return (
+    p.includes('/auth/login') ||
+    p.includes('/auth/admin/login') ||
+    p.includes('/auth/refresh') ||
+    p.includes('/auth/logout') ||
+    p.includes('/auth/register') ||
+    p.includes('/auth/forgot-password') ||
+    p.includes('/auth/reset-password')
+  );
+}
+
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
+  isRetry = false,
 ): Promise<ApiResult<T>> {
   let res: Response;
   const token = getStoredToken();
@@ -54,6 +134,18 @@ export async function apiFetch<T>(
       error: (err as Error).message || 'Network error',
       details: null,
     };
+  }
+
+  if (res.status === 401 && !isRetry && !isAuthBypassPath(path)) {
+    if (!refreshPromise) {
+      refreshPromise = performTokenRefresh().finally(() => {
+        refreshPromise = null;
+      });
+    }
+    const refreshed = await refreshPromise;
+    if (refreshed) {
+      return apiFetch<T>(path, init, true);
+    }
   }
 
   const contentType = res.headers.get('content-type') ?? '';

@@ -1,5 +1,5 @@
 """
-Resend email provider — real implementation behind USE_MOCK_INTEGRATIONS=false.
+Resend email provider - real implementation behind USE_MOCK_INTEGRATIONS=false.
 
 When the mock toggle is on (default in dev), this module is never reached;
 `app.integrations.mail.MailService` short-circuits to stdout logging instead.

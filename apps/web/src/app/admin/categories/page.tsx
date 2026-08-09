@@ -143,7 +143,7 @@ export default function CategoriesAdminPage() {
                 </p>
               ) : (
                 <>
-                  {/* Mobile: stacked cards — no horizontal overflow */}
+                  {/* Mobile: stacked cards - no horizontal overflow */}
                   <ul className="space-y-3 sm:hidden">
                     {schemas.map((s) => (
                       <li
@@ -171,7 +171,7 @@ export default function CategoriesAdminPage() {
                           <dd className="min-w-0 truncate text-content-soft">
                             {Array.isArray(s.optionsJson)
                               ? (s.optionsJson as string[]).join(', ')
-                              : '—'}
+                              : '-'}
                           </dd>
                         </dl>
                       </li>
@@ -199,7 +199,7 @@ export default function CategoriesAdminPage() {
                             <td className="max-w-xs truncate py-2 text-xs text-content-soft">
                               {Array.isArray(s.optionsJson)
                                 ? (s.optionsJson as string[]).join(', ')
-                                : '—'}
+                                : '-'}
                             </td>
                             <td className="py-2 text-right">
                               <div className="flex justify-end gap-2">

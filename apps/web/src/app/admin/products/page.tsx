@@ -117,7 +117,7 @@ export default function ProductsAdminPage() {
           <p className="text-sm text-content-soft">No products match.</p>
         ) : (
           <>
-            {/* Mobile: stacked cards — no horizontal overflow */}
+            {/* Mobile: stacked cards - no horizontal overflow */}
             <ul className="space-y-3 sm:hidden">
               {products.map((p) => {
                 const primaryImage = p.images?.[0];

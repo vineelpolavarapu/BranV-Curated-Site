@@ -3,7 +3,7 @@ Admin operational endpoints: analytics, reconciliation, price-sync trigger.
 
 Analytics rollups are computed live for now (Step 8 cron will pre-aggregate
 into analytics_daily_*). Reconciliation accepts the CSV upload and
-idempotently records the payout — full row matching to ClickEvents is a
+idempotently records the payout - full row matching to ClickEvents is a
 follow-up port.
 """
 
@@ -345,9 +345,9 @@ async def recon_upload(
     # source amount is within ±20% (loose tolerance because retailers
     # quote different rounded INR conversions). Falls into one of three
     # buckets per the BranV PRD:
-    #   MATCHED    — exactly one candidate
-    #   AMBIGUOUS  — two or more candidates
-    #   UNMATCHED  — zero candidates
+    #   MATCHED    - exactly one candidate
+    #   AMBIGUOUS  - two or more candidates
+    #   UNMATCHED  - zero candidates
     match_window = timedelta(hours=48)
     amount_tolerance = 0.20
 
@@ -359,7 +359,7 @@ async def recon_upload(
 
     for row in rows:
         row_hash = hashlib.sha256(repr(sorted(row.items())).encode()).hexdigest()
-        # Field name normalization — EarnKaro/Amazon/Meesho use varying headers.
+        # Field name normalization - EarnKaro/Amazon/Meesho use varying headers.
         amount_str = row.get("amount") or row.get("Amount") or row.get("order_value") or "0"
         commission_str = row.get("commission") or row.get("Commission") or row.get("payout") or "0"
         order_id = row.get("order_id") or row.get("OrderId") or row.get("transaction_id")
@@ -470,7 +470,7 @@ price_sync_router = APIRouter(prefix="/admin/price-sync", tags=["admin-price-syn
 
 @price_sync_router.post("/run")
 async def price_sync_run(user: Annotated[AuthenticatedUser, Depends(current_user_required)]) -> dict[str, str]:
-    """Manual trigger — the actual scrape loop lives in app/jobs/scheduler.py.
+    """Manual trigger - the actual scrape loop lives in app/jobs/scheduler.py.
     For now this endpoint just records the request; the scheduler will pick
     up the work on its next tick once the price_sync_nightly body is ported.
     """

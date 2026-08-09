@@ -1,10 +1,10 @@
 """
-Products admin CRUD — port of apps/api/src/products/products.controller.ts.
+Products admin CRUD - port of apps/api/src/products/products.controller.ts.
 
 This batch ships the core CRUD + sub-resource endpoints (images, variants,
 retailer-listings). The Quick Add atomic transaction is intentionally stubbed
 because it depends on the scrape + affiliate-convert integrations which are
-themselves mock-only in this turn — adding it without those would lie about
+themselves mock-only in this turn - adding it without those would lie about
 what works.
 """
 
@@ -340,7 +340,7 @@ async def quick_add(
 ) -> dict[str, Any]:
     """Atomic: brand upsert → product → variants from sizes → primary image →
     retailer listing → affiliate link (Amazon auto-tagged / everything else
-    stored exactly as pasted — the admin brings an already-affiliate-wrapped
+    stored exactly as pasted - the admin brings an already-affiliate-wrapped
     URL from EarnKaro, Meesho, etc.)."""
     from ...db.models import AffiliateLink, Brand
     from ...integrations.amazon import tag_url
@@ -425,7 +425,7 @@ async def quick_add(
     await db.flush()
 
     # 6. Affiliate link. Amazon gets your Associates tag appended
-    # automatically; every other retailer is stored exactly as pasted — the
+    # automatically; every other retailer is stored exactly as pasted - the
     # admin already has the affiliate-wrapped URL from EarnKaro/Meesho/etc.
     if payload.retailer.lower() == "amazon" or "amazon" in payload.rawUrl.lower():
         converted_url = tag_url(payload.rawUrl)

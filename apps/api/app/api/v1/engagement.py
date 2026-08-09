@@ -1,5 +1,5 @@
 """
-Engagement routes — wishlist, wardrobe, reviews, notifications, newsletter.
+Engagement routes - wishlist, wardrobe, reviews, notifications, newsletter.
 
 These domains share a critical pattern: SOME routes are @Public but expect to
 soft-read the access cookie and serve an anonymous-shaped payload when not
@@ -85,7 +85,7 @@ class UpdateWishlistRequest(ApiModel):
 @wishlist_router.get("/me/wishlist/ids")
 async def wishlist_ids(
     db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL — must return [] when anon
+    user=Depends(current_user_optional),  # OPTIONAL - must return [] when anon
 ) -> list[str]:
     if user is None:
         return []
@@ -418,7 +418,7 @@ async def reviews_list(
 async def reviews_me(
     product_id: str,
     db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL — anonymous shape when not signed in
+    user=Depends(current_user_optional),  # OPTIONAL - anonymous shape when not signed in
 ) -> dict[str, Any]:
     if user is None:
         return {"canReview": False, "hasWardrobeItem": False, "ownReview": None}
@@ -520,7 +520,7 @@ async def notifications_list(
 @notifications_router.get("/notifications/unread-count")
 async def notifications_unread_count(
     db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL — {count: 0} when anon
+    user=Depends(current_user_optional),  # OPTIONAL - {count: 0} when anon
 ) -> dict[str, int]:
     if user is None:
         return {"count": 0}
@@ -637,7 +637,7 @@ class TokenRequest(ApiModel):
 async def newsletter_subscribe(
     payload: SubscribeRequest,
     db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL — capture user id if signed in
+    user=Depends(current_user_optional),  # OPTIONAL - capture user id if signed in
 ) -> dict[str, str]:
     email = payload.email.strip().lower()
     existing = (await db.execute(

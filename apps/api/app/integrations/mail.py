@@ -1,5 +1,5 @@
 """
-Mail adapter — mirrors `apps/api/src/mail/mail.service.ts`.
+Mail adapter - mirrors `apps/api/src/mail/mail.service.ts`.
 
 USE_MOCK_INTEGRATIONS=true (default in dev): writes the message body to stdout
 exactly like Nest does, so the verification / reset links can be grabbed from
@@ -7,7 +7,7 @@ the API logs without a real provider.
 
 USE_MOCK_INTEGRATIONS=false (production): sends via the configured provider
 (Resend). If no MAIL_API_KEY is set yet, the message is logged and the call
-returns WITHOUT raising — email must never be a hard dependency of the flows
+returns WITHOUT raising - email must never be a hard dependency of the flows
 that call it (registration, password reset). Callers that need delivery
 guarantees should treat sends as best-effort and surface/retry accordingly.
 """
@@ -57,7 +57,7 @@ class MailService:
         if not s.MAIL_API_KEY:
             # Real integrations are on, but no provider key is configured yet.
             # Log the message (so verification / reset links remain recoverable
-            # from the API logs) and return WITHOUT raising — a missing key must
+            # from the API logs) and return WITHOUT raising - a missing key must
             # not break registration or password-reset.
             log.warning(
                 "mail_no_api_key",
@@ -111,7 +111,7 @@ class MailService:
     async def send_password_reset(self, to: str, link: str, *, totp_will_reset: bool = False) -> None:
         totp_note = (
             "\n\nCompleting this reset will also turn off two-factor authentication "
-            "on your account — you'll need to re-enroll a new authenticator app afterward."
+            "on your account - you'll need to re-enroll a new authenticator app afterward."
             if totp_will_reset
             else ""
         )

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { FormEvent, useState } from 'react';
-import { apiFetch, AuthSummary, setStoredToken } from '@/lib/api';
+import { apiFetch, AuthSummary, setStoredTokens } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
 import {
@@ -34,7 +34,7 @@ export default function AdminLoginPage() {
       return;
     }
     if (result.data?.accessToken) {
-      setStoredToken(result.data.accessToken);
+      setStoredTokens(result.data.accessToken, result.data.refreshToken || null);
     }
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     router.replace('/admin');

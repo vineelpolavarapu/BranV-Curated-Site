@@ -36,7 +36,7 @@ export default async function NewArrivalsPage(props: {
           </div>
           {!list || list.data.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-line bg-surface-muted p-10 text-center text-sm text-content-soft">
-              Nothing new yet — check back soon.
+              Nothing new yet - check back soon.
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">

@@ -1,5 +1,5 @@
 """
-Exception handlers — reproduce NestJS's error-response shapes byte-for-byte.
+Exception handlers - reproduce NestJS's error-response shapes byte-for-byte.
 
 NestJS's `ValidationPipe` (with `whitelist + transform + forbidNonWhitelisted`) and
 default `HttpException` filter both emit `{statusCode, message, error}` payloads:
@@ -35,7 +35,7 @@ def _with_cors(request: Request, response: JSONResponse) -> JSONResponse:
     """Echo the CORS headers onto a response.
 
     Starlette handles bare-``Exception`` (500) responses in its outermost
-    ServerErrorMiddleware, which sits ABOVE CORSMiddleware — so those 500s
+    ServerErrorMiddleware, which sits ABOVE CORSMiddleware - so those 500s
     ship without an ``Access-Control-Allow-Origin`` header and the browser
     masks the real error as an opaque "CORS error". Re-add the header here
     (mirroring the CORS middleware's allow-list) so genuine server errors

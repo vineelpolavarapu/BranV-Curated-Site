@@ -15,7 +15,7 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { slug } = await props.params;
   const edit = await apiServer<EditDetail>(`/edits/${slug}`);
-  if (!edit) return { title: 'BranV — The Edit' };
+  if (!edit) return { title: 'BranV - The Edit' };
   return {
     title: `${edit.title} · The Edit · BranV`,
     description: edit.description ?? 'A curated edit on BranV.',

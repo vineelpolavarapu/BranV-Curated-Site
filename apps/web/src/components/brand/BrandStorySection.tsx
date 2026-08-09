@@ -7,7 +7,7 @@ import { BrandStoryPublic } from '@/lib/phase7-types';
 
 /**
  * Renders a brand story safely. We deliberately do NOT include `rehype-raw`
- * here — that means any inline HTML in the markdown is stripped by react-
+ * here - that means any inline HTML in the markdown is stripped by react-
  * markdown's default sanitizing pipeline, so even an admin pasting `<script>`
  * into the body can't inject anything onto the public brand page.
  */

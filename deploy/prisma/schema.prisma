@@ -1,4 +1,4 @@
-// BranV — Prisma schema
+// BranV - Prisma schema
 // Phase 1: Identity. Phase 2: Brands, Categories, Products, Variants, Images,
 // Retailer Listings, Attribute Schemas, Avatars.
 
@@ -11,7 +11,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ──────────────────────────── PHASE 1 — IDENTITY ────────────────────────────
+// ──────────────────────────── PHASE 1 - IDENTITY ────────────────────────────
 
 enum UserRole {
   MEMBER
@@ -138,7 +138,7 @@ model AuditLog {
   @@map("audit_logs")
 }
 
-// ──────────────────────────── PHASE 2 — CATALOG ────────────────────────────
+// ──────────────────────────── PHASE 2 - CATALOG ────────────────────────────
 
 enum BrandStatus {
   ACTIVE
@@ -191,7 +191,7 @@ model Category {
   children     Category[] @relation("Subcategories")
   slug         String     @unique
   name         String
-  /// Denormalized path, e.g. "clothing/shirts" — fast lookup, easy breadcrumbs.
+  /// Denormalized path, e.g. "clothing/shirts" - fast lookup, easy breadcrumbs.
   path         String     @unique
   displayOrder Int        @default(0)
   createdAt    DateTime   @default(now())
@@ -244,11 +244,11 @@ model Product {
   metaDescription    String?
   tags               String[]      @default([])
   archivedAt         DateTime?
-  /// Denormalized review aggregates — maintained by ReviewsService on
+  /// Denormalized review aggregates - maintained by ReviewsService on
   /// create / moderate so storefront sort + filter stay cheap.
   avgRating          Decimal?      @db.Decimal(3, 2)
   reviewCount        Int           @default(0)
-  /// When set and > now(), the product is "featured" — sorted to the front
+  /// When set and > now(), the product is "featured" - sorted to the front
   /// of its category section on the home page and shown with a Featured
   /// badge. Cleared (or simply ignored) once the timestamp has passed.
   featuredUntil      DateTime?
@@ -357,7 +357,7 @@ model AffiliateLink {
   @@map("affiliate_links")
 }
 
-// ──────────────────────── PHASE 5 — CLICK-OUT FLOW ────────────────────────
+// ──────────────────────── PHASE 5 - CLICK-OUT FLOW ────────────────────────
 
 enum ClickReportOutcome {
   PURCHASED
@@ -474,7 +474,7 @@ model Avatar {
   @@map("avatars")
 }
 
-// ──────────────────────── PHASE 6 — ARTICLES ────────────────────────
+// ──────────────────────── PHASE 6 - ARTICLES ────────────────────────
 
 enum ArticleStatus {
   DRAFT
@@ -527,7 +527,7 @@ model ArticleProduct {
   @@map("article_products")
 }
 
-// ───────── PHASE 7 — LOOKBOOKS / EDITS / BANNERS / BRAND STORIES ─────────
+// ───────── PHASE 7 - LOOKBOOKS / EDITS / BANNERS / BRAND STORIES ─────────
 
 enum LookbookStatus {
   DRAFT
@@ -654,7 +654,7 @@ model BrandStory {
   brand     Brand            @relation(fields: [brandId], references: [id], onDelete: Cascade)
   heroUrl   String?
   /// Markdown body. Rendered with rehype-sanitize on the storefront so raw
-  /// HTML is stripped — XSS-safe even when admin pastes untrusted content.
+  /// HTML is stripped - XSS-safe even when admin pastes untrusted content.
   bodyMd    String           @default("")
   status    BrandStoryStatus @default(DRAFT)
   createdAt DateTime         @default(now())
@@ -663,7 +663,7 @@ model BrandStory {
   @@map("brand_stories")
 }
 
-// ───────── PHASE 8 — REVIEWS / NEWSLETTER / NOTIFICATIONS ─────────
+// ───────── PHASE 8 - REVIEWS / NEWSLETTER / NOTIFICATIONS ─────────
 
 enum ReviewStatus {
   PUBLISHED
@@ -679,7 +679,7 @@ model Review {
   rating           Int
   title            String?
   body             String?
-  /// Optional gallery — array of S3 URLs uploaded via /uploads/presign.
+  /// Optional gallery - array of S3 URLs uploaded via /uploads/presign.
   imagesJson       Json?
   status           ReviewStatus @default(PUBLISHED)
   moderationReason String?
@@ -802,19 +802,19 @@ model NotificationOutbox {
   @@map("notification_outbox")
 }
 
-// ───────── PHASE 9 — AFFILIATE PAYOUTS / RECONCILIATION ─────────
+// ───────── PHASE 9 - AFFILIATE PAYOUTS / RECONCILIATION ─────────
 
 enum AffiliatePayoutItemStatus {
   /// Matched to exactly one click_events row.
   MATCHED
   /// No click_events candidate within the window/amount band.
   UNMATCHED
-  /// Multiple candidates within window — admin reviews manually.
+  /// Multiple candidates within window - admin reviews manually.
   AMBIGUOUS
 }
 
 /// One row per uploaded CSV file. `csvHash` is sha256 of the file bytes so
-/// re-uploading the same export is a no-op (BUILD_GUIDE §9.1 step 3 — idempotent).
+/// re-uploading the same export is a no-op (BUILD_GUIDE §9.1 step 3 - idempotent).
 model AffiliatePayout {
   id                    String           @id @default(cuid())
   partner               AffiliatePartner
@@ -851,7 +851,7 @@ model AffiliatePayoutItem {
   commissionInr       Decimal?                  @db.Decimal(14, 2)
   occurredAt          DateTime?
   status              AffiliatePayoutItemStatus @default(UNMATCHED)
-  /// Sha256 of the normalized row contents — dedupe within a single payout.
+  /// Sha256 of the normalized row contents - dedupe within a single payout.
   rowHash             String
   /// Verbatim CSV row, for admin debugging.
   rawRow              Json?
@@ -863,7 +863,7 @@ model AffiliatePayoutItem {
   @@map("affiliate_payout_items")
 }
 
-// ───────── PHASE 10 — PLATFORM SETTINGS ─────────
+// ───────── PHASE 10 - PLATFORM SETTINGS ─────────
 
 /// Key-value store for runtime-tunable settings (sync thresholds, feature
 /// flags, default currency). Reads are cached in-process for ~30s by
@@ -879,7 +879,7 @@ model PlatformSetting {
   @@map("platform_settings")
 }
 
-// ───────── PHASE 10 — ANALYTICS ROLLUPS ─────────
+// ───────── PHASE 10 - ANALYTICS ROLLUPS ─────────
 //
 // Hourly worker (AnalyticsRollupService) aggregates raw click_events,
 // self_reported_conversions, and affiliate_payout_items into these summary

@@ -1,5 +1,5 @@
 """
-Cross-cutting security primitives — port of `apps/api/src/auth/{password,token,two-factor}.service.ts`
+Cross-cutting security primitives - port of `apps/api/src/auth/{password,token,two-factor}.service.ts`
 plus the cookie helpers from `apps/api/src/auth/auth.controller.ts`.
 
 Exact parity rules (do not change without re-running the parity suite):
@@ -36,7 +36,7 @@ from .settings import get_settings
 ACCESS_COOKIE = "branv_access"
 REFRESH_COOKIE = "branv_refresh"
 
-# Argon2id parameters — match apps/api/src/auth/password.service.ts exactly.
+# Argon2id parameters - match apps/api/src/auth/password.service.ts exactly.
 _PASSWORD_HASHER = PasswordHasher(
     time_cost=2,
     memory_cost=19 * 1024,
@@ -237,7 +237,7 @@ def payload_to_authenticated_user(p: AccessTokenPayload) -> AuthenticatedUser:
 
 
 def mint_refresh_token() -> str:
-    """48 bytes of entropy, base64url — matches Node's randomBytes(48).toString('base64url')."""
+    """48 bytes of entropy, base64url - matches Node's randomBytes(48).toString('base64url')."""
     return secrets.token_urlsafe(48)
 
 
@@ -250,7 +250,7 @@ def hash_refresh_token(token: str) -> str:
 
 
 def generate_totp_secret() -> str:
-    """Base32 secret (length 32) — same algorithm as otplib.authenticator.generateSecret()."""
+    """Base32 secret (length 32) - same algorithm as otplib.authenticator.generateSecret()."""
     return pyotp.random_base32()
 
 
@@ -270,7 +270,7 @@ def verify_totp(code: str, secret: str) -> bool:
     """
     try:
         return pyotp.TOTP(secret).verify(code, valid_window=3)
-    except Exception:  # noqa: BLE001 — same defensive catch Nest does
+    except Exception:  # noqa: BLE001 - same defensive catch Nest does
         return False
 
 
@@ -322,7 +322,7 @@ def clear_auth_cookies(response: Response) -> None:
     """
     Nest calls `res.clearCookie(name, opts)` which emits the cookie with
     Max-Age=0 and the original attributes (sans Max-Age). FastAPI's
-    delete_cookie does the same — set path/domain so the browser actually
+    delete_cookie does the same - set path/domain so the browser actually
     matches and evicts the right cookie.
     """
     s = get_settings()
@@ -337,10 +337,10 @@ def clear_auth_cookies(response: Response) -> None:
 
 
 def extract_access_token(cookies: dict[str, str], authorization_header: str | None) -> str | None:
-    """Cookie wins, then `Authorization: Bearer …`. Matches JwtAuthGuard.extractToken."""
+    """Authorization: Bearer token wins (LocalStorage/Memory strategy), then cookie fallback."""
+    if authorization_header and authorization_header.startswith("Bearer "):
+        return authorization_header[len("Bearer "):]
     from_cookie = cookies.get(ACCESS_COOKIE)
     if from_cookie:
         return from_cookie
-    if authorization_header and authorization_header.startswith("Bearer "):
-        return authorization_header[len("Bearer "):]
     return None

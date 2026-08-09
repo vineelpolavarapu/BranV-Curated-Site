@@ -3,7 +3,7 @@ Retailer scraping. Returns canned data when USE_MOCK_INTEGRATIONS=true,
 otherwise hits the live retailer and parses with selectolax.
 
 Supported real-scrape retailers: amazon, flipkart, myntra, ajio, generic.
-Unsupported ones fall back to a generic OpenGraph + JSON-LD parse — works
+Unsupported ones fall back to a generic OpenGraph + JSON-LD parse - works
 for most modern retailer sites that follow schema.org/Product.
 """
 
@@ -106,7 +106,7 @@ def _parse_amazon(tree: HTMLParser) -> ScrapedProduct:
 
 
 def _parse_flipkart(tree: HTMLParser) -> ScrapedProduct:
-    # Flipkart has aggressive class scrambling — prefer JSON-LD + role-based selectors.
+    # Flipkart has aggressive class scrambling - prefer JSON-LD + role-based selectors.
     title_node = tree.css_first("span.B_NuCI, h1._6EBuvT span, h1 span")
     title = title_node.text(strip=True) if title_node else ""
     price_node = tree.css_first("div._30jeq3, div.Nx9bqj, div._16Jk6d")
@@ -147,7 +147,7 @@ def _parse_ajio(tree: HTMLParser) -> ScrapedProduct:
 
 
 def _parse_generic(tree: HTMLParser, retailer: str) -> ScrapedProduct:
-    """Schema.org/Product JSON-LD parser — works for many modern retailer sites."""
+    """Schema.org/Product JSON-LD parser - works for many modern retailer sites."""
     title: str = ""
     price: float | None = None
     mrp: float | None = None
@@ -228,5 +228,5 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
         return parser(tree)
     except Exception as e:  # noqa: BLE001
         log.warning("retailer_parser_failed", retailer=retailer, error=str(e), url=url)
-        # Fall back to generic — better some data than none.
+        # Fall back to generic - better some data than none.
         return _parse_generic(tree, retailer)

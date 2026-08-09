@@ -21,7 +21,7 @@ UploadKindLiteral = Literal[
 
 
 class PresignUploadRequest(ApiModel):
-    # Image MIME types only — same regex Nest enforces.
+    # Image MIME types only - same regex Nest enforces.
     contentType: str = Field(pattern=r"^image/(png|jpeg|jpg|webp|avif|gif)$")
     # Alphanumeric + dot, hyphen, underscore, space. Max 120 chars.
     filename: str = Field(max_length=120, pattern=r"^[\w.\- ]+$")

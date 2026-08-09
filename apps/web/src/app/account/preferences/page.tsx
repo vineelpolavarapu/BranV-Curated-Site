@@ -10,7 +10,7 @@ import {
 } from '@/lib/phase8-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 
-// Member-facing types only — admin-only types are filtered out.
+// Member-facing types only - admin-only types are filtered out.
 const TYPES: Array<{ key: NotificationType; label: string }> = [
   { key: 'WELCOME', label: 'Welcome & onboarding' },
   { key: 'WISHLIST_PRICE_DROP', label: 'Price drops on wishlist items' },

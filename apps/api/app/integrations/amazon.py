@@ -1,4 +1,4 @@
-"""Amazon Associates tag injection. No API call — just appends ?tag=AMAZON_ASSOCIATES_TAG."""
+"""Amazon Associates tag injection. No API call - just appends ?tag=AMAZON_ASSOCIATES_TAG."""
 
 from __future__ import annotations
 

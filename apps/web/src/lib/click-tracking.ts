@@ -46,7 +46,7 @@ export function resolveRetailerLabel(
 }
 
 /**
- * Records the user's "Did you buy this?" answer. Fire-and-forget — analytics
+ * Records the user's "Did you buy this?" answer. Fire-and-forget - analytics
  * shouldn't block the celebration flow if the network blips.
  */
 export async function reportClickOutcome(
@@ -64,6 +64,6 @@ export async function reportClickOutcome(
       keepalive: true,
     });
   } catch {
-    // swallow — non-essential
+    // swallow - non-essential
   }
 }

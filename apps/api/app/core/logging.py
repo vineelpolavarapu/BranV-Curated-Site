@@ -1,5 +1,5 @@
 """
-structlog configuration — mirrors NestJS's pino setup:
+structlog configuration - mirrors NestJS's pino setup:
   - JSON output in production, pretty console in dev
   - Redacts `authorization` and `cookie` headers
   - Binds the per-request correlation id (set by CorrelationIdMiddleware) into every event

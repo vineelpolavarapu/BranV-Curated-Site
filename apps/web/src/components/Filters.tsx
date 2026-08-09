@@ -219,7 +219,7 @@ function PriceFilter() {
           onChange={(e) => set('minPrice', e.target.value || undefined)}
           className="w-20 rounded border border-line bg-surface px-2 py-1 text-sm text-content"
         />
-        <span className="text-content-muted">—</span>
+        <span className="text-content-muted">-</span>
         <input
           type="number"
           placeholder="Max"

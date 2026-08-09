@@ -1,4 +1,4 @@
-"""Auto-generated. Do not edit — re-run scripts/generate_sa_models.py."""
+"""Auto-generated. Do not edit - re-run scripts/generate_sa_models.py."""
 from .base import Base
 
 from .user import User

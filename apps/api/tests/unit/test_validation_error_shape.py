@@ -20,7 +20,7 @@ def test_validation_error_shape_matches_nest_validationpipe():
     register_exception_handlers(app)
 
     @app.post("/test/register")
-    def register(body: _RegisterPayload):  # noqa: ARG001 — validation alone
+    def register(body: _RegisterPayload):  # noqa: ARG001 - validation alone
         return {"ok": True}
 
     client = TestClient(app)

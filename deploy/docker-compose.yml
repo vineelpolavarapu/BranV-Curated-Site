@@ -9,11 +9,11 @@
 #   /opt/branv/deploy/prisma/          <- Prisma schema + migrations (read-only)
 #                                         used by the one-shot `migrate` service
 #
-# The FastAPI image is PULLED from GHCR — we never build on the VM because the
+# The FastAPI image is PULLED from GHCR - we never build on the VM because the
 # 1 GB RAM ceiling is too tight even for the Python build.
 #
 # First deploy (from your laptop, in the repo root):
-#   # 1. Build the FastAPI image — context MUST be apps/api/ (where pyproject.toml lives)
+#   # 1. Build the FastAPI image - context MUST be apps/api/ (where pyproject.toml lives)
 #   docker build -t ghcr.io/vineelpolavarapu/branv-api:latest apps/api
 #   docker push ghcr.io/vineelpolavarapu/branv-api:latest
 #
@@ -53,11 +53,11 @@ services:
 
   # One-shot Prisma migrator. Runs `prisma migrate deploy` against the live
   # Postgres, then exits. Mounts the prisma/ folder shipped in deploy/.
-  # The FastAPI app does not own the schema — Prisma still owns it (the Python
+  # The FastAPI app does not own the schema - Prisma still owns it (the Python
   # SQLAlchemy models are read-only auto-generated views of the Prisma schema).
   migrate:
     # node:20-alpine (musl libc) lacks the OpenSSL variant Prisma's schema
-    # engine binary needs — it crashes on startup and its error text gets fed
+    # engine binary needs - it crashes on startup and its error text gets fed
     # into the JSON parser instead of a real response ("Could not parse
     # schema engine response... 'Error load'... is not valid JSON"). Use
     # bullseye-slim (glibc) and install openssl/ca-certificates explicitly.

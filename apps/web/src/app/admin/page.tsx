@@ -183,7 +183,7 @@ export default function AdminDashboardPage() {
           </h2>
           {lowConversionProducts.length === 0 ? (
             <p className="text-sm text-content-soft">
-              Nothing flagged — every clicked product has at least one self-reported buy.
+              Nothing flagged - every clicked product has at least one self-reported buy.
             </p>
           ) : (
             <ul className="space-y-1.5 text-sm">

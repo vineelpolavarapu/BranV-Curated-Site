@@ -207,7 +207,7 @@ Native Next.js App Router streaming fallbacks (`loading.tsx`) were established f
 1. **Schema Parity Check**:
    ```bash
    pnpm py:schema-check
-   # Output: [schema-check] PARITY OK — 40 tables match
+   # Output: [schema-check] PARITY OK - 40 tables match
    ```
 
 2. **Backend Unit Test Suite**:

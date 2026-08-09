@@ -7,7 +7,7 @@
      (design-tokens.css §4). Cards/sections opt into white via `bg-surface`. */
   --background: rgb(var(--color-canvas));
   --foreground: rgb(var(--color-ink));
-  /* Force light mode — the site has no dark-mode design.
+  /* Force light mode - the site has no dark-mode design.
      Without this, mobile devices in dark mode flip --foreground to white,
      making text invisible on white backgrounds. */
   color-scheme: light;
@@ -58,14 +58,14 @@ textarea {
   font-size: max(16px, 1em);
 }
 
-/* Hero carousel grab cursor — open hand on hover, closed fist when the
+/* Hero carousel grab cursor - open hand on hover, closed fist when the
    user presses the mouse button (:active fires on mousedown and clears on
-   mouseup). Native OS grab/grabbing cursors — no custom .cur asset (there
+   mouseup). Native OS grab/grabbing cursors - no custom .cur asset (there
    isn't one shipped in /public/cursors), which used to 404 twice per page
    load for zero visual gain since the fallback rendered identically anyway.
 
    The cursor is also forced onto every non-interactive descendant inside
-   .hero-grab so it shows over the slide image and gradient overlay — those
+   .hero-grab so it shows over the slide image and gradient overlay - those
    elements otherwise break cursor inheritance and fall back to the OS-native
    cursor. <a> and <button> are excluded so the CTA + dots keep `pointer`. */
 .hero-grab,
@@ -135,6 +135,16 @@ textarea {
 .bv-delay-6 { animation-delay: 360ms; }
 .bv-delay-7 { animation-delay: 420ms; }
 
+.skip-animation,
+.skip-animation *,
+.in-view.skip-animation .bv-enter,
+.in-view.skip-animation .bv-enter-fade {
+  animation: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 /* ── Hero slide text stagger ────────────────────────────────────────────── */
 
 .hero-slide-text > * {
@@ -144,7 +154,7 @@ textarea {
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   animation-fill-mode: both;
 }
-/* Changing animation-name from none → bv-fade-up is a native CSS restart —
+/* Changing animation-name from none → bv-fade-up is a native CSS restart -
    fires exactly once each time the slide becomes active, during the slide. */
 .hero-slide-active.hero-slide-text > *:nth-child(1) { animation-name: bv-fade-up; animation-delay:   0ms; }
 .hero-slide-active.hero-slide-text > *:nth-child(2) { animation-name: bv-fade-up; animation-delay:  80ms; }
@@ -171,14 +181,14 @@ textarea {
   to   { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* Logo — first to appear */
+/* Logo - first to appear */
 .bv-nav-logo {
   opacity: 0;
   animation: bv-nav-down 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 0ms;
 }
 
-/* Nav items — stagger left to right, each direct child of the <nav> */
+/* Nav items - stagger left to right, each direct child of the <nav> */
 .bv-nav-links > * {
   opacity: 0;
   animation: bv-nav-down 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -188,14 +198,14 @@ textarea {
 .bv-nav-links > *:nth-child(3) { animation-delay: 180ms; }
 .bv-nav-links > *:nth-child(4) { animation-delay: 230ms; }
 
-/* Search + account — appear after nav */
+/* Search + account - appear after nav */
 .bv-nav-actions {
   opacity: 0;
   animation: bv-nav-down 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: 160ms;
 }
 
-/* Underline slides in from left on hover — uses currentColor so it works on
+/* Underline slides in from left on hover - uses currentColor so it works on
    both the white overlay navbar and the dark sticky navbar automatically. */
 .bv-nav-link {
   position: relative;
@@ -222,7 +232,7 @@ textarea {
    BASE  = exit state  (fast ease-in, short top-to-bottom stagger)
    HOVER = enter state (slow ease-out, long top-to-bottom stagger)
    Higher specificity of .group:hover rule overrides base on enter,
-   base reclaims on exit — giving independent enter/exit behaviour. */
+   base reclaims on exit - giving independent enter/exit behaviour. */
 
 .bv-dropdown-item {
   opacity: 0;
@@ -272,7 +282,7 @@ textarea {
   transform: translate3d(-8px, 0, 0);
   transition: opacity 0.14s ease-in, transform 0.14s ease-in;
 }
-/* Exit stagger: top item first, 12 ms apart — all done within ~150 ms */
+/* Exit stagger: top item first, 12 ms apart - all done within ~150 ms */
 .bv-flyout-item:nth-child(1) { transition-delay:  0ms; }
 .bv-flyout-item:nth-child(2) { transition-delay: 12ms; }
 .bv-flyout-item:nth-child(3) { transition-delay: 24ms; }

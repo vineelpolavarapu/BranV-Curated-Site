@@ -1,4 +1,4 @@
-# BranV API — Python / FastAPI
+# BranV API - Python / FastAPI
 
 Python port of `apps/api` (NestJS). See [../../NESTJS_TO_FASTAPI_MIGRATION_PLAN.md](../../NESTJS_TO_FASTAPI_MIGRATION_PLAN.md) for the full migration playbook.
 
@@ -19,11 +19,11 @@ curl -i http://localhost:5000/api/ready
 
 ## Env vars
 
-Reads `.env` at the repo root (same file NestJS uses). No renames — all `apps/api` env names work as-is. The only new vars introduced by the Python service:
+Reads `.env` at the repo root (same file NestJS uses). No renames - all `apps/api` env names work as-is. The only new vars introduced by the Python service:
 
-- `SCHEDULER_OWNER` — `fastapi` | `nest` | `none` (default `none`). Belt-and-braces gate so schedulers do not double-fire during the dev parallel-run period.
-- `PY_LOG_LEVEL` — `debug` | `info` | `warning` | `error` (default `info`).
-- `API_INTERNAL_PORT` — defaults to 5000 (Nest uses 4000 via `API_PORT`).
+- `SCHEDULER_OWNER` - `fastapi` | `nest` | `none` (default `none`). Belt-and-braces gate so schedulers do not double-fire during the dev parallel-run period.
+- `PY_LOG_LEVEL` - `debug` | `info` | `warning` | `error` (default `info`).
+- `API_INTERNAL_PORT` - defaults to 5000 (Nest uses 4000 via `API_PORT`).
 
 ## Layout
 

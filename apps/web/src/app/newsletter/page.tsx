@@ -24,7 +24,7 @@ export default function NewsletterPage() {
           <NewsletterSignup source="page" variant="page" />
         </div>
         <p className="mt-6 text-xs text-content-soft">
-          We use double opt-in — you&apos;ll get a confirmation link before
+          We use double opt-in - you&apos;ll get a confirmation link before
           we add you to the list.
         </p>
       </section>

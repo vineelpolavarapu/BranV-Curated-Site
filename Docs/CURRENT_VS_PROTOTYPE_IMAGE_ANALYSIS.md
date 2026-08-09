@@ -37,7 +37,7 @@ We guarantee **100% Preservation** of all existing taxonomy from your screenshot
 6. **Watches** & Accessories
 
 ### Universal Filters Preserved:
-* **PRICE Range**: `Min` input — `Max` input
+* **PRICE Range**: `Min` input - `Max` input
 * **DISCOUNT Filters**: `10%+`, `20%+`, `30%+`, `50%+`
 * **BRAND Multi-Select**: `NIKE`, `Unbranded`, `denim`, etc.
 * **RETAILER Filter**: `Amazon`, `Myntra`, `Ajio`, `Flipkart`
@@ -51,18 +51,18 @@ We guarantee **100% Preservation** of all existing taxonomy from your screenshot
 All design mockups in `prototype/desktop/` and `prototype/mobile/` are strictly synchronized with your screenshots:
 
 ### 📁 `prototype/desktop/` (16:9 Aspect Ratio)
-- **`homepage.jpg`** — Aligned with `desktop-banner.png` (Horizontal widescreen banner, `Sports Wear` hero slide, top nav, search, trust badges).
-- **`category_catalog.jpg`** — Aligned with `desktop- category page.png` (Shirts category, subcategory chips `Half Sleeves`, `Full Sleeves`, etc., left filter sidebar, 4-col product grid).
-- **`product_detail.jpg`** — Aligned with `desktop- each product .png` (PDP layout, `DEELMO Linen Shirt`, `Buy on Amazon ↗` affiliate CTA, `Where to buy` card block, reviews).
-- **`user_account.jpg`** — Aligned with `desktop-user profile.png` (`Vineel Kumar Polavarapu`, `VP` avatar, 4 action cards `Wishlist`, `My Wardrobe`, `Notifications`, `Preferences`, `Recently viewed`, `Support`).
-- **`admin_dashboard.jpg`** — Admin control console (`/admin`).
+- **`homepage.jpg`** - Aligned with `desktop-banner.png` (Horizontal widescreen banner, `Sports Wear` hero slide, top nav, search, trust badges).
+- **`category_catalog.jpg`** - Aligned with `desktop- category page.png` (Shirts category, subcategory chips `Half Sleeves`, `Full Sleeves`, etc., left filter sidebar, 4-col product grid).
+- **`product_detail.jpg`** - Aligned with `desktop- each product .png` (PDP layout, `DEELMO Linen Shirt`, `Buy on Amazon ↗` affiliate CTA, `Where to buy` card block, reviews).
+- **`user_account.jpg`** - Aligned with `desktop-user profile.png` (`Vineel Kumar Polavarapu`, `VP` avatar, 4 action cards `Wishlist`, `My Wardrobe`, `Notifications`, `Preferences`, `Recently viewed`, `Support`).
+- **`admin_dashboard.jpg`** - Admin control console (`/admin`).
 
 ### 📁 `prototype/mobile/` (9:16 Aspect Ratio)
-- **`homepage.jpg`** — Aligned with `mobile-banner.png` (Sticky top header with badges, 48px search pill, vertical 9:16 portrait `Trendy Wear` hero banner, 62px circular category strip, 5-tab bottom bar).
-- **`category_catalog.jpg`** — Aligned with `mobile-categories.png` (Heading `Shop`, 2-column category grid cards, custom SVG icons, 5-tab bottom bar).
-- **`product_detail.jpg`** — Aligned with `desktop- each product .png` adapted for mobile (Full-width `Buy on Amazon ↗` affiliate CTA button, `Where to buy` card list, bottom bar).
-- **`user_account.jpg`** — Aligned with `mobile-user profile.png` (`VP` avatar, `Vineel Kumar Polavarapu`, 2x2 grid of action cards, bottom navigation bar).
-- **`user_login.jpg`** — Aligned with `mobile- user login.png` (`Sign in` card, email/password inputs, `Forgot password?`, `Invalid credentials` error state, `Sign in` button, `Create an account` link).
+- **`homepage.jpg`** - Aligned with `mobile-banner.png` (Sticky top header with badges, 48px search pill, vertical 9:16 portrait `Trendy Wear` hero banner, 62px circular category strip, 5-tab bottom bar).
+- **`category_catalog.jpg`** - Aligned with `mobile-categories.png` (Heading `Shop`, 2-column category grid cards, custom SVG icons, 5-tab bottom bar).
+- **`product_detail.jpg`** - Aligned with `desktop- each product .png` adapted for mobile (Full-width `Buy on Amazon ↗` affiliate CTA button, `Where to buy` card list, bottom bar).
+- **`user_account.jpg`** - Aligned with `mobile-user profile.png` (`VP` avatar, `Vineel Kumar Polavarapu`, 2x2 grid of action cards, bottom navigation bar).
+- **`user_login.jpg`** - Aligned with `mobile- user login.png` (`Sign in` card, email/password inputs, `Forgot password?`, `Invalid credentials` error state, `Sign in` button, `Create an account` link).
 
 ---
 

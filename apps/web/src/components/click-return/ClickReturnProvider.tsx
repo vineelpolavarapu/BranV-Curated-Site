@@ -52,7 +52,7 @@ export function ClickReturnProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const startTracking = useCallback((click: PendingClick) => {
-    // Replace any previous pending click — only the most recent Buy Now matters.
+    // Replace any previous pending click - only the most recent Buy Now matters.
     clearAll();
     pendingRef.current = click;
   }, [clearAll]);
@@ -121,7 +121,7 @@ export function ClickReturnProvider({ children }: { children: ReactNode }) {
 export function useClickReturn(): ClickReturnContextValue {
   const ctx = useContext(ClickReturnContext);
   if (!ctx) {
-    // Outside the provider tree — return a no-op so a stray BuyNowButton
+    // Outside the provider tree - return a no-op so a stray BuyNowButton
     // doesn't crash (e.g. on the admin shell which doesn't mount this).
     return { startTracking: () => {} };
   }

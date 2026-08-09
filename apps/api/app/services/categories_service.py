@@ -1,4 +1,4 @@
-"""Categories — flat list, slug lookup, attribute-schema CRUD per category."""
+"""Categories - flat list, slug lookup, attribute-schema CRUD per category."""
 
 from __future__ import annotations
 

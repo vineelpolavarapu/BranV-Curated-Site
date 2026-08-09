@@ -1,5 +1,5 @@
 """
-Pydantic schemas for /api/auth/* — mirrors `apps/api/src/auth/dto/auth.dto.ts`.
+Pydantic schemas for /api/auth/* - mirrors `apps/api/src/auth/dto/auth.dto.ts`.
 
 Validator parity table:
     @IsEmail          → EmailStr
@@ -61,6 +61,14 @@ class TwoFactorDisableRequest(ApiModel):
     code: str = Field(min_length=6, max_length=6)
 
 
+class RefreshRequest(ApiModel):
+    refreshToken: str | None = Field(default=None)
+
+
+class LogoutRequest(ApiModel):
+    refreshToken: str | None = Field(default=None)
+
+
 # ───────────── responses ─────────────────────────────────────────────────────
 
 
@@ -89,7 +97,7 @@ class TwoFactorSetupResponse(ApiModel):
 
 
 class MeProfile(ApiModel):
-    # Matches the raw `member_profiles` row shape Nest serializes via Prisma —
+    # Matches the raw `member_profiles` row shape Nest serializes via Prisma -
     # the captured fixture includes id, userId, dob, createdAt, updatedAt.
     id: str
     userId: str

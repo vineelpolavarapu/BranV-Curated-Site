@@ -1,7 +1,7 @@
 [project]
 name = "branv-api-py"
 version = "0.1.0"
-description = "BranV API — Python / FastAPI port of apps/api (NestJS). See ../../NESTJS_TO_FASTAPI_MIGRATION_PLAN.md."
+description = "BranV API - Python / FastAPI port of apps/api (NestJS). See ../../NESTJS_TO_FASTAPI_MIGRATION_PLAN.md."
 readme = "README.md"
 requires-python = ">=3.11"
 
@@ -11,7 +11,7 @@ dependencies = [
     "uvicorn[standard]>=0.32,<0.40",
     "pydantic>=2.9,<3",
     "pydantic-settings>=2.5,<3",
-    # Database — Prisma owns the schema; SQLAlchemy reads it.
+    # Database - Prisma owns the schema; SQLAlchemy reads it.
     "sqlalchemy[asyncio]>=2.0.36,<2.1",
     "asyncpg>=0.30,<0.31",
     "greenlet>=3.1",
@@ -22,13 +22,13 @@ dependencies = [
     "qrcode[pil]>=8.0,<9",
     # HTTP out
     "httpx>=0.28,<0.29",
-    # S3 — aioboto3 for async I/O, boto3 only for presign (CPU-bound).
+    # S3 - aioboto3 for async I/O, boto3 only for presign (CPU-bound).
     "aioboto3>=13.2,<14",
     "boto3>=1.35,<2",
-    # Scraping — port cheerio selectors verbatim.
+    # Scraping - port cheerio selectors verbatim.
     "selectolax>=0.3.27,<0.4",
     "beautifulsoup4>=4.12,<5",
-    # Scheduling — APScheduler async + PG advisory locks per playbook §8.
+    # Scheduling - APScheduler async + PG advisory locks per playbook §8.
     "apscheduler>=3.10,<4",
     # Logging
     "structlog>=24.4,<25",

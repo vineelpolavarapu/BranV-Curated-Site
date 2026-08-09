@@ -1,5 +1,5 @@
 """
-GET /api/admin/audit — admin-only paginated audit-log listing with filters.
+GET /api/admin/audit - admin-only paginated audit-log listing with filters.
 
 Mirrors apps/api/src/audit/audit.controller.ts.
 """

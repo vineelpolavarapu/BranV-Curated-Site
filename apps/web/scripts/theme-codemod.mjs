@@ -20,7 +20,7 @@ import { dirname } from 'node:path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SRC = join(__dirname, '..', 'src');
 
-// Ordered — earlier entries run first.
+// Ordered - earlier entries run first.
 const RULES = [
   // compound state prefixes first
   ['hover:text-neutral-950', 'hover:text-primary'],
@@ -68,7 +68,7 @@ const RULES = [
 ];
 
 const EXTS = new Set(['.tsx', '.ts']);
-// Files that own intentional non-token values — skip.
+// Files that own intentional non-token values - skip.
 const SKIP = new Set(['design-tokens.css']);
 // Admin surfaces are handled deliberately in P6 (utilitarian, not auto-blued).
 const SKIP_PATH = /[\\/](admin|AdminShell|QuickAddModal|BrandFormModal|ProductPicker|MultiProductPicker|ArticleEditor|EditEditor|LookbookEditor|MiniBarChart)/i;
@@ -85,7 +85,7 @@ function walk(dir, files = []) {
 let changed = 0;
 for (const file of walk(SRC)) {
   if (SKIP.has(file.split(/[\\/]/).pop())) continue;
-  // P6: admin now included (light shell — blue primaries are on-theme). Keep
+  // P6: admin now included (light shell - blue primaries are on-theme). Keep
   // SKIP_PATH available but disabled so the sweep reaches every surface.
   void SKIP_PATH;
   let text = readFileSync(file, 'utf8');

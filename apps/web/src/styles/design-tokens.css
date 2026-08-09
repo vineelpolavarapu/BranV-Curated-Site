@@ -1,18 +1,18 @@
 /* ─────────────────────────────────────────────────────────────────────────
-   BranV Design Tokens — "Confident Blue" theme
+   BranV Design Tokens - "Confident Blue" theme
    Source of truth: THEME_REDESIGN_PLAN.md §3 (token architecture) + §4 (palette).
 
    Layer 1 = primitive scales (raw hues, 50→950).
    Layer 2 = semantic tokens (what components reference via Tailwind utilities).
 
-   NOTE: Introducing these variables changes NOTHING visually on its own — existing
+   NOTE: Introducing these variables changes NOTHING visually on its own - existing
    components still use their current classes until they are migrated per phase (§9).
    ───────────────────────────────────────────────────────────────────────── */
 
 :root {
   /* ── Layer 1: Primitives ────────────────────────────────────────────────── */
 
-  /* Primary — royal blue (#1D4ED8 = 700), from reference */
+  /* Primary - royal blue (#1D4ED8 = 700), from reference */
   --primary-50:  #eff6ff;
   --primary-100: #dbeafe;
   --primary-200: #bfdbfe;
@@ -25,7 +25,7 @@
   --primary-900: #1e3a8a;
   --primary-950: #172554;
 
-  /* Accent — coral (#FF5A4D), urgency: sale/new/badges/cart count */
+  /* Accent - coral (#FF5A4D), urgency: sale/new/badges/cart count */
   --accent-50:  #fff1f0;
   --accent-100: #ffe2df;
   --accent-200: #ffc9c3;
@@ -37,7 +37,7 @@
   --accent-800: #a5261d;
   --accent-900: #88251e;
 
-  /* Neutral — slate/gray ramp for canvas, surfaces, text, borders */
+  /* Neutral - slate/gray ramp for canvas, surfaces, text, borders */
   --neutral-50:  #f8fafc;
   --neutral-100: #f1f5f9;
   --neutral-200: #e5e7eb;

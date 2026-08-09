@@ -1,4 +1,4 @@
-# BranV — Project Requirements
+# BranV - Project Requirements
 
 Everything you need to install and run BranV locally. The project is a **pnpm monorepo** with a Next.js 15 frontend and a FastAPI (Python 3.12) backend, backed by PostgreSQL 16.
 
@@ -98,7 +98,7 @@ Managed by **uv** (`pyproject.toml` in `apps/api/`).
 | PostgreSQL | 16 | Primary database (spun up via Docker) |
 | Prisma | ^5.22.0 | Schema definition and migration runner |
 
-The local Postgres instance is managed by Docker Compose — no manual Postgres installation required.
+The local Postgres instance is managed by Docker Compose - no manual Postgres installation required.
 
 ---
 
@@ -117,7 +117,7 @@ MinIO is auto-started by Docker Compose. The bucket `branv-dev` is created autom
 | Service | Version | Purpose |
 |---------|---------|---------|
 | Redis | 7-alpine (Docker) | Background job queue (included in docker-compose but not actively used in Phase 11+) |
-| MinIO Console | — | Web UI at `http://localhost:9001` |
+| MinIO Console | - | Web UI at `http://localhost:9001` |
 | Prisma Studio | bundled | Database GUI via `pnpm db:studio` |
 
 ---
@@ -180,8 +180,8 @@ pnpm dev:api
 
 | Script | Command | Description |
 |--------|---------|-------------|
-| Dev — frontend | `pnpm dev:web` | Next.js on port 3000 |
-| Dev — backend | `pnpm dev:api` | FastAPI / uvicorn on port 5000 |
+| Dev - frontend | `pnpm dev:web` | Next.js on port 3000 |
+| Dev - backend | `pnpm dev:api` | FastAPI / uvicorn on port 5000 |
 | Build all | `pnpm build` | Build shared packages + Next.js |
 | Lint | `pnpm lint` | ESLint on web app |
 | Type check | `pnpm typecheck` | TypeScript check (no emit) |

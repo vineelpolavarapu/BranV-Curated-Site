@@ -1,5 +1,5 @@
 """
-CorrelationIdMiddleware — equivalent of NestJS's CorrelationIdMiddleware.
+CorrelationIdMiddleware - equivalent of NestJS's CorrelationIdMiddleware.
 
 Reads the incoming `X-Request-Id` header (or generates a UUID4 if absent),
 binds it to structlog's contextvars so every log line in the request carries it,

@@ -1,9 +1,9 @@
 """
-Public storefront business logic — port of apps/api/src/storefront/products-public.service.ts.
+Public storefront business logic - port of apps/api/src/storefront/products-public.service.ts.
 
 Scope cut for v1: implements list / get-by-slug / related with the most-used filter
 combos (category, brand, in_stock, on_sale, is_new, sort). Color/size/material
-filters require variant joins that this v1 leaves as TODO — the parity gate will
+filters require variant joins that this v1 leaves as TODO - the parity gate will
 flag if the frontend uses them in practice.
 """
 
@@ -43,7 +43,7 @@ def _iso_ms(dt: datetime | None) -> str | None:
 
 
 async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict[str, Any]]:
-    """Build storefront card payloads in bulk using batched queries — eliminates N+1 queries."""
+    """Build storefront card payloads in bulk using batched queries - eliminates N+1 queries."""
     if not products:
         return []
 
@@ -307,7 +307,7 @@ async def related(db: AsyncSession, slug: str) -> list[dict[str, Any]]:
 
 
 async def home(db: AsyncSession) -> dict[str, Any]:
-    """Composite payload for the home page — matches NestJS's overview()."""
+    """Composite payload for the home page - matches NestJS's overview()."""
     from ..core.cache import cache_get, cache_set
     cached = await cache_get("storefront:home")
     if cached is not None:
@@ -352,7 +352,7 @@ async def home(db: AsyncSession) -> dict[str, Any]:
 
 
 async def _latest_articles(db: AsyncSession, *, limit: int) -> list[dict[str, Any]]:
-    from ..db.models import Article  # noqa: PLC0415 — lazy import to avoid cycle risk
+    from ..db.models import Article  # noqa: PLC0415 - lazy import to avoid cycle risk
     rows = (await db.execute(
         select(Article)
         .where(Article.status == "PUBLISHED")

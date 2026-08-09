@@ -19,7 +19,7 @@ export async function generateMetadata(props: {
 }): Promise<Metadata> {
   const { slug } = await props.params;
   const product = await apiServer<ProductCardData>(`/products/${slug}`);
-  if (!product) return { title: 'BranV — Product' };
+  if (!product) return { title: 'BranV - Product' };
   const desc = product.description?.slice(0, 160) ?? `${product.brand.name} on BranV.`;
   return {
     title: `${product.title} · ${product.brand.name} · BranV`,
@@ -190,7 +190,7 @@ function Summary({ product }: { product: ProductCardData }) {
             productTitle={product.title}
           />
           <p className="mt-2 text-xs text-content-soft">
-            We earn a small commission when you buy through our link — at no
+            We earn a small commission when you buy through our link - at no
             extra cost to you.
           </p>
         </div>

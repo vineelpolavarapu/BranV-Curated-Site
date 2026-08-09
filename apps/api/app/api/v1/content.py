@@ -229,7 +229,7 @@ async def articles_admin_delete(
     user: Annotated[AuthenticatedUser, Depends(current_user_required)],
     db: DbDep,
 ) -> Response:
-    # Soft-delete: flip to ARCHIVED (matches Nest behavior — preserves embeds + analytics).
+    # Soft-delete: flip to ARCHIVED (matches Nest behavior - preserves embeds + analytics).
     result = await db.execute(
         update(Article).where(Article.id_ == article_id).values(status="ARCHIVED", updatedAt=_now())
     )
@@ -476,8 +476,8 @@ async def edits_public_detail(slug: str, db: DbDep) -> dict[str, Any]:
         .where(EditProduct.editId == e.id_, Product.status == "ACTIVE")
         .order_by(EditProduct.position.asc())
     )).all()
-    # Full storefront card shape (brand, image, price, buyNow) — the same
-    # hydration the product-list/detail pages use — not the minimal
+    # Full storefront card shape (brand, image, price, buyNow) - the same
+    # hydration the product-list/detail pages use - not the minimal
     # {id, slug, title, position} shape the admin product-picker needs.
     out = _serialize_edit(e)
     out["products"] = [await _hydrate_card(db, p) for _, p in eps]

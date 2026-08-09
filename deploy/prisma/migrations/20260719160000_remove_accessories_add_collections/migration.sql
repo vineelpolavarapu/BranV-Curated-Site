@@ -10,7 +10,7 @@
 --     Wear, Fashion Forward, Easy Casuals). These are real categories so
 --     products can be assigned to them exactly like Footwear/Watches, but they
 --     are deliberately given a high displayOrder and are hidden from the Shop
---     grid / nav in the frontend — they are reached only via the banner CTAs at
+--     grid / nav in the frontend - they are reached only via the banner CTAs at
 --     bare URLs (e.g. /sharp-formals). Idempotent via ON CONFLICT (slug).
 --
 -- Slug-based so it runs correctly regardless of environment-specific row ids.

@@ -11,7 +11,7 @@ interface LenisProviderProps {
 export function LenisProvider({ children }: LenisProviderProps) {
   const pathname = usePathname();
 
-  // Admin is a data-entry console, not a marketing page — smooth-scroll
+  // Admin is a data-entry console, not a marketing page - smooth-scroll
   // easing there only hurts usability, and Lenis's cached scroll-height can
   // go stale when async-loaded form content (dropdowns, checkbox lists)
   // changes page height after mount, making the page feel "stuck" before

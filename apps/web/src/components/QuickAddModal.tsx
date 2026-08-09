@@ -278,7 +278,7 @@ const DEFAULT_BRANDS = [
     }
     const s = result.data;
     // Keep the admin's current pick when the scraper couldn't tell (returns
-    // 'other'). But a value like 'unknown' isn't a dropdown option either —
+    // 'other'). But a value like 'unknown' isn't a dropdown option either -
     // route it to 'other' so the manual name input appears, instead of
     // silently carrying an unmapped retailer key through to "Buy on unknown".
     let scrapedRetailer = form.retailer;
@@ -554,7 +554,7 @@ const DEFAULT_BRANDS = [
                 className={adminInput}
               >
                 <option value="__new__">+ New brand</option>
-                <option value="">— select —</option>
+                <option value="">- select -</option>
                 {brands.map((b) => (
                   <option key={b.id} value={b.id}>
                     {b.name}
@@ -596,7 +596,7 @@ const DEFAULT_BRANDS = [
                 }}
                 className={adminInput}
               >
-                <option value="">— select —</option>
+                <option value="">- select -</option>
                 {l1.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -612,7 +612,7 @@ const DEFAULT_BRANDS = [
                 disabled={!form.categoryId}
                 className={adminInput}
               >
-                <option value="">— none —</option>
+                <option value="">- none -</option>
                 {l2.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -814,7 +814,7 @@ const DEFAULT_BRANDS = [
               {flash}
               {pendingAffiliate && (
                 <span className="ml-2 text-xs">
-                  (affiliate link pending — worker will retry within 10 min)
+                  (affiliate link pending - worker will retry within 10 min)
                 </span>
               )}
             </p>

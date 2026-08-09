@@ -1,5 +1,5 @@
 """
-Pagination DTO + page-result helper — port of `apps/api/src/common/dto/pagination.dto.ts`.
+Pagination DTO + page-result helper - port of `apps/api/src/common/dto/pagination.dto.ts`.
 
 Query coercion parity:
   * `page` and `pageSize` arrive as strings on the wire; Pydantic coerces to int.

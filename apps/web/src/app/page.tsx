@@ -46,7 +46,7 @@ export default async function HomePage() {
             products={section.products}
           />
         ))}
-        {/* Static category sections — show placeholders until seeded */}
+        {/* Static category sections - show placeholders until seeded */}
         {STATIC_CATEGORIES.filter((c) => !apiSlugs.has(c.slug)).map((c) => (
           <CategoryShowcase key={c.slug} title={c.title} slug={c.slug} products={[]} />
         ))}
@@ -62,7 +62,7 @@ function DisclosureStrip() {
       <div className="mx-auto max-w-7xl px-6 py-6 text-center text-xs text-content-soft">
         <strong className="text-content">Affiliate disclosure:</strong>{' '}
         BranV is a curated affiliate platform. Clicking Buy Now redirects you to
-        the retailer. We earn a small commission on qualifying sales — at no
+        the retailer. We earn a small commission on qualifying sales - at no
         extra cost to you.
       </div>
     </section>

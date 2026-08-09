@@ -7,7 +7,7 @@ const ACCESS_COOKIE = 'branv_access';
  *
  * We can't decode the JWT here without leaking the secret to the edge runtime,
  * so this only checks whether an access cookie exists. Role-based gating
- * (member vs admin) happens on the protected page itself via /api/auth/me —
+ * (member vs admin) happens on the protected page itself via /api/auth/me -
  * the backend is the source of truth and will 401/403 anyway.
  */
 export function middleware(req: NextRequest) {

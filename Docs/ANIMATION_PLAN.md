@@ -1,16 +1,16 @@
-# BranV — Animation & Micro-Interaction Plan
+# BranV - Animation & Micro-Interaction Plan
 
 **Document owner:** BranV / Deccansoft  
 **Date:** 2026-05-23  
 **Scope:** Every animated surface on the BranV storefront (`apps/web/`).  
-**Reference studied:** Pelgana UGC Animation Plan (Deccansoft internal) — patterns adapted, not copied; all timings, components, and contexts are BranV-specific.
+**Reference studied:** Pelgana UGC Animation Plan (Deccansoft internal) - patterns adapted, not copied; all timings, components, and contexts are BranV-specific.
 
 ---
 
 ## 1. Executive Summary
 
 BranV is a curated men's fashion affiliate platform. The visual language is
-**calm, premium, and editorial** — dark neutrals, clean white space, full-bleed
+**calm, premium, and editorial** - dark neutrals, clean white space, full-bleed
 product imagery. Animation must reinforce that register: it should feel like
 flipping through a well-designed lookbook, never like a discount flash-sale.
 
@@ -30,8 +30,8 @@ Every animation on this page follows three rules:
 
 | # | Principle | BranV reason |
 |---|---|---|
-| 1 | **Images are the content.** | Fashion sells on visuals. Never zoom, crop, or distort images during entrance — they must read as editorial photographs. |
-| 2 | **Stagger reveals confidence.** | Grid entrances stagger left-to-right, row by row. This mimics a stylist laying out a collection — deliberate, not random. |
+| 1 | **Images are the content.** | Fashion sells on visuals. Never zoom, crop, or distort images during entrance - they must read as editorial photographs. |
+| 2 | **Stagger reveals confidence.** | Grid entrances stagger left-to-right, row by row. This mimics a stylist laying out a collection - deliberate, not random. |
 | 3 | **Hover = discovery.** | Product card hover reveals the CTA and the secondary image. The motion is the shopping trigger. |
 | 4 | **No loops in static view.** | Nothing pulses, floats, or breathes on the storefront when the user is not interacting. This is a store, not a landing page. |
 | 5 | **Speed matches price point.** | Entrances are 0.35–0.65s. Hover responses are 180–220ms. Anything faster feels cheap; anything slower feels broken. |
@@ -45,7 +45,7 @@ Every animation on this page follows three rules:
 
 - **Pure CSS keyframes** scoped per component in a local `<style>` block or a
   shared `animations.css` file imported once.
-- **`AnimateOnScroll` wrapper component** (to be built — see §12) uses
+- **`AnimateOnScroll` wrapper component** (to be built - see §12) uses
   `IntersectionObserver` at a 10 % threshold. Adds `.in-view` to the root
   the first time it enters the viewport, then disconnects. Entrances never
   re-fire.
@@ -82,9 +82,9 @@ Every animation on this page follows three rules:
 
 ---
 
-## 4. Section bv1 — HeroCarousel
+## 4. Section bv1 - HeroCarousel
 
-**Component:** `components/HeroCarousel.tsx` — already `'use client'`, already has
+**Component:** `components/HeroCarousel.tsx` - already `'use client'`, already has
 700 ms slide transitions via inline `transform: translate3d()`.
 
 ### What exists
@@ -97,7 +97,7 @@ Every animation on this page follows three rules:
 
 #### 4a. Slide content entrance (text overlay)
 
-Each slide's text content — eyebrow pill, headline, subhead, CTA — should
+Each slide's text content - eyebrow pill, headline, subhead, CTA - should
 animate in *after* the slide has settled. Trigger: slide becomes active
 (add/remove `.slide-active` class from the carousel controller).
 
@@ -142,9 +142,9 @@ Hover: translate `+3 px` in direction of travel, 180 ms ease-in-out.
 
 ---
 
-## 5. Section bv2 — CategoryShowcase (Homepage)
+## 5. Section bv2 - CategoryShowcase (Homepage)
 
-**Component:** `components/CategoryShowcase.tsx` — server component, rendered
+**Component:** `components/CategoryShowcase.tsx` - server component, rendered
 N times on the homepage (Shirts, T-Shirts, Jeans, Tracks, Footwear, Watches).
 
 ### Section header entrance
@@ -181,9 +181,9 @@ Current: `hover:bg-neutral-800`. Add:
 
 ---
 
-## 6. Section bv3 — ProductCard (Universal)
+## 6. Section bv3 - ProductCard (Universal)
 
-**Component:** `components/ProductCard.tsx` — `'use client'`. This is the single
+**Component:** `components/ProductCard.tsx` - `'use client'`. This is the single
 most important animated surface on the site.
 
 ### Current state
@@ -207,7 +207,7 @@ most important animated surface on the site.
 ```
 
 This is done via Tailwind: `transition-transform duration-200 hover:-translate-y-1`
-plus a shadow utility. **Do not animate `box-shadow` in a keyframe** — use
+plus a shadow utility. **Do not animate `box-shadow` in a keyframe** - use
 a CSS transition on the hover selector only (one paint, composited thereafter).
 
 #### 6b. Image zoom on hover
@@ -227,7 +227,7 @@ The product image wrapper (`aspect-[4/5]`) has `overflow-hidden`. The inner
 This runs simultaneously with the secondary-image cross-fade. The scale is
 on the primary image only; secondary image swaps in at scale 1.0 already.
 
-#### 6c. CTA "Buy Now" button — slide-up reveal
+#### 6c. CTA "Buy Now" button - slide-up reveal
 
 Currently the CTA button is always visible. The upgrade: hide it by default
 (translate down 100 % within the card bottom), reveal on card hover.
@@ -247,13 +247,13 @@ Currently the CTA button is always visible. The upgrade: hide it by default
 The card bottom section already uses `absolute` positioning, so this fits
 without layout shift.
 
-#### 6d. Wishlist heart — existing `hover:scale-110` is good
+#### 6d. Wishlist heart - existing `hover:scale-110` is good
 
 When the user *adds* to wishlist (filled state), add a one-shot pop:
 scale `1 → 1.35 → 1` over 300 ms ease-out-back. Triggered by state change
 in the existing wishlist toggle handler.
 
-#### 6e. Discount badge — entrance pop
+#### 6e. Discount badge - entrance pop
 
 On page load / section entrance, discount badges (e.g. "−30 %") scale in:
 `0 → 1.15 → 1` over 350 ms ease-out-back, with a 300 ms delay after the
@@ -267,15 +267,15 @@ card itself fades in. This is a one-shot, not a loop.
 | Hover card | Image | Scale 1.04 | 400 ms |
 | Hover card | CTA button | Slide up + fade in | 220 ms |
 | Hover card | Secondary image | Cross-fade (existing) | 300 ms |
-| Hover wishlist btn | Heart icon | Scale 1.10 (existing) | — |
+| Hover wishlist btn | Heart icon | Scale 1.10 (existing) | - |
 | Click wishlist | Heart icon | Pop 1 → 1.35 → 1 | 300 ms |
-| Hover CTA btn | Button bg | Darken (existing) | — |
+| Hover CTA btn | Button bg | Darken (existing) | - |
 
 ---
 
-## 7. Section bv4 — ShopMegaMenu
+## 7. Section bv4 - ShopMegaMenu
 
-**Component:** `components/StorefrontShell.tsx` — server component, CSS-only hover.
+**Component:** `components/StorefrontShell.tsx` - server component, CSS-only hover.
 
 ### Current state
 
@@ -343,7 +343,7 @@ highlight (neutral-100 / white/10) fades in instead of snapping.
 
 ---
 
-## 8. Section bv5 — Category Listing Page
+## 8. Section bv5 - Category Listing Page
 
 **Component:** `apps/web/src/app/category/[slug]/page.tsx`
 
@@ -381,7 +381,7 @@ Add a brief fade transition to the outgoing grid:
 
 ---
 
-## 9. Section bv6 — Brand Cards
+## 9. Section bv6 - Brand Cards
 
 **Page:** `apps/web/src/app/brands/page.tsx`
 
@@ -405,7 +405,7 @@ Current: `hover:border-neutral-400`. Add:
 
 ---
 
-## 10. Section bv7 — Article Cards
+## 10. Section bv7 - Article Cards
 
 **Page:** `apps/web/src/app/articles/page.tsx`
 
@@ -427,7 +427,7 @@ Current: `hover:border-neutral-400`. Add:
 
 ---
 
-## 11. Section bv8 — Product Detail Page (PDP)
+## 11. Section bv8 - Product Detail Page (PDP)
 
 **Page:** `apps/web/src/app/products/[slug]/page.tsx`
 
@@ -443,7 +443,7 @@ Current: `hover:border-neutral-400`. Add:
 
 ### 11b. Image gallery entrance
 
-Primary image: fade in only (no rise — it is a photograph, same rule as
+Primary image: fade in only (no rise - it is a photograph, same rule as
 the hero carousel). `opacity: 0 → 1`, 0.40 s. Thumbnail images stagger
 in 40 ms after the primary.
 
@@ -460,7 +460,7 @@ viewport.
 
 ---
 
-## 12. Section bv9 — Footer + NewsletterSignup
+## 12. Section bv9 - Footer + NewsletterSignup
 
 ### 12a. Footer entrance
 
@@ -484,7 +484,7 @@ When subscription submits, the feedback `<p>` tag mounts with:
 
 ---
 
-## 13. `AnimateOnScroll` — Component Spec
+## 13. `AnimateOnScroll` - Component Spec
 
 **File to create:** `apps/web/src/components/AnimateOnScroll.tsx`
 
@@ -538,7 +538,7 @@ Usage example in CategoryShowcase:
 
 ---
 
-## 14. Global CSS — Keyframes Reference
+## 14. Global CSS - Keyframes Reference
 
 Add to `apps/web/src/app/globals.css` (or a new `animations.css` imported there):
 
@@ -613,7 +613,7 @@ Add to `apps/web/src/app/globals.css` (or a new `animations.css` imported there)
 
 | Element | Reason |
 |---|---|
-| Product image aspect ratio / crop | Sacred — must look like a real photograph. |
+| Product image aspect ratio / crop | Sacred - must look like a real photograph. |
 | Price text | Counting up price figures is a pattern for "earned income" pages (UGC), not for retail. Customers expect stable prices. |
 | The BranV wordmark | Brand anchor must feel permanent. |
 | Loading skeletons | `animate-pulse` is already correct. Do not change. |
@@ -646,13 +646,13 @@ Build in this order so each phase is independently testable:
 | Phase | What to build | Est. |
 |---|---|---|
 | 1 | `AnimateOnScroll` component + global keyframes CSS | 0.5 days |
-| 2 | **ProductCard** — lift, image zoom, CTA slide-up, wishlist pop | 1 day |
-| 3 | **CategoryShowcase** — title + grid stagger entrance | 0.5 days |
-| 4 | **ShopMegaMenu** — L1 drop + L2 slide-in | 0.5 days |
-| 5 | **HeroCarousel** — text stagger on slide change + Ken Burns | 0.5 days |
-| 6 | **CategoryPage** — header stagger + subcategory chips + filter sidebar slide | 0.5 days |
-| 7 | **BrandCard + ArticleCard** — hover lift + image zoom + grid stagger | 0.5 days |
-| 8 | **PDP** — breadcrumb + gallery + retailer cards entrance | 0.5 days |
+| 2 | **ProductCard** - lift, image zoom, CTA slide-up, wishlist pop | 1 day |
+| 3 | **CategoryShowcase** - title + grid stagger entrance | 0.5 days |
+| 4 | **ShopMegaMenu** - L1 drop + L2 slide-in | 0.5 days |
+| 5 | **HeroCarousel** - text stagger on slide change + Ken Burns | 0.5 days |
+| 6 | **CategoryPage** - header stagger + subcategory chips + filter sidebar slide | 0.5 days |
+| 7 | **BrandCard + ArticleCard** - hover lift + image zoom + grid stagger | 0.5 days |
+| 8 | **PDP** - breadcrumb + gallery + retailer cards entrance | 0.5 days |
 | 9 | **Footer** entrance + newsletter feedback | 0.25 days |
 | 10 | Cross-browser QA + reduced-motion audit | 0.5 days |
 
@@ -662,7 +662,7 @@ Build in this order so each phase is independently testable:
 
 ## 17. How to Verify Completion
 
-1. `pnpm build && pnpm start` — test animations under production build only.
+1. `pnpm build && pnpm start` - test animations under production build only.
    Next.js dev mode (StrictMode) double-invokes effects and can introduce
    false jitter.
 2. Scroll from the top of the homepage to the footer. Every CategoryShowcase
@@ -679,5 +679,5 @@ Build in this order so each phase is independently testable:
 
 ---
 
-*Version 1.0 — Ready for implementation. Update this document when new
+*Version 1.0 - Ready for implementation. Update this document when new
 components are added or timings are adjusted after client review.*

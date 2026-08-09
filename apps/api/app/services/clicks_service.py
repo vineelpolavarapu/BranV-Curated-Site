@@ -1,5 +1,5 @@
 """
-Click tracking — port of apps/api/src/clicks/clicks.service.ts.
+Click tracking - port of apps/api/src/clicks/clicks.service.ts.
 
 Flow:
   1. POST /api/clicks/track → mint a tracking_id, store ClickIntent.
@@ -143,7 +143,7 @@ async def report_outcome(
         select(ClickEvent).where(ClickEvent.trackingId == tracking_id)
     )).scalar_one_or_none()
     if event is None:
-        return  # silent — matches Nest's behavior (event may have been GC'd)
+        return  # silent - matches Nest's behavior (event may have been GC'd)
 
     now = _now()
     db.add(

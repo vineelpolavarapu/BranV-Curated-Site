@@ -6,7 +6,7 @@
    Drag/gesture-heavy surfaces that need `domMax` load it locally via their own
    dynamic import, keeping it off routes that don't use drag.
 
-   Inert until `m.*` components exist — mounting it changes nothing visually. */
+   Inert until `m.*` components exist - mounting it changes nothing visually. */
 
 import { LazyMotion, domAnimation, MotionConfig } from 'motion/react';
 import type { ReactNode } from 'react';

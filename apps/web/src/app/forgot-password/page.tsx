@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
       body: JSON.stringify({ email }),
     });
     setSubmitting(false);
-    setDone(true); // Always show success — server doesn't reveal account existence.
+    setDone(true); // Always show success - server doesn't reveal account existence.
   }
 
   if (done) {

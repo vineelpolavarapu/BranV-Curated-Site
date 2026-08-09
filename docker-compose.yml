@@ -64,7 +64,7 @@ services:
       exit 0
       "
 
-  # ─── FastAPI backend (apps/api) — the only API ────────────────────
+  # ─── FastAPI backend (apps/api) - the only API ────────────────────
   # Reads root .env. SCHEDULER_OWNER must be `fastapi` for cron jobs to run.
   api:
     container_name: branv-api
@@ -91,7 +91,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      # Inherit host clock — critical for TOTP correctness on VM deployments.
+      # Inherit host clock - critical for TOTP correctness on VM deployments.
       - /etc/localtime:/etc/localtime:ro
 
 volumes:

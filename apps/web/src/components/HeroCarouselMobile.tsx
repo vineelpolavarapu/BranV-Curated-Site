@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Mobile-only hero carousel. Renders at <1080px (parent gates via matchMedia).
-// All image references point at /mobile-hero/mobile_*.svg — 9:16 portrait art.
+// All image references point at /mobile-hero/mobile_*.svg - 9:16 portrait art.
 // This component has NO knowledge of /hero/ or desktop layout. Changing
 // the 1080px breakpoint or desktop visuals will not affect this file.
 
@@ -199,7 +199,7 @@ export function HeroCarouselMobile() {
     setIsDragging(false);
   };
 
-  // Unified pointer handlers — fire for touch, mouse, AND pen, so swipe works
+  // Unified pointer handlers - fire for touch, mouse, AND pen, so swipe works
   // on real phones and in Chrome DevTools device emulation (which sends mouse
   // events, not touch). No pointerType filter: we accept whatever the user has.
   const onPointerDown = (e: React.PointerEvent) => {
@@ -267,7 +267,7 @@ export function HeroCarouselMobile() {
               aria-hidden={isClone || i - 1 !== realIndex}
               className="relative h-full w-full shrink-0 overflow-hidden"
             >
-              {/* Direct <img> — no <picture> swap. The portrait SVG matches
+              {/* Direct <img> - no <picture> swap. The portrait SVG matches
                   the 9:16 section exactly so object-cover is safe (no crop).
                   Switch to object-contain if you ever ship art that isn't
                   exactly 9:16. */}

@@ -1,4 +1,4 @@
-# Build Guide: Brand by Vineel — Affiliate Model
+# Build Guide: Brand by Vineel - Affiliate Model
 
 > **End-to-end build instructions for the platform defined in `PRD_brand_by_vineel_v2.md`.**
 > Follow phases in order. Each phase has Objective → Prerequisites → Steps → Acceptance Checks.
@@ -9,14 +9,14 @@
 ## How to Use This Guide
 
 1. Read the PRD v2 in full first.
-2. Keep the PRD open — every step here maps to a PRD section.
+2. Keep the PRD open - every step here maps to a PRD section.
 3. Don't move on until **all acceptance checks pass**.
 4. Configuration (return window, sync intervals, sync thresholds) lives in env vars or a `platform_settings` table, not in code.
 5. This guide is shorter than v1 because the affiliate model removes payment, order, fulfillment, and returns subsystems. Don't backfill them.
 
 ---
 
-## Phase 0 — Foundations
+## Phase 0 - Foundations
 
 **Objective:** Working local environment with Postgres, Redis, and S3-compatible storage. Empty backend + Next.js app both start with one command.
 
@@ -24,7 +24,7 @@
 
 - Node.js 20+, pnpm, Docker Desktop, Git, VS Code.
 - GitHub private repo `brand-by-vineel`.
-- Backend choice: **NestJS + Prisma (TypeScript) — recommended.** FastAPI works too; this guide notes both where they diverge.
+- Backend choice: **NestJS + Prisma (TypeScript) - recommended.** FastAPI works too; this guide notes both where they diverge.
 
 ### 0.2 Steps
 
@@ -62,7 +62,7 @@
    JWT_REFRESH_SECRET
    S3_ENDPOINT  S3_BUCKET  S3_ACCESS_KEY  S3_SECRET_KEY
    AMAZON_ASSOCIATES_TAG  AMAZON_ACCESS_KEY  AMAZON_SECRET_KEY  AMAZON_REGION
-   EARNKARO_API_KEY (optional, unused — EarnKaro links are pasted in manually)
+   EARNKARO_API_KEY (optional, unused - EarnKaro links are pasted in manually)
    MAIL_PROVIDER  MAIL_API_KEY  MAIL_FROM
    BASE_CURRENCY=INR
    PRICE_SYNC_DRIFT_THRESHOLD_PCT=5
@@ -75,7 +75,7 @@
 
 7. **Structured logging** (JSON stdout) + correlation ID middleware reading/setting `X-Request-Id`.
 
-8. **README.md** — prerequisites, one-command startup (`docker compose up && pnpm dev`), URLs of all services.
+8. **README.md** - prerequisites, one-command startup (`docker compose up && pnpm dev`), URLs of all services.
 
 ### 0.3 Acceptance Checks
 
@@ -88,7 +88,7 @@
 
 ---
 
-## Phase 1 — Identity (Member + Admin)
+## Phase 1 - Identity (Member + Admin)
 
 **Objective:** Two login flows with JWT, refresh rotation, email verification, mandatory 2FA for admin.
 
@@ -122,7 +122,7 @@
 
 ---
 
-## Phase 2 — Brand & Catalog Core + Avatar Library
+## Phase 2 - Brand & Catalog Core + Avatar Library
 
 **Objective:** Admin can manage brands, categories with attribute schemas, products, and the AI Avatar Asset Library.
 
@@ -139,7 +139,7 @@ Migrate: `brands`, `categories`, `category_attribute_schemas`, `products`, `prod
 3. **Brand CRUD (admin):**
    - `GET /api/admin/brands` (paginated, searchable).
    - `POST /api/admin/brands`, `PATCH /api/admin/brands/:id`, `DELETE /api/admin/brands/:id` (soft delete if products exist).
-   - UI at `/admin/brands` — list with logo, name, country, status, product count. Form with logo upload, hero upload, slug auto-generated, Featured toggle.
+   - UI at `/admin/brands` - list with logo, name, country, status, product count. Form with logo upload, hero upload, slug auto-generated, Featured toggle.
 
 4. **Product CRUD (admin):**
    - Plain CRUD endpoints (the Quick Add modal lives in Phase 3 and wraps these).
@@ -164,7 +164,7 @@ Migrate: `brands`, `categories`, `category_attribute_schemas`, `products`, `prod
 8. **Avatar Asset Library:**
    - `GET/POST/PATCH/DELETE /api/admin/avatars`.
    - Each avatar: name, reference_image_url, prompt_template, tags.
-   - UI at `/admin/avatars` — grid of references with thumbnails + "Copy Prompt" button (admin pastes the stored prompt template into Gemini/ChatGPT).
+   - UI at `/admin/avatars` - grid of references with thumbnails + "Copy Prompt" button (admin pastes the stored prompt template into Gemini/ChatGPT).
    - Seed Vineel's first base avatar references manually.
 
 ### 2.3 Acceptance Checks
@@ -177,7 +177,7 @@ Migrate: `brands`, `categories`, `category_attribute_schemas`, `products`, `prod
 
 ---
 
-## Phase 3 — Quick Add Workflow
+## Phase 3 - Quick Add Workflow
 
 **Objective:** Single modal that adds a product end-to-end in under 60 seconds. URL paste → autofill → AI avatar paste → submit.
 
@@ -195,8 +195,8 @@ This is the platform's productivity centerpiece. Build it carefully.
 2. **Affiliate link handling (no conversion API):** the admin brings an already
    affiliate-wrapped URL from their network of choice (EarnKaro, Meesho,
    etc.), pastes it into the retailer URL field, and it's stored + redirected
-   verbatim — no third-party conversion call.
-   - For Amazon URLs only: route to Amazon Associates direct — append
+   verbatim - no third-party conversion call.
+   - For Amazon URLs only: route to Amazon Associates direct - append
      `?tag={AMAZON_ASSOCIATES_TAG}` server-side.
    - Store the resulting `affiliate_links` row with `partner` set to whichever
      network the admin selected (EARNKARO / MEESHO / AMAZON / DIRECT).
@@ -204,7 +204,7 @@ This is the platform's productivity centerpiece. Build it carefully.
 3. **Quick Add endpoint:** `POST /api/admin/products/quick-add` with one combined payload:
    ```
    {
-     scraped: {...},       // optional — admin may have edited
+     scraped: {...},       // optional - admin may have edited
      title, brand_id (or new_brand_name), category_id, subcategory_id,
      price, mrp, color, sizes, material, tags,
      avatar_image_url,     // uploaded via presign first
@@ -223,7 +223,7 @@ This is the platform's productivity centerpiece. Build it carefully.
    - All other fields visible in one scroll.
    - Avatar image field: drag-drop + paste-from-clipboard handlers (listen for `paste` event with `Clipboard.items`).
    - Status radio: Draft / Publish now.
-   - "Keep modal open after submit (bulk mode)" checkbox — when checked, form clears after success and refocuses URL field.
+   - "Keep modal open after submit (bulk mode)" checkbox - when checked, form clears after success and refocuses URL field.
    - Auto-save form state to `localStorage` on every change; offered on reopen if not submitted.
    - `Ctrl/Cmd + Enter` submits.
    - Visual feedback: brief success animation on submit, optional toast.
@@ -254,7 +254,7 @@ This is the platform's productivity centerpiece. Build it carefully.
 
 ---
 
-## Phase 4 — Storefront Browse, Filters, Search
+## Phase 4 - Storefront Browse, Filters, Search
 
 **Objective:** Public catalog with full faceted filtering, search with autocomplete, product detail pages, brand pages, home page.
 
@@ -271,7 +271,7 @@ This is the platform's productivity centerpiece. Build it carefully.
    - Product, variants, all retailer listings, all images (AI + retailer), aggregate review, related products.
    - Computed: best current price across retailers, available retailers.
 
-4. **Related products:** `GET /api/products/:slug/related` — same category + price band, prefer same brand.
+4. **Related products:** `GET /api/products/:slug/related` - same category + price band, prefer same brand.
 
 5. **Brand endpoints:** `GET /api/brands` (active), `GET /api/brands/:slug` (with brand story and products).
 
@@ -280,9 +280,9 @@ This is the platform's productivity centerpiece. Build it carefully.
    - `tsvector` column on products covering title + description + brand_name + tags.
    - GIN index.
    - Trigger to maintain on insert/update.
-   - `GET /api/search/autocomplete?q=` — returns products, brands, categories.
+   - `GET /api/search/autocomplete?q=` - returns products, brands, categories.
 
-7. **Home endpoint:** `GET /api/home` — aggregated payload: banners, featured brands, new arrivals, the edit, latest articles, active drops.
+7. **Home endpoint:** `GET /api/home` - aggregated payload: banners, featured brands, new arrivals, the edit, latest articles, active drops.
 
 8. **Frontend pages:**
    - `/` home page (hero, featured brands, new arrivals, the edit, articles teaser, drops teaser).
@@ -308,7 +308,7 @@ This is the platform's productivity centerpiece. Build it carefully.
     - "Buy Now" CTA (primary action).
     - Wishlist heart (top right).
 
-12. **AI disclosure tag styling:** small, subtle badge on every AI-rendered image — `bottom-right`, semi-transparent, "AI-rendered" text.
+12. **AI disclosure tag styling:** small, subtle badge on every AI-rendered image - `bottom-right`, semi-transparent, "AI-rendered" text.
 
 13. **Mobile-first checks (PRD §20):** every page works at 360px; bottom nav present; touch targets ≥44×44 px.
 
@@ -324,7 +324,7 @@ This is the platform's productivity centerpiece. Build it carefully.
 
 ---
 
-## Phase 5 — Click-Out Flow + Nice Pick + Wardrobe
+## Phase 5 - Click-Out Flow + Nice Pick + Wardrobe
 
 **Objective:** The core revenue moment. Click tracking, retailer redirect, "Did you buy this?" prompt, Nice Pick celebration, My Wardrobe.
 
@@ -335,11 +335,11 @@ Migrate: `click_events`, `self_reported_conversions`, `wardrobe_items`, `wishlis
 ### 5.2 Steps
 
 1. **Click tracking endpoint** (the `/go/:trackingId` redirect):
-   - `GET /go/:trackingId` — public, no auth required.
+   - `GET /go/:trackingId` - public, no auth required.
    - Look up the click target (product + retailer + affiliate URL).
    - Insert `click_events` row with: product_id, user_id (if logged in), session_id (cookie), source_page_url (from `Referer`), UTM params (from query string), user_agent, ip_country (via `cf-ipcountry` header or MaxMind lite), partner, partner_url, timestamp.
    - 302 redirect to the affiliate URL.
-   - Critical: this endpoint must be fast (<50ms) — don't block the user on heavy logic. Insert can be async via a Redis queue if needed.
+   - Critical: this endpoint must be fast (<50ms) - don't block the user on heavy logic. Insert can be async via a Redis queue if needed.
 
 2. **Generating tracking links:**
    - When rendering a product card or detail page, server creates a short tracking ID per click context (cached in Redis for short TTL, or pre-generated and stored with the product).
@@ -348,7 +348,7 @@ Migrate: `click_events`, `self_reported_conversions`, `wardrobe_items`, `wishlis
 
 3. **"Did you buy this?" prompt:**
    - Frontend listens for `visibilitychange` event.
-   - When the user returns to the Vineel tab after clicking out, after a short delay (e.g., 8 seconds — long enough that they had time to look at the retailer), show a non-intrusive bottom sheet:
+   - When the user returns to the Vineel tab after clicking out, after a short delay (e.g., 8 seconds - long enough that they had time to look at the retailer), show a non-intrusive bottom sheet:
      ```
      How did it go?
      Did you buy [Product Title]?
@@ -359,7 +359,7 @@ Migrate: `click_events`, `self_reported_conversions`, `wardrobe_items`, `wishlis
 
 4. **"Yes, I bought it" handler:**
    - If member: insert `wardrobe_items` row and `self_reported_conversions` row.
-   - If visitor: prompt inline signup ("Save this to your wardrobe — takes 10 seconds. Email + password.") or skip with a smaller anonymous conversion log.
+   - If visitor: prompt inline signup ("Save this to your wardrobe - takes 10 seconds. Email + password.") or skip with a smaller anonymous conversion log.
    - Trigger the **Nice Pick celebration modal**.
 
 5. **Nice Pick Celebration Modal:**
@@ -402,7 +402,7 @@ Migrate: `click_events`, `self_reported_conversions`, `wardrobe_items`, `wishlis
 
    - Auto-dismiss after 4 seconds OR on any click.
    - Animated checkmark: SVG with `stroke-dasharray` + `stroke-dashoffset` transition (~600ms).
-   - Reduced motion preference: respect `prefers-reduced-motion: reduce` — skip confetti, use a static checkmark.
+   - Reduced motion preference: respect `prefers-reduced-motion: reduce` - skip confetti, use a static checkmark.
 
    - **No "Purchase Successful" wording anywhere.** No transaction confirmation language. Stick to celebrating the choice.
 
@@ -438,7 +438,7 @@ Migrate: `click_events`, `self_reported_conversions`, `wardrobe_items`, `wishlis
 
 ---
 
-## Phase 6 — Articles & Content Management
+## Phase 6 - Articles & Content Management
 
 **Objective:** Editorial system with markdown editor, embeddable product cards, SEO-ready output. The SEO engine of the platform.
 
@@ -487,7 +487,7 @@ Migrate: `articles`, `article_products`.
 
 ---
 
-## Phase 7 — Drops, Lookbooks, Edits, Home Banners
+## Phase 7 - Drops, Lookbooks, Edits, Home Banners
 
 **Objective:** Editorial drop posts (affiliate-style), shoppable lookbooks, curated edits, home page banner management.
 
@@ -540,20 +540,20 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ---
 
-## Phase 8 — Reviews, Newsletter, Notifications
+## Phase 8 - Reviews, Newsletter, Notifications
 
 **Objective:** Reviews gated by wardrobe ownership; newsletter capture; full notification engine.
 
 ### 8.1 Reviews
 
-1. `POST /api/products/:id/reviews` — enforce member has a `wardrobe_items` row for this product.
+1. `POST /api/products/:id/reviews` - enforce member has a `wardrobe_items` row for this product.
 2. `GET /api/products/:id/reviews` paginated.
 3. Maintain `products.avg_rating` + `products.review_count` via trigger or worker.
-4. Admin moderation at `/admin/reviews` — hide/restore with reason logged.
+4. Admin moderation at `/admin/reviews` - hide/restore with reason logged.
 
 ### 8.2 Newsletter
 
-1. ESP integration (Resend Audiences, Mailchimp, Buttondown — admin choice via env).
+1. ESP integration (Resend Audiences, Mailchimp, Buttondown - admin choice via env).
 2. Endpoints: `POST /api/newsletter/subscribe`, `POST /api/newsletter/unsubscribe`.
 3. Sign-up forms on home, footer, article pages, and a dedicated `/newsletter` page.
 4. Worker sends weekly digest: top new products, featured article, upcoming drops, top edit.
@@ -577,7 +577,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ---
 
-## Phase 9 — Affiliate Sync + Reconciliation
+## Phase 9 - Affiliate Sync + Reconciliation
 
 **Objective:** Keep product data fresh; reconcile actual affiliate payouts against tracked clicks.
 
@@ -592,14 +592,14 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
        - Update `products.price` if this is the primary retailer.
        - Fire price-drop notifications to wishlisters who toggled `notify_price_drop`.
      - If unavailable: set `availability_status = 'OUT_OF_STOCK_AT_RETAILER'`. Hidden from listings until restocked.
-   - Concurrency-limited (don't hammer retailers — 1–2 requests/second per retailer, with backoff).
+   - Concurrency-limited (don't hammer retailers - 1–2 requests/second per retailer, with backoff).
    - Failed syncs logged; product flagged with `sync_failed` after 3 consecutive failures (admin alert).
 
-2. **Affiliate link self-heal:** worker every 10 min checks `affiliate_links.pending_conversion = true` — only ever true for historical rows from the retired Cuelinks integration — and falls back to storing the raw URL directly. New links never end up in this state; every partner is written synchronously at Quick Add time.
+2. **Affiliate link self-heal:** worker every 10 min checks `affiliate_links.pending_conversion = true` - only ever true for historical rows from the retired Cuelinks integration - and falls back to storing the raw URL directly. New links never end up in this state; every partner is written synchronously at Quick Add time.
 
 3. **CSV reconciliation:**
    - Admin uploads provider CSV via `POST /api/admin/affiliate/reconciliation` (multipart), labeled with the partner (EarnKaro, Amazon, Meesho, etc.).
-   - Parser normalizes CSV column structure (Amazon, EarnKaro, Meesho — each has different formats).
+   - Parser normalizes CSV column structure (Amazon, EarnKaro, Meesho - each has different formats).
    - For each row: try to match to a `click_events` record by (partner, time window, amount band). Store match in `affiliate_payout_items`.
    - Unmatched rows still stored, flagged for admin review.
    - Idempotent: re-uploading the same CSV (detected via `csv_row_hash`) doesn't duplicate.
@@ -619,7 +619,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ---
 
-## Phase 10 — Admin Analytics & Audit
+## Phase 10 - Admin Analytics & Audit
 
 **Objective:** Admin dashboard with click analytics, content performance, drop metrics, member insights, audit log.
 
@@ -628,12 +628,12 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 1. **Rollup worker** runs hourly, aggregating raw events into summary tables: `analytics_daily_clicks`, `analytics_daily_conversions`, `analytics_content_perf`. Keeps endpoints fast.
 
 2. **Analytics endpoints** (PRD §14.4 + §27):
-   - `GET /api/admin/analytics/overview` — clicks, self-reported conversions, estimated commission, reconciled commission for today / 7d / 30d / 90d.
-   - `GET /api/admin/analytics/clicks` — top-clicked products, top retailers, top source pages.
-   - `GET /api/admin/analytics/content` — top articles by clicks and reconciled revenue.
-   - `GET /api/admin/analytics/drops` — per-drop click/conversion metrics.
-   - `GET /api/admin/analytics/members` — new vs returning, top wardrobes by item count.
-   - `GET /api/admin/analytics/system` — API p95, error rate, queue depth, sync health.
+   - `GET /api/admin/analytics/overview` - clicks, self-reported conversions, estimated commission, reconciled commission for today / 7d / 30d / 90d.
+   - `GET /api/admin/analytics/clicks` - top-clicked products, top retailers, top source pages.
+   - `GET /api/admin/analytics/content` - top articles by clicks and reconciled revenue.
+   - `GET /api/admin/analytics/drops` - per-drop click/conversion metrics.
+   - `GET /api/admin/analytics/members` - new vs returning, top wardrobes by item count.
+   - `GET /api/admin/analytics/system` - API p95, error rate, queue depth, sync health.
 
 3. **Admin dashboard** at `/admin`:
    - KPI cards: clicks today, conversions today, estimated commission, reconciled MTD.
@@ -641,7 +641,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
    - Quick links: low-conversion alerts, sync failures, pending reviews, open tickets.
    - "Live drops" badge with count.
 
-4. **Audit log viewer** at `/admin/audit` — filter by actor, action, date range.
+4. **Audit log viewer** at `/admin/audit` - filter by actor, action, date range.
 
 5. **Platform settings** at `/admin/settings`: sync intervals, drift thresholds, notification toggles, feature flags, default currency.
 
@@ -654,7 +654,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ---
 
-## Phase 11 — Hardening
+## Phase 11 - Hardening
 
 **Objective:** Production-ready: performance, security, accessibility, PWA, SEO.
 
@@ -665,7 +665,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 3. HTTP caching headers on public catalog endpoints.
 4. Next.js ISR for product detail and article pages with on-demand revalidation via webhook on admin edit.
 5. Image optimization: Next.js `<Image>` with `sizes`, WebP/AVIF, lazy-load below the fold.
-6. Bundle analysis — route bundles under 200 KB gzipped.
+6. Bundle analysis - route bundles under 200 KB gzipped.
 
 ### 11.2 Security
 
@@ -684,7 +684,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 3. Schema.org `Article` markup on articles.
 4. Open Graph + Twitter Card meta on every public page.
 5. Canonical tags everywhere.
-6. Auto-generated `sitemap.xml` — products, articles, brands, categories, drops, edits, lookbooks.
+6. Auto-generated `sitemap.xml` - products, articles, brands, categories, drops, edits, lookbooks.
 7. `robots.txt` configured (disallow `/admin/*`, `/account/*`, `/go/*`).
 8. **Google Search Console + Bing Webmaster** verification (note tag in admin settings).
 9. **Affiliate disclosure** verified on every product card, product page, and article (automated test).
@@ -720,7 +720,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 ---
 
-## Phase 12 — Testing & CI/CD
+## Phase 12 - Testing & CI/CD
 
 **Objective:** Comprehensive test suite + green CI/CD pipeline.
 
@@ -763,7 +763,7 @@ Required checks on PRs: all green before merge. On merge to `main`: build, push,
 
 ---
 
-## Phase 13 — Deployment
+## Phase 13 - Deployment
 
 **Objective:** Staging + production deployment, monitoring, runbooks.
 
@@ -821,11 +821,11 @@ Run these manually on production after Phase 13.
 2. Open mega-menu; navigate to Watches → Analog.
 3. Apply filters: brand=Tag Heuer, color=Black, price 5000–20000.
 4. Open a product detail page; verify AI avatar image (with badge), retailer image, all variants, related products.
-5. Tap "Buy Now" — new tab opens with Flipkart affiliate URL; check URL contains affiliate tag in DevTools.
+5. Tap "Buy Now" - new tab opens with Flipkart affiliate URL; check URL contains affiliate tag in DevTools.
 6. Return to Vineel tab; "Did you buy this?" bottom sheet appears after 8 seconds.
-7. Tap "Yes I bought it" — inline signup prompt; register quickly.
+7. Tap "Yes I bought it" - inline signup prompt; register quickly.
 8. Nice Pick celebration fires with a random headline + confetti.
-9. Tap "View My Wardrobe" — item is there.
+9. Tap "View My Wardrobe" - item is there.
 10. Leave a review on the wardrobe item; submit; appears on product page after admin moderation.
 
 ### Admin Journey
@@ -845,19 +845,19 @@ Run these manually on production after Phase 13.
 ### Drop Journey
 
 1. Admin creates "Monsoon Capsule" drop, scheduled 2 min in the future, with 5 curated products.
-2. Visit `/drops/monsoon-capsule` — see countdown, "Notify me" form. Sign up an email.
+2. Visit `/drops/monsoon-capsule` - see countdown, "Notify me" form. Sign up an email.
 3. Wait for scheduler. Drop flips to LIVE within 60s. Email arrives.
 4. Refresh; products now shoppable with Buy Now CTAs.
 5. Click Buy Now → affiliate redirect → Nice Pick celebration.
-6. Open admin drop dashboard — see clicks, self-reported conversion, estimated commission.
+6. Open admin drop dashboard - see clicks, self-reported conversion, estimated commission.
 
 ### Resilience Journey
 
 1. Kill backend during a click; restart. Click event logged via queue or repeated client retry.
-2. 1000 concurrent `/go/:trackingId` requests — all logged, p95 < 100ms.
-3. Paste a malformed/empty affiliate URL — Quick Add still completes, link stored exactly as given (no external call to fail).
-4. Run sync worker on a retailer that returns 404 — product flagged after 3 consecutive failures; admin alerted.
-5. Upload the same reconciliation CSV twice — second upload detected as duplicate, no double-counting.
+2. 1000 concurrent `/go/:trackingId` requests - all logged, p95 < 100ms.
+3. Paste a malformed/empty affiliate URL - Quick Add still completes, link stored exactly as given (no external call to fail).
+4. Run sync worker on a retailer that returns 404 - product flagged after 3 consecutive failures; admin alerted.
+5. Upload the same reconciliation CSV twice - second upload detected as duplicate, no double-counting.
 
 ---
 

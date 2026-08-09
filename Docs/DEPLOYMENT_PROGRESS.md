@@ -1,4 +1,4 @@
-# BranV Deployment — Full Progress Log + Continuation Guide
+# BranV Deployment - Full Progress Log + Continuation Guide
 
 > **This file is your handoff document.** It records everything done so far in plain English, then gives you the remaining steps to finish the deployment. You can resume from any new chat session using this file as context.
 
@@ -8,13 +8,13 @@
 
 | Thing | Value |
 |---|---|
-| **Project** | BranV — curated affiliate site (`branv.in`) |
+| **Project** | BranV - curated affiliate site (`branv.in`) |
 | **Frontend** | Next.js, deployed on Vercel (free tier) |
 | **Backend** | FastAPI (Python 3.12), deployed on Oracle Cloud VM |
 | **Database** | Postgres 16, running in Docker on the same VM |
 | **Reverse proxy** | Caddy, running in Docker on the VM (handles HTTPS) |
 | **DNS / CDN** | Cloudflare (free tier) in front of everything |
-| **Object storage** | Cloudflare R2 (free tier — 10 GB) for product images + backups |
+| **Object storage** | Cloudflare R2 (free tier - 10 GB) for product images + backups |
 | **Domain** | `branv.in` (registered at GoDaddy) |
 | **Oracle VM IP** | `68.233.118.28` |
 | **Oracle VM shape** | VM.Standard.E2.1.Micro (AMD x86, 1 GB RAM, Always Free) |
@@ -61,13 +61,13 @@
 
 ---
 
-# PART 1 — What's been done (in order)
+# PART 1 - What's been done (in order)
 
 Every section says: **What** (we did), **Why** (the use case), **How** (the key actions).
 
 ---
 
-## Phase 1 — Code changes on the laptop
+## Phase 1 - Code changes on the laptop
 
 **What:** Removed Redis from the NestJS code, added a new database table called `ClickIntent`, fixed a TypeScript config error, then committed and pushed to GitHub.
 
@@ -85,7 +85,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Phase 2 — Cloudflare onboarding
+## Phase 2 - Cloudflare onboarding
 
 **What:** Pointed the domain `branv.in` at Cloudflare so Cloudflare manages DNS and provides free TLS, CDN, and DDoS protection.
 
@@ -94,17 +94,17 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 **How:**
 1. Created a free Cloudflare account at `dash.cloudflare.com`.
 2. Clicked **Add a site**, entered `branv.in`, picked **Free plan**.
-3. Cloudflare scanned existing DNS records — found 0 (the domain was brand new).
+3. Cloudflare scanned existing DNS records - found 0 (the domain was brand new).
 4. Cloudflare gave 2 nameservers (e.g., `bob.ns.cloudflare.com` and `lisa.ns.cloudflare.com`).
 5. Logged into **GoDaddy** → My Products → `branv.in` → Nameservers → set custom nameservers → pasted both Cloudflare names → saved.
-6. Waited ~15 min — Cloudflare status flipped from 🟡 Pending → 🟢 Active.
+6. Waited ~15 min - Cloudflare status flipped from 🟡 Pending → 🟢 Active.
 7. In Cloudflare: **SSL/TLS → Overview** → set mode to **Full (strict)**.
 
 **Verify:** `nslookup -type=NS branv.in 8.8.8.8` returned the Cloudflare nameservers.
 
 ---
 
-## Phase 3 — Map the frontend to the domain (Vercel)
+## Phase 3 - Map the frontend to the domain (Vercel)
 
 **What:** Connected `www.branv.in` and `branv.in` to the existing Vercel deployment of the Next.js frontend.
 
@@ -120,11 +120,11 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    - **Critical:** Grey cloud (not orange). Vercel needs to handle TLS itself; Cloudflare's orange proxy interferes with Vercel's certificate.
 5. Vercel auto-issued Let's Encrypt certificates for both domains within 5 min.
 
-**Verify:** `https://www.branv.in` loads in the browser, shows the hero carousel. (API calls inside the page fail because the backend isn't live yet — expected.)
+**Verify:** `https://www.branv.in` loads in the browser, shows the hero carousel. (API calls inside the page fail because the backend isn't live yet - expected.)
 
 ---
 
-## Phase 4 — Created the Oracle Cloud VM (with detour)
+## Phase 4 - Created the Oracle Cloud VM (with detour)
 
 **What:** Got a free Linux server in the cloud where the backend will live.
 
@@ -134,7 +134,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 1. Signed up at `cloud.oracle.com` → Free Trial → home region **India South (Hyderabad)**.
 
-2. **First attempt — ARM (didn't work):**
+2. **First attempt - ARM (didn't work):**
    - Tried to create a `VM.Standard.A1.Flex` instance (ARM Ampere, 12 GB RAM target).
    - Got error: **"Out of capacity for shape VM.Standard.A1.Flex in availability domain AD-1."**
    - **Why:** Oracle gave away too many free ARM VMs; capacity is rarely available.
@@ -144,31 +144,31 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    - Almost always available. Trade-off: only 1 GB RAM, so we have to be careful about memory.
 
 4. **Instance settings:**
-   - Name: `branv-prod` (Oracle later named it `branv-vcn` based on the VCN — harmless cosmetic mismatch)
+   - Name: `branv-prod` (Oracle later named it `branv-vcn` based on the VCN - harmless cosmetic mismatch)
    - Image: Canonical Ubuntu 22.04
    - Shape: VM.Standard.E2.1.Micro (Always Free Eligible)
    - Public IPv4: assigned automatically → `68.233.118.28`
    - SSH keys: clicked **Generate a key pair for me** → downloaded both files.
 
 5. **Saved SSH keys** to `C:\Users\Lenovo\.ssh\`:
-   - `branv-prod.key` — private key (the secret)
-   - `branv-prod.key.pub` — public key
+   - `branv-prod.key` - private key (the secret)
+   - `branv-prod.key.pub` - public key
    - Hit a snag: both files initially had `.pub` extension; renamed correctly based on file size (private = 1679 bytes, public = 399 bytes).
 
 ---
 
-## Phase 5 — Networking fix (Internet Gateway)
+## Phase 5 - Networking fix (Internet Gateway)
 
 **What:** Connected the VM's network to the public internet.
 
-**Why:** Even though the VM had a public IP, it couldn't be reached from outside because the underlying Virtual Cloud Network (VCN) had no "front door" — no Internet Gateway. Without that, no traffic enters or leaves.
+**Why:** Even though the VM had a public IP, it couldn't be reached from outside because the underlying Virtual Cloud Network (VCN) had no "front door" - no Internet Gateway. Without that, no traffic enters or leaves.
 
 **How:**
 
 1. SSH attempts timed out. Diagnosed by:
    - Confirming the VM was 🟢 RUNNING in Oracle Console
    - Confirming `Test-NetConnection github.com -Port 22` from the laptop succeeded (so user's network is fine)
-   - Checking the Security List ingress rules — port 22 was correctly open
+   - Checking the Security List ingress rules - port 22 was correctly open
    - **Found the cause:** VCN had no Internet Gateway listed.
 
 2. **Created the Internet Gateway:**
@@ -181,13 +181,13 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    - Destination CIDR: `0.0.0.0/0`
    - Target: `branv-igw`
 
-4. **Re-tested SSH — succeeded.** Landed at `ubuntu@branv-vcn:~$`.
+4. **Re-tested SSH - succeeded.** Landed at `ubuntu@branv-vcn:~$`.
 
 **Verify:** `ssh -i C:\Users\Lenovo\.ssh\branv-prod.key ubuntu@68.233.118.28` lands at the Ubuntu shell.
 
 ---
 
-## Phase 6 — VM provisioning (firewall + Docker + swap)
+## Phase 6 - VM provisioning (firewall + Docker + swap)
 
 **What:** Prepared the VM to run our containerized backend.
 
@@ -237,11 +237,11 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 6. **Logged out and back in** so docker-group membership took effect.
 
-**Verify:** `docker ps` worked without "permission denied" — empty container list returned.
+**Verify:** `docker ps` worked without "permission denied" - empty container list returned.
 
 ---
 
-## Phase 7 — Discovered the FastAPI migration
+## Phase 7 - Discovered the FastAPI migration
 
 **What:** Realized the backend code we were deploying is FastAPI (Python), not NestJS (TypeScript).
 
@@ -250,14 +250,14 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 **How:** Switched our deployment plan:
 - **Image:** `ghcr.io/vineelpolavarapu/branv-api:latest` (Python image, ~300 MB)
 - **Port:** 5000 (FastAPI uvicorn default), not 4000 (NestJS default)
-- **Env vars:** FastAPI-shaped (SCHEDULER_OWNER, PY_LOG_LEVEL — no NODE_ENV)
+- **Env vars:** FastAPI-shaped (SCHEDULER_OWNER, PY_LOG_LEVEL - no NODE_ENV)
 - **Migrations:** Prisma still owns the schema. FastAPI's SQLAlchemy models are read-only auto-generated from the Prisma schema. So we need a one-shot Node container to run `prisma migrate deploy` before FastAPI starts.
 - **Updated `deploy/docker-compose.yml`** to reflect all of the above.
 - **Updated `deploy/Caddyfile`** to reverse-proxy to `api:5000`.
 
 ---
 
-## Phase 8 — Built the API image on the laptop
+## Phase 8 - Built the API image on the laptop
 
 **What:** Compiled the FastAPI code into a Docker container image on the laptop, then uploaded it to GitHub Container Registry (GHCR).
 
@@ -290,16 +290,16 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    docker push ghcr.io/vineelpolavarapu/branv-api:latest
    ```
    - Failed once with `use of closed network connection` (Docker Desktop proxy hiccup).
-   - Retried — succeeded. Image visible at `https://github.com/vineelpolavarapu?tab=packages`.
+   - Retried - succeeded. Image visible at `https://github.com/vineelpolavarapu?tab=packages`.
    - Package is **private** by GHCR default.
 
 ---
 
-## Phase 9 — Prepared deploy/ folder + copied Prisma
+## Phase 9 - Prepared deploy/ folder + copied Prisma
 
 **What:** Bundled everything the VM needs into a single `deploy/` folder.
 
-**Why:** The VM does not need the entire codebase — only the compose file, Caddy config, environment template, and the Prisma migrations (so the one-shot migrate container can run them).
+**Why:** The VM does not need the entire codebase - only the compose file, Caddy config, environment template, and the Prisma migrations (so the one-shot migrate container can run them).
 
 **How:**
 
@@ -309,9 +309,9 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    - Tunes Postgres for low memory
    - Adds a one-shot `migrate` service that runs Prisma migrations before the API starts
 
-2. Created [deploy/backup.sh](deploy/backup.sh) — runs nightly `pg_dump` and ships to R2 from the VM host (not in a container, to save memory).
+2. Created [deploy/backup.sh](deploy/backup.sh) - runs nightly `pg_dump` and ships to R2 from the VM host (not in a container, to save memory).
 
-3. Created [deploy/install-backup-cron.sh](deploy/install-backup-cron.sh) — one-time installer for the cron entry.
+3. Created [deploy/install-backup-cron.sh](deploy/install-backup-cron.sh) - one-time installer for the cron entry.
 
 4. Copied the Prisma folder into deploy/:
    ```powershell
@@ -322,7 +322,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Phase 10 — Shipped deploy/ to the VM
+## Phase 10 - Shipped deploy/ to the VM
 
 **What:** Sent the deploy folder from laptop to VM and moved it to its final home.
 
@@ -350,15 +350,15 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Phase 11 — Cloudflare R2 buckets
+## Phase 11 - Cloudflare R2 buckets
 
-**What:** Created two free object-storage buckets in Cloudflare R2 — one for product images, one for database backups. Created an API token to access them.
+**What:** Created two free object-storage buckets in Cloudflare R2 - one for product images, one for database backups. Created an API token to access them.
 
 **Why:** Storing images on the VM disk is wasteful (the VM only has 50 GB) and dangerous (if VM dies, images die). R2 gives 10 GB free with zero data-egress fees.
 
 **How:**
 
-1. Cloudflare → **R2 Object Storage** → subscribed to R2 (free tier, $0 — but requires a card on file for safety).
+1. Cloudflare → **R2 Object Storage** → subscribed to R2 (free tier, $0 - but requires a card on file for safety).
 
 2. Created bucket: `branv-uploads` (location auto / APAC).
 
@@ -381,13 +381,13 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-# PART 2 — What's left to do (continuation)
+# PART 2 - What's left to do (continuation)
 
-**Current state (2026-07-03):** Phases 1–11 complete AND Steps 12–14 of Part 2 complete. **⚠️ STUCK PARTWAY THROUGH STEP 15 — the FastAPI `api` container is in a restart loop.** All other services are healthy: `postgres` is Up and healthy, `migrate` exited 0 (migrations applied cleanly), and `caddy` is Up on 80/443. `.env` is fully populated, GHCR login is active on the VM, and the `api.branv.in` A record is live in Cloudflare as **grey cloud (DNS only)** — we have NOT yet flipped it to orange because Caddy cannot finish confirming its Let's Encrypt cert until the API is stable.
+**Current state (2026-07-03):** Phases 1–11 complete AND Steps 12–14 of Part 2 complete. **⚠️ STUCK PARTWAY THROUGH STEP 15 - the FastAPI `api` container is in a restart loop.** All other services are healthy: `postgres` is Up and healthy, `migrate` exited 0 (migrations applied cleanly), and `caddy` is Up on 80/443. `.env` is fully populated, GHCR login is active on the VM, and the `api.branv.in` A record is live in Cloudflare as **grey cloud (DNS only)** - we have NOT yet flipped it to orange because Caddy cannot finish confirming its Let's Encrypt cert until the API is stable.
 
-> **Fix already applied to `deploy/docker-compose.yml` during Step 15:** the `migrate` service originally used `node:20-alpine`, which crashed Prisma's schema engine with `Could not parse schema engine response: SyntaxError: Unexpected token 'E', "Error load"... is not valid JSON` because Alpine (musl) lacks the libssl variant Prisma's default binary needs. **Fix:** switched image to `node:20-bullseye-slim` and prepended `apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates &&` to the entrypoint. Migrations then applied. Keep this modified compose file — do not revert.
+> **Fix already applied to `deploy/docker-compose.yml` during Step 15:** the `migrate` service originally used `node:20-alpine`, which crashed Prisma's schema engine with `Could not parse schema engine response: SyntaxError: Unexpected token 'E', "Error load"... is not valid JSON` because Alpine (musl) lacks the libssl variant Prisma's default binary needs. **Fix:** switched image to `node:20-bullseye-slim` and prepended `apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates &&` to the entrypoint. Migrations then applied. Keep this modified compose file - do not revert.
 
-> **⚠️ Open issue — RESUME HERE:** the `api` container is crash-looping. Symptom: `docker compose exec api ...` returns `Container … is restarting, wait until the container is running`. Root cause is unknown because we never captured the crash logs. **First action in the next session:**
+> **⚠️ Open issue - RESUME HERE:** the `api` container is crash-looping. Symptom: `docker compose exec api ...` returns `Container … is restarting, wait until the container is running`. Root cause is unknown because we never captured the crash logs. **First action in the next session:**
 >
 > ```bash
 > cd /opt/branv
@@ -399,7 +399,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Step 12 — Finish filling `.env` on the VM ✅ DONE
+## Step 12 - Finish filling `.env` on the VM ✅ DONE
 
 **What:** Fill in the remaining environment variables in `/opt/branv/.env`.
 
@@ -412,7 +412,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    ssh -i C:\Users\Lenovo\.ssh\branv-prod.key ubuntu@68.233.118.28
    ```
 
-2. Check which variables are still empty (safe — only shows names, not values):
+2. Check which variables are still empty (safe - only shows names, not values):
    ```bash
    cd /opt/branv
    grep -v '^#' .env | grep '=' | awk -F= '{ if ($2 == "") print $1 " ❌ EMPTY"; else print $1 " ✅ filled" }'
@@ -423,11 +423,11 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    | Variable | What to set |
    |---|---|
    | `API_HOSTNAME` | `api.branv.in` |
-   | `ACME_EMAIL` | your real email — Let's Encrypt uses this for cert expiry alerts |
+   | `ACME_EMAIL` | your real email - Let's Encrypt uses this for cert expiry alerts |
    | `DB_PASSWORD` | Generate with `openssl rand -hex 32` |
    | `JWT_ACCESS_SECRET` | Generate with `openssl rand -hex 64` |
    | `JWT_REFRESH_SECRET` | Generate with `openssl rand -hex 64` |
-   | `COOKIE_DOMAIN` | `.branv.in` (with leading dot — covers all subdomains) |
+   | `COOKIE_DOMAIN` | `.branv.in` (with leading dot - covers all subdomains) |
    | `WEB_ORIGIN` | `https://www.branv.in` |
    | `S3_ENDPOINT` | `https://<your-account-id>.r2.cloudflarestorage.com` (from R2) |
    | `S3_REGION` | `auto` |
@@ -443,7 +443,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
    - `AMAZON_ASSOCIATES_TAG`, `AMAZON_ACCESS_KEY`, `AMAZON_SECRET_KEY`
    - `EARNKARO_API_KEY`
-   - `MAIL_API_KEY`, `MAIL_FROM` (email won't send — affects member signup/reset)
+   - `MAIL_API_KEY`, `MAIL_FROM` (email won't send - affects member signup/reset)
 
 5. **Generate strong secrets and edit `.env`:**
    ```bash
@@ -458,7 +458,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Step 13 — Docker login on the VM ✅ DONE
+## Step 13 - Docker login on the VM ✅ DONE
 
 **What:** Make the VM able to pull your private container image from GHCR.
 
@@ -470,14 +470,14 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
    ```bash
    docker login ghcr.io -u vineelpolavarapu
    ```
-2. When it asks for password, paste your **GitHub Personal Access Token** (the `ghp_xxx...` you generated in Phase 8). It will not show as you type — that's normal.
+2. When it asks for password, paste your **GitHub Personal Access Token** (the `ghp_xxx...` you generated in Phase 8). It will not show as you type - that's normal.
 3. Expected: `Login Succeeded`.
 
 **Note:** If you forgot the token, generate a new one at `https://github.com/settings/tokens/new` with `read:packages` scope (you don't need write on the VM, just read).
 
 ---
 
-## Step 14 — Create the `api.branv.in` DNS record ✅ DONE
+## Step 14 - Create the `api.branv.in` DNS record ✅ DONE
 
 **What:** Add a DNS record pointing `api.branv.in` to your VM's IP.
 
@@ -500,7 +500,7 @@ Every section says: **What** (we did), **Why** (the use case), **How** (the key 
 
 ---
 
-## Step 15 — Pull the image + start the stack ⚠️ IN PROGRESS — API CRASH-LOOPING ⬅️ **RESUME HERE**
+## Step 15 - Pull the image + start the stack ⚠️ IN PROGRESS - API CRASH-LOOPING ⬅️ **RESUME HERE**
 
 **What:** Launch all 4 containers: Postgres → migrate (runs once) → FastAPI → Caddy.
 
@@ -550,7 +550,7 @@ curl -I https://api.branv.in/api/health           # 200 OK, with Caddy's TLS cer
 
 ---
 
-## Step 16 — Switch DNS to Proxied (orange cloud)
+## Step 16 - Switch DNS to Proxied (orange cloud)
 
 **What:** Turn on Cloudflare's proxy in front of `api.branv.in`.
 
@@ -568,31 +568,31 @@ Response headers now include `Server: cloudflare` and `CF-RAY: ...`.
 
 ---
 
-## Step 17 — Seed the admin account
+## Step 17 - Seed the admin account
 
 **What:** Create the first admin user so you can log into `/admin` from the storefront.
 
-**Why:** The database is empty — no users exist. We seed one admin via a one-off Node container.
+**Why:** The database is empty - no users exist. We seed one admin via a one-off Node container.
 
 **How:** *(exact command depends on what seed script the FastAPI port has; if FastAPI dropped the seed script, use Prisma Studio or psql to insert manually)*
 
 ```bash
-# Option A — if there's a Python seed script:
+# Option A - if there's a Python seed script:
 docker compose exec api python -m app.scripts.seed_admin \
     --email you@branv.in --password 'YourStrongPassword123!'
 
-# Option B — direct SQL via psql:
+# Option B - direct SQL via psql:
 docker compose exec postgres psql -U branv -d branv -c \
   "INSERT INTO users (id, email, \"passwordHash\", role, status, \"createdAt\", \"updatedAt\") VALUES (
      'admin1', 'you@branv.in', '<argon2 hash>', 'ADMIN', 'ACTIVE', NOW(), NOW()
    );"
 ```
 
-The argon2 password hash can be generated by running the API in a one-off mode or with a small Python snippet — confirm in the next session.
+The argon2 password hash can be generated by running the API in a one-off mode or with a small Python snippet - confirm in the next session.
 
 ---
 
-## Step 18 — Install the host-level backup cron
+## Step 18 - Install the host-level backup cron
 
 **What:** Schedule `pg_dump` → R2 to run every night at 3 AM UTC.
 
@@ -620,7 +620,7 @@ And check Cloudflare R2 → `branv-pg-backups` bucket → should see `branv-<tim
 
 ---
 
-## Step 19 — End-to-end smoke test
+## Step 19 - End-to-end smoke test
 
 Test all the critical user paths. Pass = ready for traffic.
 
@@ -635,7 +635,7 @@ Test all the critical user paths. Pass = ready for traffic.
 
 ---
 
-## Step 20 — Cloudflare WAF rate-limit on `/auth/*`
+## Step 20 - Cloudflare WAF rate-limit on `/auth/*`
 
 **What:** Add a rate-limit rule in front of login endpoints.
 
@@ -651,7 +651,7 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 
 ---
 
-## Step 21 — UptimeRobot keep-alive
+## Step 21 - UptimeRobot keep-alive
 
 **What:** Ping your API every 5 minutes from outside.
 
@@ -664,7 +664,7 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 
 ---
 
-## Step 22 — Decommission Railway
+## Step 22 - Decommission Railway
 
 **What:** Turn off your old Railway project and clean the repo.
 
@@ -689,7 +689,7 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 | **VM (Virtual Machine)** | A virtual computer in the cloud. Looks like a real Linux box, but it's actually a slice of a bigger physical server. |
 | **VCN (Virtual Cloud Network)** | A private network for your Oracle VMs. Like a building with several offices (subnets). |
 | **Internet Gateway** | The "front door" connecting your VCN to the public internet. Without it, the VM can't be reached from outside. |
-| **Security List / Security Group** | Cloud-level firewall rules — what ports are open from where. |
+| **Security List / Security Group** | Cloud-level firewall rules - what ports are open from where. |
 | **iptables** | Operating-system-level firewall on the VM itself. Even if the cloud firewall allows traffic, iptables can block it. |
 | **Swap** | Disk space used as fake-extra-RAM when real RAM runs out. Slower than RAM but prevents crashes. |
 | **Docker** | A way to package an app + its dependencies into one "container" that runs identically everywhere. |
@@ -697,19 +697,19 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 | **Image** | The compiled, packaged software. Like a snapshot of an app ready to run. |
 | **Docker Compose** | A way to define + start multiple containers together (e.g., API + database + reverse proxy). |
 | **Registry** | A "storage" for Docker images on the internet. We use **GHCR** (GitHub Container Registry). |
-| **GHCR** | GitHub Container Registry — free, attached to your GitHub account. |
+| **GHCR** | GitHub Container Registry - free, attached to your GitHub account. |
 | **PAT (Personal Access Token)** | A long password used by command-line tools instead of your GitHub password. |
 | **Caddy** | A web server / reverse proxy that auto-fetches Let's Encrypt TLS certs. |
 | **Reverse proxy** | A server that takes incoming HTTPS traffic and forwards it to your actual app, hiding it from the internet. |
 | **Let's Encrypt** | A free certificate authority that issues TLS/SSL certificates automatically. |
 | **TLS / SSL** | The "lock icon" in browsers. Encrypts data between user and server. |
-| **DNS** | The phonebook of the internet — translates `branv.in` into an IP address. |
+| **DNS** | The phonebook of the internet - translates `branv.in` into an IP address. |
 | **Cloudflare** | A free CDN + DNS + security service that sits between users and your servers. |
 | **R2** | Cloudflare's S3-compatible object storage. 10 GB free. |
 | **S3 / S3-compatible** | A standard for storing files in the cloud. R2 follows this standard, so any tool that talks to S3 works with R2. |
 | **Prisma** | A database tool that manages schema and migrations. The Python app reads the schema; Prisma writes it. |
 | **Migration** | A SQL script that updates the database schema (add a table, add a column, etc.) |
-| **scp** | "Secure Copy" — uploads files over SSH. |
+| **scp** | "Secure Copy" - uploads files over SSH. |
 | **Grey cloud / Orange cloud** | Cloudflare DNS settings. Grey = DNS only (Cloudflare doesn't touch traffic). Orange = Proxied (Cloudflare CDN + protection). |
 
 ---
@@ -734,7 +734,7 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 | Path | What it is |
 |---|---|
 | [deploy/docker-compose.yml](docker-compose.yml) | All 4 services (Caddy, API, Postgres, migrate). |
-| [deploy/Caddyfile](Caddyfile) | Caddy reverse-proxy config — TLS + headers. |
+| [deploy/Caddyfile](Caddyfile) | Caddy reverse-proxy config - TLS + headers. |
 | [deploy/.env.production.example](.env.production.example) | Template for `.env`. Never commit `.env` itself. |
 | [deploy/backup.sh](backup.sh) | Nightly pg_dump → R2 script. |
 | [deploy/install-backup-cron.sh](install-backup-cron.sh) | Installs the cron entry on the VM. |
@@ -751,7 +751,7 @@ Cloudflare → **Security → WAF → Rate limiting rules → Create rule**:
 
 When you start a new chat, paste this into the first message:
 
-> "I'm resuming the BranV deployment (currently in Phase 13 — Deployment per the README). Full context is in `deploy/DEPLOYMENT_PROGRESS.md`. Phases 1–11 of Part 1 AND Steps 12–14 of Part 2 are complete: VM provisioned on Oracle Cloud (68.233.118.28), FastAPI image in GHCR, `deploy/` folder on the VM at `/opt/branv`, R2 buckets and API token configured, `/opt/branv/.env` fully populated with production secrets, GHCR login active on the VM, `api.branv.in` A record live in Cloudflare as grey cloud (DNS only). **I'm stuck partway through Step 15 — the FastAPI `api` container is in a restart loop.** Current stack state on the VM: `postgres` Up (healthy), `migrate` Exited 0 (Prisma migrations applied cleanly after we edited `deploy/docker-compose.yml` to switch the migrate service from `node:20-alpine` to `node:20-bullseye-slim` and prepend `apt-get install openssl ca-certificates` in the entrypoint — keep that fix), `caddy` Up on 80/443, `api` restarting. We never captured the api crash logs. **First action:** SSH into the VM (`ssh -i C:\Users\Lenovo\.ssh\branv-prod.key ubuntu@68.233.118.28`), then run `cd /opt/branv && docker compose ps && docker compose logs api --tail 200` and paste the full output so we can diagnose. Likely causes: missing env var required by `apps/api/app/core/settings.py`, `DATABASE_URL` naming mismatch between what migrate sets and what FastAPI reads, or an import-time error in `app.main`. After the API is stable and `curl.exe -I https://api.branv.in/api/health` from the laptop returns HTTP 200 with a valid Caddy TLS cert, proceed to Step 16 (flip DNS to orange Proxied), then Steps 17–22 (seed admin, install backup cron, smoke test, WAF rate-limit, UptimeRobot, decommission Railway). Read the file end-to-end and pick up from Step 15."
+> "I'm resuming the BranV deployment (currently in Phase 13 - Deployment per the README). Full context is in `deploy/DEPLOYMENT_PROGRESS.md`. Phases 1–11 of Part 1 AND Steps 12–14 of Part 2 are complete: VM provisioned on Oracle Cloud (68.233.118.28), FastAPI image in GHCR, `deploy/` folder on the VM at `/opt/branv`, R2 buckets and API token configured, `/opt/branv/.env` fully populated with production secrets, GHCR login active on the VM, `api.branv.in` A record live in Cloudflare as grey cloud (DNS only). **I'm stuck partway through Step 15 - the FastAPI `api` container is in a restart loop.** Current stack state on the VM: `postgres` Up (healthy), `migrate` Exited 0 (Prisma migrations applied cleanly after we edited `deploy/docker-compose.yml` to switch the migrate service from `node:20-alpine` to `node:20-bullseye-slim` and prepend `apt-get install openssl ca-certificates` in the entrypoint - keep that fix), `caddy` Up on 80/443, `api` restarting. We never captured the api crash logs. **First action:** SSH into the VM (`ssh -i C:\Users\Lenovo\.ssh\branv-prod.key ubuntu@68.233.118.28`), then run `cd /opt/branv && docker compose ps && docker compose logs api --tail 200` and paste the full output so we can diagnose. Likely causes: missing env var required by `apps/api/app/core/settings.py`, `DATABASE_URL` naming mismatch between what migrate sets and what FastAPI reads, or an import-time error in `app.main`. After the API is stable and `curl.exe -I https://api.branv.in/api/health` from the laptop returns HTTP 200 with a valid Caddy TLS cert, proceed to Step 16 (flip DNS to orange Proxied), then Steps 17–22 (seed admin, install backup cron, smoke test, WAF rate-limit, UptimeRobot, decommission Railway). Read the file end-to-end and pick up from Step 15."
 
 The new assistant should read `DEPLOYMENT_PROGRESS.md` and continue without losing context.
 

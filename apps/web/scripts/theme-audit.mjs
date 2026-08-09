@@ -75,7 +75,7 @@ for (const file of files) {
 
 perFile.sort((a, b) => b.fileCount - a.fileCount);
 
-console.log('\nBranV theme-audit — legacy color literals remaining\n' + '='.repeat(52));
+console.log('\nBranV theme-audit - legacy color literals remaining\n' + '='.repeat(52));
 for (const { file, fileCount, hits } of perFile) {
   console.log(`  ${String(fileCount).padStart(4)}  ${file}  (${hits.join(', ')})`);
 }
@@ -87,7 +87,7 @@ for (const [label, n] of Object.entries(totals)) {
 console.log('-'.repeat(52));
 console.log(`  Files with literals: ${perFile.length}`);
 console.log(`  Total literals:      ${grand}`);
-console.log(`  Progress target:     0 (every page/section migrated — §9.0)\n`);
+console.log(`  Progress target:     0 (every page/section migrated - §9.0)\n`);
 
 const strict = process.argv.includes('--strict');
 if (strict && grand > 0) {

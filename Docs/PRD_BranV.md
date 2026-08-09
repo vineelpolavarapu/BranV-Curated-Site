@@ -1,6 +1,6 @@
 # Product Requirements Document (PRD)
 
-> **Brand by Vineel — Curated Men's Affiliate Fashion Platform**
+> **Brand by Vineel - Curated Men's Affiliate Fashion Platform**
 > Version 2.0 · Status: Draft · Theme: Tech Innovation
 > *Supersedes v1.0. Affiliate model replaces direct e-commerce.*
 
@@ -8,13 +8,13 @@
 
 ## 1. Executive Summary
 
-**Brand by Vineel** is a curated men's fashion content platform that monetizes through **affiliate marketing**. Vineel sources outfits and watches from major retailers (Flipkart, Amazon, Myntra, Ajio, Meesho, Nykaa Man, Snitch, Bewakoof, and others), styles them on **AI-generated avatar models created by Vineel**, and presents them as shoppable editorial content. When users click "Buy Now," they are redirected to the retailer's affiliate-tagged URL where the actual purchase happens — Vineel earns a commission per converted sale.
+**Brand by Vineel** is a curated men's fashion content platform that monetizes through **affiliate marketing**. Vineel sources outfits and watches from major retailers (Flipkart, Amazon, Myntra, Ajio, Meesho, Nykaa Man, Snitch, Bewakoof, and others), styles them on **AI-generated avatar models created by Vineel**, and presents them as shoppable editorial content. When users click "Buy Now," they are redirected to the retailer's affiliate-tagged URL where the actual purchase happens - Vineel earns a commission per converted sale.
 
 Vineel **never holds inventory**, **never processes payments**, **never fulfills orders**, and **never handles returns**. The retailer does all of that. Vineel provides curation, styling, content, and a destination.
 
 The model is closest to **The Wirecutter, GQ Recommends, Hypebeast Shopping, and successful menswear Instagram creators monetizing via link-in-bio sites**. Revenue comes from affiliate commissions paid by retailers (typically 1–10% per sale depending on category and program).
 
-The platform is built as a **mobile-first responsive Progressive Web App (PWA)** — one codebase serving mobile and desktop browsers. No native apps.
+The platform is built as a **mobile-first responsive Progressive Web App (PWA)** - one codebase serving mobile and desktop browsers. No native apps.
 
 ---
 
@@ -23,7 +23,7 @@ The platform is built as a **mobile-first responsive Progressive Web App (PWA)**
 ### 2.1 Revenue
 
 - **Affiliate commissions** via **Amazon Associates direct** (server-side auto-tagging) for Amazon products.
-- **EarnKaro**, **Meesho affiliate program**, and other manually-managed networks for everything else — the admin joins each program directly, generates the affiliate-wrapped URL on the network's own dashboard, and pastes it into the retailer URL field. BranV stores and redirects to it verbatim; no conversion API call.
+- **EarnKaro**, **Meesho affiliate program**, and other manually-managed networks for everything else - the admin joins each program directly, generates the affiliate-wrapped URL on the network's own dashboard, and pastes it into the retailer URL field. BranV stores and redirects to it verbatim; no conversion API call.
 - **Direct brand programs** (Bewakoof, Snitch, The Souled Store) added opportunistically once traffic justifies the operational overhead.
 
 ### 2.2 Cost Structure
@@ -35,7 +35,7 @@ The platform is built as a **mobile-first responsive Progressive Web App (PWA)**
 
 ### 2.3 Disclosure & Compliance
 
-- Prominent affiliate disclosure on every product page and in the footer (ASCI-aligned for India, FTC-aligned for international visitors): *"We earn a small commission when you buy through our links — at no extra cost to you."*
+- Prominent affiliate disclosure on every product page and in the footer (ASCI-aligned for India, FTC-aligned for international visitors): *"We earn a small commission when you buy through our links - at no extra cost to you."*
 - AI-generated imagery disclosure on every avatar image: small tag reading *"AI-rendered model"* or *"Styled with AI."*
 - No misrepresentation of the affiliate relationship anywhere in UX copy.
 - Product imagery from retailers used per each affiliate program's terms (Amazon PA-API / EarnKaro / Meesho compliant usage).
@@ -46,7 +46,7 @@ The platform is built as a **mobile-first responsive Progressive Web App (PWA)**
 
 ### 3.1 Vision
 
-Build the destination men in India check first before shopping — an editorial, opinionated, AI-illustrated curation of menswear across the internet, where Vineel's eye is the differentiator.
+Build the destination men in India check first before shopping - an editorial, opinionated, AI-illustrated curation of menswear across the internet, where Vineel's eye is the differentiator.
 
 ### 3.2 Primary Goals
 
@@ -54,7 +54,7 @@ Build the destination men in India check first before shopping — an editorial,
 2. **One-modal Quick Add workflow** so adding a new product takes under 60 seconds end-to-end.
 3. **Honest, satisfying click-out experience** with a celebratory "Nice pick!" moment that respects user trust while feeling premium.
 4. **Robust click tracking** so Vineel knows what's converting, even when retailers don't share conversion data.
-5. **AI avatar consistency** — Vineel's signature AI model appears across the catalog, becoming a recognizable visual identity.
+5. **AI avatar consistency** - Vineel's signature AI model appears across the catalog, becoming a recognizable visual identity.
 6. **SEO-first architecture** so every piece of content compounds in long-term value.
 7. **Mobile-first responsive design** because most fashion browsing happens on mobile.
 
@@ -82,7 +82,7 @@ Free signup. Can do everything a visitor can, plus: save to wishlist, build "My 
 
 ### 4.3 Admin (Vineel)
 
-Sole operator. Manages content, products, affiliate links, AI avatars, drops, analytics, members, and platform settings. Mandatory 2FA. CLI-seeded only — no admin self-registration.
+Sole operator. Manages content, products, affiliate links, AI avatars, drops, analytics, members, and platform settings. Mandatory 2FA. CLI-seeded only - no admin self-registration.
 
 ### 4.4 Future Compatibility
 
@@ -94,18 +94,18 @@ Role enum reserves `STAFF` for v2 (if Vineel ever hires content help, fulfillmen
 |---|:---:|:---:|:---:|
 | Browse, search, filter | ✓ | ✓ | ✓ |
 | Click affiliate link out | ✓ | ✓ | ✓ |
-| Self-report a purchase | ✓ (anon) | ✓ (saved) | — |
-| Wishlist | — | ✓ | — |
-| My Wardrobe | — | ✓ | — |
-| Leave product review | — | ✓ (purchase-gated) | — |
-| Newsletter signup | ✓ | ✓ | — |
-| Drop pre-launch notify | ✓ | ✓ | — |
-| Content management (CRUD) | — | — | ✓ |
-| Avatar asset library | — | — | ✓ |
-| Affiliate link configuration | — | — | ✓ |
-| Click analytics | — | — | ✓ |
-| Member management | — | — | ✓ |
-| Platform settings | — | — | ✓ |
+| Self-report a purchase | ✓ (anon) | ✓ (saved) | - |
+| Wishlist | - | ✓ | - |
+| My Wardrobe | - | ✓ | - |
+| Leave product review | - | ✓ (purchase-gated) | - |
+| Newsletter signup | ✓ | ✓ | - |
+| Drop pre-launch notify | ✓ | ✓ | - |
+| Content management (CRUD) | - | - | ✓ |
+| Avatar asset library | - | - | ✓ |
+| Affiliate link configuration | - | - | ✓ |
+| Click analytics | - | - | ✓ |
+| Member management | - | - | ✓ |
+| Platform settings | - | - | ✓ |
 
 ---
 
@@ -136,7 +136,7 @@ One backend, one design system, shared auth, separate IA.
 
 ### 6.2 Brand as a First-Class Entity
 
-- `brands` table is independent — name, slug, logo, country of origin, founded year, hero image, short description, featured flag.
+- `brands` table is independent - name, slug, logo, country of origin, founded year, hero image, short description, featured flag.
 - Every product links to one brand.
 - `/brands/[slug]` brand pages with brand story and all carried products.
 - "Shop by Brand" is a top-level navigation axis alongside "Shop by Category."
@@ -144,10 +144,10 @@ One backend, one design system, shared auth, separate IA.
 
 ### 6.3 Curatorial Concepts
 
-- **Featured Brands** — admin-rotated home page module.
-- **New Arrivals** — products added in last 30 days.
-- **Editor's Picks** — admin-curated lists.
-- **The Edit** — themed collections ("Monsoon Essentials," "Wedding Guest," "Festive 2026").
+- **Featured Brands** - admin-rotated home page module.
+- **New Arrivals** - products added in last 30 days.
+- **Editor's Picks** - admin-curated lists.
+- **The Edit** - themed collections ("Monsoon Essentials," "Wedding Guest," "Festive 2026").
 - **Drop Posts** (see §11).
 
 ---
@@ -163,7 +163,7 @@ This is the single most important admin workflow and the platform's productivity
 
 ### 7.2 The Modal
 
-Single-screen modal — no tabs, no multi-step. Layout:
+Single-screen modal - no tabs, no multi-step. Layout:
 
 ```
 ┌──────────────────────────────────────────────────┐
@@ -191,7 +191,7 @@ Single-screen modal — no tabs, no multi-step. Layout:
 │  [ ✓ extracted from Flipkart                   ] │
 │                                                  │
 │  🔗 Affiliate Link                               │
-│  [ stored exactly as pasted — pick network:     ]│
+│  [ stored exactly as pasted - pick network:     ]│
 │  [ EarnKaro ▾ ]                                  │
 │                                                  │
 │  Status:  ○ Draft   ● Publish now                │
@@ -208,11 +208,11 @@ Single-screen modal — no tabs, no multi-step. Layout:
   - Auto-fill is best-effort; admin reviews and corrects before submitting.
 - **Paste-from-clipboard image upload**: `Ctrl+V` / `Cmd+V` inside the modal pastes an image directly (no file dialog). Critical for fast workflow since Vineel generates avatars in Gemini/ChatGPT and pastes results in.
 - **Drag-drop image upload** as alternative.
-- **Affiliate link stored as pasted**: admin brings an already affiliate-wrapped URL from their network's own dashboard (EarnKaro, Meesho, etc.) and pastes it into the retailer URL field; it's stored and redirected to exactly as given, tagged with the network picked from a dropdown. Amazon URLs are the one exception — those get the Associates tag appended automatically server-side.
-- **Brand dropdown with inline creation**: pick an existing brand from the dropdown, or choose "+ New brand" to open a full brand-creation form in a modal layered on top — Quick Add stays open and untouched underneath. The new brand is selected automatically once created.
+- **Affiliate link stored as pasted**: admin brings an already affiliate-wrapped URL from their network's own dashboard (EarnKaro, Meesho, etc.) and pastes it into the retailer URL field; it's stored and redirected to exactly as given, tagged with the network picked from a dropdown. Amazon URLs are the one exception - those get the Associates tag appended automatically server-side.
+- **Brand dropdown with inline creation**: pick an existing brand from the dropdown, or choose "+ New brand" to open a full brand-creation form in a modal layered on top - Quick Add stays open and untouched underneath. The new brand is selected automatically once created.
 - **Inline category navigation**: subcategory dropdown depends on selected category.
 - **Keyboard-first**: Tab through fields. `Ctrl/Cmd + Enter` submits.
-- **Bulk mode**: checkbox keeps modal open after submit, clears form, refocuses URL field — for adding 10–20 products in rapid succession.
+- **Bulk mode**: checkbox keeps modal open after submit, clears form, refocuses URL field - for adding 10–20 products in rapid succession.
 - **Auto-save draft**: if admin closes modal mid-entry, form state is saved to localStorage and offered on reopen.
 - **Validation inline**: red highlight on missing required fields with the submit button disabled until valid.
 
@@ -233,7 +233,7 @@ A signature visual differentiator. Vineel generates a consistent AI avatar model
 ### 8.1 Avatar Asset Library
 
 - Admin section at `/admin/avatars`.
-- Stores Vineel's base reference avatar(s) — front view, side view, back view, different poses, different settings (studio, outdoor, urban).
+- Stores Vineel's base reference avatar(s) - front view, side view, back view, different poses, different settings (studio, outdoor, urban).
 - Each reference has a name, tags, and a stored prompt template (the exact prompt that generates Vineel's signature look).
 - Used as reference inputs when generating new outfit images in Gemini/ChatGPT or Midjourney with `--cref`.
 
@@ -267,7 +267,7 @@ Vineel's typical content creation loop:
 
 ### 9.1 Home Page
 
-- **Hero carousel** — admin-managed editorial banners with CTAs (link to a drop, a brand, an edit, or an article).
+- **Hero carousel** - admin-managed editorial banners with CTAs (link to a drop, a brand, an edit, or an article).
 - **Featured brands** module.
 - **New arrivals** carousel.
 - **The Edit** featured collection block.
@@ -279,34 +279,34 @@ Vineel's typical content creation loop:
 
 - Routes: `/category/[slug]`, `/brands/[slug]`, `/search?q=`, `/new`, `/sale`, `/edits/[slug]`, `/drops/[slug]`.
 - **Sort:** Relevance, Newest, Price (low→high, high→low), Best Rated, Most Popular (by click count).
-- **Faceted filters** — see §10.
+- **Faceted filters** - see §10.
 - **Card design:** AI avatar image as hero (primary), retailer product image as secondary swap on hover/tap, brand name, title, price, MRP strikethrough, discount %, retailer badge ("Buy on Flipkart" / "Buy on Amazon" / etc.), "Buy Now" CTA, wishlist heart.
 
 ### 9.3 Product Detail Page
 
 - **Image gallery:** AI avatar images (primary) + retailer product images (secondary) in a swipeable carousel. AI-rendered tag visible on avatar images.
 - **Title, brand** (links to brand page), **price**, MRP strikethrough, **discount %**, **retailer badge**.
-- **Variant info:** sizes available, colors available (display-only — actual variant selection happens on the retailer's site).
+- **Variant info:** sizes available, colors available (display-only - actual variant selection happens on the retailer's site).
 - **Description, material, care, country of origin** (from retailer + Vineel's editorial notes).
-- **Size guide modal** — category-specific.
+- **Size guide modal** - category-specific.
 - **Aggregate rating + reviews** (from members who self-reported purchase).
-- **"You may also like"** — same category + price band, prefer same brand.
+- **"You may also like"** - same category + price band, prefer same brand.
 - **Affiliate disclosure** line.
 - **CTAs:** **Buy Now** (primary, retailer-branded), **Add to Wishlist**.
-- **"Where to buy"** secondary section — if the same product is tracked across multiple retailers, show price comparison and let user pick where to buy.
+- **"Where to buy"** secondary section - if the same product is tracked across multiple retailers, show price comparison and let user pick where to buy.
 
 ### 9.4 The Click-Out Flow
 
 This is the core revenue moment. Designed for honesty and delight.
 
-**Step 1 — Click "Buy Now"**
+**Step 1 - Click "Buy Now"**
 
 - Click goes through `/go/:trackingId` redirect endpoint.
 - Server logs: user_id (or anonymous session_id), product_id, retailer, source page, UTM data, timestamp, user agent, IP region.
 - Server responds with 302 redirect to the stored affiliate URL (Amazon: auto-tagged; everything else: the URL exactly as the admin pasted it).
 - Frontend opens this URL in a **new tab** (`target="_blank"` with `rel="noopener nofollow sponsored"` for SEO compliance and security).
 
-**Step 2 — Optional in-tab return modal**
+**Step 2 - Optional in-tab return modal**
 
 When the user returns to the Vineel tab (detected via `visibilitychange` event when they switch back), show a small non-intrusive bottom-sheet:
 
@@ -317,14 +317,14 @@ When the user returns to the Vineel tab (detected via `visibilitychange` event w
 │                                          │
 │ [ Yes, I bought it ]                     │
 │ [ Just browsing, not yet ]               │
-│ [ Need help — contact us ]               │
+│ [ Need help - contact us ]               │
 └──────────────────────────────────────────┘
 ```
 
 - Member is gently prompted, not forced. Dismissible. Shown once per click event.
 - Visitor (unauthenticated) gets the same prompt but the "Yes" path encourages signup to save the item.
 
-**Step 3a — "Yes, I bought it"**
+**Step 3a - "Yes, I bought it"**
 
 - For members: item is added to **My Wardrobe** with the self-reported purchase timestamp.
 - For visitors: optional inline signup with one-tap email, then add to Wardrobe.
@@ -345,17 +345,17 @@ When the user returns to the Vineel tab (detected via `visibilitychange` event w
 └────────────────────────────────────────────────┘
 ```
 
-- **Headline rotates randomly** from a pool — never the same phrase twice in a row for the same user. Pool examples: "Nice pick!", "Solid choice!", "Great taste!", "Love that one!", "You've got an eye!", "Stylish move!", "Top tier!", "That's the one!", "Excellent!", "Pure class!", "Sharp!", "On point!", "Looking good!", "Killer choice!", "Bold move!", "Crisp!", "Elite taste!", "Wardrobe upgrade unlocked!". A `random` helper picks from this pool with a small "no immediate repeat" guard.
-- **Background celebration animation** runs behind the modal — light confetti or sparkles, ~1.5 seconds, then fades. Lightweight (canvas-based or CSS-only, no heavy libs).
+- **Headline rotates randomly** from a pool - never the same phrase twice in a row for the same user. Pool examples: "Nice pick!", "Solid choice!", "Great taste!", "Love that one!", "You've got an eye!", "Stylish move!", "Top tier!", "That's the one!", "Excellent!", "Pure class!", "Sharp!", "On point!", "Looking good!", "Killer choice!", "Bold move!", "Crisp!", "Elite taste!", "Wardrobe upgrade unlocked!". A `random` helper picks from this pool with a small "no immediate repeat" guard.
+- **Background celebration animation** runs behind the modal - light confetti or sparkles, ~1.5 seconds, then fades. Lightweight (canvas-based or CSS-only, no heavy libs).
 - **No mention of "Purchase Successful"**, no PhonePe-mimicking copy, no fake order confirmation. The celebration is for *the choice*, not a fabricated transaction.
 - Modal auto-dismisses after 4 seconds or on click anywhere.
 
-**Step 3b — "Just browsing"**
+**Step 3b - "Just browsing"**
 
 - Click logged with `outcome: browsing`.
 - Modal closes. No celebration. Item optionally added to wishlist with one tap.
 
-**Step 3c — "Need help"**
+**Step 3c - "Need help"**
 
 - Opens support ticket flow with the product pre-filled.
 
@@ -366,7 +366,7 @@ A genuinely useful feature for members. Items they've self-reported buying live 
 - Route: `/wardrobe`.
 - Grid of items grouped by retailer, brand, or season.
 - Each item shows: image, title, brand, retailer, purchase date (self-reported), "Manage on Flipkart →" link to retailer's order history, optional notes ("for cousin's wedding"), tag editor (own categorization).
-- "Leave a review" CTA on each wardrobe item — gated to members with the item in their wardrobe.
+- "Leave a review" CTA on each wardrobe item - gated to members with the item in their wardrobe.
 - Privacy: wardrobe is private by default. Optional public profile in v1.5.
 - Wardrobe statistics: total spend (self-reported), favorite brand, most-bought category.
 
@@ -374,7 +374,7 @@ A genuinely useful feature for members. Items they've self-reported buying live 
 
 - Members can save items to a wishlist with a tap on the heart icon.
 - Route `/wishlist`.
-- "Notify me on price drop" toggle per item — fires when admin updates the price (or the nightly sync detects a drop) on that product.
+- "Notify me on price drop" toggle per item - fires when admin updates the price (or the nightly sync detects a drop) on that product.
 
 ### 9.7 Search
 
@@ -384,8 +384,8 @@ A genuinely useful feature for members. Items they've self-reported buying live 
 
 ### 9.8 Member Account
 
-- `/account` — profile, email, password, 2FA toggle, notification preferences, newsletter preferences.
-- `/account/addresses` — *kept lightweight; only used for member profile, not order routing* (since there are no orders).
+- `/account` - profile, email, password, 2FA toggle, notification preferences, newsletter preferences.
+- `/account/addresses` - *kept lightweight; only used for member profile, not order routing* (since there are no orders).
 - `/wardrobe`, `/wishlist`, `/account/notifications`, `/account/reviews`.
 
 ### 9.9 Newsletter
@@ -430,11 +430,11 @@ Desktop: sticky sidebar. Mobile: slide-up sheet with chips for active filters ab
 
 ## 11. Drop Posts (Editorial)
 
-Repositioned for affiliate model — no inventory, no purchase limits, no waitlist.
+Repositioned for affiliate model - no inventory, no purchase limits, no waitlist.
 
 ### 11.1 Concept
 
-A **Drop Post** is an editorial article about a launch happening at one of the covered brands or retailers — e.g., "Snitch Monsoon Drop — Out Friday 8PM on Snitch.co.in" or "The Tag Heuer Anniversary Edition — Pre-orders on Flipkart."
+A **Drop Post** is an editorial article about a launch happening at one of the covered brands or retailers - e.g., "Snitch Monsoon Drop - Out Friday 8PM on Snitch.co.in" or "The Tag Heuer Anniversary Edition - Pre-orders on Flipkart."
 
 ### 11.2 Structure
 
@@ -449,7 +449,7 @@ A **Drop Post** is an editorial article about a launch happening at one of the c
   - **Pre-launch:** hero, countdown to launch, "Notify Me" form, share buttons.
   - **Live:** hero, products with affiliate Buy Now links, countdown to end (if set).
   - **Ended:** archive view, link to next drop.
-- **Drop calendar** at `/drops` — upcoming and past.
+- **Drop calendar** at `/drops` - upcoming and past.
 - Email notifications: 24h-before reminder, launch notification, last-call.
 
 ### 11.4 Admin
@@ -469,18 +469,18 @@ Runs every minute, flips drop statuses at scheduled times, fires pre-launch and 
 
 ### 12.1 Articles
 
-A full editorial system — this is the engine of SEO and affiliate revenue.
+A full editorial system - this is the engine of SEO and affiliate revenue.
 
 - Article types: Roundup ("10 Best Linen Shirts Under ₹2000"), Guide ("How to Style a Bomber Jacket"), Brand Spotlight, Comparison ("Snitch vs The Souled Store"), Drop announcement.
-- Rich markdown editor with embeddable product cards — admin types `/product` in the editor and gets a product picker that inserts a styled embed.
+- Rich markdown editor with embeddable product cards - admin types `/product` in the editor and gets a product picker that inserts a styled embed.
 - Each article has: title, slug, hero image, excerpt, body (markdown), tags, related products, author byline (Vineel), publish date, scheduled publish, SEO metadata (meta title, meta description, OG image), reading time (auto-calculated).
 - Article listing at `/articles`, individual articles at `/articles/[slug]`.
-- Articles are major SEO assets — full schema.org markup as `Article` with `mentions` of products.
+- Articles are major SEO assets - full schema.org markup as `Article` with `mentions` of products.
 
 ### 12.2 Lookbooks
 
 - Themed photo collections built around Vineel's AI avatar.
-- Each lookbook image has shoppable hotspots — click a hotspot, get a product card with Buy Now.
+- Each lookbook image has shoppable hotspots - click a hotspot, get a product card with Buy Now.
 - Public at `/lookbooks/[slug]`.
 - Teaser block on home page.
 
@@ -507,13 +507,13 @@ A full editorial system — this is the engine of SEO and affiliate revenue.
 
 - Register for Amazon Associates India (requires a website with content; approval can take days).
 - For Amazon URLs, use direct Amazon Associates tag (`tag=brandbyvineel-21` or similar), appended server-side.
-- Backend detects Amazon URLs (by retailer field or hostname) and routes them through this direct integration automatically — no admin action needed beyond pasting the plain product URL.
+- Backend detects Amazon URLs (by retailer field or hostname) and routes them through this direct integration automatically - no admin action needed beyond pasting the plain product URL.
 
 ### 13.2 Everything Else: Manual Affiliate Links (EarnKaro, Meesho, and others)
 
-- No conversion API for these — the admin joins each network directly (EarnKaro, Meesho affiliate program, etc.), generates the affiliate-wrapped URL on that network's own dashboard, and pastes the finished link into the retailer URL field in Quick Add.
-- Stored as `(raw_url, converted_url, partner, partner_link_id, created_at)` in `affiliate_links` table — `converted_url` is identical to `raw_url` for these rows (no conversion happened), and `partner` records which network the admin selected from a dropdown (EarnKaro / Meesho / Other-Direct) so reconciliation reports can still be split per network.
-- The redirect endpoint (`/go/:trackingId`) simply serves this stored URL — no external call at click time either.
+- No conversion API for these - the admin joins each network directly (EarnKaro, Meesho affiliate program, etc.), generates the affiliate-wrapped URL on that network's own dashboard, and pastes the finished link into the retailer URL field in Quick Add.
+- Stored as `(raw_url, converted_url, partner, partner_link_id, created_at)` in `affiliate_links` table - `converted_url` is identical to `raw_url` for these rows (no conversion happened), and `partner` records which network the admin selected from a dropdown (EarnKaro / Meesho / Other-Direct) so reconciliation reports can still be split per network.
+- The redirect endpoint (`/go/:trackingId`) simply serves this stored URL - no external call at click time either.
 
 ### 13.3 Direct Brand Programs (Future)
 
@@ -550,16 +550,16 @@ This is the heart of analytics for affiliate businesses, because retailer dashbo
 - Most affiliate programs send weekly/monthly CSV reports of confirmed conversions and commissions.
 - Admin uploads these CSVs via `/admin/affiliate/reconciliation`.
 - Parser matches reported transactions to logged clicks where possible (by retailer, approximate time window, approximate amount).
-- Stores reconciled records in `affiliate_payouts` table — the source of truth for actual revenue.
+- Stores reconciled records in `affiliate_payouts` table - the source of truth for actual revenue.
 
 ### 14.4 Metrics
 
-- **Self-reported conversion rate** — clicks → self-reported buys (member-disclosed).
-- **Confirmed conversion rate** — clicks → reconciled payouts (from CSV).
-- **Estimated commission** vs **actual commission** — variance helps tune content strategy.
-- **Top performing content** — articles, drops, edits ranked by click volume and reconciled revenue.
-- **Top performing products** — products ranked by clicks and conversions.
-- **Retailer health** — which retailer programs are converting best.
+- **Self-reported conversion rate** - clicks → self-reported buys (member-disclosed).
+- **Confirmed conversion rate** - clicks → reconciled payouts (from CSV).
+- **Estimated commission** vs **actual commission** - variance helps tune content strategy.
+- **Top performing content** - articles, drops, edits ranked by click volume and reconciled revenue.
+- **Top performing products** - products ranked by clicks and conversions.
+- **Retailer health** - which retailer programs are converting best.
 
 ---
 
@@ -570,7 +570,7 @@ This is the heart of analytics for affiliate businesses, because retailer dashbo
 - Email (primary).
 - In-app notifications (bell icon).
 - Web Push (PWA, gated behind permission).
-- SMS — feature-flagged, off at launch.
+- SMS - feature-flagged, off at launch.
 
 ### 15.2 Types
 
@@ -591,7 +591,7 @@ This is the heart of analytics for affiliate businesses, because retailer dashbo
 - 1–5 star rating + optional title, body, images.
 - Admin moderation (hide/restore).
 - Aggregate rating on product page.
-- *Self-reported purchase is sufficient gating* — no order-system gating possible since there are no orders.
+- *Self-reported purchase is sufficient gating* - no order-system gating possible since there are no orders.
 
 ---
 
@@ -662,7 +662,7 @@ Lightweight ticket system.
 
 - DB writes in transactions.
 - Idempotent operations where retried (affiliate sync, notifications).
-- No external conversion API in the affiliate-link write path to degrade — links are stored exactly as pasted (Amazon tagging is a local string operation).
+- No external conversion API in the affiliate-link write path to degrade - links are stored exactly as pasted (Amazon tagging is a local string operation).
 
 ### 19.5 Observability
 
@@ -703,74 +703,74 @@ Lightweight ticket system.
 ## 21. Data Model (Core Tables)
 
 ```
-users                      — id, email, password_hash, role, status, email_verified_at, totp_secret, created_at
-member_profiles            — id, user_id, first_name, last_name, phone, dob, avatar_url, tier
-addresses                  — id, user_id, line1, line2, city, state, pincode, country (profile-only, optional)
+users                      - id, email, password_hash, role, status, email_verified_at, totp_secret, created_at
+member_profiles            - id, user_id, first_name, last_name, phone, dob, avatar_url, tier
+addresses                  - id, user_id, line1, line2, city, state, pincode, country (profile-only, optional)
 
-brands                     — id, slug, name, logo_url, hero_url, country, founded_year, description, is_featured, status
-categories                 — id, parent_id, slug, name, path, display_order
-category_attribute_schemas — id, category_id, attribute_key, display_name, filter_type, options_json
+brands                     - id, slug, name, logo_url, hero_url, country, founded_year, description, is_featured, status
+categories                 - id, parent_id, slug, name, path, display_order
+category_attribute_schemas - id, category_id, attribute_key, display_name, filter_type, options_json
 
-products                   — id, brand_id, category_id, subcategory_id, slug, title, description,
+products                   - id, brand_id, category_id, subcategory_id, slug, title, description,
                               price, mrp, discount_pct, currency, primary_retailer, status,
                               created_by_admin_id, meta_title, meta_description, tags[], created_at
-product_variants           — id, product_id, sku?, attributes_jsonb, color, size, is_default
-product_images             — id, product_id, url, alt_text, is_primary, is_ai_generated, position
-product_retailer_listings  — id, product_id, retailer, retailer_product_url, retailer_image_url,
+product_variants           - id, product_id, sku?, attributes_jsonb, color, size, is_default
+product_images             - id, product_id, url, alt_text, is_primary, is_ai_generated, position
+product_retailer_listings  - id, product_id, retailer, retailer_product_url, retailer_image_url,
                               raw_price, last_synced_at, availability_status
                               (allows the same product to be listed across multiple retailers)
 
-affiliate_links            — id, product_retailer_listing_id, partner, raw_url, converted_url,
+affiliate_links            - id, product_retailer_listing_id, partner, raw_url, converted_url,
                               partner_link_id, created_at, last_validated_at
 
-click_events               — id, tracking_id UNIQUE, product_id, user_id?, session_id, source_page_url,
+click_events               - id, tracking_id UNIQUE, product_id, user_id?, session_id, source_page_url,
                               referrer, utm_source, utm_medium, utm_campaign, user_agent, ip_country,
                               partner, partner_url, at
-self_reported_conversions  — id, click_event_id, user_id, product_id, reported_at,
+self_reported_conversions  - id, click_event_id, user_id, product_id, reported_at,
                               estimated_commission, notes
-affiliate_payouts          — id, partner, reported_period_start, reported_period_end,
+affiliate_payouts          - id, partner, reported_period_start, reported_period_end,
                               reported_clicks, reported_orders, reported_commission_inr, csv_row_hash, at
-affiliate_payout_items     — id, payout_id, matched_click_event_id?, retailer_order_id?,
+affiliate_payout_items     - id, payout_id, matched_click_event_id?, retailer_order_id?,
                               amount_inr, commission_inr
 
-wardrobe_items             — id, user_id, product_id, self_reported_purchase_at, retailer, notes, tags[]
-wishlist_items             — id, user_id, product_id, notify_price_drop, added_at
+wardrobe_items             - id, user_id, product_id, self_reported_purchase_at, retailer, notes, tags[]
+wishlist_items             - id, user_id, product_id, notify_price_drop, added_at
 
-reviews                    — id, product_id, user_id, rating, title, body, images_jsonb, status, created_at
+reviews                    - id, product_id, user_id, rating, title, body, images_jsonb, status, created_at
 
-articles                   — id, slug, title, hero_url, excerpt, body_md, status, scheduled_at,
+articles                   - id, slug, title, hero_url, excerpt, body_md, status, scheduled_at,
                               published_at, author_id, tags[], meta_title, meta_description, og_image
-article_products           — id, article_id, product_id, position
+article_products           - id, article_id, product_id, position
 
-drops                      — id, slug, name, hero_url, description, launch_at, ends_at, status
-drop_products              — id, drop_id, product_id, display_order
-drop_notify_signups        — id, drop_id, user_id?, email, notified_at
+drops                      - id, slug, name, hero_url, description, launch_at, ends_at, status
+drop_products              - id, drop_id, product_id, display_order
+drop_notify_signups        - id, drop_id, user_id?, email, notified_at
 
-lookbooks                  — id, slug, title, hero_url, description, status
-lookbook_images            — id, lookbook_id, image_url, position
-lookbook_tags              — id, lookbook_image_id, product_id, x_percent, y_percent
+lookbooks                  - id, slug, title, hero_url, description, status
+lookbook_images            - id, lookbook_id, image_url, position
+lookbook_tags              - id, lookbook_image_id, product_id, x_percent, y_percent
 
-edits                      — id, slug, title, hero_url, description, status
-edit_products              — id, edit_id, product_id, display_order
+edits                      - id, slug, title, hero_url, description, status
+edit_products              - id, edit_id, product_id, display_order
 
-home_banners               — id, image_url, headline, cta_label, cta_link, display_order,
+home_banners               - id, image_url, headline, cta_label, cta_link, display_order,
                               starts_at, ends_at, status
-brand_stories              — id, brand_id, body_md, hero_url, status
+brand_stories              - id, brand_id, body_md, hero_url, status
 
-avatars                    — id, name, reference_image_url, prompt_template, tags[], created_at
+avatars                    - id, name, reference_image_url, prompt_template, tags[], created_at
                               (Vineel's AI avatar reference library)
 
-newsletter_subscribers     — id, email, user_id?, source, subscribed_at, confirmed_at, unsubscribed_at
+newsletter_subscribers     - id, email, user_id?, source, subscribed_at, confirmed_at, unsubscribed_at
 
-notifications              — id, user_id, channel, type, payload_jsonb, read_at, sent_at
-notification_preferences   — id, user_id, channel, type, enabled
+notifications              - id, user_id, channel, type, payload_jsonb, read_at, sent_at
+notification_preferences   - id, user_id, channel, type, enabled
 
-support_tickets            — id, user_id, category, subject, status, opened_at, sla_due_at
-ticket_messages            — id, ticket_id, author_id, body, is_internal, at
+support_tickets            - id, user_id, category, subject, status, opened_at, sla_due_at
+ticket_messages            - id, ticket_id, author_id, body, is_internal, at
 
-audit_logs                 — id, actor_id, action, target_type, target_id, metadata_jsonb, at
-idempotency_keys           — key PK, user_id, endpoint, response_body_jsonb, status_code, created_at
-platform_settings          — key PK, value_jsonb, updated_at, updated_by
+audit_logs                 - id, actor_id, action, target_type, target_id, metadata_jsonb, at
+idempotency_keys           - key PK, user_id, endpoint, response_body_jsonb, status_code, created_at
+platform_settings          - key PK, value_jsonb, updated_at, updated_by
 ```
 
 ### Key Constraints
@@ -975,7 +975,7 @@ GitHub Actions on PR + push: lint, typecheck, unit, integration (services: postg
 | Affiliate program terms change or rates cut | Diversify partners (Amazon direct + EarnKaro + Meesho + brand direct). Track per-partner economics. |
 | Retailer scraping breaks Quick Add autofill | cheerio/BeautifulSoup scraping for autofill only; manual entry always works regardless. |
 | AI image consistency drift | Avatar Asset Library with stored prompt templates and reference images. |
-| Content velocity below threshold | Quick Add modal is the primary mitigation — sub-60s product addition. |
+| Content velocity below threshold | Quick Add modal is the primary mitigation - sub-60s product addition. |
 | SEO ranking takes 6–12 months | Bake SEO infrastructure (schema.org, sitemap, OG, canonicals) from day one. |
 | Price/stock data goes stale | Nightly sync worker; flag stale products; hide delisted. |
 | User confused by AI imagery | "AI-rendered model" tag + retailer's actual product photo alongside. |
@@ -1006,7 +1006,7 @@ The platform is successful when:
 
 - Native iOS/Android apps.
 - Real-money payment processing.
-- Direct e-commerce / inventory / fulfillment (the original v1 design — explicitly out of scope).
+- Direct e-commerce / inventory / fulfillment (the original v1 design - explicitly out of scope).
 - Live chat support.
 - Multi-currency display.
 - Internationalization beyond English.
@@ -1021,17 +1021,17 @@ The platform is successful when:
 
 ## 31. Glossary
 
-- **Affiliate Link** — Special URL that tracks Vineel as the referrer and pays commission on resulting sales. For every retailer except Amazon, this is pasted in by the admin already-wrapped from the network's own dashboard (EarnKaro, Meesho, etc.) and stored verbatim — BranV performs no server-side conversion.
-- **Click-out** — When a user clicks Buy Now and is redirected to the retailer.
-- **Self-reported Conversion** — User-disclosed "Yes I bought it" event; not verified.
-- **Reconciliation** — Matching self-reported and tracked click events to actual affiliate-program-confirmed payouts.
-- **Nice Pick** — The celebratory modal shown after a self-reported purchase.
-- **Quick Add** — The single-modal admin workflow for adding products in under 60 seconds.
-- **AI Avatar** — Vineel's AI-generated model that wears each product.
-- **My Wardrobe** — Member's collection of self-reported purchases.
-- **Drop Post** — Editorial article about a launch happening at a covered retailer/brand.
-- **PWA** — Progressive Web App; installable from browser.
+- **Affiliate Link** - Special URL that tracks Vineel as the referrer and pays commission on resulting sales. For every retailer except Amazon, this is pasted in by the admin already-wrapped from the network's own dashboard (EarnKaro, Meesho, etc.) and stored verbatim - BranV performs no server-side conversion.
+- **Click-out** - When a user clicks Buy Now and is redirected to the retailer.
+- **Self-reported Conversion** - User-disclosed "Yes I bought it" event; not verified.
+- **Reconciliation** - Matching self-reported and tracked click events to actual affiliate-program-confirmed payouts.
+- **Nice Pick** - The celebratory modal shown after a self-reported purchase.
+- **Quick Add** - The single-modal admin workflow for adding products in under 60 seconds.
+- **AI Avatar** - Vineel's AI-generated model that wears each product.
+- **My Wardrobe** - Member's collection of self-reported purchases.
+- **Drop Post** - Editorial article about a launch happening at a covered retailer/brand.
+- **PWA** - Progressive Web App; installable from browser.
 
 ---
 
-*End of PRD v2.0 — Affiliate Model · Aligned with Vineel's pivot from v1.0 e-commerce model*
+*End of PRD v2.0 - Affiliate Model · Aligned with Vineel's pivot from v1.0 e-commerce model*

@@ -1,17 +1,17 @@
 """
-POST   /api/auth/register                — public, rate-limited
-POST   /api/auth/login                   — public, rate-limited, sets cookies, HTTP 200
-POST   /api/auth/admin/login             — public, rate-limited, sets cookies, HTTP 200
-POST   /api/auth/refresh                 — public, sets cookies, HTTP 200
-POST   /api/auth/logout                  — public, clears cookies, HTTP 200
-POST   /api/auth/verify-email            — public, HTTP 200
-POST   /api/auth/resend-verification     — public, rate-limited, HTTP 200
-POST   /api/auth/forgot-password         — public, rate-limited, HTTP 200
-POST   /api/auth/reset-password          — public, HTTP 200
-POST   /api/auth/2fa/setup               — authenticated (Skip2FA), HTTP 200
-POST   /api/auth/2fa/verify              — authenticated (Skip2FA), HTTP 200
-POST   /api/auth/2fa/disable             — authenticated, MEMBER only, HTTP 200
-GET    /api/auth/me                      — authenticated (Skip2FA)
+POST   /api/auth/register                - public, rate-limited
+POST   /api/auth/login                   - public, rate-limited, sets cookies, HTTP 200
+POST   /api/auth/admin/login             - public, rate-limited, sets cookies, HTTP 200
+POST   /api/auth/refresh                 - public, sets cookies, HTTP 200
+POST   /api/auth/logout                  - public, clears cookies, HTTP 200
+POST   /api/auth/verify-email            - public, HTTP 200
+POST   /api/auth/resend-verification     - public, rate-limited, HTTP 200
+POST   /api/auth/forgot-password         - public, rate-limited, HTTP 200
+POST   /api/auth/reset-password          - public, HTTP 200
+POST   /api/auth/2fa/setup               - authenticated (Skip2FA), HTTP 200
+POST   /api/auth/2fa/verify              - authenticated (Skip2FA), HTTP 200
+POST   /api/auth/2fa/disable             - authenticated, MEMBER only, HTTP 200
+GET    /api/auth/me                      - authenticated (Skip2FA)
 
 Mirrors `apps/api/src/auth/auth.controller.ts` byte-for-byte where the wire
 contract is concerned. Captured fixtures live under tests/parity/fixtures/auth-*.
@@ -40,6 +40,8 @@ from ...schemas.auth import (
     MeResponse,
     PublicUser,
     RegisterRequest,
+    RefreshRequest,
+    LogoutRequest,
     ResetPasswordRequest,
     StatusOk,
     TwoFactorDisableRequest,
@@ -192,8 +194,13 @@ async def refresh(
     request: Request,
     response: Response,
     db: DbDep,
+    payload: RefreshRequest | None = None,
 ) -> PublicUser:
-    presented = request.cookies.get(REFRESH_COOKIE)
+    presented = (
+        (payload.refreshToken if payload else None)
+        or request.headers.get("x-refresh-token")
+        or request.cookies.get(REFRESH_COOKIE)
+    )
     if not presented:
         raise HTTPException(status_code=401, detail="No refresh token")
     ip, ua = _client_ip_and_ua(request)
@@ -216,8 +223,13 @@ async def logout(
     response: Response,
     background: BackgroundTasks,
     db: DbDep,
+    payload: LogoutRequest | None = None,
 ) -> StatusOk:
-    presented = request.cookies.get(REFRESH_COOKIE)
+    presented = (
+        (payload.refreshToken if payload else None)
+        or request.headers.get("x-refresh-token")
+        or request.cookies.get(REFRESH_COOKIE)
+    )
     # The user may or may not be authenticated. Soft-read for audit purposes only.
     from ...core.auth_deps import _read_user_from_request
     user = _read_user_from_request(request)
@@ -308,7 +320,7 @@ async def reset_password(
     if totp_reset:
         return StatusOk(
             status="ok",
-            message="Two-factor authentication was also turned off — re-enroll after signing in.",
+            message="Two-factor authentication was also turned off - re-enroll after signing in.",
         )
     return StatusOk(status="ok")
 

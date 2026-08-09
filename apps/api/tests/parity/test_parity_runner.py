@@ -1,5 +1,5 @@
 """
-Parity harness — replays HTTP fixtures captured from NestJS (Step 1b) and
+Parity harness - replays HTTP fixtures captured from NestJS (Step 1b) and
 asserts FastAPI returns the same status + body + headers.
 
 How it works:
@@ -37,7 +37,7 @@ FIXTURES_ROOT = REPO_ROOT / "tests" / "parity" / "fixtures"
 NEST_BASE = os.environ.get("PARITY_NEST_URL", "http://127.0.0.1:4000")
 PY_BASE = os.environ.get("PARITY_PY_URL", "http://127.0.0.1:5000")
 
-# Endpoints whose state mutates between calls — covered by dedicated tests.
+# Endpoints whose state mutates between calls - covered by dedicated tests.
 SKIP_DIRS = {"auth-member"}
 
 VOLATILE_PATTERNS = [
@@ -89,7 +89,7 @@ FIXTURES = _discover_fixtures()
 @pytest.mark.asyncio
 async def test_fixture_parity(fixture_id: str, fixture_path: Path | None):
     if fixture_path is None:
-        pytest.skip("no fixtures discovered — run `pnpm --filter @branv/api run migration:capture-fixtures` first")
+        pytest.skip("no fixtures discovered - run `pnpm --filter @branv/api run migration:capture-fixtures` first")
     fixture = json.loads(fixture_path.read_text())
     req = fixture["request"]
     async with httpx.AsyncClient(timeout=15.0) as client:

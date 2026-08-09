@@ -128,7 +128,7 @@ export default function EditsAdminPage() {
                   </td>
                   <td className="px-2 py-3 text-content-soft">{e._count?.editProducts ?? 0}</td>
                   <td className="px-2 py-3 text-content-soft">
-                    {e.isFeaturedOnHome ? '★' : '—'}
+                    {e.isFeaturedOnHome ? '★' : '-'}
                   </td>
                   <td className="px-2 py-3 text-right">
                     <div className="flex justify-end gap-2">

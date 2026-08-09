@@ -1,5 +1,5 @@
 // CUELINKS is retained only so historical records (pre-removal of the
-// Cuelinks integration) still type-check — it's never written going forward.
+// Cuelinks integration) still type-check - it's never written going forward.
 export type AffiliatePartner = 'CUELINKS' | 'AMAZON' | 'EARNKARO' | 'MEESHO' | 'DIRECT';
 
 export type PayoutItemStatus = 'MATCHED' | 'UNMATCHED' | 'AMBIGUOUS';

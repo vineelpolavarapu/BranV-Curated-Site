@@ -106,14 +106,14 @@ function StatsBlock({ stats }: { stats: WardrobePage['stats'] }) {
       <Stat label="Items" value={String(stats.totalItems)} />
       <Stat
         label="Self-reported spend"
-        value={stats.totalSpend > 0 ? `₹${formatINR(stats.totalSpend)}` : '—'}
+        value={stats.totalSpend > 0 ? `₹${formatINR(stats.totalSpend)}` : '-'}
       />
       <Stat
         label="Favorite brand"
         value={
           stats.favoriteBrand
             ? `${stats.favoriteBrand.name} (${stats.favoriteBrand.count})`
-            : '—'
+            : '-'
         }
       />
     </div>

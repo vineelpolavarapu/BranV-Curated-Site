@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiFetch, AuthSummary, CurrentUser, setStoredToken } from '@/lib/api';
+import { apiFetch, AuthSummary, CurrentUser, setStoredTokens, clearStoredTokens } from '@/lib/api';
 
 export const AUTH_QUERY_KEY = ['auth', 'me'];
 
@@ -9,7 +9,7 @@ export function useCurrentUser(options?: { enabled?: boolean }) {
     queryFn: async () => {
       const res = await apiFetch<CurrentUser>('/auth/me');
       if (res.status === 401 || res.status === 403) {
-        setStoredToken(null);
+        clearStoredTokens();
         return null;
       }
       if (!res.ok) throw new Error(res.error || 'Failed to fetch current user');
@@ -30,7 +30,7 @@ export function useLogin() {
       });
       if (!res.ok) throw res;
       if (res.data?.accessToken) {
-        setStoredToken(res.data.accessToken);
+        setStoredTokens(res.data.accessToken, res.data.refreshToken || null);
       }
       return res.data;
     },
@@ -45,12 +45,12 @@ export function useLogout() {
   return useMutation({
     mutationFn: async () => {
       const res = await apiFetch('/auth/logout', { method: 'POST' });
-      setStoredToken(null);
+      clearStoredTokens();
       if (!res.ok) throw new Error(res.error || 'Logout failed');
       return res;
     },
     onSuccess: () => {
-      setStoredToken(null);
+      clearStoredTokens();
       queryClient.setQueryData(AUTH_QUERY_KEY, null);
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
     },

@@ -13,15 +13,15 @@ Baseline at P0: **161 legacy literals / 51 files**. After P1: **77 / 30**. Targe
 - ✅ **P0** Foundations: design-tokens.css, Tailwind semantic tokens, Poppins/Inter fonts, Lucide icon map, Framer Motion (`LazyMotion`) + `useReducedMotion`, audit script + npm scripts, this registry. Build green, zero visual change.
 - ✅ **P1** Global chrome (all build-green): StorefrontShell, MobileBottomNav, MobileNavDrawer, AccountPopup, NotificationsBell, ProductCard, HeroCarousel (Desktop+Mobile+wrapper), Filters, SubcategoryChips, CustomSelect, SearchBox, animated-modal, animated-drawer, animated-option-group, DidYouBuyBottomSheet, NicePickModal, NewsletterSignup, CategoryShowcase, ReviewsSection, EmbeddedProductCard, ShoppableImage, global typography, **global gray canvas + blue form accents** (globals.css). Icons swapped to Lucide across chrome.
 - ✅ **P2** Storefront core pages: home, shop, new, sale, search, category/[slug], products/[slug] (PDP). Typecheck+build green.
-- ✅ **P3 + P4** Curated (6 pages, shared-driven), content (articles, lookbooks, edits, brands, help, terms, newsletter) and account/auth pages + AuthShell — migrated via reviewed codemod (`scripts/theme-codemod.mjs`, admin excluded). **Audit: 161→44, and every remaining literal is admin-only (P6).** Full build green.
+- ✅ **P3 + P4** Curated (6 pages, shared-driven), content (articles, lookbooks, edits, brands, help, terms, newsletter) and account/auth pages + AuthShell - migrated via reviewed codemod (`scripts/theme-codemod.mjs`, admin excluded). **Audit: 161→44, and every remaining literal is admin-only (P6).** Full build green.
 - ✅ **P6** Admin reskin: AdminShell + all `/admin/*` pages + admin editors/pickers + QuickAddModal/BrandFormModal, via codemod (light shell, blue primaries). Build green.
-- ✅ **Reskin verification**: `typecheck` clean, production `build` green, **`theme:audit --strict` = 0 legacy literals across the whole `apps/web/src` tree** (every page, sub-page, section — §9.0 satisfied for color/layout/icons).
-- ⏳ **P5** Framer Motion interaction layer (§7.5) — remaining (scaffolding in place: `motion` + `LazyMotion` provider + `useReducedMotion`).
-- ⏳ **P7/P8** cross-cutting-state polish + on-device visual QA (375/768/1080/1440 + reduced-motion) — remaining manual pass.
+- ✅ **Reskin verification**: `typecheck` clean, production `build` green, **`theme:audit --strict` = 0 legacy literals across the whole `apps/web/src` tree** (every page, sub-page, section - §9.0 satisfied for color/layout/icons).
+- ⏳ **P5** Framer Motion interaction layer (§7.5) - remaining (scaffolding in place: `motion` + `LazyMotion` provider + `useReducedMotion`).
+- ⏳ **P7/P8** cross-cutting-state polish + on-device visual QA (375/768/1080/1440 + reduced-motion) - remaining manual pass.
 
 ---
 
-## P1 — Global chrome & shared components (recolors most sections everywhere)
+## P1 - Global chrome & shared components (recolors most sections everywhere)
 Order = build sequence; one component per PR, no overlap.
 
 | # | Component | M | D | Notes (sections) |
@@ -56,7 +56,7 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P2 — Storefront core pages (every section each)
+## P2 - Storefront core pages (every section each)
 | # | Route | M | D | Sections |
 |---|---|---|---|---|
 | 1 | `/` | [ ] | [ ] | hero, category rail, trending rail, feature strip, promo band, editorial blocks |
@@ -69,7 +69,7 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P3 — Curated landing + content pages (every section each)
+## P3 - Curated landing + content pages (every section each)
 | # | Route | M | D |
 |---|---|---|---|
 | 1 | `/fashion-forward` | [ ] | [ ] |
@@ -92,7 +92,7 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P4 — Account, auth & commerce pages (every section each)
+## P4 - Account, auth & commerce pages (every section each)
 | # | Route | M | D |
 |---|---|---|---|
 | 1 | `/login` | [ ] | [ ] |
@@ -105,11 +105,11 @@ Order = build sequence; one component per PR, no overlap.
 | 8 | `/account/notifications` | [ ] | [ ] |
 | 9 | `/wishlist` | [ ] | [ ] |
 | 10 | `/wardrobe` | [ ] | [ ] |
-| — | `AuthShell` | [ ] | [ ] |
+| - | `AuthShell` | [ ] | [ ] |
 
 ---
 
-## P5 — Motion layer (Framer Motion §7.5) — mobile-first, then desktop
+## P5 - Motion layer (Framer Motion §7.5) - mobile-first, then desktop
 | Group | Interactions | M | D |
 |---|---|---|---|
 | A Nav | sticky hide/show, hamburger→X, overlay, search morph, autocomplete, bottom-nav indicator | [ ] | [ ] |
@@ -121,7 +121,7 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P6 — Admin (`/admin/*`) — utilitarian token application
+## P6 - Admin (`/admin/*`) - utilitarian token application
 | # | Route / component | Done |
 |---|---|---|
 | 1 | `AdminShell` | [ ] |
@@ -144,7 +144,7 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P7 — Cross-cutting states (every route)
+## P7 - Cross-cutting states (every route)
 | State | Covered |
 |---|---|
 | Empty states | [ ] |
@@ -156,10 +156,10 @@ Order = build sequence; one component per PR, no overlap.
 
 ---
 
-## P8 — Full-coverage QA gate (blocks launch)
+## P8 - Full-coverage QA gate (blocks launch)
 - [ ] `theme:audit:strict` reports **0** legacy literals
 - [ ] All rows above `[x]` (M+D)
 - [ ] Cross-device QA 375 / 768 / 1080 / 1440
 - [ ] reduced-motion pass
 - [ ] Lighthouse perf + a11y floors
-- [ ] Content-parity diff empty (same data/categories/elements — §2.4)
+- [ ] Content-parity diff empty (same data/categories/elements - §2.4)

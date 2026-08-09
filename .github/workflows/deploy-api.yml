@@ -142,14 +142,14 @@ jobs:
     if: always() && needs.build-and-push.result == 'success'
     steps:
       # A missing or environment-scoped secret does NOT fail here with an
-      # auth error — GitHub Actions silently substitutes an empty string, so
+      # auth error - GitHub Actions silently substitutes an empty string, so
       # the deploy-to-vm job below used to just silently show as "skipped"
       # with no indication why (the image built and pushed fine, but nobody
       # noticed the VM never actually got updated). Fail loudly here instead,
       # naming exactly which secret/variable is missing, so a bad/missing
       # value is a visible red X, not a quiet no-op or a silent deploy to the
       # wrong path (OCI_DEPLOY_PATH previously had a fallback default that
-      # didn't match the VM's real deploy folder — now it's required).
+      # didn't match the VM's real deploy folder - now it's required).
       - name: Verify required VM deploy secrets and variables
         env:
           OCI_SSH_HOST: ${{ secrets.OCI_SSH_HOST }}
@@ -164,7 +164,7 @@ jobs:
           [ -z "$OCI_SSH_KEY" ] && missing+=("OCI_SSH_KEY (repository secret)")
           [ -z "$OCI_DEPLOY_PATH" ] && missing+=("OCI_DEPLOY_PATH (repository VARIABLE, e.g. /opt/branv)")
           if [ ${#missing[@]} -ne 0 ]; then
-            echo "::error::Missing required repository secret(s)/variable(s): ${missing[*]}. Secrets go under Settings > Secrets and variables > Actions > Secrets tab (not Environment secrets, since these jobs have no 'environment:'). OCI_DEPLOY_PATH goes under the Variables tab of the same page — it's the absolute path to the deploy folder on the VM, plain text, not sensitive. The API image built and pushed to GHCR fine — only the VM deploy steps are blocked on these."
+            echo "::error::Missing required repository secret(s)/variable(s): ${missing[*]}. Secrets go under Settings > Secrets and variables > Actions > Secrets tab (not Environment secrets, since these jobs have no 'environment:'). OCI_DEPLOY_PATH goes under the Variables tab of the same page - it's the absolute path to the deploy folder on the VM, plain text, not sensitive. The API image built and pushed to GHCR fine - only the VM deploy steps are blocked on these."
             exit 1
           fi
 
@@ -173,7 +173,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-push, check-deploy-secrets]
     # check-ci-status only runs for workflow_run events (it skips itself for
-    # workflow_dispatch) — that "skipped" status cascades to every downstream
+    # workflow_dispatch) - that "skipped" status cascades to every downstream
     # job by default unless each one explicitly opts out with always(), same
     # as build-and-push and check-deploy-secrets already do above. Without
     # this, manual workflow_dispatch runs silently skip this job entirely.
@@ -223,7 +223,7 @@ jobs:
     name: Deploy to Oracle Cloud VM
     runs-on: ubuntu-latest
     needs: [build-and-push, check-deploy-secrets, sync-deploy-config]
-    # Same skip-cascade guard as sync-deploy-config above — without this,
+    # Same skip-cascade guard as sync-deploy-config above - without this,
     # workflow_dispatch runs skip this job too (this was latent even before
     # sync-deploy-config existed, just never noticed since manual dispatch
     # was rarely used to test the VM deploy path).
@@ -263,7 +263,7 @@ jobs:
 
             # ── 3. Pull latest images and apply pending Prisma migrations ──────
             # Previously this ran `docker compose up -d --no-deps api`, which
-            # skips the migrate service entirely — new migrations committed to
+            # skips the migrate service entirely - new migrations committed to
             # git were never applied automatically. Run migrate explicitly and
             # wait for it to actually finish (`up -d` alone only starts it, it
             # doesn't block until the one-shot container exits).
@@ -277,7 +277,7 @@ jobs:
             done
             MIGRATE_EXIT=$(docker inspect --format='{{.State.ExitCode}}' "$MIGRATE_ID")
             if [ "$MIGRATE_EXIT" != "0" ]; then
-              echo "::error::Prisma migration failed (exit $MIGRATE_EXIT) — aborting before touching the api container."
+              echo "::error::Prisma migration failed (exit $MIGRATE_EXIT) - aborting before touching the api container."
               docker compose logs migrate --tail 100
               exit 1
             fi
@@ -285,12 +285,12 @@ jobs:
             # ── 4. Restart the API container ────────────────────────────────
             docker compose up -d --no-deps --force-recreate api
 
-            # ── 5. Health-check gate — a Restarting container used to still
+            # ── 5. Health-check gate - a Restarting container used to still
             # report success here (`docker compose ps` never fails the job).
             # The api service only `expose`s port 5000 to the internal Docker
             # network (no `ports:` mapping to the host), so a plain
             # `curl localhost:5000` from the VM's own shell always gets
-            # connection refused — it has to be checked through Docker itself.
+            # connection refused - it has to be checked through Docker itself.
             # Poll the container's own HEALTHCHECK status (see
             # deploy/docker-compose.yml) instead. Retry with backoff, then
             # fail loudly and roll back on failure.
@@ -318,7 +318,7 @@ jobs:
                 sleep 5
                 docker compose ps api
               else
-                echo "::error::No previous image was recorded — cannot auto-rollback. Manual intervention required on the VM."
+                echo "::error::No previous image was recorded - cannot auto-rollback. Manual intervention required on the VM."
               fi
               exit 1
             fi
@@ -327,7 +327,7 @@ jobs:
     name: Seed production categories (one-off)
     runs-on: ubuntu-latest
     needs: [check-deploy-secrets, deploy-to-vm]
-    # Same always() requirement as sync-deploy-config/deploy-to-vm above —
+    # Same always() requirement as sync-deploy-config/deploy-to-vm above -
     # without it, GitHub implicitly ANDs in success() across the whole
     # ancestor graph (including check-ci-status, which skips itself on
     # workflow_dispatch), so this job silently skips despite every explicit

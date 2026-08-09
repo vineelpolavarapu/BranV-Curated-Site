@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Desktop-only hero carousel. Renders at >=1080px (parent gates via matchMedia).
 // All image references point at /hero/ (landscape art).
-// Mobile lives in HeroCarouselMobile.tsx — keep them physically separate so
+// Mobile lives in HeroCarouselMobile.tsx - keep them physically separate so
 // neither component has to deal with the other's image set or layout rules.
 
 type HeroSlide = {

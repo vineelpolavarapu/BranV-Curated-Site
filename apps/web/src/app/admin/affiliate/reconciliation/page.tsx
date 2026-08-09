@@ -99,7 +99,7 @@ export default function ReconciliationAdminPage() {
                   <tr key={p.id} className="border-b border-neutral-100">
                     <td className="px-2 py-3 font-medium">{p.partner}</td>
                     <td className="px-2 py-3 text-xs text-content-soft">
-                      {p.csvFilename ?? '—'}
+                      {p.csvFilename ?? '-'}
                       <p className="mt-0.5 text-[10px] text-content-muted">
                         {new Date(p.createdAt).toLocaleString()}
                       </p>
@@ -107,11 +107,11 @@ export default function ReconciliationAdminPage() {
                     <td className="px-2 py-3 text-xs text-content-soft">
                       {p.reportedPeriodStart
                         ? new Date(p.reportedPeriodStart).toLocaleDateString()
-                        : '—'}
+                        : '-'}
                       {' – '}
                       {p.reportedPeriodEnd
                         ? new Date(p.reportedPeriodEnd).toLocaleDateString()
-                        : '—'}
+                        : '-'}
                     </td>
                     <td className="px-2 py-3">{p.rowCount}</td>
                     <td className="px-2 py-3 text-success">
@@ -126,7 +126,7 @@ export default function ReconciliationAdminPage() {
                     <td className="px-2 py-3">
                       {p.reportedCommissionInr
                         ? `₹${Number(p.reportedCommissionInr).toLocaleString('en-IN')}`
-                        : '—'}
+                        : '-'}
                     </td>
                     <td className="px-2 py-3 text-right">
                       <button
@@ -200,7 +200,7 @@ function VarianceCards({ variance }: { variance: VarianceResponse | null }) {
             <p className="text-base font-medium">
               {stats?.reported
                 ? `₹${stats.reported.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
-                : '—'}
+                : '-'}
             </p>
             <p className="mt-2 text-[10px] text-content-soft">
               {stats ? `${stats.matched}/${stats.total} matched` : 'No uploads'}
@@ -287,7 +287,7 @@ function UploadModal({
             />
             <p className="mt-1 text-xs text-content-soft">
               Amazon / EarnKaro / Meesho exports. Column headers vary by
-              network — pick which one below.
+              network - pick which one below.
             </p>
           </div>
           <div>
@@ -396,18 +396,18 @@ function DetailModal({
                     <td className="px-2 py-2 text-xs text-content-soft">
                       {item.occurredAt
                         ? new Date(item.occurredAt).toLocaleString()
-                        : '—'}
+                        : '-'}
                     </td>
                     <td className="px-2 py-2 text-xs font-mono">
-                      {item.retailerOrderId ?? '—'}
+                      {item.retailerOrderId ?? '-'}
                     </td>
                     <td className="px-2 py-2 text-xs">
-                      {item.amountInr ? `₹${Number(item.amountInr)}` : '—'}
+                      {item.amountInr ? `₹${Number(item.amountInr)}` : '-'}
                     </td>
                     <td className="px-2 py-2 text-xs">
                       {item.commissionInr
                         ? `₹${Number(item.commissionInr)}`
-                        : '—'}
+                        : '-'}
                     </td>
                     <td className="px-2 py-2 text-xs">
                       {item.matchedClickEvent ? (
@@ -420,7 +420,7 @@ function DetailModal({
                           {item.matchedClickEvent.product.title}
                         </a>
                       ) : (
-                        '—'
+                        '-'
                       )}
                     </td>
                   </tr>

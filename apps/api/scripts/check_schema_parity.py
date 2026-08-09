@@ -12,7 +12,7 @@ non-zero on any drift between them. Detects:
 
 Intentionally does NOT compare:
   * Default values (Prisma writes Postgres-cast literals like 'MEMBER'::"UserRole";
-    SQLAlchemy serialization is informational only — Prisma owns DDL).
+    SQLAlchemy serialization is informational only - Prisma owns DDL).
   * Index / constraint shape (Prisma may emit unique constraints via NOT NULL +
     unique index; we trust Prisma's schema as the source of truth).
 
@@ -87,7 +87,7 @@ def _canon(t: str) -> str:
 def _sa_column_type(col) -> str:
     """SQLAlchemy column → Postgres-equivalent token suitable for comparison."""
     sa_type = col.type
-    # SAEnum carries the PG enum type name — compare lowercase. Prisma names
+    # SAEnum carries the PG enum type name - compare lowercase. Prisma names
     # its types case-preserved (e.g. "UserRole") but information_schema
     # returns udt_name lowercased ("userrole"), so casefold to match.
     enum_name = getattr(sa_type, "name", None)
@@ -203,7 +203,7 @@ async def main() -> int:
 
     if not diffs:
         n_tables = len(Base.metadata.tables)
-        print(f"[schema-check] PARITY OK — {n_tables} tables match")
+        print(f"[schema-check] PARITY OK - {n_tables} tables match")
         return 0
 
     by_kind: dict[str, int] = {}
@@ -211,7 +211,7 @@ async def main() -> int:
         by_kind[d.kind] = by_kind.get(d.kind, 0) + 1
         print(d)
     summary = ", ".join(f"{k}={v}" for k, v in sorted(by_kind.items()))
-    print(f"[schema-check] DRIFT — {len(diffs)} diffs ({summary})", file=sys.stderr)
+    print(f"[schema-check] DRIFT - {len(diffs)} diffs ({summary})", file=sys.stderr)
     return 1
 
 

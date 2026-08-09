@@ -60,22 +60,15 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {/* AI-rendered disclosure badge */}
         {shownImage?.isAiGenerated && <AiBadge />}
 
-        {/* Top-left badge stack: Featured (when active) above Discount — max-w-[calc(100%-44px)] prevents collision with wishlist button */}
-        {(product.isFeatured || (product.discountPct && product.discountPct > 0)) && (
+        {/* Top-left badge stack: Featured (when active) - max-w-[calc(100%-44px)] prevents collision with wishlist button */}
+        {product.isFeatured && (
           <div className="absolute left-2 top-2 z-10 flex max-w-[calc(100%-44px)] flex-col items-start gap-1">
-            {product.isFeatured && (
-              <span className="inline-flex items-center gap-1 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-sm">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-                  <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
-                </svg>
-                Featured
-              </span>
-            )}
-            {product.discountPct && product.discountPct > 0 && (
-              <span className="rounded bg-accent px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm animate-pop-badge">
-                -{Math.round(product.discountPct)}%
-              </span>
-            )}
+            <span className="inline-flex items-center gap-1 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-sm">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" />
+              </svg>
+              Featured
+            </span>
           </div>
         )}
 

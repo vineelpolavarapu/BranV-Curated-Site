@@ -1,5 +1,5 @@
 """
-Async SQLAlchemy session — one engine per process, sessions per request via `get_db`.
+Async SQLAlchemy session - one engine per process, sessions per request via `get_db`.
 
 Reads `DATABASE_URL` from settings (the same URL Prisma uses). Coerces the
 `postgresql://` scheme to `postgresql+asyncpg://` so SQLAlchemy picks the
