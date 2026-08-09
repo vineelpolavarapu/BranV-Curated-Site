@@ -30,7 +30,8 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const primary = product.primaryImage;
   const secondary = product.secondaryImage;
   const showSecondary = hovered && !!secondary;
-  const shownImage = showSecondary ? secondary! : primary;
+  const galleryFallback = product.gallery?.[0] ? { url: product.gallery[0].url, isAiGenerated: product.gallery[0].isAiGenerated, altText: product.gallery[0].altText } : null;
+  const shownImage = showSecondary ? secondary! : (primary ?? galleryFallback);
 
   return (
     <article

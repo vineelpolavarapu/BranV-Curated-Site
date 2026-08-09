@@ -103,6 +103,14 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
         ai_images = [i for i in p_images if i.isAiGenerated]
         retailer_images = [i for i in p_images if not i.isAiGenerated]
         primary = next((i for i in p_images if i.isPrimary), None) or (p_images[0] if p_images else None)
+        if not primary and p_listings:
+            fallback_url = next((l.retailerImageUrl for l in p_listings if l.retailerImageUrl), None)
+            if fallback_url:
+                primary = type("SyntheticImage", (), {
+                    "url": fallback_url,
+                    "isAiGenerated": False,
+                    "altText": p.title,
+                })()
         secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
 
         sorted_listings = sorted(

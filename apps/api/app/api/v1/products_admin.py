@@ -410,6 +410,12 @@ async def quick_add(
             isPrimary=True, isAiGenerated=True, position=0,
             createdAt=now, updatedAt=now,
         ))
+    elif payload.retailerImageUrl:
+        db.add(ProductImage(
+            id_=_cuid(), productId=pid, url=payload.retailerImageUrl,
+            isPrimary=True, isAiGenerated=False, position=0,
+            createdAt=now, updatedAt=now,
+        ))
 
     # 5. Retailer listing.
     listing_id = _cuid()
@@ -680,9 +686,19 @@ async def admin_add_image(
         raise HTTPException(404, "Product not found")
     now = _now()
     img_id = _cuid()
+    existing_count = (await db.execute(
+        select(func.count(ProductImage.id_)).where(ProductImage.productId == product_id)
+    )).scalar() or 0
+    is_primary = bool(payload.isPrimary) or (existing_count == 0)
+    if is_primary:
+        await db.execute(
+            update(ProductImage)
+            .where(ProductImage.productId == product_id)
+            .values(isPrimary=False)
+        )
     db.add(ProductImage(
         id_=img_id, productId=product_id, url=payload.url, altText=payload.altText,
-        isPrimary=bool(payload.isPrimary), isAiGenerated=bool(payload.isAiGenerated),
+        isPrimary=is_primary, isAiGenerated=bool(payload.isAiGenerated),
         position=payload.position or 0, createdAt=now, updatedAt=now,
     ))
     await db.commit()

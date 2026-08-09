@@ -126,9 +126,14 @@ async def wishlist_list(
     brand_map = {b.id_: b for b in brands}
 
     images = (await db.execute(
-        select(ProductImage).where(ProductImage.productId.in_(product_ids), ProductImage.isPrimary == True)
+        select(ProductImage)
+        .where(ProductImage.productId.in_(product_ids))
+        .order_by(ProductImage.isPrimary.desc(), ProductImage.position.asc())
     )).scalars().all() if product_ids else []
-    image_map = {img.productId: img for img in images}
+    image_map: dict[str, ProductImage] = {}
+    for img in images:
+        if img.productId not in image_map:
+            image_map[img.productId] = img
 
     items = []
     for w in rows:
@@ -272,9 +277,14 @@ async def wardrobe_list(
     brand_map = {b.id_: b for b in brands}
 
     images = (await db.execute(
-        select(ProductImage).where(ProductImage.productId.in_(product_ids), ProductImage.isPrimary == True)
+        select(ProductImage)
+        .where(ProductImage.productId.in_(product_ids))
+        .order_by(ProductImage.isPrimary.desc(), ProductImage.position.asc())
     )).scalars().all() if product_ids else []
-    image_map = {img.productId: img for img in images}
+    image_map: dict[str, ProductImage] = {}
+    for img in images:
+        if img.productId not in image_map:
+            image_map[img.productId] = img
 
     items = []
     for w in rows:

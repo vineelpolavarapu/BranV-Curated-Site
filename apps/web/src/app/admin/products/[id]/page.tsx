@@ -372,22 +372,79 @@ function ImagesPanel({
   const [isAi, setIsAi] = useState(false);
   const [isPrimary, setIsPrimary] = useState(product.images.length === 0);
   const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function uploadFile(file: File) {
+    setUploading(true);
+    setError(null);
+    try {
+      const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
+        '/uploads/presign',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            contentType: file.type || 'image/png',
+            filename: file.name,
+            kind: 'product-avatar',
+          }),
+        },
+      );
+      if (!presign.ok || !presign.data) {
+        setError(presign.error ?? 'Could not get upload URL');
+        return;
+      }
+      const put = await fetch(presign.data.uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type || 'image/png' },
+      });
+      if (!put.ok) {
+        setError(`Upload failed (${put.status})`);
+        return;
+      }
+      setUrl(presign.data.publicUrl);
+    } catch (err: any) {
+      setError(err?.message ?? 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) void uploadFile(file);
+  }
+
+  function onDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      void uploadFile(file);
+    }
+  }
 
   async function onAdd(e: FormEvent) {
     e.preventDefault();
+    if (!url) {
+      setError('Upload an image file or enter an image URL');
+      return;
+    }
     setSubmitting(true);
+    setError(null);
     const result = await apiFetch(`/admin/products/${product.id}/images`, {
       method: 'POST',
       body: JSON.stringify({
         url,
         altText: altText || undefined,
         isAiGenerated: isAi,
-        isPrimary,
+        isPrimary: isPrimary || product.images.length === 0,
       }),
     });
     setSubmitting(false);
     if (!result.ok) {
-      alert(result.error ?? 'Failed to add image');
+      setError(result.error ?? 'Failed to add image');
       return;
     }
     setUrl('');
@@ -444,15 +501,69 @@ function ImagesPanel({
           ))}
         </ul>
       )}
+
+      {/* File Dropzone & Picker */}
+      <div
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={onDrop}
+        className="mb-4 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-4 text-center transition hover:border-primary/50"
+      >
+        <div className="flex flex-col items-center justify-center gap-2">
+          <span className="text-2xl">📸</span>
+          <p className="text-xs font-semibold text-slate-700">
+            Upload Image File (Drag & drop or browse from device)
+          </p>
+          <label className={`${adminButtonSecondary} cursor-pointer text-xs`}>
+            {uploading ? 'Uploading image file…' : '📁 Choose Image File'}
+            <input
+              type="file"
+              accept="image/*"
+              disabled={uploading}
+              onChange={onFilePick}
+              className="hidden"
+            />
+          </label>
+          {uploading && (
+            <p className="text-xs font-medium text-primary animate-pulse">
+              Uploading image file to storage…
+            </p>
+          )}
+        </div>
+      </div>
+
       <form onSubmit={onAdd} className="space-y-3 border-t border-line pt-4">
+        {url && (
+          <div className="flex items-center gap-3 rounded-lg border border-line bg-surface-muted p-2">
+            <div className="relative h-14 w-12 shrink-0 overflow-hidden rounded border border-line bg-surface">
+              <Image
+                src={url}
+                alt="Upload preview"
+                fill
+                unoptimized
+                className="object-cover"
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-success">✓ Image ready to add</p>
+              <p className="truncate text-[10px] text-content-soft">{url}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setUrl('')}
+              className="text-xs text-content-muted hover:text-red-600"
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
         <div>
-          <label className={adminLabel}>Image URL</label>
+          <label className={adminLabel}>Image URL (or uploaded file URL above)</label>
           <input
-            required
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="https://…"
+            placeholder="https://… or upload file above"
             className={adminInput}
           />
         </div>
@@ -461,11 +572,12 @@ function ImagesPanel({
           <input
             value={altText}
             onChange={(e) => setAltText(e.target.value)}
+            placeholder="Product hero image description"
             className={adminInput}
           />
         </div>
         <div className="flex gap-4 text-sm">
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={isAi}
@@ -473,17 +585,22 @@ function ImagesPanel({
             />
             AI-generated
           </label>
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
-              checked={isPrimary}
+              checked={isPrimary || product.images.length === 0}
               onChange={(e) => setIsPrimary(e.target.checked)}
             />
-            Primary
+            Primary image
           </label>
         </div>
-        <button type="submit" disabled={submitting} className={adminButtonPrimary}>
-          {submitting ? 'Adding…' : 'Add image'}
+        {error && <p className="text-xs font-medium text-danger">{error}</p>}
+        <button
+          type="submit"
+          disabled={submitting || uploading || !url}
+          className={adminButtonPrimary}
+        >
+          {submitting ? 'Adding image…' : 'Add image'}
         </button>
       </form>
     </div>
