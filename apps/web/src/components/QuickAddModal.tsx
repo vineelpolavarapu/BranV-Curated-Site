@@ -32,6 +32,7 @@ interface ScrapeResult {
   price: number | null;
   mrp: number | null;
   primaryImageUrl: string | null;
+  images?: string[] | null;
   source: string;
 }
 
@@ -58,6 +59,7 @@ interface FormState {
   tagsCsv: string;
   avatarImageUrl: string;
   retailerImageUrl: string;
+  imageUrls: string[];
   status: ProductStatus;
   affiliatePartner: AffiliatePartner;
 }
@@ -78,6 +80,7 @@ const EMPTY: FormState = {
   tagsCsv: '',
   avatarImageUrl: '',
   retailerImageUrl: '',
+  imageUrls: [],
   status: 'ACTIVE',
   affiliatePartner: 'EARNKARO',
 };
@@ -291,6 +294,7 @@ const DEFAULT_BRANDS = [
       title: prev.title || s.title || '',
       mrp: prev.mrp || (s.mrp ? String(s.mrp) : ''),
       retailerImageUrl: prev.retailerImageUrl || s.primaryImageUrl || '',
+      imageUrls: Array.from(new Set([...(prev.imageUrls || []), ...(s.images || [])])),
     }));
     // If brand hint matches an existing brand, pre-select it.
     if (s.brandHint && !form.brandId) {
@@ -303,64 +307,73 @@ const DEFAULT_BRANDS = [
   }
 
   // ── Image upload (presign → PUT to S3) ──
-  async function uploadAvatar(blob: Blob, filename: string) {
+  async function uploadImages(files: File[]) {
+    if (files.length === 0) return;
     setUploading(true);
     setError(null);
     try {
-      const presign = await apiFetch<PresignResult>('/uploads/presign', {
-        method: 'POST',
-        body: JSON.stringify({
-          contentType: blob.type || 'image/png',
-          filename,
-          kind: 'product-avatar',
+      const uploaded: string[] = [];
+      await Promise.all(
+        files.map(async (file) => {
+          const presign = await apiFetch<PresignResult>('/uploads/presign', {
+            method: 'POST',
+            body: JSON.stringify({
+              contentType: file.type || 'image/png',
+              filename: file.name,
+              kind: 'product-avatar',
+            }),
+          });
+          if (!presign.ok || !presign.data) return;
+          const put = await fetch(presign.data.uploadUrl, {
+            method: 'PUT',
+            body: file,
+            headers: { 'Content-Type': file.type || 'image/png' },
+          });
+          if (put.ok) {
+            uploaded.push(presign.data.publicUrl);
+          }
         }),
-      });
-      if (!presign.ok || !presign.data) {
-        setError(presign.error ?? 'Could not get upload URL');
-        return;
+      );
+      if (uploaded.length > 0) {
+        setForm((prev) => ({
+          ...prev,
+          imageUrls: [...prev.imageUrls, ...uploaded],
+          avatarImageUrl: prev.avatarImageUrl || uploaded[0],
+        }));
       }
-      const put = await fetch(presign.data.uploadUrl, {
-        method: 'PUT',
-        body: blob,
-        headers: { 'Content-Type': blob.type || 'image/png' },
-      });
-      if (!put.ok) {
-        setError(`Upload failed (${put.status})`);
-        return;
-      }
-      set('avatarImageUrl', presign.data.publicUrl);
     } finally {
       setUploading(false);
     }
   }
 
   function onPaste(e: ClipboardEvent<HTMLDivElement>) {
+    const files: File[] = [];
     for (const item of Array.from(e.clipboardData.items)) {
       if (item.type.startsWith('image/')) {
         const blob = item.getAsFile();
-        if (blob) {
-          e.preventDefault();
-          void uploadAvatar(
-            blob,
-            `paste-${Date.now()}.${item.type.split('/')[1] ?? 'png'}`,
-          );
-          return;
-        }
+        if (blob) files.push(blob);
       }
+    }
+    if (files.length > 0) {
+      e.preventDefault();
+      void uploadImages(files);
     }
   }
 
   function onDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      void uploadAvatar(file, file.name);
+    const files = Array.from(e.dataTransfer.files).filter((f) =>
+      f.type.startsWith('image/'),
+    );
+    if (files.length > 0) {
+      void uploadImages(files);
     }
   }
 
   function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) void uploadAvatar(file, file.name);
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    if (files.length > 0) void uploadImages(files);
   }
 
   // ── Submit ──
@@ -407,6 +420,7 @@ const DEFAULT_BRANDS = [
         : undefined,
       avatarImageUrl: form.avatarImageUrl || undefined,
       retailerImageUrl: form.retailerImageUrl || undefined,
+      imageUrls: form.imageUrls.length > 0 ? form.imageUrls : undefined,
       status: form.status,
       affiliatePartner: form.affiliatePartner,
     };
@@ -693,18 +707,26 @@ const DEFAULT_BRANDS = [
 
           <hr className="border-neutral-100" />
 
-          {/* Avatar image: drag + paste + pick */}
+          {/* Product images: drag + paste + pick + gallery grid */}
           <section>
             <label className={adminLabel}>
-              📸 Product Image
+              📸 Product Images ({form.imageUrls.length})
             </label>
             <ImageDropPaste
+              imageUrls={form.imageUrls}
               currentUrl={form.avatarImageUrl}
               uploading={uploading}
               onDrop={onDrop}
               onPaste={onPaste}
               onFilePick={onFilePick}
-              onClear={() => set('avatarImageUrl', '')}
+              onRemoveImage={(url) =>
+                setForm((prev) => ({
+                  ...prev,
+                  imageUrls: prev.imageUrls.filter((u) => u !== url),
+                  avatarImageUrl: prev.avatarImageUrl === url ? (prev.imageUrls.find((u) => u !== url) || '') : prev.avatarImageUrl,
+                }))
+              }
+              onSetPrimary={(url) => set('avatarImageUrl', url)}
             />
           </section>
 
@@ -867,86 +889,107 @@ const DEFAULT_BRANDS = [
 // ─────────────── Drop / paste / pick image zone ───────────────
 
 function ImageDropPaste({
+  imageUrls,
   currentUrl,
   uploading,
   onDrop,
   onPaste,
   onFilePick,
-  onClear,
+  onRemoveImage,
+  onSetPrimary,
 }: {
+  imageUrls: string[];
   currentUrl: string;
   uploading: boolean;
   onDrop: (e: DragEvent<HTMLDivElement>) => void;
   onPaste: (e: ClipboardEvent<HTMLDivElement>) => void;
   onFilePick: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onClear: () => void;
+  onRemoveImage: (url: string) => void;
+  onSetPrimary: (url: string) => void;
 }) {
   const [hover, setHover] = useState(false);
   return (
-    <div
-      onPaste={onPaste}
-      onDragOver={(e) => {
-        e.preventDefault();
-        setHover(true);
-      }}
-      onDragLeave={() => setHover(false)}
-      onDrop={(e) => {
-        setHover(false);
-        onDrop(e);
-      }}
-      tabIndex={0}
-      className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition ${
-        hover ? 'border-neutral-900 bg-surface-muted' : 'border-line'
-      }`}
-    >
-      {currentUrl ? (
-        <>
-          <Image
-            src={currentUrl}
-            alt="Avatar preview"
-            width={80}
-            height={100}
-            unoptimized
-            className="rounded object-cover"
-          />
-          <div className="flex-1 text-sm">
-            <p className="text-success">✓ Avatar uploaded</p>
-            <p className="break-all text-[10px] text-content-muted">
-              {currentUrl}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClear}
-            className="text-xs text-content-soft underline"
-          >
-            Remove
-          </button>
-        </>
-      ) : (
-        <>
-          <div className="flex h-20 w-16 items-center justify-center rounded bg-surface-muted text-content-muted">
-            📸
-          </div>
-          <div className="flex-1 text-sm">
-            <p className="font-medium text-content-soft">
-              {uploading ? 'Uploading…' : 'Drag, drop, or Ctrl+V paste'}
-            </p>
-            <p className="text-xs text-content-soft">
-              Or{' '}
-              <label className="cursor-pointer text-content underline">
-                choose a file
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={onFilePick}
-                />
-              </label>
-              
-            </p>
-          </div>
-        </>
+    <div className="space-y-3">
+      <div
+        onPaste={onPaste}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setHover(true);
+        }}
+        onDragLeave={() => setHover(false)}
+        onDrop={(e) => {
+          setHover(false);
+          onDrop(e);
+        }}
+        tabIndex={0}
+        className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition ${
+          hover ? 'border-neutral-900 bg-surface-muted' : 'border-line'
+        }`}
+      >
+        <div className="flex h-12 w-12 items-center justify-center rounded bg-surface-muted text-xl">
+          📸
+        </div>
+        <div className="flex-1 text-sm">
+          <p className="font-medium text-content">
+            {uploading ? 'Uploading images…' : 'Drag & drop multiple image files, or Ctrl+V paste'}
+          </p>
+          <p className="text-xs text-content-soft">
+            Or{' '}
+            <label className="cursor-pointer text-primary font-medium underline">
+              choose image files
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={onFilePick}
+              />
+            </label>
+          </p>
+        </div>
+      </div>
+
+      {imageUrls.length > 0 && (
+        <div className="grid grid-cols-4 gap-2">
+          {imageUrls.map((url, idx) => (
+            <div
+              key={url + idx}
+              className={`relative aspect-[4/5] rounded border overflow-hidden bg-surface ${
+                currentUrl === url ? 'border-2 border-primary shadow-sm' : 'border-line'
+              }`}
+            >
+              <Image
+                src={url}
+                alt={`Product image ${idx + 1}`}
+                fill
+                unoptimized
+                className="object-cover"
+              />
+              <div className="absolute left-1 top-1 flex flex-col gap-1">
+                {currentUrl === url ? (
+                  <span className="rounded bg-primary px-1 py-0.5 text-[8px] font-bold uppercase text-primary-fg">
+                    Primary
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onSetPrimary(url)}
+                    className="rounded bg-surface/90 px-1 py-0.5 text-[8px] font-medium text-content hover:bg-surface"
+                  >
+                    Set Primary
+                  </button>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveImage(url)}
+                className="absolute right-1 top-1 rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-bold text-red-600 hover:bg-surface"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

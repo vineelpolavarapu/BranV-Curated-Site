@@ -12,6 +12,8 @@ import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { RecordRecentlyViewed } from '@/components/RecordRecentlyViewed';
 
+import { ProductGallery } from '@/components/ProductGallery';
+
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: {
@@ -50,7 +52,7 @@ export default async function ProductDetailPage(props: {
         <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-6">
-              <Gallery product={product} />
+              <ProductGallery product={product} />
             </div>
             <div className="bv-enter bv-delay-2 lg:col-span-6">
               <Summary product={product} />
@@ -87,68 +89,7 @@ export default async function ProductDetailPage(props: {
   );
 }
 
-function Gallery({ product }: { product: ProductCardData }) {
-  const images = product.gallery.length > 0 ? product.gallery : [];
-  const hero = images[0] ?? product.primaryImage;
-  const rest = images.slice(1);
 
-  return (
-    <div>
-      <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted">
-        {hero && 'url' in hero ? (
-          <>
-            <Image
-              src={hero.url}
-              alt={hero.altText ?? product.title}
-              fill
-              sizes="(max-width: 1023px) 100vw, 50vw"
-              className="object-cover"
-              unoptimized
-              priority
-            />
-            {hero.isAiGenerated && (
-              <span
-                title="AI-rendered on Vineel's avatar"
-                className="absolute bottom-3 right-3 rounded bg-content/70 px-2 py-1 text-[10px] font-medium uppercase tracking-wider text-primary-fg backdrop-blur"
-              >
-                AI-rendered
-              </span>
-            )}
-          </>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-content-muted">
-            no image
-          </div>
-        )}
-      </div>
-      {rest.length > 0 && (
-        <ul className="mt-3 grid grid-cols-4 gap-2">
-          {rest.map((img, idx) => (
-            <li
-              key={idx}
-              style={{ animationDelay: `${40 + idx * 40}ms` }}
-              className="bv-enter-fade relative aspect-[4/5] overflow-hidden rounded-md bg-surface-muted"
-            >
-              <Image
-                src={img.url}
-                alt={img.altText ?? `${product.title} image ${idx + 2}`}
-                fill
-                sizes="100px"
-                unoptimized
-                className="object-cover"
-              />
-              {img.isAiGenerated && (
-                <span className="absolute bottom-1 right-1 rounded bg-content/70 px-1 py-0.5 text-[8px] font-medium uppercase text-primary-fg">
-                  AI
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 function Summary({ product }: { product: ProductCardData }) {
   return (

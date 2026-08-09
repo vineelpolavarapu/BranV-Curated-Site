@@ -375,53 +375,70 @@ function ImagesPanel({
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function uploadFile(file: File) {
+  async function uploadFiles(files: File[]) {
+    if (files.length === 0) return;
     setUploading(true);
     setError(null);
     try {
-      const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
-        '/uploads/presign',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            contentType: file.type || 'image/png',
-            filename: file.name,
-            kind: 'product-avatar',
-          }),
-        },
+      const uploadedUrls: string[] = [];
+      await Promise.all(
+        files.map(async (file) => {
+          const presign = await apiFetch<{ uploadUrl: string; publicUrl: string }>(
+            '/uploads/presign',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                contentType: file.type || 'image/png',
+                filename: file.name,
+                kind: 'product-avatar',
+              }),
+            },
+          );
+          if (!presign.ok || !presign.data) return;
+          const put = await fetch(presign.data.uploadUrl, {
+            method: 'PUT',
+            body: file,
+            headers: { 'Content-Type': file.type || 'image/png' },
+          });
+          if (put.ok) {
+            uploadedUrls.push(presign.data.publicUrl);
+          }
+        }),
       );
-      if (!presign.ok || !presign.data) {
-        setError(presign.error ?? 'Could not get upload URL');
-        return;
+
+      if (uploadedUrls.length > 0) {
+        const batchRes = await apiFetch(`/admin/products/${product.id}/images/batch`, {
+          method: 'POST',
+          body: JSON.stringify({ urls: uploadedUrls }),
+        });
+        if (batchRes.ok) {
+          onChanged();
+        } else {
+          setError(batchRes.error ?? 'Failed to save uploaded images');
+        }
+      } else {
+        setError('Failed to upload selected image files');
       }
-      const put = await fetch(presign.data.uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type || 'image/png' },
-      });
-      if (!put.ok) {
-        setError(`Upload failed (${put.status})`);
-        return;
-      }
-      setUrl(presign.data.publicUrl);
     } catch (err: any) {
-      setError(err?.message ?? 'Upload failed');
+      setError(err?.message ?? 'Multi-file upload failed');
     } finally {
       setUploading(false);
     }
   }
 
   function onFilePick(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
+    const files = Array.from(e.target.files ?? []);
     e.target.value = '';
-    if (file) void uploadFile(file);
+    if (files.length > 0) void uploadFiles(files);
   }
 
   function onDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith('image/')) {
-      void uploadFile(file);
+    const files = Array.from(e.dataTransfer.files ?? []).filter((f) =>
+      f.type.startsWith('image/'),
+    );
+    if (files.length > 0) {
+      void uploadFiles(files);
     }
   }
 
@@ -514,10 +531,11 @@ function ImagesPanel({
             Upload Image File (Drag & drop or browse from device)
           </p>
           <label className={`${adminButtonSecondary} cursor-pointer text-xs`}>
-            {uploading ? 'Uploading image file…' : '📁 Choose Image File'}
+            {uploading ? 'Uploading images…' : '📁 Choose Image Files'}
             <input
               type="file"
               accept="image/*"
+              multiple
               disabled={uploading}
               onChange={onFilePick}
               className="hidden"

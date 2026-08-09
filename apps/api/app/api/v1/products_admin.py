@@ -328,6 +328,7 @@ class QuickAddRequest(ApiModel):
     tags: list[str] | None = Field(default=None, max_length=20)
     avatarImageUrl: str | None = None
     retailerImageUrl: str | None = None
+    imageUrls: list[str] | None = Field(default=None)
     status: ProductStatusLit | None = None
     affiliatePartner: ManualAffiliatePartnerLit | None = None
 
@@ -403,17 +404,21 @@ async def quick_add(
             isDefault=False, createdAt=now, updatedAt=now,
         ))
 
-    # 4. Primary image.
-    if payload.avatarImageUrl:
+    # 4. Images (supports multiple gallery images).
+    all_image_urls: list[str] = []
+    if payload.imageUrls:
+        for u in payload.imageUrls:
+            if u and u not in all_image_urls:
+                all_image_urls.append(u)
+    if payload.avatarImageUrl and payload.avatarImageUrl not in all_image_urls:
+        all_image_urls.insert(0, payload.avatarImageUrl)
+    if not all_image_urls and payload.retailerImageUrl:
+        all_image_urls.append(payload.retailerImageUrl)
+
+    for idx, img_url in enumerate(all_image_urls):
         db.add(ProductImage(
-            id_=_cuid(), productId=pid, url=payload.avatarImageUrl,
-            isPrimary=True, isAiGenerated=True, position=0,
-            createdAt=now, updatedAt=now,
-        ))
-    elif payload.retailerImageUrl:
-        db.add(ProductImage(
-            id_=_cuid(), productId=pid, url=payload.retailerImageUrl,
-            isPrimary=True, isAiGenerated=False, position=0,
+            id_=_cuid(), productId=pid, url=img_url,
+            isPrimary=(idx == 0), isAiGenerated=False, position=idx,
             createdAt=now, updatedAt=now,
         ))
 
@@ -704,6 +709,39 @@ async def admin_add_image(
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.image.add", targetType="product", targetId=product_id)
     return {"id": img_id, "url": payload.url}
+
+
+class BatchImagesInput(ApiModel):
+    urls: list[str] = Field(min_length=1, max_length=50)
+
+
+@router.post("/{product_id}/images/batch", dependencies=AdminDeps)
+async def admin_add_images_batch(
+    product_id: str,
+    payload: BatchImagesInput,
+    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
+    db: DbDep,
+) -> dict[str, Any]:
+    if not (await db.execute(select(Product.id_).where(Product.id_ == product_id))).scalar_one_or_none():
+        raise HTTPException(404, "Product not found")
+    now = _now()
+    existing_count = (await db.execute(
+        select(func.count(ProductImage.id_)).where(ProductImage.productId == product_id)
+    )).scalar() or 0
+
+    added = []
+    for idx, url in enumerate(payload.urls):
+        img_id = _cuid()
+        is_primary = (existing_count == 0 and idx == 0)
+        db.add(ProductImage(
+            id_=img_id, productId=product_id, url=url,
+            isPrimary=is_primary, isAiGenerated=False,
+            position=existing_count + idx, createdAt=now, updatedAt=now,
+        ))
+        added.append({"id": img_id, "url": url})
+    await db.commit()
+    await audit_service.record(actorId=user.id, action="product.image.batch_add", targetType="product", targetId=product_id)
+    return {"added": added}
 
 
 class ReorderImagesRequest(ApiModel):

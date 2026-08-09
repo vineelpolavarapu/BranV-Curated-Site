@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
 import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { formatINR } from '@/lib/format';
@@ -14,6 +14,7 @@ import { Icon } from './icons';
 export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
   const [heartPopping, setHeartPopping] = useState(false);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const { isInWishlist, toggle } = useWishlist();
   const liked = isInWishlist(product.id);
 
@@ -27,11 +28,36 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     void toggle(product.id);
   };
 
-  const primary = product.primaryImage;
-  const secondary = product.secondaryImage;
-  const showSecondary = hovered && !!secondary;
-  const galleryFallback = product.gallery?.[0] ? { url: product.gallery[0].url, isAiGenerated: product.gallery[0].isAiGenerated, altText: product.gallery[0].altText } : null;
-  const shownImage = showSecondary ? secondary! : (primary ?? galleryFallback);
+  // Compile full image list from gallery or primary/secondary fallbacks
+  const images = useMemo(() => {
+    if (product.gallery && product.gallery.length > 0) {
+      return product.gallery;
+    }
+    const list: Array<{ url: string; isAiGenerated?: boolean; altText?: string | null }> = [];
+    if (product.primaryImage) list.push(product.primaryImage);
+    if (product.secondaryImage) list.push(product.secondaryImage);
+    return list;
+  }, [product]);
+
+  const shownImage = images[activeImageIndex] ?? images[0] ?? product.primaryImage;
+
+  const prevSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const nextSlide = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
+
+  const selectSlide = (e: React.MouseEvent, idx: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveImageIndex(idx);
+  };
 
   return (
     <article
@@ -45,6 +71,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       >
         {shownImage ? (
           <Image
+            key={shownImage.url}
             src={shownImage.url}
             alt={shownImage.altText ?? product.title}
             fill
@@ -58,10 +85,49 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         )}
 
+        {/* Prev/Next Slider Chevrons */}
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Previous image"
+              onClick={prevSlide}
+              className="absolute left-1.5 top-1/2 z-10 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-slate-950/40 text-white backdrop-blur-sm opacity-0 transition-opacity duration-200 hover:bg-slate-950/70 group-hover:opacity-100"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              aria-label="Next image"
+              onClick={nextSlide}
+              className="absolute right-1.5 top-1/2 z-10 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full bg-slate-950/40 text-white backdrop-blur-sm opacity-0 transition-opacity duration-200 hover:bg-slate-950/70 group-hover:opacity-100"
+            >
+              ›
+            </button>
+
+            {/* Slide dot indicators */}
+            <div className="absolute bottom-2 left-0 right-0 z-10 flex justify-center gap-1.5 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  aria-label={`Go to slide ${idx + 1}`}
+                  onClick={(e) => selectSlide(e, idx)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeImageIndex === idx
+                      ? 'w-4 bg-white shadow-sm'
+                      : 'w-1.5 bg-white/50 hover:bg-white/80'
+                  }`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         {/* AI-rendered disclosure badge */}
         {shownImage?.isAiGenerated && <AiBadge />}
 
-        {/* Top-left badge stack: Featured (when active) - max-w-[calc(100%-44px)] prevents collision with wishlist button */}
+        {/* Top-left badge stack: Featured (when active) */}
         {product.isFeatured && (
           <div className="absolute left-2 top-2 z-10 flex max-w-[calc(100%-44px)] flex-col items-start gap-1">
             <span className="inline-flex items-center gap-1 rounded bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-950 shadow-sm">
@@ -73,7 +139,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
           </div>
         )}
 
-        {/* Wishlist heart button in 32px glassmorphic circle */}
+        {/* Wishlist heart button */}
         <m.button
           type="button"
           aria-pressed={liked}
