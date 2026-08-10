@@ -41,7 +41,7 @@ AdminDeps = [
 async def admin_list(
     db: DbDep,
     page: Annotated[int, Query(ge=1)] = 1,
-    pageSize: Annotated[int, Query(ge=1, le=100)] = 20,
+    pageSize: Annotated[int, Query(ge=1, le=1000)] = 20,
     search: Annotated[str | None, Query()] = None,
 ) -> dict[str, Any]:
     return await brands_service.list_admin(db, page=page, page_size=pageSize, search=search)
@@ -61,9 +61,7 @@ async def admin_create(
     user: Annotated[AuthenticatedUser, Depends(current_user_required)],
     db: DbDep,
 ) -> dict[str, Any]:
-    return await brands_service.create(
-        db, dto=payload.model_dump(exclude_none=True), actor_id=user.id
-    )
+    return await brands_service.create_brand(db, payload=payload, actor_id=user.id)
 
 
 @admin_router.patch("/{brand_id}", dependencies=AdminDeps)
@@ -74,7 +72,7 @@ async def admin_update(
     db: DbDep,
 ) -> dict[str, Any]:
     updated = await brands_service.update_brand(
-        db, brand_id=brand_id, dto=payload.model_dump(exclude_unset=True), actor_id=user.id
+        db, brand_id=brand_id, payload=payload, actor_id=user.id
     )
     if updated is None:
         raise HTTPException(status_code=404, detail="Brand not found")
@@ -102,7 +100,12 @@ async def admin_delete(
 
 
 @public_router.get("")
-async def public_list(db: DbDep) -> list[dict[str, Any]]:
+async def public_list(
+    db: DbDep,
+    page: Annotated[int, Query(ge=1)] = 1,
+    pageSize: Annotated[int, Query(ge=1, le=1000)] = 200,
+    search: Annotated[str | None, Query()] = None,
+) -> Any:
     return await brands_service.list_public(db)
 
 

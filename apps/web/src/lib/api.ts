@@ -107,11 +107,49 @@ function isAuthBypassPath(path: string): boolean {
   );
 }
 
+export function isTokenExpiredOrNearExpiry(
+  token: string | null,
+  bufferSeconds = 60,
+): boolean {
+  if (!token) return true;
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    const payloadJson = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+    const payload = JSON.parse(payloadJson);
+    if (!payload || typeof payload.exp !== 'number') return false;
+    const nowSec = Math.floor(Date.now() / 1000);
+    return payload.exp <= nowSec + bufferSeconds;
+  } catch {
+    return false;
+  }
+}
+
+export async function ensureValidToken(): Promise<string | null> {
+  let token = getStoredToken();
+  if (token && isTokenExpiredOrNearExpiry(token)) {
+    if (!refreshPromise) {
+      refreshPromise = performTokenRefresh().finally(() => {
+        refreshPromise = null;
+      });
+    }
+    const ok = await refreshPromise;
+    if (ok) {
+      token = getStoredToken();
+    }
+  }
+  return token;
+}
+
 export async function apiFetch<T>(
   path: string,
   init: RequestInit = {},
   isRetry = false,
 ): Promise<ApiResult<T>> {
+  if (!isRetry && !isAuthBypassPath(path)) {
+    await ensureValidToken();
+  }
+
   let res: Response;
   const token = getStoredToken();
   const headers: Record<string, string> = {

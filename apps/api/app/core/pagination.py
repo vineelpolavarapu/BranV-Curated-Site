@@ -21,7 +21,7 @@ T = TypeVar("T")
 
 
 PageParam = Annotated[int, Query(ge=1)]
-PageSizeParam = Annotated[int, Query(ge=1, le=100)]
+PageSizeParam = Annotated[int, Query(ge=1, le=1000)]
 
 
 def make_page(data: list[T], total: int, page: int, page_size: int) -> dict:

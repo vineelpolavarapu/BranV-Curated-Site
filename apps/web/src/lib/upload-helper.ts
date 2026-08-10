@@ -1,10 +1,10 @@
-import { apiFetch } from './api';
+import { apiFetch, ensureValidToken } from './api';
 
 export async function uploadFileToStorage(
   file: File,
   kind: string = 'product-avatar',
 ): Promise<string> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('branv_access_token') : null;
+  const token = await ensureValidToken();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
 
   // Strategy A: Direct multipart upload to API server (bypasses browser CORS on R2/S3!)

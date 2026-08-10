@@ -483,7 +483,7 @@ async def quick_add(
 async def admin_list(
     db: DbDep,
     page: Annotated[int, Query(ge=1)] = 1,
-    pageSize: Annotated[int, Query(ge=1, le=100)] = 20,
+    pageSize: Annotated[int, Query(ge=1, le=1000)] = 20,
     search: Annotated[str | None, Query()] = None,
     brandId: Annotated[str | None, Query()] = None,
     categoryId: Annotated[str | None, Query()] = None,
