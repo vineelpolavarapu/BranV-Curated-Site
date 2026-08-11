@@ -15,6 +15,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
   const [heartPopping, setHeartPopping] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [imgError, setImgError] = useState(false);
   const { isInWishlist, toggle } = useWishlist();
   const liked = isInWishlist(product.id);
 
@@ -69,19 +70,32 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         href={`/products/${product.slug}`}
         className="relative block aspect-[4/5] w-full overflow-hidden bg-surface-muted"
       >
-        {shownImage ? (
-          <Image
-            key={shownImage.url}
-            src={shownImage.url}
-            alt={shownImage.altText ?? product.title}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
-            className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
-            unoptimized
-          />
+        {shownImage && !imgError ? (
+          shownImage.url.startsWith('blob:') || shownImage.url.startsWith('data:') ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              key={shownImage.url}
+              src={shownImage.url}
+              alt={shownImage.altText ?? product.title}
+              className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <Image
+              key={shownImage.url}
+              src={shownImage.url}
+              alt={shownImage.altText ?? product.title}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
+              className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
+              unoptimized
+              onError={() => setImgError(true)}
+            />
+          )
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-content-muted">
-            no image
+          <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 p-4 text-center text-slate-400">
+            <span className="text-3xl">🛍️</span>
+            <span className="mt-1 text-[11px] font-medium text-slate-500">Image Preview</span>
           </div>
         )}
 

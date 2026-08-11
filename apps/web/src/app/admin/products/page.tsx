@@ -125,16 +125,27 @@ export default function ProductsAdminPage() {
                   <li key={p.id} className="min-w-0 rounded-xl border border-line p-3">
                     <div className="flex min-w-0 items-start gap-3">
                       {primaryImage ? (
-                        <Image
-                          src={primaryImage.url}
-                          alt=""
-                          width={40}
-                          height={50}
-                          unoptimized
-                          className="h-12 w-10 shrink-0 rounded object-cover"
-                        />
+                        primaryImage.url.startsWith('blob:') || primaryImage.url.startsWith('data:') ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={primaryImage.url}
+                            alt=""
+                            className="h-12 w-10 shrink-0 rounded object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={primaryImage.url}
+                            alt=""
+                            width={40}
+                            height={50}
+                            unoptimized
+                            className="h-12 w-10 shrink-0 rounded object-cover"
+                          />
+                        )
                       ) : (
-                        <div className="h-12 w-10 shrink-0 rounded bg-line" />
+                        <div className="flex h-12 w-10 shrink-0 items-center justify-center rounded bg-slate-100 text-xs">
+                          📸
+                        </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-2">
@@ -200,16 +211,27 @@ export default function ProductsAdminPage() {
                         <td className="px-2 py-3">
                           <div className="flex min-w-0 items-center gap-3">
                             {primaryImage ? (
-                              <Image
-                                src={primaryImage.url}
-                                alt=""
-                                width={40}
-                                height={50}
-                                unoptimized
-                                className="h-12 w-10 shrink-0 rounded object-cover"
-                              />
+                              primaryImage.url.startsWith('blob:') || primaryImage.url.startsWith('data:') ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  src={primaryImage.url}
+                                  alt=""
+                                  className="h-12 w-10 shrink-0 rounded object-cover"
+                                />
+                              ) : (
+                                <Image
+                                  src={primaryImage.url}
+                                  alt=""
+                                  width={40}
+                                  height={50}
+                                  unoptimized
+                                  className="h-12 w-10 shrink-0 rounded object-cover"
+                                />
+                              )
                             ) : (
-                              <div className="h-12 w-10 shrink-0 rounded bg-line" />
+                              <div className="flex h-12 w-10 shrink-0 items-center justify-center rounded bg-slate-100 text-xs">
+                                📸
+                              </div>
                             )}
                             <div className="min-w-0">
                               <p className="truncate font-medium">{p.title}</p>

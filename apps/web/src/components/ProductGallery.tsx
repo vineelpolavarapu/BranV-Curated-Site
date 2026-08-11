@@ -26,23 +26,38 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
     setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
+  const [hasError, setHasError] = useState(false);
+
   return (
     <div>
       {/* Main Slider Display */}
       <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted group border border-line shadow-sm">
-        {hero && 'url' in hero ? (
+        {hero && 'url' in hero && !hasError ? (
           <>
-            <Image
-              key={hero.url}
-              src={hero.url}
-              alt={hero.altText ?? product.title}
-              fill
-              sizes="(max-width: 1023px) 100vw, 50vw"
-              className="object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
-              unoptimized
-              priority
-              onClick={() => setLightboxOpen(true)}
-            />
+            {hero.url.startsWith('blob:') || hero.url.startsWith('data:') ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                key={hero.url}
+                src={hero.url}
+                alt={hero.altText ?? product.title}
+                className="absolute inset-0 h-full w-full object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
+                onClick={() => setLightboxOpen(true)}
+                onError={() => setHasError(true)}
+              />
+            ) : (
+              <Image
+                key={hero.url}
+                src={hero.url}
+                alt={hero.altText ?? product.title}
+                fill
+                sizes="(max-width: 1023px) 100vw, 50vw"
+                className="object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
+                unoptimized
+                priority
+                onClick={() => setLightboxOpen(true)}
+                onError={() => setHasError(true)}
+              />
+            )}
 
             {/* Slider Counter Badge */}
             {images.length > 1 && (
@@ -84,8 +99,9 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
             )}
           </>
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-content-muted">
-            no image
+          <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 p-8 text-center text-slate-400">
+            <span className="text-4xl">📸</span>
+            <span className="mt-2 text-xs font-semibold text-slate-500">Image Preview</span>
           </div>
         )}
       </div>
