@@ -347,124 +347,166 @@ async def quick_add(
     from ...integrations.amazon import tag_url
     from ...core.slug import ensure_unique_slug
 
-    if not payload.brandId and not payload.newBrandName:
+    brand_id = payload.brandId.strip() if payload.brandId and payload.brandId.strip() else None
+    cat_id = payload.categoryId.strip() if payload.categoryId and payload.categoryId.strip() else None
+    subcat_id = payload.subcategoryId.strip() if payload.subcategoryId and payload.subcategoryId.strip() else None
+
+    if not brand_id and not (payload.newBrandName and payload.newBrandName.strip()):
         raise HTTPException(400, "brandId or newBrandName required")
 
+    if not cat_id:
+        raise HTTPException(400, "categoryId is required")
+
     now = _now()
-    # 1. Brand upsert.
-    if payload.brandId:
-        brand_id = payload.brandId
-    else:
-        name = payload.newBrandName or ""
-        slug_base = slugify(name)
+    try:
+        # 1. Brand upsert.
+        if not brand_id:
+            name = payload.newBrandName.strip() if payload.newBrandName else ""
+            slug_base = slugify(name)
 
-        async def brand_slug_taken(cand: str) -> bool:
-            return (await db.execute(
-                select(Brand.id_).where(Brand.slug == cand)
-            )).scalar_one_or_none() is not None
+            async def brand_slug_taken(cand: str) -> bool:
+                return (await db.execute(
+                    select(Brand.id_).where(Brand.slug == cand)
+                )).scalar_one_or_none() is not None
 
-        slug = await ensure_unique_slug(slug_base, brand_slug_taken)
-        brand_id = _cuid()
-        db.add(Brand(
-            id_=brand_id, slug=slug, name=name, status="ACTIVE",
-            isFeatured=False, createdAt=now, updatedAt=now,
+            slug = await ensure_unique_slug(slug_base, brand_slug_taken)
+            brand_id = _cuid()
+            db.add(Brand(
+                id_=brand_id, slug=slug, name=name, status="ACTIVE",
+                isFeatured=False, createdAt=now, updatedAt=now,
+            ))
+            await db.flush()
+
+        # 2. Product.
+        from ...db.enums import AffiliatePartner, AvailabilityStatus, ProductStatus
+        p_slug = await _unique_product_slug(db, slugify(payload.title))
+        discount = _calc_discount(payload.price, payload.mrp)
+        pid = _cuid()
+
+        try:
+            price_val = Decimal(str(payload.price)) if payload.price is not None else Decimal("0")
+        except Exception:
+            price_val = Decimal("0")
+
+        try:
+            mrp_val = Decimal(str(payload.mrp)) if payload.mrp is not None else None
+        except Exception:
+            mrp_val = None
+
+        try:
+            status_enum = ProductStatus((payload.status or "ACTIVE").upper())
+        except Exception:
+            status_enum = ProductStatus.ACTIVE
+
+        discount_dec = Decimal(f"{discount:.2f}") if discount is not None else None
+
+        db.add(Product(
+            id_=pid,
+            brandId=brand_id,
+            categoryId=cat_id,
+            subcategoryId=subcat_id,
+            slug=p_slug,
+            title=payload.title,
+            description=payload.description,
+            price=price_val,
+            mrp=mrp_val,
+            discountPct=discount_dec,
+            currency="INR",
+            primaryRetailer=payload.retailer,
+            status=status_enum,
+            createdByAdminId=user.id,
+            tags=payload.tags or [],
+            reviewCount=0,
+            createdAt=now,
+            updatedAt=now,
         ))
         await db.flush()
 
-    # 2. Product.
-    p_slug = await _unique_product_slug(db, slugify(payload.title))
-    discount = _calc_discount(payload.price, payload.mrp)
-    pid = _cuid()
-    db.add(Product(
-        id_=pid,
-        brandId=brand_id,
-        categoryId=payload.categoryId,
-        subcategoryId=payload.subcategoryId,
-        slug=p_slug,
-        title=payload.title,
-        description=payload.description,
-        price=Decimal(str(payload.price if payload.price is not None else 0)),
-        mrp=Decimal(str(payload.mrp)) if payload.mrp is not None else None,
-        discountPct=Decimal(str(discount)) if discount is not None else None,
-        currency="INR",
-        primaryRetailer=payload.retailer,
-        status=payload.status or "ACTIVE",
-        createdByAdminId=user.id,
-        tags=payload.tags or [],
-        reviewCount=0,
-        createdAt=now,
-        updatedAt=now,
-    ))
-    await db.flush()
+        # 3. Variants (one per size).
+        for s in payload.sizes or []:
+            db.add(ProductVariant(
+                id_=_cuid(), productId=pid, color=payload.color, size=s,
+                isDefault=False, createdAt=now, updatedAt=now,
+            ))
 
-    # 3. Variants (one per size).
-    for s in payload.sizes or []:
-        db.add(ProductVariant(
-            id_=_cuid(), productId=pid, color=payload.color, size=s,
-            isDefault=False, createdAt=now, updatedAt=now,
+        # 4. Images (supports multiple gallery images).
+        all_image_urls: list[str] = []
+        if payload.imageUrls:
+            for u in payload.imageUrls:
+                if u and u not in all_image_urls:
+                    all_image_urls.append(u)
+        if payload.avatarImageUrl and payload.avatarImageUrl not in all_image_urls:
+            all_image_urls.insert(0, payload.avatarImageUrl)
+        if not all_image_urls and payload.retailerImageUrl:
+            all_image_urls.append(payload.retailerImageUrl)
+
+        for idx, img_url in enumerate(all_image_urls):
+            db.add(ProductImage(
+                id_=_cuid(), productId=pid, url=img_url,
+                isPrimary=(idx == 0), isAiGenerated=False, position=idx,
+                createdAt=now,
+            ))
+
+        # 5. Retailer listing.
+        listing_id = _cuid()
+        db.add(ProductRetailerListing(
+            id_=listing_id, productId=pid, retailer=payload.retailer,
+            retailerDisplayName=payload.retailerDisplayName,
+            retailerProductUrl=payload.rawUrl, retailerImageUrl=payload.retailerImageUrl,
+            rawPrice=price_val,
+            availabilityStatus=AvailabilityStatus.IN_STOCK,
+            syncFailedCount=0,
+            createdAt=now, updatedAt=now,
         ))
+        await db.flush()
 
-    # 4. Images (supports multiple gallery images).
-    all_image_urls: list[str] = []
-    if payload.imageUrls:
-        for u in payload.imageUrls:
-            if u and u not in all_image_urls:
-                all_image_urls.append(u)
-    if payload.avatarImageUrl and payload.avatarImageUrl not in all_image_urls:
-        all_image_urls.insert(0, payload.avatarImageUrl)
-    if not all_image_urls and payload.retailerImageUrl:
-        all_image_urls.append(payload.retailerImageUrl)
+        # 6. Affiliate link. Amazon gets your Associates tag appended
+        # automatically; every other retailer is stored exactly as pasted - the
+        # admin already has the affiliate-wrapped URL from EarnKaro/Meesho/etc.
+        if payload.retailer.lower() == "amazon" or "amazon" in payload.rawUrl.lower():
+            converted_url = tag_url(payload.rawUrl)
+            partner_name = "AMAZON"
+        else:
+            converted_url = payload.rawUrl
+            partner_name = payload.affiliatePartner or "DIRECT"
+        
+        try:
+            partner_enum = AffiliatePartner(partner_name.upper())
+        except Exception:
+            partner_enum = AffiliatePartner.DIRECT
 
-    for idx, img_url in enumerate(all_image_urls):
-        db.add(ProductImage(
-            id_=_cuid(), productId=pid, url=img_url,
-            isPrimary=(idx == 0), isAiGenerated=False, position=idx,
+        pending = False
+        partner_link_id = None
+
+        db.add(AffiliateLink(
+            id_=_cuid(),
+            productRetailerListingId=listing_id,
+            partner=partner_enum,
+            rawUrl=payload.rawUrl,
+            convertedUrl=converted_url,
+            partnerLinkId=partner_link_id,
+            pendingConversion=pending,
+            lastValidatedAt=now if not pending else None,
             createdAt=now, updatedAt=now,
         ))
 
-    # 5. Retailer listing.
-    listing_id = _cuid()
-    db.add(ProductRetailerListing(
-        id_=listing_id, productId=pid, retailer=payload.retailer,
-        retailerDisplayName=payload.retailerDisplayName,
-        retailerProductUrl=payload.rawUrl, retailerImageUrl=payload.retailerImageUrl,
-        rawPrice=Decimal(str(payload.price)) if payload.price is not None else None,
-        availabilityStatus="IN_STOCK",
-        syncFailedCount=0,
-        createdAt=now, updatedAt=now,
-    ))
-    await db.flush()
+        await db.commit()
+    except HTTPException:
+        await db.rollback()
+        raise
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(400, f"Product creation failed: {str(e)}") from None
 
-    # 6. Affiliate link. Amazon gets your Associates tag appended
-    # automatically; every other retailer is stored exactly as pasted - the
-    # admin already has the affiliate-wrapped URL from EarnKaro/Meesho/etc.
-    if payload.retailer.lower() == "amazon" or "amazon" in payload.rawUrl.lower():
-        converted_url = tag_url(payload.rawUrl)
-        partner = "AMAZON"
-    else:
-        converted_url = payload.rawUrl
-        partner = payload.affiliatePartner or "DIRECT"
-    pending = False
-    partner_link_id = None
+    try:
+        await audit_service.record(
+            actorId=user.id, action="product.quick_add",
+            targetType="product", targetId=pid,
+            metadata={"retailer": payload.retailer, "brandId": brand_id},
+        )
+    except Exception:
+        pass
 
-    db.add(AffiliateLink(
-        id_=_cuid(),
-        productRetailerListingId=listing_id,
-        partner=partner,
-        rawUrl=payload.rawUrl,
-        convertedUrl=converted_url,
-        partnerLinkId=partner_link_id,
-        pendingConversion=pending,
-        lastValidatedAt=now if not pending else None,
-        createdAt=now, updatedAt=now,
-    ))
-
-    await db.commit()
-    await audit_service.record(
-        actorId=user.id, action="product.quick_add",
-        targetType="product", targetId=pid,
-        metadata={"retailer": payload.retailer, "brandId": brand_id},
-    )
     fresh = (await db.execute(select(Product).where(Product.id_ == pid))).scalar_one()
     return {
         "product": {
@@ -474,7 +516,7 @@ async def quick_add(
         },
         "affiliate": {
             "pendingConversion": pending,
-            "partner": partner,
+            "partner": partner_name,
         }
     }
 
@@ -578,7 +620,7 @@ async def admin_create(
             altText=img.altText, isPrimary=bool(img.isPrimary),
             isAiGenerated=bool(img.isAiGenerated),
             position=img.position if img.position is not None else idx,
-            createdAt=now, updatedAt=now,
+            createdAt=now,
         ))
     for v in payload.variants or []:
         db.add(ProductVariant(
@@ -704,7 +746,7 @@ async def admin_add_image(
     db.add(ProductImage(
         id_=img_id, productId=product_id, url=payload.url, altText=payload.altText,
         isPrimary=is_primary, isAiGenerated=bool(payload.isAiGenerated),
-        position=payload.position or 0, createdAt=now, updatedAt=now,
+        position=payload.position or 0, createdAt=now,
     ))
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.image.add", targetType="product", targetId=product_id)
@@ -736,7 +778,7 @@ async def admin_add_images_batch(
         db.add(ProductImage(
             id_=img_id, productId=product_id, url=url,
             isPrimary=is_primary, isAiGenerated=False,
-            position=existing_count + idx, createdAt=now, updatedAt=now,
+            position=existing_count + idx, createdAt=now,
         ))
         added.append({"id": img_id, "url": url})
     await db.commit()

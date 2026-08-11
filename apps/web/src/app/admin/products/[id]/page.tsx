@@ -375,20 +375,26 @@ function ImagesPanel({
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [stagedUploadUrl, setStagedUploadUrl] = useState<string | null>(null);
+  const [stagedBlobUrl, setStagedBlobUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function uploadSingleFile(file: File) {
     setUploading(true);
     setError(null);
+    // Create a local blob URL for instant preview
+    const blobUrl = URL.createObjectURL(file);
     try {
       const publicUrl = await uploadFileToStorage(file, 'product-avatar');
       if (publicUrl) {
         setStagedUploadUrl(publicUrl);
+        setStagedBlobUrl(blobUrl);
         setUrl(publicUrl);
       } else {
+        URL.revokeObjectURL(blobUrl);
         setError('Upload to storage failed');
       }
     } catch (err: any) {
+      URL.revokeObjectURL(blobUrl);
       setError(err?.message ?? 'Storage upload failed');
     } finally {
       setUploading(false);
@@ -476,6 +482,10 @@ function ImagesPanel({
         return;
       }
       setStagedUploadUrl(null);
+      if (stagedBlobUrl) {
+        try { URL.revokeObjectURL(stagedBlobUrl); } catch { /* ignore */ }
+        setStagedBlobUrl(null);
+      }
       setUrl('');
       setAltText('');
       setIsAi(false);
@@ -570,13 +580,24 @@ function ImagesPanel({
         <div className="mb-4 rounded-xl border-2 border-primary/40 bg-slate-50 p-4 shadow-sm space-y-3">
           <div className="flex items-center gap-3">
             <div className="relative h-16 w-14 overflow-hidden rounded-lg border border-line bg-surface shrink-0">
-              <Image
-                src={stagedUploadUrl}
-                alt="Uploaded to storage"
-                fill
-                unoptimized
-                className="object-cover"
-              />
+              {(stagedBlobUrl || stagedUploadUrl) && (
+                stagedBlobUrl ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={stagedBlobUrl}
+                    alt="Uploaded to storage"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={stagedUploadUrl!}
+                    alt="Uploaded to storage"
+                    fill
+                    unoptimized
+                    className="object-cover"
+                  />
+                )
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-xs font-bold text-emerald-700">✓ Image Stored in Storage Account</p>
@@ -586,6 +607,10 @@ function ImagesPanel({
               type="button"
               onClick={() => {
                 setStagedUploadUrl(null);
+                if (stagedBlobUrl) {
+                  try { URL.revokeObjectURL(stagedBlobUrl); } catch { /* ignore */ }
+                  setStagedBlobUrl(null);
+                }
                 setUrl('');
               }}
               className="text-xs text-slate-400 hover:text-red-600"

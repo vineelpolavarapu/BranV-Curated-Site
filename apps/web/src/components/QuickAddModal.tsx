@@ -122,6 +122,19 @@ export function QuickAddModal({
   const [showNewBrand, setShowNewBrand] = useState(false);
   const [showVisibility, setShowVisibility] = useState(false);
 
+  // Map server URLs → local blob URLs for instant preview
+  const [blobPreviews, setBlobPreviews] = useState<Record<string, string>>({});
+
+  // Clean up blob URLs on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(blobPreviews).forEach((blobUrl) => {
+        try { URL.revokeObjectURL(blobUrl); } catch { /* ignore */ }
+      });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const urlInputRef = useRef<HTMLInputElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -314,17 +327,27 @@ const DEFAULT_BRANDS = [
     setError(null);
     try {
       const uploaded: string[] = [];
+      const newBlobMap: Record<string, string> = {};
       await Promise.all(
         files.map(async (file) => {
           try {
-            const url = await uploadFileToStorage(file, 'product-avatar');
-            if (url) uploaded.push(url);
+            // Create a local blob URL for instant preview
+            const blobUrl = URL.createObjectURL(file);
+            const serverUrl = await uploadFileToStorage(file, 'product-avatar');
+            if (serverUrl) {
+              uploaded.push(serverUrl);
+              newBlobMap[serverUrl] = blobUrl;
+            } else {
+              // Upload failed, clean up blob
+              URL.revokeObjectURL(blobUrl);
+            }
           } catch {
             // continue other uploads
           }
         }),
       );
       if (uploaded.length > 0) {
+        setBlobPreviews((prev) => ({ ...prev, ...newBlobMap }));
         setForm((prev) => ({
           ...prev,
           imageUrls: [...prev.imageUrls, ...uploaded],
@@ -461,6 +484,11 @@ const DEFAULT_BRANDS = [
     } catch {
       /* ignore */
     }
+    // Revoke all blob preview URLs
+    Object.values(blobPreviews).forEach((blobUrl) => {
+      try { URL.revokeObjectURL(blobUrl); } catch { /* ignore */ }
+    });
+    setBlobPreviews({});
     setForm(EMPTY);
     setAutofillSource(null);
   }
@@ -705,17 +733,27 @@ const DEFAULT_BRANDS = [
             <ImageDropPaste
               imageUrls={form.imageUrls}
               currentUrl={form.avatarImageUrl}
+              blobPreviews={blobPreviews}
               uploading={uploading}
               onDrop={onDrop}
               onPaste={onPaste}
               onFilePick={onFilePick}
-              onRemoveImage={(url) =>
+              onRemoveImage={(url) => {
+                // Revoke blob URL when image is removed
+                if (blobPreviews[url]) {
+                  try { URL.revokeObjectURL(blobPreviews[url]); } catch { /* ignore */ }
+                  setBlobPreviews((prev) => {
+                    const next = { ...prev };
+                    delete next[url];
+                    return next;
+                  });
+                }
                 setForm((prev) => ({
                   ...prev,
                   imageUrls: prev.imageUrls.filter((u) => u !== url),
                   avatarImageUrl: prev.avatarImageUrl === url ? (prev.imageUrls.find((u) => u !== url) || '') : prev.avatarImageUrl,
-                }))
-              }
+                }));
+              }}
               onSetPrimary={(url) => set('avatarImageUrl', url)}
             />
           </section>
@@ -878,9 +916,100 @@ const DEFAULT_BRANDS = [
 
 // ─────────────── Drop / paste / pick image zone ───────────────
 
+function ImagePreviewCard({
+  url,
+  previewUrl,
+  idx,
+  isPrimary,
+  onSetPrimary,
+  onRemove,
+}: {
+  url: string;
+  previewUrl?: string;
+  idx: number;
+  isPrimary: boolean;
+  onSetPrimary: () => void;
+  onRemove: () => void;
+}) {
+  const [hasError, setHasError] = useState(false);
+  // Prefer local blob URL for instant preview, fall back to server URL
+  const displayUrl = previewUrl || url;
+  // Use native <img> for blob: URLs since next/image doesn't handle them well
+  const isBlobUrl = displayUrl.startsWith('blob:');
+
+  return (
+    <div
+      className={`group relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 border transition-all duration-200 ${
+        isPrimary
+          ? 'border-blue-600 ring-2 ring-blue-500/80 shadow-md'
+          : 'border-slate-200 hover:border-slate-400 hover:shadow-sm'
+      }`}
+    >
+      {!hasError ? (
+        isBlobUrl ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={displayUrl}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={() => setHasError(true)}
+          />
+        ) : (
+          <Image
+            src={displayUrl}
+            alt=""
+            fill
+            unoptimized
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            onError={() => setHasError(true)}
+          />
+        )
+      ) : (
+        <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 p-2 text-center text-slate-400">
+          <span className="text-2xl">📸</span>
+          <span className="mt-1 text-[10px] font-semibold text-slate-500">Image Preview</span>
+        </div>
+      )}
+
+      {/* Floating Badges */}
+      <div className="absolute left-1.5 top-1.5 z-10 flex items-center gap-1">
+        {isPrimary ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-md backdrop-blur-sm">
+            ★ PRIMARY
+          </span>
+        ) : (
+          <button
+            type="button"
+            onClick={onSetPrimary}
+            className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[9px] font-semibold text-slate-700 shadow-sm transition hover:bg-blue-600 hover:text-white"
+          >
+            ⭐ Set Primary
+          </button>
+        )}
+      </div>
+
+      {/* Delete Button */}
+      <button
+        type="button"
+        onClick={onRemove}
+        title="Remove image"
+        className="absolute right-1.5 top-1.5 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 text-xs font-bold text-white shadow transition hover:bg-red-600"
+      >
+        ✕
+      </button>
+
+      {/* Index Tag */}
+      <div className="absolute bottom-1.5 left-1.5 z-10 rounded bg-slate-900/70 px-1.5 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
+        #{idx + 1}
+      </div>
+    </div>
+  );
+}
+
 function ImageDropPaste({
   imageUrls,
   currentUrl,
+  blobPreviews,
   uploading,
   onDrop,
   onPaste,
@@ -890,6 +1019,7 @@ function ImageDropPaste({
 }: {
   imageUrls: string[];
   currentUrl: string;
+  blobPreviews?: Record<string, string>;
   uploading: boolean;
   onDrop: (e: DragEvent<HTMLDivElement>) => void;
   onPaste: (e: ClipboardEvent<HTMLDivElement>) => void;
@@ -912,21 +1042,21 @@ function ImageDropPaste({
           onDrop(e);
         }}
         tabIndex={0}
-        className={`flex items-center gap-4 rounded-lg border-2 border-dashed p-4 transition ${
-          hover ? 'border-neutral-900 bg-surface-muted' : 'border-line'
+        className={`flex items-center gap-4 rounded-xl border-2 border-dashed p-4 transition ${
+          hover ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200 bg-slate-50/50'
         }`}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded bg-surface-muted text-xl">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl shadow-sm border border-slate-200">
           📸
         </div>
         <div className="flex-1 text-sm">
-          <p className="font-medium text-content">
-            {uploading ? 'Uploading images…' : 'Drag & drop multiple image files, or Ctrl+V paste'}
+          <p className="font-semibold text-slate-800">
+            {uploading ? 'Uploading product images…' : 'Drag & drop multiple image files, or Ctrl+V paste'}
           </p>
-          <p className="text-xs text-content-soft">
+          <p className="text-xs text-slate-500 mt-0.5">
             Or{' '}
-            <label className="cursor-pointer text-primary font-medium underline">
-              choose image files
+            <label className="cursor-pointer text-blue-600 font-bold hover:underline">
+              browse & choose image files
               <input
                 type="file"
                 accept="image/*"
@@ -940,44 +1070,17 @@ function ImageDropPaste({
       </div>
 
       {imageUrls.length > 0 && (
-        <div className="grid grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {imageUrls.map((url, idx) => (
-            <div
+            <ImagePreviewCard
               key={url + idx}
-              className={`relative aspect-[4/5] rounded border overflow-hidden bg-surface ${
-                currentUrl === url ? 'border-2 border-primary shadow-sm' : 'border-line'
-              }`}
-            >
-              <Image
-                src={url}
-                alt={`Product image ${idx + 1}`}
-                fill
-                unoptimized
-                className="object-cover"
-              />
-              <div className="absolute left-1 top-1 flex flex-col gap-1">
-                {currentUrl === url ? (
-                  <span className="rounded bg-primary px-1 py-0.5 text-[8px] font-bold uppercase text-primary-fg">
-                    Primary
-                  </span>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => onSetPrimary(url)}
-                    className="rounded bg-surface/90 px-1 py-0.5 text-[8px] font-medium text-content hover:bg-surface"
-                  >
-                    Set Primary
-                  </button>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => onRemoveImage(url)}
-                className="absolute right-1 top-1 rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-bold text-red-600 hover:bg-surface"
-              >
-                ✕
-              </button>
-            </div>
+              url={url}
+              previewUrl={blobPreviews?.[url]}
+              idx={idx}
+              isPrimary={currentUrl === url}
+              onSetPrimary={() => onSetPrimary(url)}
+              onRemove={() => onRemoveImage(url)}
+            />
           ))}
         </div>
       )}
