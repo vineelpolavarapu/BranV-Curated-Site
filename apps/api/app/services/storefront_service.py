@@ -42,6 +42,21 @@ def _iso_ms(dt: datetime | None) -> str | None:
     return dt.strftime("%Y-%m-%dT%H:%M:%S.") + f"{dt.microsecond // 1000:03d}Z"
 
 
+_CATEGORY_FALLBACK_IMAGES: dict[str, str] = {
+    "jeans": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "shirts": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=80",
+    "t-shirts": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+    "tracks": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
+    "footwear": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80",
+    "watches": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80",
+    "trousers": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+    "shorts": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80",
+    "jackets": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "hoodies": "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80",
+}
+_DEFAULT_FALLBACK_IMAGE = "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+
+
 async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict[str, Any]]:
     """Build storefront card payloads in bulk using batched queries - eliminates N+1 queries."""
     if not products:
@@ -103,14 +118,16 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
         ai_images = [i for i in p_images if i.isAiGenerated]
         retailer_images = [i for i in p_images if not i.isAiGenerated]
         primary = next((i for i in p_images if i.isPrimary), None) or (p_images[0] if p_images else None)
-        if not primary and p_listings:
-            fallback_url = next((l.retailerImageUrl for l in p_listings if l.retailerImageUrl), None)
-            if fallback_url:
-                primary = type("SyntheticImage", (), {
-                    "url": fallback_url,
-                    "isAiGenerated": False,
-                    "altText": p.title,
-                })()
+        if not primary or "placehold.co" in primary.url:
+            fallback_url = next((l.retailerImageUrl for l in p_listings if l.retailerImageUrl and "placehold.co" not in l.retailerImageUrl), None)
+            if not fallback_url:
+                cat_slug = c_info[2] if c_info else ""
+                fallback_url = _CATEGORY_FALLBACK_IMAGES.get(cat_slug, _DEFAULT_FALLBACK_IMAGE)
+            primary = type("SyntheticImage", (), {
+                "url": fallback_url,
+                "isAiGenerated": False,
+                "altText": p.title,
+            })()
         secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
 
         sorted_listings = sorted(
@@ -122,6 +139,25 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
 
         sizes = sorted(list(set(v.size for v in p_variants if v.size)))
         colors = sorted(list(set(v.color for v in p_variants if v.color)))
+
+        gallery_list = [
+            {
+                "url": i.url,
+                "altText": i.altText,
+                "isAiGenerated": i.isAiGenerated,
+                "isPrimary": i.isPrimary,
+                "position": i.position,
+            }
+            for i in p_images
+        ] if p_images else [
+            {
+                "url": primary.url,
+                "altText": p.title,
+                "isAiGenerated": False,
+                "isPrimary": True,
+                "position": 0,
+            }
+        ]
 
         cards.append({
             "id": p.id_,
@@ -154,16 +190,7 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
                 "isAiGenerated": secondary.isAiGenerated,
                 "altText": secondary.altText,
             } if secondary else None,
-            "gallery": [
-                {
-                    "url": i.url,
-                    "altText": i.altText,
-                    "isAiGenerated": i.isAiGenerated,
-                    "isPrimary": i.isPrimary,
-                    "position": i.position,
-                }
-                for i in p_images
-            ],
+            "gallery": gallery_list,
             "aiImageCount": len(ai_images),
             "variants": [
                 {

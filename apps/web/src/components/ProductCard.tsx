@@ -11,11 +11,26 @@ import { useClickReturn } from './click-return/ClickReturnProvider';
 import { useWishlist } from './wishlist/WishlistProvider';
 import { Icon } from './icons';
 
+const CATEGORY_FALLBACK_MAP: Record<string, string> = {
+  jeans: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
+  shirts: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=80',
+  't-shirts': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80',
+  tracks: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80',
+  footwear: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80',
+  watches: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80',
+  trousers: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
+  shorts: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
+  jackets: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80',
+  hoodies: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
+};
+const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80';
+
 export function ProductCard({ product }: { product: ProductCardData }) {
   const [hovered, setHovered] = useState(false);
   const [heartPopping, setHeartPopping] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [imgError, setImgError] = useState(false);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
   const { isInWishlist, toggle } = useWishlist();
   const liked = isInWishlist(product.id);
 
@@ -40,7 +55,10 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     return list;
   }, [product]);
 
-  const shownImage = images[activeImageIndex] ?? images[0] ?? product.primaryImage;
+  const rawShown = images[activeImageIndex] ?? images[0] ?? product.primaryImage;
+  const shownImage = fallbackUrl
+    ? { url: fallbackUrl, altText: product.title, isAiGenerated: false }
+    : rawShown;
 
   const prevSlide = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -58,6 +76,18 @@ export function ProductCard({ product }: { product: ProductCardData }) {
     e.preventDefault();
     e.stopPropagation();
     setActiveImageIndex(idx);
+  };
+
+  const handleImageError = () => {
+    if (activeImageIndex < images.length - 1) {
+      setActiveImageIndex((prev) => prev + 1);
+    } else if (!fallbackUrl) {
+      const catSlug = product.category?.slug ?? '';
+      const catImg = CATEGORY_FALLBACK_MAP[catSlug] ?? DEFAULT_FALLBACK_IMAGE;
+      setFallbackUrl(catImg);
+    } else {
+      setImgError(true);
+    }
   };
 
   return (
@@ -78,13 +108,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               src={shownImage.url}
               alt={shownImage.altText ?? product.title}
               className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
-              onError={() => {
-                if (activeImageIndex < images.length - 1) {
-                  setActiveImageIndex(prev => prev + 1);
-                } else {
-                  setImgError(true);
-                }
-              }}
+              onError={handleImageError}
             />
           ) : (
             <Image
@@ -95,13 +119,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
               className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
               unoptimized
-              onError={() => {
-                if (activeImageIndex < images.length - 1) {
-                  setActiveImageIndex(prev => prev + 1);
-                } else {
-                  setImgError(true);
-                }
-              }}
+              onError={handleImageError}
             />
           )
         ) : (

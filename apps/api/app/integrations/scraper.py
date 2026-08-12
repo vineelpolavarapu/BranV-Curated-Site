@@ -203,16 +203,28 @@ _PARSERS = {
 }
 
 
+_MOCK_RETAILER_IMAGES = {
+    "amazon": "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80",
+    "flipkart": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=80",
+    "myntra": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80",
+    "ajio": "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    "meesho": "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80",
+    "nykaa": "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80",
+}
+_DEFAULT_MOCK_IMAGE = "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80"
+
+
 async def scrape_product_url(url: str) -> ScrapedProduct:
     s = get_settings()
     retailer = detect_retailer(url)
     if s.USE_MOCK_INTEGRATIONS:
+        mock_img = _MOCK_RETAILER_IMAGES.get(retailer, _DEFAULT_MOCK_IMAGE)
         return ScrapedProduct(
             title=f"Mock product from {retailer}",
             price=1999.0,
             mrp=2499.0,
-            primaryImageUrl=f"https://placehold.co/600x800?text={retailer}",
-            images=[],
+            primaryImageUrl=mock_img,
+            images=[mock_img],
             color="black",
             sizes=["S", "M", "L"],
             material=None,

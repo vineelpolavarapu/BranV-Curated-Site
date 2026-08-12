@@ -14,6 +14,12 @@ router = APIRouter(prefix="/uploads", tags=["uploads"])
 UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads_storage"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+WEB_PUBLIC_DIR = Path(__file__).resolve().parents[4] / "web" / "public" / "uploads"
+try:
+    WEB_PUBLIC_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
 
 @router.post(
     "/presign",
@@ -37,7 +43,7 @@ async def presign(payload: PresignUploadRequest) -> PresignUploadResponse:
     # If S3 endpoint is on localhost or mock mode, proxy storage through local uploads route
     if s.USE_MOCK_INTEGRATIONS or "localhost" in (s.S3_ENDPOINT or ""):
         upload_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{result.key}"
-        public_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{result.key}"
+        public_url = f"/uploads/{result.key.replace('/', '_')}"
         return PresignUploadResponse(
             uploadUrl=upload_url,
             publicUrl=public_url,
@@ -94,7 +100,15 @@ async def upload_direct_file(
         target_path = UPLOAD_DIR / filename
         with open(target_path, "wb") as f:
             f.write(content)
-        public_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{filename}"
+
+        if WEB_PUBLIC_DIR.exists():
+            try:
+                with open(WEB_PUBLIC_DIR / filename, "wb") as f:
+                    f.write(content)
+            except Exception:
+                pass
+
+        public_url = f"/uploads/{filename}"
 
     return {
         "uploadUrl": public_url,
@@ -126,8 +140,14 @@ async def handle_storage_upload(key: str, request: Request) -> Response:
     with open(target_path, "wb") as f:
         f.write(body)
 
-    s = get_settings()
-    public_url = f"http://localhost:{s.API_INTERNAL_PORT}/api/uploads/storage/{safe_key}"
+    if WEB_PUBLIC_DIR.exists():
+        try:
+            with open(WEB_PUBLIC_DIR / safe_key, "wb") as f:
+                f.write(body)
+        except Exception:
+            pass
+
+    public_url = f"/uploads/{safe_key}"
     return Response(
         content=f'{{"publicUrl": "{public_url}"}}',
         media_type="application/json",

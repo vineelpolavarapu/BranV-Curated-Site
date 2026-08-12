@@ -4,6 +4,20 @@ import Image from 'next/image';
 import { useState, useMemo } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
 
+const CATEGORY_FALLBACK_MAP: Record<string, string> = {
+  jeans: 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80',
+  shirts: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=1000&q=80',
+  't-shirts': 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=1000&q=80',
+  tracks: 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?auto=format&fit=crop&w=1000&q=80',
+  footwear: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=1000&q=80',
+  watches: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=1000&q=80',
+  trousers: 'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=1000&q=80',
+  shorts: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=1000&q=80',
+  jackets: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80',
+  hoodies: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=1000&q=80',
+};
+const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1541099649105-f69ad21f3246?auto=format&fit=crop&w=1000&q=80';
+
 export function ProductGallery({ product }: { product: ProductCardData }) {
   const images = useMemo(() => {
     if (product.gallery && product.gallery.length > 0) return product.gallery;
@@ -15,8 +29,13 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
 
-  const hero = images[activeIndex] ?? images[0] ?? product.primaryImage;
+  const rawHero = images[activeIndex] ?? images[0] ?? product.primaryImage;
+  const hero = fallbackUrl
+    ? { url: fallbackUrl, altText: product.title, isAiGenerated: false }
+    : rawHero;
 
   const prevSlide = () => {
     setActiveIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -26,7 +45,17 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
     setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
-  const [hasError, setHasError] = useState(false);
+  const handleImageError = () => {
+    if (activeIndex < images.length - 1) {
+      setActiveIndex((prev) => prev + 1);
+    } else if (!fallbackUrl) {
+      const catSlug = product.category?.slug ?? '';
+      const catImg = CATEGORY_FALLBACK_MAP[catSlug] ?? DEFAULT_FALLBACK_IMAGE;
+      setFallbackUrl(catImg);
+    } else {
+      setHasError(true);
+    }
+  };
 
   return (
     <div>
@@ -42,13 +71,7 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                 alt={hero.altText ?? product.title}
                 className="absolute inset-0 h-full w-full object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
                 onClick={() => setLightboxOpen(true)}
-                onError={() => {
-                  if (activeIndex < images.length - 1) {
-                    setActiveIndex(prev => prev + 1);
-                  } else {
-                    setHasError(true);
-                  }
-                }}
+                onError={handleImageError}
               />
             ) : (
               <Image
@@ -61,13 +84,7 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                 unoptimized
                 priority
                 onClick={() => setLightboxOpen(true)}
-                onError={() => {
-                  if (activeIndex < images.length - 1) {
-                    setActiveIndex(prev => prev + 1);
-                  } else {
-                    setHasError(true);
-                  }
-                }}
+                onError={handleImageError}
               />
             )}
 
