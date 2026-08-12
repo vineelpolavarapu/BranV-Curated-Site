@@ -78,7 +78,13 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               src={shownImage.url}
               alt={shownImage.altText ?? product.title}
               className="absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
-              onError={() => setImgError(true)}
+              onError={() => {
+                if (activeImageIndex < images.length - 1) {
+                  setActiveImageIndex(prev => prev + 1);
+                } else {
+                  setImgError(true);
+                }
+              }}
             />
           ) : (
             <Image
@@ -89,7 +95,13 @@ export function ProductCard({ product }: { product: ProductCardData }) {
               sizes="(max-width: 640px) 50vw, (max-width: 1080px) 33vw, 25vw"
               className="object-cover transition-[opacity,transform] duration-300 group-hover:scale-[1.04]"
               unoptimized
-              onError={() => setImgError(true)}
+              onError={() => {
+                if (activeImageIndex < images.length - 1) {
+                  setActiveImageIndex(prev => prev + 1);
+                } else {
+                  setImgError(true);
+                }
+              }}
             />
           )
         ) : (

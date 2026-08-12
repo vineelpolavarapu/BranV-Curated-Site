@@ -374,27 +374,36 @@ function ImagesPanel({
   const [isPrimary, setIsPrimary] = useState(product.images.length === 0);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [stagedUploadUrl, setStagedUploadUrl] = useState<string | null>(null);
-  const [stagedBlobUrl, setStagedBlobUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function uploadSingleFile(file: File) {
     setUploading(true);
     setError(null);
-    // Create a local blob URL for instant preview
-    const blobUrl = URL.createObjectURL(file);
     try {
       const publicUrl = await uploadFileToStorage(file, 'product-avatar');
       if (publicUrl) {
-        setStagedUploadUrl(publicUrl);
-        setStagedBlobUrl(blobUrl);
-        setUrl(publicUrl);
+        const result = await apiFetch(`/admin/products/${product.id}/images`, {
+          method: 'POST',
+          body: JSON.stringify({
+            url: publicUrl,
+            altText: altText || undefined,
+            isAiGenerated: isAi,
+            isPrimary: product.images.length === 0,
+          }),
+        });
+        if (!result.ok) {
+          setError(result.error ?? 'Failed to save image to database');
+        } else {
+          setUrl('');
+          setAltText('');
+          setIsAi(false);
+          setIsPrimary(false);
+          onChanged();
+        }
       } else {
-        URL.revokeObjectURL(blobUrl);
         setError('Upload to storage failed');
       }
     } catch (err: any) {
-      URL.revokeObjectURL(blobUrl);
       setError(err?.message ?? 'Storage upload failed');
     } finally {
       setUploading(false);
@@ -462,16 +471,15 @@ function ImagesPanel({
     }
   }
 
-  async function saveStagedImageToDatabase(overridePrimary: boolean) {
-    const targetUrl = stagedUploadUrl || url;
-    if (!targetUrl) return;
+  async function saveManualUrlToDatabase(overridePrimary: boolean) {
+    if (!url) return;
     setSubmitting(true);
     setError(null);
     try {
       const result = await apiFetch(`/admin/products/${product.id}/images`, {
         method: 'POST',
         body: JSON.stringify({
-          url: targetUrl,
+          url: url,
           altText: altText || undefined,
           isAiGenerated: isAi,
           isPrimary: overridePrimary || product.images.length === 0,
@@ -480,11 +488,6 @@ function ImagesPanel({
       if (!result.ok) {
         setError(result.error ?? 'Failed to save image to main database');
         return;
-      }
-      setStagedUploadUrl(null);
-      if (stagedBlobUrl) {
-        try { URL.revokeObjectURL(stagedBlobUrl); } catch { /* ignore */ }
-        setStagedBlobUrl(null);
       }
       setUrl('');
       setAltText('');
@@ -495,7 +498,6 @@ function ImagesPanel({
       setSubmitting(false);
     }
   }
-
 
 
   async function onDelete(id: string) {
@@ -575,82 +577,14 @@ function ImagesPanel({
         </div>
       </div>
 
-      {/* Staged Upload Decision Panel: 2 Options */}
-      {stagedUploadUrl && (
-        <div className="mb-4 rounded-xl border-2 border-primary/40 bg-slate-50 p-4 shadow-sm space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="relative h-16 w-14 overflow-hidden rounded-lg border border-line bg-surface shrink-0">
-              {(stagedBlobUrl || stagedUploadUrl) && (
-                stagedBlobUrl ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={stagedBlobUrl}
-                    alt="Uploaded to storage"
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={stagedUploadUrl!}
-                    alt="Uploaded to storage"
-                    fill
-                    unoptimized
-                    className="object-cover"
-                  />
-                )
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-emerald-700">✓ Image Stored in Storage Account</p>
-              <p className="truncate text-[10px] text-slate-500">{stagedUploadUrl}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setStagedUploadUrl(null);
-                if (stagedBlobUrl) {
-                  try { URL.revokeObjectURL(stagedBlobUrl); } catch { /* ignore */ }
-                  setStagedBlobUrl(null);
-                }
-                setUrl('');
-              }}
-              className="text-xs text-slate-400 hover:text-red-600"
-            >
-              Cancel
-            </button>
-          </div>
 
-          <p className="text-xs font-semibold text-slate-800">
-            Select database storage option for this product:
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={() => void saveStagedImageToDatabase(true)}
-              className="flex items-center justify-center gap-1.5 rounded-lg bg-amber-600 px-3.5 py-2.5 text-xs font-bold text-white hover:bg-amber-700 transition shadow-sm"
-            >
-              🔄 Override Primary Image
-            </button>
-            <button
-              type="button"
-              disabled={submitting}
-              onClick={() => void saveStagedImageToDatabase(false)}
-              className="flex items-center justify-center gap-1.5 rounded-lg bg-primary px-3.5 py-2.5 text-xs font-bold text-primary-fg hover:bg-primary-hover transition shadow-sm"
-            >
-              ➕ Add as Additional Image
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Manual URL Form */}
-      {!stagedUploadUrl && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            void saveStagedImageToDatabase(isPrimary);
-          }}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void saveManualUrlToDatabase(isPrimary);
+        }}
           className="space-y-3 border-t border-line pt-4"
         >
           <div>
@@ -699,7 +633,6 @@ function ImagesPanel({
             {submitting ? 'Saving to database…' : 'Save to database'}
           </button>
         </form>
-      )}
     </div>
   );
 }

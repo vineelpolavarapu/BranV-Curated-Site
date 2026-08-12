@@ -138,6 +138,7 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
             "avgRating": float(p.avgRating) if p.avgRating is not None else None,
             "reviewCount": p.reviewCount,
             "featuredUntil": _iso_ms(p.featuredUntil),
+            "isFeatured": bool(p.featuredUntil and p.featuredUntil > datetime.now(timezone.utc).replace(tzinfo=None)),
             "createdAt": _iso_ms(p.createdAt),
             "updatedAt": _iso_ms(p.updatedAt),
             "brand": {"id": b_info[0], "name": b_info[1], "slug": b_info[2]} if b_info else None,

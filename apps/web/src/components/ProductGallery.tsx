@@ -42,7 +42,13 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                 alt={hero.altText ?? product.title}
                 className="absolute inset-0 h-full w-full object-cover cursor-zoom-in transition-transform duration-300 group-hover:scale-[1.02]"
                 onClick={() => setLightboxOpen(true)}
-                onError={() => setHasError(true)}
+                onError={() => {
+                  if (activeIndex < images.length - 1) {
+                    setActiveIndex(prev => prev + 1);
+                  } else {
+                    setHasError(true);
+                  }
+                }}
               />
             ) : (
               <Image
@@ -55,7 +61,13 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                 unoptimized
                 priority
                 onClick={() => setLightboxOpen(true)}
-                onError={() => setHasError(true)}
+                onError={() => {
+                  if (activeIndex < images.length - 1) {
+                    setActiveIndex(prev => prev + 1);
+                  } else {
+                    setHasError(true);
+                  }
+                }}
               />
             )}
 

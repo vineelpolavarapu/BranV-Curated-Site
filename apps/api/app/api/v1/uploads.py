@@ -1,7 +1,7 @@
 import os
 import uuid
 from pathlib import Path
-from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, UploadFile, Response
+from fastapi import APIRouter, Body, Depends, File, Form, HTTPException, UploadFile, Response, Request
 from starlette.concurrency import run_in_threadpool
 
 from ...core.auth_deps import current_user_required, require_roles
@@ -103,10 +103,24 @@ async def upload_direct_file(
     }
 
 
+@router.options("/storage/{key:path}")
+async def preflight_storage_upload(key: str) -> Response:
+    """Handle CORS preflight for storage uploads."""
+    return Response(
+        status_code=204,
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "PUT, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        },
+    )
+
+
 @router.put("/storage/{key:path}")
 @router.post("/storage/{key:path}")
-async def handle_storage_upload(key: str, body: bytes = Body(default=b"")) -> Response:
+async def handle_storage_upload(key: str, request: Request) -> Response:
     """Fallback handler for storage uploads. Stores raw bytes and returns 200 OK with CORS."""
+    body = await request.body()
     safe_key = key.replace("/", "_")
     target_path = UPLOAD_DIR / safe_key
     with open(target_path, "wb") as f:
