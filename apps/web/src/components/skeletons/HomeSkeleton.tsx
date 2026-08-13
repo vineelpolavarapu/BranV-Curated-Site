@@ -1,10 +1,9 @@
 export function HomeSkeleton() {
   return (
-    <div className="space-y-12 pb-16 animate-pulse">
-      {/* Hero Skeleton */}
-      <div className="w-full px-4 pt-6 md:px-8 lg:px-12">
-        <div className="h-[360px] md:h-[460px] w-full overflow-hidden rounded-3xl bg-surface-muted" />
-      </div>
+    <div className="pb-16">
+      {/* Hero Skeleton — matches the real full-screen hero height to avoid
+          layout shift during client-side navigation to home. */}
+      <div className="h-[100svh] min-h-[480px] w-full bg-hero-gradient" />
 
       {/* Category Showcase Section Skeleton */}
       <div className="w-full px-4 py-6 md:px-8 lg:px-12">
@@ -12,7 +11,7 @@ export function HomeSkeleton() {
           <div className="h-8 w-48 rounded-lg bg-surface-muted" />
           <div className="hidden md:block h-8 w-28 rounded-full bg-surface-muted" />
         </div>
-        
+
         {/* Mobile snap strip */}
         <div className="flex gap-3 overflow-x-auto md:hidden pb-2">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -37,4 +36,3 @@ export function HomeSkeleton() {
     </div>
   );
 }
-

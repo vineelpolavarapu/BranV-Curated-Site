@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHeroSlideMemory } from './useHeroSlideMemory';
+import { HERO_SLIDES } from './hero-data';
 
 // Desktop-only hero carousel. Renders at >=1080px (parent gates via matchMedia).
-// All image references point at /hero/ (landscape art).
+// Uses the landscape art from the shared HERO_SLIDES (desktopImage field).
 // Mobile lives in HeroCarouselMobile.tsx - keep them physically separate so
 // neither component has to deal with the other's image set or layout rules.
 
@@ -18,77 +19,14 @@ type HeroSlide = {
   ctaHref: string;
 };
 
-const BASE_SLIDES: HeroSlide[] = [
-  {
-    key: 'formals',
-    imageUrl: '/hero/formals1.webp',
-
-    headline: 'Sharp Formals',
-    subtext: 'Tailored shirts and trousers for the office and beyond.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/sharp-formals',
-  },
-  {
-    key: 'classic',
-    imageUrl: '/hero/easy_causal.webp',
-
-    headline: 'Classic Essentials',
-    subtext: 'The wardrobe staples that never go out of style.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/classic-essentials',
-  },
-  {
-    key: 'trendy',
-    imageUrl: '/hero/latest_web.webp',
-
-    headline: 'Trendy Wear',
-    subtext: 'The pieces everyone is reaching for right now.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/trendy-wear',
-  },
-  {
-    key: 'sportswear',
-    imageUrl: '/hero/sports.webp',
-
-    headline: 'Sports Wear',
-    subtext: 'Performance fits built for the gym, the run, and everything after.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/sports-wear',
-  },
-  {
-    key: 'fashion',
-    imageUrl: '/hero/fashoin.webp',
-
-    headline: 'Fashion Forward',
-    subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/fashion-forward',
-  },
-  {
-    key: 'casual',
-    imageUrl: '/hero/casual2.webp',
-    headline: 'Easy Casuals',
-    subtext: 'Weekend-ready tees, joggers, and overshirts.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/easy-casuals',
-  },
-  {
-    key: 'footwear',
-    imageUrl: '/hero/footwear.webp',
-    headline: 'Footwear',
-    subtext: 'Sneakers, loafers, boots, the foundation of every outfit.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/category/footwear',
-  },
-  {
-    key: 'watches',
-    imageUrl: '/hero/watches.webp',
-    headline: 'Watches',
-    subtext: 'Watches, belts, bags, the details that complete a look.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/category/watches',
-  },
-];
+const BASE_SLIDES: HeroSlide[] = HERO_SLIDES.map((s) => ({
+  key: s.key,
+  imageUrl: s.desktopImage,
+  headline: s.headline,
+  subtext: s.subtext,
+  ctaLabel: s.ctaLabel,
+  ctaHref: s.ctaHref,
+}));
 
 const ROTATE_MS = 3000;
 const TRANSITION_MS = 700;

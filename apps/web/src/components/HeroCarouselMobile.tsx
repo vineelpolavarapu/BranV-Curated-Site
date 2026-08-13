@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHeroSlideMemory } from './useHeroSlideMemory';
+import { HERO_SLIDES } from './hero-data';
 
 // Mobile-only hero carousel. Renders at <1080px (parent gates via matchMedia).
-// All image references point at /mobile-hero/mobile_*.svg - 9:16 portrait art.
+// Uses the portrait 9:16 art from the shared HERO_SLIDES (mobileImage field).
 // This component has NO knowledge of /hero/ or desktop layout. Changing
 // the 1080px breakpoint or desktop visuals will not affect this file.
 
@@ -18,72 +19,14 @@ type HeroSlide = {
   ctaHref: string;
 };
 
-const BASE_SLIDES: HeroSlide[] = [
-  {
-    key: 'formals',
-    imageUrl: '/mobile-hero/mobile_formals.webp',
-    headline: 'Sharp Formals',
-    subtext: 'Tailored shirts and trousers for the office and beyond.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/sharp-formals',
-  },
-  {
-    key: 'classic',
-    imageUrl: '/mobile-hero/mobile_classic.webp',
-    headline: 'Classic Essentials',
-    subtext: 'The wardrobe staples that never go out of style.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/classic-essentials',
-  },
-  {
-    key: 'trendy',
-    imageUrl: '/mobile-hero/latest_trends.webp',
-    headline: 'Trendy Wear',
-    subtext: 'The pieces everyone is reaching for right now.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/trendy-wear',
-  },
-  {
-    key: 'sportswear',
-    imageUrl: '/mobile-hero/mobile_sports.webp',
-    headline: 'Sports Wear',
-    subtext: 'Performance fits built for the gym, the run, and everything after.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/sports-wear',
-  },
-  {
-    key: 'fashion',
-    imageUrl: '/mobile-hero/mobile_fashion.webp',
-    headline: 'Fashion Forward',
-    subtext: 'Bold cuts, brave colours, conversation-starting silhouettes.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/fashion-forward',
-  },
-  {
-    key: 'casual',
-    imageUrl: '/mobile-hero/mobile_casual.webp',
-    headline: 'Easy Casuals',
-    subtext: 'Weekend-ready tees, joggers, and overshirts.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/easy-casuals',
-  },
-  {
-    key: 'footwear',
-    imageUrl: '/mobile-hero/mobile_footwear.webp',
-    headline: 'Footwear',
-    subtext: 'Sneakers, loafers, boots, the foundation of every outfit.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/category/footwear',
-  },
-  {
-    key: 'watches',
-    imageUrl: '/mobile-hero/mobile_watches.webp',
-    headline: 'Watches',
-    subtext: 'Watches, belts, bags, the details that complete a look.',
-    ctaLabel: 'Explore Collection',
-    ctaHref: '/category/watches',
-  },
-];
+const BASE_SLIDES: HeroSlide[] = HERO_SLIDES.map((s) => ({
+  key: s.key,
+  imageUrl: s.mobileImage,
+  headline: s.headline,
+  subtext: s.subtext,
+  ctaLabel: s.ctaLabel,
+  ctaHref: s.ctaHref,
+}));
 
 const ROTATE_MS = 3000;
 const TRANSITION_MS = 700;
