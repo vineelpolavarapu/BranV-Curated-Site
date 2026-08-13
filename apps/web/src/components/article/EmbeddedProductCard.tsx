@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { EmbeddedProduct } from '@/lib/article-types';
 import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
-import { formatINR } from '@/lib/format';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
 
 /**
@@ -61,18 +60,7 @@ export function EmbeddedProductCard({ product }: { product: EmbeddedProduct }) {
         >
           {product.title}
         </Link>
-        {product.price > 0 && (
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-base font-semibold">
-              ₹{formatINR(product.price)}
-            </span>
-            {product.mrp && product.mrp > product.price && (
-              <span className="text-xs text-content-muted line-through">
-                ₹{formatINR(product.mrp)}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Amount visibility removed per request */}
         {buyHref && (
           <a
             href={buyHref}

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { formatINR } from '@/lib/format';
 
 interface WardrobeItem {
   id: string;
@@ -102,12 +101,8 @@ export default function WardrobePage() {
 
 function StatsBlock({ stats }: { stats: WardrobePage['stats'] }) {
   return (
-    <div className="mt-6 grid gap-3 sm:grid-cols-3">
+    <div className="mt-6 grid gap-3 sm:grid-cols-2">
       <Stat label="Items" value={String(stats.totalItems)} />
-      <Stat
-        label="Self-reported spend"
-        value={stats.totalSpend > 0 ? `₹${formatINR(stats.totalSpend)}` : '-'}
-      />
       <Stat
         label="Favorite brand"
         value={

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { LookbookPublicImage } from '@/lib/phase7-types';
-import { formatINR } from '@/lib/format';
 import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { useClickReturn } from '@/components/click-return/ClickReturnProvider';
 import { Icon } from '@/components/icons';
@@ -111,16 +110,7 @@ function Hotspot({
               >
                 {product.title}
               </Link>
-              {product.price > 0 && (
-                <p className="mt-1 text-xs font-semibold">
-                  ₹{formatINR(product.price)}
-                  {product.mrp && product.mrp > product.price && (
-                    <span className="ml-1.5 font-normal text-content-muted line-through">
-                      ₹{formatINR(product.mrp)}
-                    </span>
-                  )}
-                </p>
-              )}
+              {/* Amount visibility removed per request */}
             </div>
             <button
               type="button"

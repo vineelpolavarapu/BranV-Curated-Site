@@ -9,7 +9,6 @@ import { StorefrontShell } from '@/components/StorefrontShell';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { useWishlist } from '@/components/wishlist/WishlistProvider';
 import { getRecentlyViewed, RecentlyViewedItem } from '@/lib/recently-viewed';
-import { formatINR } from '@/lib/format';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { AUTH_QUERY_KEY } from '@/hooks/use-auth';
@@ -179,9 +178,6 @@ export default function AccountPage() {
                       </div>
                       <p className="mt-2 truncate text-xs text-content-soft">{item.brandName}</p>
                       <p className="truncate text-sm font-medium text-content">{item.title}</p>
-                      <p className="text-sm font-semibold text-content">
-                        ₹{formatINR(item.price)}
-                      </p>
                     </Link>
                   </li>
                 ))}

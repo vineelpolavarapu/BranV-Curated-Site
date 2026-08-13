@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { StorefrontShell } from '@/components/StorefrontShell';
-import { formatINR } from '@/lib/format';
 import { ProductGridSkeleton } from '@/components/skeletons/ProductGridSkeleton';
 
 interface WishlistItem {
@@ -167,18 +166,7 @@ function WishlistCard({
         >
           {item.product.title}
         </Link>
-        {item.product.price > 0 && (
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-sm font-semibold text-content">
-              ₹{formatINR(item.product.price)}
-            </span>
-            {item.product.mrp && item.product.mrp > item.product.price && (
-              <span className="text-xs text-content-muted line-through">
-                ₹{formatINR(item.product.mrp)}
-              </span>
-            )}
-          </div>
-        )}
+        {/* Amount visibility removed per request */}
         <label className="mt-2 inline-flex items-center gap-2 text-xs text-content-soft">
           <input
             type="checkbox"

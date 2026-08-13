@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHeroSlideMemory } from './useHeroSlideMemory';
 
 // Mobile-only hero carousel. Renders at <1080px (parent gates via matchMedia).
 // All image references point at /mobile-hero/mobile_*.svg - 9:16 portrait art.
@@ -92,8 +93,8 @@ export function HeroCarouselMobile() {
   const total = SLIDES.length;
   const trackSlides = [SLIDES[total - 1], ...SLIDES, SLIDES[0]];
 
-  const [trackIndex, setTrackIndex] = useState(1);
-  const [withTransition, setWithTransition] = useState(true);
+  const { trackIndex, setTrackIndex, withTransition, setWithTransition } =
+    useHeroSlideMemory(total);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const pointerStartX = useRef<number | null>(null);

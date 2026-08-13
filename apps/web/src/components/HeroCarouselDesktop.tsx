@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useHeroSlideMemory } from './useHeroSlideMemory';
 
 // Desktop-only hero carousel. Renders at >=1080px (parent gates via matchMedia).
 // All image references point at /hero/ (landscape art).
@@ -97,8 +98,8 @@ export function HeroCarouselDesktop() {
   const total = SLIDES.length;
   const trackSlides = [SLIDES[total - 1], ...SLIDES, SLIDES[0]];
 
-  const [trackIndex, setTrackIndex] = useState(1);
-  const [withTransition, setWithTransition] = useState(true);
+  const { trackIndex, setTrackIndex, withTransition, setWithTransition } =
+    useHeroSlideMemory(total);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const pointerStartX = useRef<number | null>(null);

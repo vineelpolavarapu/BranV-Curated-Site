@@ -7,8 +7,6 @@ import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
 import { ProductCardData } from '@/lib/storefront-types';
 import { StorefrontShell } from '@/components/StorefrontShell';
 import { ProductCard, BuyNowButton } from '@/components/ProductCard';
-import { formatINR } from '@/lib/format';
-import { ReviewsSection } from '@/components/reviews/ReviewsSection';
 import { AnimateOnScroll } from '@/components/AnimateOnScroll';
 import { RecordRecentlyViewed } from '@/components/RecordRecentlyViewed';
 
@@ -63,19 +61,29 @@ export default async function ProductDetailPage(props: {
 
       <WhereToBuy product={product} />
 
-      <ReviewsSection
-        productId={product.id}
-        avgRating={product.avgRating}
-        reviewCount={product.reviewCount}
-      />
-
       {related && related.length > 0 && (
         <AnimateOnScroll>
           <section className="mx-auto max-w-7xl px-6 pb-14">
             <h2 className="bv-enter mb-5 text-xl font-semibold tracking-tight">
               You may also like
             </h2>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
+
+            {/* Phone (<768px): horizontal scroll strip — same rail pattern as the
+                home page. Renders ALL related products so 100 items scroll instead
+                of stacking into a giant grid. */}
+            <ul className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-2 [scrollbar-width:none] md:hidden [&::-webkit-scrollbar]:hidden">
+              {related.map((p, i) => (
+                <li
+                  key={p.id}
+                  className={`bv-enter bv-delay-${Math.min((i % 7) + 1, 7)} w-[60vw] max-w-[240px] shrink-0 snap-start`}
+                >
+                  <ProductCard product={p} />
+                </li>
+              ))}
+            </ul>
+
+            {/* Tablet & desktop (>=768px): grid */}
+            <div className="hidden gap-x-4 gap-y-8 md:grid md:grid-cols-3 lg:grid-cols-4">
               {related.slice(0, 8).map((p, i) => (
                 <div key={p.id} className={`bv-enter bv-delay-${Math.min(i + 1, 7)}`}>
                   <ProductCard product={p} />
@@ -202,11 +210,6 @@ function WhereToBuy({ product }: { product: ProductCardData }) {
               >
                 <div>
                   <p className="font-medium capitalize">{label}</p>
-                  {r.rawPrice !== null && (
-                    <p className="text-sm text-content-soft">
-                      ₹{formatINR(r.rawPrice)}
-                    </p>
-                  )}
                 </div>
                 <BuyNowButton
                   href={r.affiliateUrl}
@@ -230,13 +233,7 @@ function ProductSchema({ product }: { product: ProductCardData }) {
     image: product.primaryImage?.url,
     description: product.description ?? undefined,
     brand: { '@type': 'Brand', name: product.brand.name },
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: product.currency || 'INR',
-      price: product.price,
-      availability: product.buyNow ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      url: product.buyNow?.url,
-    },
+    // Price/offers removed from structured data — pricing is no longer surfaced.
   };
   return (
     <script

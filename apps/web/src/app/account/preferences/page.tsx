@@ -15,7 +15,6 @@ const TYPES: Array<{ key: NotificationType; label: string }> = [
   { key: 'WELCOME', label: 'Welcome & onboarding' },
   { key: 'WISHLIST_PRICE_DROP', label: 'Price drops on wishlist items' },
   { key: 'NEW_ARTICLE', label: 'New articles' },
-  { key: 'REVIEW_HIDDEN', label: 'Review moderation updates' },
   { key: 'GENERIC', label: 'Other notifications' },
 ];
 

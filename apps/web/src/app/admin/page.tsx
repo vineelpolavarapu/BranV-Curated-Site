@@ -74,7 +74,6 @@ export default function AdminDashboardPage() {
     syncFailureCount: backendSystem.syncFailureCount ?? 0,
     pendingAffiliateConversions:
       backendSystem.pendingAffiliateConversions ?? 0,
-    hiddenReviewCount: backendSystem.hiddenReviewCount ?? 0,
     notificationOutbox: {
       pending: backendOutbox.pending ?? 0,
       failed: backendOutbox.failed ?? 0,
@@ -103,14 +102,6 @@ export default function AdminDashboardPage() {
           <span className="rounded-full border border-red-300 bg-red-50 px-3 py-1 text-xs font-medium text-red-700">
             {system.notificationOutbox.failed} failed notifications
           </span>
-        )}
-        {system.hiddenReviewCount > 0 && (
-          <Link
-            href="/admin/reviews"
-            className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium hover:bg-surface-muted"
-          >
-            {system.hiddenReviewCount} hidden reviews
-          </Link>
         )}
       </div>
 
@@ -229,10 +220,6 @@ export default function AdminDashboardPage() {
             <SystemRow
               label="Pending affiliate conversions"
               value={system.pendingAffiliateConversions}
-            />
-            <SystemRow
-              label="Hidden reviews"
-              value={system.hiddenReviewCount}
             />
             <li className="flex justify-between gap-2 text-content-soft">
               <span>API p95 · error rate</span>
