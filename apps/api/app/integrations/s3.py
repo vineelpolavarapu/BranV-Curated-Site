@@ -82,6 +82,20 @@ def _build_key(kind: UploadKind, filename: str, ownerId: str | None) -> str:
     return f"{folder}/{owner_segment}{_nanoid(16)}.{ext}"
 
 
+def public_base(s) -> str:
+    """Base URL browsers use to GET uploaded objects.
+
+    Prefers the configured ``S3_PUBLIC_URL`` (R2 r2.dev subdomain / custom domain
+    - the *public* surface). Falls back to ``S3_ENDPOINT`` + bucket, which is only
+    correct when the S3 endpoint is itself publicly readable (local MinIO). For R2
+    the S3 endpoint is the private S3 API and must NOT be used as a public URL, so
+    ``S3_PUBLIC_URL`` must be set in production.
+    """
+    if s.S3_PUBLIC_URL:
+        return s.S3_PUBLIC_URL.rstrip("/")
+    return (s.S3_ENDPOINT or "").rstrip("/") + f"/{s.S3_BUCKET}"
+
+
 def presign_upload(
     *,
     contentType: str,
@@ -97,10 +111,9 @@ def presign_upload(
         Params={"Bucket": s.S3_BUCKET, "Key": key, "ContentType": contentType},
         ExpiresIn=_PRESIGN_EXPIRES,
     )
-    public_base = (s.S3_ENDPOINT or "").rstrip("/") + f"/{s.S3_BUCKET}"
     return PresignResult(
         uploadUrl=upload_url,
-        publicUrl=f"{public_base}/{key}",
+        publicUrl=f"{public_base(s)}/{key}",
         key=key,
         expiresIn=_PRESIGN_EXPIRES,
     )

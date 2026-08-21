@@ -16,9 +16,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
 
 # Repo-root .env for local dev. In the monorepo layout, this file lives at
 # apps/api/app/core/settings.py so parents[4] is the repo root. In the Docker
@@ -67,6 +65,12 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY: str = "branv"
     S3_SECRET_KEY: str = "branv-secret"
     S3_FORCE_PATH_STYLE: bool = True
+    # Public base URL for serving uploaded objects to browsers. For Cloudflare R2
+    # this is the bucket's r2.dev subdomain (https://pub-<id>.r2.dev) or a bound
+    # custom domain - NOT the private S3 API endpoint in S3_ENDPOINT. Empty =>
+    # derive from S3_ENDPOINT + S3_BUCKET (correct for local MinIO, where the
+    # endpoint itself is publicly readable; wrong for R2, which is why this exists).
+    S3_PUBLIC_URL: str = ""
 
     # ---- Integrations ----
     USE_MOCK_INTEGRATIONS: bool = True
