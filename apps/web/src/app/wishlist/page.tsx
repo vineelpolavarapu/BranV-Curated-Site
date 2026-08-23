@@ -133,10 +133,10 @@ function WishlistCard({
 }) {
   const img = item.product.primaryImage;
   return (
-    <article className="group flex flex-col">
+    <article className="group flex flex-col overflow-hidden rounded-card bg-surface shadow-card transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover">
       <Link
         href={`/products/${item.product.slug}`}
-        className="relative block aspect-[4/5] w-full overflow-hidden rounded-lg bg-surface-muted"
+        className="relative block aspect-[4/5] w-full overflow-hidden bg-surface-muted"
       >
         {img ? (
           <Image
@@ -148,35 +148,38 @@ function WishlistCard({
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-content-muted">
-            no image
+          <div className="flex h-full w-full flex-col items-center justify-center bg-slate-100 p-4 text-center text-slate-400">
+            <span className="text-3xl">🛍️</span>
+            <span className="mt-1 text-[11px] font-medium text-slate-500">
+              Image Preview
+            </span>
           </div>
         )}
       </Link>
-      <div className="mt-3 flex flex-1 flex-col gap-1">
+      <div className="flex flex-1 flex-col gap-1 p-3.5">
         <Link
           href={`/brands/${item.product.brand.slug}`}
-          className="text-[11px] font-medium uppercase tracking-wider text-content-soft hover:text-primary"
+          className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors"
         >
           {item.product.brand.name}
         </Link>
         <Link
           href={`/products/${item.product.slug}`}
-          className="line-clamp-2 text-sm font-medium leading-snug text-content hover:underline"
+          className="line-clamp-2 text-xs font-semibold leading-snug text-slate-800 hover:text-primary transition-colors"
         >
           {item.product.title}
         </Link>
         {/* Amount visibility removed per request */}
-        <label className="mt-2 inline-flex items-center gap-2 text-xs text-content-soft">
+        <label className="mt-2 inline-flex min-w-0 items-center gap-2 text-xs text-content-soft">
           <input
             type="checkbox"
             checked={item.notifyOnPriceDrop}
             onChange={() =>
               onToggleNotify(item.productId, item.notifyOnPriceDrop)
             }
-            className="h-3.5 w-3.5 rounded border-line"
+            className="h-3.5 w-3.5 shrink-0 rounded border-line"
           />
-          Notify on price drop
+          <span className="truncate">Notify on price drop</span>
         </label>
         <button
           type="button"
