@@ -1,11 +1,11 @@
 export function ProductDetailSkeleton() {
   return (
-    <div className="animate-pulse">
+    <div className="animate-pulse w-full overflow-hidden">
       {/* Main Grid */}
-      <section className="mx-auto max-w-7xl px-6 pb-12 pt-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-10 sm:pb-12 pt-4 sm:pt-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start min-w-0 w-full">
           {/* Gallery Column (6 cols) */}
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 min-w-0 w-full">
             <div className="aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted" />
             <div className="mt-3 grid grid-cols-4 gap-2">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -15,7 +15,7 @@ export function ProductDetailSkeleton() {
           </div>
 
           {/* Summary Column (6 cols) */}
-          <div className="lg:col-span-6 flex flex-col">
+          <div className="lg:col-span-6 flex flex-col min-w-0 w-full">
             <div className="h-3 w-20 rounded bg-line" />
             <div className="mt-2 h-8 w-3/4 rounded bg-line" />
 

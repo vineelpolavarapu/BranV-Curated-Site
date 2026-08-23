@@ -241,6 +241,7 @@ export function BuyNowButton({
   size = 'sm',
   trackingId,
   productTitle,
+  fullWidthOnMobile = false,
 }: {
   href: string;
   retailer: string;
@@ -248,6 +249,7 @@ export function BuyNowButton({
   size?: 'sm' | 'lg';
   trackingId?: string | null;
   productTitle?: string;
+  fullWidthOnMobile?: boolean;
 }) {
   const label = resolveRetailerLabel(retailer, retailerDisplayName);
   const { startTracking } = useClickReturn();
@@ -263,7 +265,9 @@ export function BuyNowButton({
       target="_blank"
       rel="noopener noreferrer nofollow sponsored"
       onClick={onClick}
-      className={`mt-2 inline-flex items-center justify-center rounded-md bg-primary font-medium text-primary-fg transition hover:bg-primary-hover ${
+      className={`inline-flex items-center justify-center rounded-md bg-primary font-medium text-primary-fg transition hover:bg-primary-hover active:scale-[0.98] ${
+        fullWidthOnMobile ? 'w-full sm:w-auto' : ''
+      } ${
         size === 'lg' ? 'px-5 py-3 text-base' : 'px-3 py-2 text-xs'
       }`}
     >

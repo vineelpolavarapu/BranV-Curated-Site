@@ -26,7 +26,7 @@ export function StorefrontShell({
       <ClickReturnProvider>
         <div className={`grid grid-rows-[auto_1fr_auto] min-h-[100dvh] pb-16 lg:pb-0 ${heroOverlay ? 'pt-0' : 'pt-28 lg:pt-24'}`}>
           <SiteHeader overlay={heroOverlay} />
-          <main className="w-full">{children}</main>
+          <main className="w-full min-w-0 overflow-x-hidden">{children}</main>
           <SiteFooter />
           <MobileBottomNav />
         </div>
@@ -67,9 +67,9 @@ function SiteHeader({ overlay = false }: { overlay?: boolean }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // 100% Transparent background at all times per Task 1
-  const headerBaseClasses =
-    'fixed inset-x-0 top-0 z-30 bg-transparent text-slate-900 transition-all duration-300 ease-out pointer-events-auto';
+  const headerBaseClasses = overlay
+    ? 'fixed inset-x-0 top-0 z-30 bg-transparent text-slate-900 transition-all duration-300 ease-out pointer-events-auto'
+    : 'fixed inset-x-0 top-0 z-30 bg-surface/95 backdrop-blur-md border-b border-line text-slate-900 transition-all duration-300 ease-out pointer-events-auto';
 
   const visibilityClasses = visible
     ? 'translate-y-0 opacity-100'

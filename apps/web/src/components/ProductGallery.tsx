@@ -31,6 +31,8 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
 
   const rawHero = images[activeIndex] ?? images[0] ?? product.primaryImage;
   const hero = fallbackUrl
@@ -43,6 +45,27 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
 
   const nextSlide = () => {
     setActiveIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
+
+  const minSwipeDistance = 40;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    if (distance > minSwipeDistance) {
+      nextSlide();
+    } else if (distance < -minSwipeDistance) {
+      prevSlide();
+    }
   };
 
   const handleImageError = () => {
@@ -58,9 +81,14 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
   };
 
   return (
-    <div>
+    <div className="w-full min-w-0">
       {/* Main Slider Display */}
-      <div className="bv-enter-fade relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-muted group border border-line shadow-sm">
+      <div
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="bv-enter-fade relative aspect-[4/5] w-full min-w-0 overflow-hidden rounded-2xl bg-surface-muted group border border-line shadow-sm touch-pan-y select-none"
+      >
         {hero && 'url' in hero && !hasError ? (
           <>
             {hero.url.startsWith('blob:') || hero.url.startsWith('data:') ? (
@@ -112,7 +140,7 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                   type="button"
                   aria-label="Previous product image"
                   onClick={prevSlide}
-                  className="absolute left-3 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-slate-800 shadow-md backdrop-blur transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95"
+                  className="absolute left-2.5 sm:left-3 top-1/2 z-10 grid h-9 w-9 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-slate-800 shadow-md backdrop-blur transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95"
                 >
                   ‹
                 </button>
@@ -120,7 +148,7 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
                   type="button"
                   aria-label="Next product image"
                   onClick={nextSlide}
-                  className="absolute right-3 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-slate-800 shadow-md backdrop-blur transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95"
+                  className="absolute right-2.5 sm:right-3 top-1/2 z-10 grid h-9 w-9 sm:h-10 sm:w-10 -translate-y-1/2 place-items-center rounded-full bg-white/80 text-slate-800 shadow-md backdrop-blur transition-all duration-200 hover:bg-white hover:scale-110 active:scale-95"
                 >
                   ›
                 </button>
@@ -137,13 +165,13 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
 
       {/* Thumbnail Strip Slider */}
       {images.length > 1 && (
-        <ul className="mt-4 flex items-center gap-3 overflow-x-auto pb-1 scrollbar-thin">
+        <ul className="mt-3 sm:mt-4 flex items-center gap-2.5 sm:gap-3 overflow-x-auto pb-1 scrollbar-thin min-w-0 w-full">
           {images.map((img, idx) => (
             <li key={img.url + idx} className="shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveIndex(idx)}
-                className={`relative h-20 w-16 overflow-hidden rounded-xl border-2 transition-all duration-200 ${
+                className={`relative h-16 w-14 sm:h-20 sm:w-16 overflow-hidden rounded-xl border-2 transition-all duration-200 ${
                   activeIndex === idx
                     ? 'border-primary ring-2 ring-primary/20 scale-105 shadow-sm'
                     : 'border-transparent opacity-70 hover:opacity-100 hover:border-slate-300'
