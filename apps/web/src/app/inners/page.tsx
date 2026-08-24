@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Inners · BranV',
-  description: 'Explore the Inners collection on BranV.',
+  description: 'Shop the Inners collection on BranV.',
 };
 
 export default async function InnersPage(props: {

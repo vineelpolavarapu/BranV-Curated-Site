@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom';
 import { AnimatePresence, m } from 'motion/react';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { CategoryIcon } from '@/components/category-icons';
-import { categoryHrefL2 } from '@/lib/category-href';
+import { categoryHrefL1, categoryHrefL2 } from '@/lib/category-href';
 import { Icon } from './icons';
 
 export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
@@ -123,7 +123,7 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
                           <li key={c.slug}>
                             <div className="flex items-stretch">
                               <Link
-                                href={`/category/${c.slug}`}
+                                href={categoryHrefL1(c.slug)}
                                 onClick={() => setOpen(false)}
                                 className="flex-1 flex items-center gap-2.5 rounded-md px-3 py-2.5 font-medium text-content hover:bg-surface-muted transition-colors"
                               >

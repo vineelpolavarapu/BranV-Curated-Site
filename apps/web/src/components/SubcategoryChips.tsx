@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { categoryHrefL2 } from '@/lib/category-href';
+import { categoryHrefL1, categoryHrefL2 } from '@/lib/category-href';
 import { useRouter } from 'next/navigation';
 
 interface SubcategoryChipsProps {
@@ -24,7 +24,7 @@ export function SubcategoryChips({ categorySlug, children }: SubcategoryChipsPro
 
   function handleSelect(selectedValue: string) {
     if (!selectedValue) {
-      router.push(`/category/${categorySlug}`);
+      router.push(categoryHrefL1(categorySlug));
       window.location.hash = '';
       window.dispatchEvent(new Event('hashchange'));
       return;

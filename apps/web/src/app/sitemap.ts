@@ -3,6 +3,7 @@ import { apiServer } from '@/lib/api-server';
 import { ArticleSummary } from '@/lib/article-types';
 import { BrandCard } from '@/lib/storefront-types';
 import { EditSummary } from '@/lib/phase7-types';
+import { categoryHrefL1 } from '@/lib/category-href';
 
 /**
  * Dynamic sitemap. Articles get refreshed every time the scheduler publishes
@@ -56,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const categoryEntries: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((slug) => ({
-    url: `${BASE}/category/${slug}`,
+    url: `${BASE}${categoryHrefL1(slug)}`,
     lastModified: now,
     changeFrequency: 'weekly',
     priority: 0.7,

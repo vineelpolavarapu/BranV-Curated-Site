@@ -11,7 +11,7 @@ import { NewsletterSignup } from './newsletter/NewsletterSignup';
 import { AccountPopup } from './AccountPopup';
 import { AnimateOnScroll } from './AnimateOnScroll';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
-import { categoryHrefL2 } from '@/lib/category-href';
+import { categoryHrefL1, categoryHrefL2 } from '@/lib/category-href';
 import { Icon } from './icons';
 
 export function StorefrontShell({
@@ -190,7 +190,7 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
               const hasSubs = c.subcategories.length > 0;
               return (
                 <li key={c.slug} className="bv-dropdown-item group/cat relative">
-                  <Link href={`/category/${c.slug}`} className={`${itemClasses} transition-colors duration-150`}>
+                  <Link href={categoryHrefL1(c.slug)} className={`${itemClasses} transition-colors duration-150`}>
                     <span>{c.name}</span>
                     {hasSubs && (
                       <span className="opacity-40">
@@ -206,7 +206,7 @@ function ShopMegaMenu({ overlay = false }: { overlay?: boolean }) {
                         <ul className="space-y-0.5">
                           {/* "All [Category]" always first */}
                           <li className="bv-flyout-item">
-                            <Link href={`/category/${c.slug}`} className={subItemClasses}>
+                            <Link href={categoryHrefL1(c.slug)} className={subItemClasses}>
                               All {c.name}
                             </Link>
                           </li>

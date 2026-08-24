@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Sweatshirts · BranV',
-  description: 'Explore the Sweatshirts collection on BranV.',
+  description: 'Shop the Sweatshirts collection on BranV.',
 };
 
 export default async function SweatshirtsPage(props: {
