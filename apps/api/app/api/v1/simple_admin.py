@@ -381,7 +381,7 @@ settings_router = APIRouter(prefix="/admin/settings", tags=["admin-settings"], d
 
 SETTING_DEFAULTS: dict[str, Any] = {
     "PRICE_SYNC_DRIFT_THRESHOLD_PCT": 5,
-    "NEW_ARRIVAL_DAYS": 30,
+    "NEW_ARRIVAL_DAYS": 7,
     "BASE_CURRENCY": "INR",
     "ANALYTICS_ESTIMATED_RATE_PCT": 5,
     "GOOGLE_OAUTH_ENABLED": False,

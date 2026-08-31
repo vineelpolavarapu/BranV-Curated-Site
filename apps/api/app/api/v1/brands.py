@@ -61,7 +61,7 @@ async def admin_create(
     user: Annotated[AuthenticatedUser, Depends(current_user_required)],
     db: DbDep,
 ) -> dict[str, Any]:
-    return await brands_service.create_brand(db, payload=payload, actor_id=user.id)
+    return await brands_service.create(db, dto=payload.model_dump(), actor_id=user.id)
 
 
 @admin_router.patch("/{brand_id}", dependencies=AdminDeps)
@@ -72,7 +72,7 @@ async def admin_update(
     db: DbDep,
 ) -> dict[str, Any]:
     updated = await brands_service.update_brand(
-        db, brand_id=brand_id, payload=payload, actor_id=user.id
+        db, brand_id=brand_id, dto=payload.model_dump(), actor_id=user.id
     )
     if updated is None:
         raise HTTPException(status_code=404, detail="Brand not found")

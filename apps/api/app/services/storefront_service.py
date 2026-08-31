@@ -21,13 +21,33 @@ from ..db.models import (
     AffiliateLink,
     Brand,
     Category,
+    PlatformSetting,
     Product,
+    ProductCategoryLink,
     ProductImage,
     ProductRetailerListing,
     ProductVariant,
 )
 
-NEW_ARRIVAL_DAYS = 30
+# Default "new arrivals" window: products stay in New Arrivals for one week
+# after they are added, then drop out (and remain reachable via their category).
+# Overridable at runtime via the admin `NEW_ARRIVAL_DAYS` platform setting.
+NEW_ARRIVAL_DAYS_DEFAULT = 7
+
+
+async def _new_arrival_days(db: AsyncSession) -> int:
+    """Resolve the "new arrivals" window (in days) from the admin platform
+    setting, falling back to the one-week default. Guards against non-numeric
+    or non-positive stored values so a bad setting never breaks the storefront.
+    """
+    raw = (await db.execute(
+        select(PlatformSetting.valueJson).where(PlatformSetting.key == "NEW_ARRIVAL_DAYS")
+    )).scalar_one_or_none()
+    try:
+        days = int(raw)
+    except (TypeError, ValueError):
+        return NEW_ARRIVAL_DAYS_DEFAULT
+    return days if days > 0 else NEW_ARRIVAL_DAYS_DEFAULT
 
 
 def _dec(v) -> str | None:
@@ -248,7 +268,16 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
             select(Category.id_).where(Category.slug == q["category"])
         )).scalars().all()
         if cat_ids:
-            conds.append(or_(Product.categoryId.in_(cat_ids), Product.subcategoryId.in_(cat_ids)))
+            conds.append(or_(
+                Product.categoryId.in_(cat_ids),
+                Product.subcategoryId.in_(cat_ids),
+                # Extra visibility surfaces chosen in the admin "Product
+                # Visibility" checkboxes (product_category_links).
+                exists().where(and_(
+                    ProductCategoryLink.productId == Product.id_,
+                    ProductCategoryLink.categoryId.in_(cat_ids),
+                )),
+            ))
         else:
             return make_page([], 0, page, page_size)
     if q.get("brand"):
@@ -284,7 +313,8 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
     if q.get("discount") and q["discount"] > 0:
         conds.append(Product.discountPct >= q["discount"])
     if q.get("isNew"):
-        cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=NEW_ARRIVAL_DAYS)
+        days = await _new_arrival_days(db)
+        cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
         conds.append(Product.createdAt >= cutoff)
 
     where = and_(*conds)
@@ -350,7 +380,7 @@ async def home(db: AsyncSession) -> dict[str, Any]:
         return cached
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
-    new_cutoff = now - timedelta(days=NEW_ARRIVAL_DAYS)
+    new_cutoff = now - timedelta(days=await _new_arrival_days(db))
 
     featured_brands = (await db.execute(
         select(Brand)

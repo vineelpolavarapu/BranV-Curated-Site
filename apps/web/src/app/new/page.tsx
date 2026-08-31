@@ -24,7 +24,7 @@ export default async function NewArrivalsPage(props: {
           New arrivals
         </h1>
         <p className="mt-1 text-sm text-content-soft">
-          Added in the last 30 days · {list?.total ?? 0} products
+          Added in the last 7 days · {list?.total ?? 0} products
         </p>
       </section>
 

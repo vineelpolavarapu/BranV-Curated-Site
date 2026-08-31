@@ -36,6 +36,7 @@ from ...db.models import (
     Edit,
     EditProduct,
     Product,
+    ProductCategoryLink,
     ProductImage,
     ProductRetailerListing,
     ProductVariant,
@@ -121,6 +122,9 @@ class ProductBase(ApiModel):
     images: list[ImageInput] | None = Field(default=None, max_length=20)
     retailerListings: list[RetailerListingInput] | None = Field(default=None, max_length=20)
     editIds: list[str] | None = Field(default=None, max_length=20)
+    # Extra category/collection landing pages this product should also appear
+    # on (the admin "Product Visibility" checkboxes). Slugs, e.g. ["trendy-wear"].
+    visibilityCategorySlugs: list[str] | None = Field(default=None, max_length=40)
 
 
 class CreateProductRequest(ProductBase):
@@ -143,6 +147,7 @@ class UpdateProductRequest(ApiModel):
     featureDays: int | None = None
     tags: list[str] | None = None
     editIds: list[str] | None = Field(default=None, max_length=20)
+    visibilityCategorySlugs: list[str] | None = Field(default=None, max_length=40)
 
 
 def _serialize_product(p: Product) -> dict[str, Any]:
@@ -577,6 +582,36 @@ async def admin_get(product_id: str, db: DbDep) -> dict[str, Any]:
     return out
 
 
+async def _sync_visibility_links(
+    db: AsyncSession, *, product_id: str, slugs: list[str] | None, now: datetime
+) -> None:
+    """Replace a product's extra category-visibility links to match `slugs`.
+
+    Backs the admin "Product Visibility" checkboxes. `None` means "leave links
+    untouched" (field not sent); an empty list clears them. Unknown slugs are
+    ignored silently so a stale option can never 500 the save.
+    """
+    if slugs is None:
+        return
+    wanted_ids: set[str] = set()
+    if slugs:
+        wanted_ids = set((await db.execute(
+            select(Category.id_).where(Category.slug.in_(slugs))
+        )).scalars().all())
+    await db.execute(
+        delete(ProductCategoryLink).where(
+            ProductCategoryLink.productId == product_id,
+            ProductCategoryLink.categoryId.notin_(wanted_ids) if wanted_ids else True,
+        )
+    )
+    if wanted_ids:
+        existing = set((await db.execute(
+            select(ProductCategoryLink.categoryId).where(ProductCategoryLink.productId == product_id)
+        )).scalars().all())
+        for cid in wanted_ids - existing:
+            db.add(ProductCategoryLink(productId=product_id, categoryId=cid, createdAt=now))
+
+
 @router.post("", status_code=201, dependencies=AdminDeps)
 async def admin_create(
     payload: CreateProductRequest,
@@ -641,6 +676,7 @@ async def admin_create(
     for idx, eid in enumerate(payload.editIds or []):
         db.add(EditProduct(id_=_cuid(), editId=eid, productId=pid, position=idx,
                            createdAt=now, updatedAt=now))
+    await _sync_visibility_links(db, product_id=pid, slugs=payload.visibilityCategorySlugs, now=now)
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.create", targetType="product", targetId=pid)
     fresh = (await db.execute(select(Product).where(Product.id_ == pid))).scalar_one()
@@ -695,6 +731,9 @@ async def admin_update(
                 )).scalar_one()
                 db.add(EditProduct(id_=_cuid(), editId=eid, productId=product_id, position=pos,
                                    createdAt=now2, updatedAt=now2))
+    await _sync_visibility_links(
+        db, product_id=product_id, slugs=payload.visibilityCategorySlugs, now=_now()
+    )
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.update", targetType="product", targetId=product_id)
     fresh = (await db.execute(select(Product).where(Product.id_ == product_id))).scalar_one()

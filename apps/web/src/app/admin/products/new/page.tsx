@@ -17,6 +17,30 @@ import {
 
 const FALLBACK_BRAND_SLUG = 'unbranded';
 
+// Extra category / collection landing pages a product can be surfaced on via
+// the "Product Visibility" checkboxes. Slugs must match the category rows so
+// the backend can resolve them (see product_category_links).
+const VISIBILITY_CATEGORIES: { name: string; slug: string }[] = [
+  { name: 'Trendy Wear', slug: 'trendy-wear' },
+  { name: 'Sports Wear', slug: 'sports-wear' },
+  { name: 'Classic Essentials', slug: 'classic-essentials' },
+  { name: 'Easy Casuals', slug: 'easy-casuals' },
+  { name: 'Fashion Forward', slug: 'fashion-forward' },
+  { name: 'Sharp Formals', slug: 'sharp-formals' },
+  { name: 'Shirts', slug: 'shirts' },
+  { name: 'T-Shirts', slug: 't-shirts' },
+  { name: 'Jeans', slug: 'jeans' },
+  { name: 'Tracks', slug: 'tracks' },
+  { name: 'Footwear', slug: 'footwear' },
+  { name: 'Watches', slug: 'watches' },
+  { name: 'Trousers', slug: 'trousers' },
+  { name: 'Shorts', slug: 'shorts' },
+  { name: 'Jackets', slug: 'jackets' },
+  { name: 'Inners', slug: 'inners' },
+  { name: 'Sweatshirts', slug: 'sweatshirts' },
+  { name: 'Hoodies', slug: 'hoodies' },
+];
+
 export default function NewProductPage() {
   const router = useRouter();
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -39,6 +63,7 @@ export default function NewProductPage() {
   const [featureDays, setFeatureDays] = useState<number>(7);
   const [editIds, setEditIds] = useState<string[]>([]);
   const [showVisibility, setShowVisibility] = useState(false);
+  const [visibilitySlugs, setVisibilitySlugs] = useState<string[]>([]);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -85,6 +110,12 @@ export default function NewProductPage() {
   function toggleEditId(id: string) {
     setEditIds((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
+
+  function toggleVisibility(slug: string) {
+    setVisibilitySlugs((prev) =>
+      prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug],
     );
   }
 
@@ -159,6 +190,7 @@ export default function NewProductPage() {
       status,
       featureDays: feature ? Math.max(1, Math.min(365, featureDays)) : 0,
       editIds: editIds.length ? editIds : undefined,
+      visibilityCategorySlugs: visibilitySlugs.length ? visibilitySlugs : undefined,
     };
     const result = await apiFetch<{ id: string }>('/admin/products', {
       method: 'POST',
@@ -290,19 +322,15 @@ export default function NewProductPage() {
           </button>
           {showVisibility && (
             <div className="mt-3 border-t border-slate-200/60 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-              {[
-                'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
-                'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
-                'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
-                'Inners', 'Sweatshirts', 'Hoodies'
-              ].map((cat) => (
-                <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+              {VISIBILITY_CATEGORIES.map((cat) => (
+                <label key={cat.slug} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
                   <input
                     type="checkbox"
-                    defaultChecked={false}
+                    checked={visibilitySlugs.includes(cat.slug)}
+                    onChange={() => toggleVisibility(cat.slug)}
                     className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
                   />
-                  <span>{cat}</span>
+                  <span>{cat.name}</span>
                 </label>
               ))}
             </div>

@@ -41,6 +41,7 @@ from .platform_setting import PlatformSetting
 from .analytics_daily_clicks import AnalyticsDailyClicks
 from .analytics_daily_conversions import AnalyticsDailyConversions
 from .analytics_content_perf import AnalyticsContentPerf
+from .product_category_link import ProductCategoryLink
 
 __all__ = [
     "Base",
@@ -84,4 +85,5 @@ __all__ = [
     "AnalyticsDailyClicks",
     "AnalyticsDailyConversions",
     "AnalyticsContentPerf",
+    "ProductCategoryLink",
 ]

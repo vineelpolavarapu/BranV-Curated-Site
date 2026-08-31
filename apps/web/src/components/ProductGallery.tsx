@@ -81,7 +81,11 @@ export function ProductGallery({ product }: { product: ProductCardData }) {
   };
 
   return (
-    <div className="w-full min-w-0">
+    // On desktop the gallery is bounded so the 4:5 hero fits within the viewport
+    // height (previously a half-width column made the image taller than the
+    // screen, forcing the user to scroll to see the whole product). Mobile keeps
+    // the full-width behaviour.
+    <div className="w-full min-w-0 lg:mx-auto lg:max-w-[min(440px,calc((100vh_-_9rem)*0.8))]">
       {/* Main Slider Display */}
       <div
         onTouchStart={handleTouchStart}
