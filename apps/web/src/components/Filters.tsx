@@ -114,7 +114,6 @@ function FilterBody({
       {(context.categoryFilters ?? []).map((cf) => (
         <CategoryFilter key={cf.attributeKey} filter={cf} />
       ))}
-      <ToggleFilter param="onSale" label="On sale only" />
       <ToggleFilter param="inStock" label="In stock at retailer" />
       <ToggleFilter param="isNew" label="New arrivals" />
       <div className="lg:hidden pt-2">
@@ -200,56 +199,6 @@ function ActiveFilterChips({ onCleared }: { onCleared?: () => void }) {
 }
 
 // ──────────────── Individual filter UIs ────────────────
-
-function PriceFilter() {
-  const { search, set } = useUrlParam();
-  const min = search.get('minPrice') ?? '';
-  const max = search.get('maxPrice') ?? '';
-  return (
-    <Group title="Price">
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          placeholder="Min"
-          value={min}
-          onChange={(e) => set('minPrice', e.target.value || undefined)}
-          className="w-20 rounded border border-line bg-surface px-2 py-1 text-sm text-content"
-        />
-        <span className="text-content-muted">-</span>
-        <input
-          type="number"
-          placeholder="Max"
-          value={max}
-          onChange={(e) => set('maxPrice', e.target.value || undefined)}
-          className="w-20 rounded border border-line bg-surface px-2 py-1 text-sm text-content"
-        />
-      </div>
-    </Group>
-  );
-}
-
-function DiscountFilter() {
-  const { search, set } = useUrlParam();
-  const current = search.get('discount') ?? '';
-  return (
-    <Group title="Discount">
-      <div className="flex flex-wrap gap-1">
-        {['10', '20', '30', '50'].map((d) => (
-          <button
-            key={d}
-            onClick={() => set('discount', current === d ? undefined : d)}
-            className={`rounded-md border px-2 py-1 text-xs ${current === d
-              ? 'border-primary bg-primary text-primary-fg'
-              : 'border-line hover:bg-surface-muted'
-              }`}
-          >
-            {d}%+
-          </button>
-        ))}
-      </div>
-    </Group>
-  );
-}
 
 function BrandFilter({
   brands,
@@ -418,7 +367,6 @@ export function SortPicker() {
         { value: 'relevance', label: 'Relevance' },
         { value: 'newest', label: 'Newest' },
         { value: 'oldest', label: 'Oldest' },
-        { value: 'best_rated', label: 'Best rated' },
       ]}
     />
   );

@@ -1,6 +1,4 @@
-export type LookbookStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 export type EditStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
-export type HomeBannerStatus = 'ACTIVE' | 'HIDDEN';
 export type BrandStoryStatus = 'DRAFT' | 'PUBLISHED';
 
 export interface ProductLite {
@@ -21,10 +19,6 @@ export interface ProductDetail {
   slug: string;
   title: string;
   brand: { id: string; name: string; slug: string };
-  price: number;
-  mrp: number | null;
-  discountPct: number | null;
-  currency: string;
   primaryImage: { url: string; altText: string | null; isAiGenerated: boolean } | null;
   buyNow: {
     retailer: string;
@@ -34,59 +28,6 @@ export interface ProductDetail {
     pending: boolean;
     trackingId: string | null;
   } | null;
-}
-
-// ── Lookbooks ───────────────────────────────────────────────────────────
-
-export interface LookbookTagAdmin {
-  id: string;
-  productId: string;
-  xPercent: string | number;
-  yPercent: string | number;
-  product: ProductLite;
-}
-
-export interface LookbookImageAdmin {
-  id: string;
-  imageUrl: string;
-  position: number;
-  tags: LookbookTagAdmin[];
-}
-
-export interface LookbookAdmin {
-  id: string;
-  slug: string;
-  title: string;
-  heroUrl: string | null;
-  description: string | null;
-  status: LookbookStatus;
-  publishedAt: string | null;
-  images?: LookbookImageAdmin[];
-  _count?: { images: number };
-}
-
-export interface LookbookPublicTag {
-  id: string;
-  xPercent: number;
-  yPercent: number;
-  product: ProductDetail;
-}
-
-export interface LookbookPublicImage {
-  id: string;
-  imageUrl: string;
-  position: number;
-  tags: LookbookPublicTag[];
-}
-
-export interface LookbookPublic {
-  id: string;
-  slug: string;
-  title: string;
-  heroUrl: string | null;
-  description: string | null;
-  publishedAt: string | null;
-  images: LookbookPublicImage[];
 }
 
 // ── Edits ───────────────────────────────────────────────────────────────
@@ -117,22 +58,6 @@ export interface EditSummary {
 
 export interface EditDetail extends EditSummary {
   products: ProductDetail[];
-}
-
-// ── Banners ─────────────────────────────────────────────────────────────
-
-export interface Banner {
-  id: string;
-  imageUrl: string;
-  headline: string | null;
-  ctaLabel: string | null;
-  ctaLink: string | null;
-  displayOrder: number;
-  startsAt: string | null;
-  endsAt: string | null;
-  status: HomeBannerStatus;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // ── Brand story ─────────────────────────────────────────────────────────

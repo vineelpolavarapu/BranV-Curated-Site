@@ -31,8 +31,6 @@ export function CategoryHashFilter({
       list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else if (sortKey === 'oldest') {
       list.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-    } else if (sortKey === 'best_rated') {
-      list.sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0));
     }
 
     setTransitioning(true);

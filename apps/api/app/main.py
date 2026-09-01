@@ -100,26 +100,18 @@ def create_app() -> FastAPI:
     app.include_router(clicks.router, prefix="/api")
     app.include_router(engagement.wishlist_router, prefix="/api")
     app.include_router(engagement.wardrobe_router, prefix="/api")
-    app.include_router(engagement.reviews_router, prefix="/api")
     app.include_router(engagement.notifications_router, prefix="/api")
-    app.include_router(engagement.newsletter_router, prefix="/api")
     # Real admin domain routers (Step 11a port).
     app.include_router(products_admin.router, prefix="/api")
     app.include_router(content.articles_admin_router, prefix="/api")
     app.include_router(content.articles_public_router, prefix="/api")
     app.include_router(content.edits_admin_router, prefix="/api")
     app.include_router(content.edits_public_router, prefix="/api")
-    app.include_router(content.lookbooks_admin_router, prefix="/api")
-    app.include_router(content.lookbooks_public_router, prefix="/api")
-    app.include_router(simple_admin.avatars_router, prefix="/api")
-    app.include_router(simple_admin.banners_router, prefix="/api")
     app.include_router(simple_admin.brand_story_admin_router, prefix="/api")
     app.include_router(simple_admin.brand_story_public_router, prefix="/api")
     app.include_router(simple_admin.settings_router, prefix="/api")
     app.include_router(simple_admin.public_settings_router, prefix="/api")
     app.include_router(admin_ops.analytics_router, prefix="/api")
-    app.include_router(admin_ops.recon_router, prefix="/api")
-    app.include_router(admin_ops.price_sync_router, prefix="/api")
     app.include_router(clicks_redirect.router)  # NO /api prefix - matches Nest exclusion
 
     log.info(

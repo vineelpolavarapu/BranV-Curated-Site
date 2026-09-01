@@ -54,8 +54,6 @@ export default function NewProductPage() {
   const [color, setColor] = useState('');
   const [sizesCsv, setSizesCsv] = useState('');
   const [material, setMaterial] = useState('');
-  const [price, setPrice] = useState('');
-  const [mrp, setMrp] = useState('');
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProductStatus>('DRAFT');
@@ -181,8 +179,6 @@ export default function NewProductPage() {
       brandId: resolvedBrandId,
       categoryId,
       subcategoryId: subcategoryId || undefined,
-      price: Number(price),
-      mrp: mrp ? Number(mrp) : undefined,
       description: description || undefined,
       tags: tags
         ? tags.split(',').map((t) => t.trim()).filter(Boolean)

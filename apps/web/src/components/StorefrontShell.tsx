@@ -7,7 +7,6 @@ import { MobileBottomNav } from './MobileBottomNav';
 import { MobileNavDrawer } from './MobileNavDrawer';
 import { ClickReturnProvider } from './click-return/ClickReturnProvider';
 import { WishlistProvider } from './wishlist/WishlistProvider';
-import { NewsletterSignup } from './newsletter/NewsletterSignup';
 import { AccountPopup } from './AccountPopup';
 import { AnimateOnScroll } from './AnimateOnScroll';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';

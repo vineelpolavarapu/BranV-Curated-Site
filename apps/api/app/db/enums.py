@@ -54,32 +54,14 @@ class ArticleStatus(str, Enum):
     PUBLISHED = 'PUBLISHED'
     ARCHIVED = 'ARCHIVED'
 
-class LookbookStatus(str, Enum):
-    DRAFT = 'DRAFT'
-    PUBLISHED = 'PUBLISHED'
-    ARCHIVED = 'ARCHIVED'
-
 class EditStatus(str, Enum):
     DRAFT = 'DRAFT'
     PUBLISHED = 'PUBLISHED'
     ARCHIVED = 'ARCHIVED'
 
-class HomeBannerStatus(str, Enum):
-    ACTIVE = 'ACTIVE'
-    HIDDEN = 'HIDDEN'
-
 class BrandStoryStatus(str, Enum):
     DRAFT = 'DRAFT'
     PUBLISHED = 'PUBLISHED'
-
-class ReviewStatus(str, Enum):
-    PUBLISHED = 'PUBLISHED'
-    HIDDEN = 'HIDDEN'
-
-class NewsletterStatus(str, Enum):
-    PENDING = 'PENDING'
-    CONFIRMED = 'CONFIRMED'
-    UNSUBSCRIBED = 'UNSUBSCRIBED'
 
 class NotificationChannel(str, Enum):
     EMAIL = 'EMAIL'
@@ -102,8 +84,3 @@ class OutboxStatus(str, Enum):
     PENDING = 'PENDING'
     DISPATCHED = 'DISPATCHED'
     FAILED = 'FAILED'
-
-class AffiliatePayoutItemStatus(str, Enum):
-    MATCHED = 'MATCHED'
-    UNMATCHED = 'UNMATCHED'
-    AMBIGUOUS = 'AMBIGUOUS'

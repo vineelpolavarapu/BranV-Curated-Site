@@ -17,10 +17,6 @@ interface WishlistItem {
     id: string;
     slug: string;
     title: string;
-    price: number;
-    mrp: number | null;
-    discountPct: number | null;
-    currency: string;
     brand: { id: string; name: string; slug: string };
     primaryImage: {
       url: string;

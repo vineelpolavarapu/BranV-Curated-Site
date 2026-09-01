@@ -152,7 +152,7 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
 
         sorted_listings = sorted(
             p_listings,
-            key=lambda x: float(x.rawPrice) if x.rawPrice is not None else float(p.price)
+            key=lambda x: float(x.rawPrice) if x.rawPrice is not None else 0
         )
         best_listing = sorted_listings[0] if sorted_listings else None
         best_affiliate = link_map.get(best_listing.id_) if best_listing else None
@@ -184,15 +184,9 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
             "slug": p.slug,
             "title": p.title,
             "description": p.description,
-            "price": float(p.price) if p.price is not None else None,
-            "mrp": float(p.mrp) if p.mrp is not None else None,
-            "discountPct": float(p.discountPct) if p.discountPct is not None else None,
-            "currency": p.currency,
             "primaryRetailer": p.primaryRetailer,
             "status": p.status,
             "tags": p.tags or [],
-            "avgRating": float(p.avgRating) if p.avgRating is not None else None,
-            "reviewCount": p.reviewCount,
             "featuredUntil": _iso_ms(p.featuredUntil),
             "isFeatured": bool(p.featuredUntil and p.featuredUntil > datetime.now(timezone.utc).replace(tzinfo=None)),
             "createdAt": _iso_ms(p.createdAt),
@@ -295,10 +289,6 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
                 )
             )
         )
-    if q.get("minPrice") is not None:
-        conds.append(Product.price >= q["minPrice"])
-    if q.get("maxPrice") is not None:
-        conds.append(Product.price <= q["maxPrice"])
     if q.get("inStock"):
         conds.append(
             exists().where(
@@ -308,10 +298,6 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
                 )
             )
         )
-    if q.get("onSale"):
-        conds.append(Product.discountPct > 0)
-    if q.get("discount") and q["discount"] > 0:
-        conds.append(Product.discountPct >= q["discount"])
     if q.get("isNew"):
         days = await _new_arrival_days(db)
         cutoff = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(days=days)
@@ -322,14 +308,8 @@ async def list_products(db: AsyncSession, q: dict[str, Any]) -> dict[str, Any]:
 
     # Sort.
     sort = q.get("sort") or "newest"
-    if sort == "price_asc":
-        order = Product.price.asc()
-    elif sort == "price_desc":
-        order = Product.price.desc()
-    elif sort == "best_rated":
-        order = Product.avgRating.desc().nulls_last()
-    elif sort == "popular":
-        order = Product.reviewCount.desc()
+    if sort == "oldest":
+        order = Product.createdAt.asc()
     else:
         order = Product.createdAt.desc()
 

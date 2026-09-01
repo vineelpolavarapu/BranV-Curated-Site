@@ -1,5 +1,3 @@
-export type ReviewStatus = 'PUBLISHED' | 'HIDDEN';
-
 export type NotificationChannel = 'EMAIL' | 'IN_APP' | 'WEB_PUSH' | 'SMS';
 export type NotificationType =
   | 'WELCOME'
@@ -11,43 +9,6 @@ export type NotificationType =
   | 'ADMIN_SYNC_FAILURE'
   | 'ADMIN_WEEKLY_SUMMARY'
   | 'GENERIC';
-
-export interface ReviewPublic {
-  id: string;
-  productId: string;
-  rating: number;
-  title: string | null;
-  body: string | null;
-  images: string[];
-  status: ReviewStatus;
-  createdAt: string;
-  author: { id: string; displayName: string };
-}
-
-export interface ReviewsPage {
-  data: ReviewPublic[];
-  page: number;
-  pageSize: number;
-  total: number;
-  totalPages: number;
-}
-
-export interface Reviewability {
-  canReview: boolean;
-  hasWardrobeItem: boolean;
-  ownReview: ReviewPublic | null;
-}
-
-export interface AdminReviewRow extends ReviewPublic {
-  moderationReason: string | null;
-  moderatedAt: string | null;
-  product: { id: string; slug: string; title: string };
-  user: {
-    id: string;
-    email: string;
-    profile: { firstName: string | null; lastName: string | null } | null;
-  };
-}
 
 export interface NotificationItem {
   id: string;
@@ -78,14 +39,4 @@ export interface NotificationPreference {
   type: NotificationType;
   channel: NotificationChannel;
   enabled: boolean;
-}
-
-export interface NewsletterSubscriberRow {
-  id: string;
-  email: string;
-  status: 'PENDING' | 'CONFIRMED' | 'UNSUBSCRIBED';
-  source: string | null;
-  confirmedAt: string | null;
-  unsubscribedAt: string | null;
-  createdAt: string;
 }

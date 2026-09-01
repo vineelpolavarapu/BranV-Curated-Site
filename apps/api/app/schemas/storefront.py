@@ -10,7 +10,7 @@ from pydantic import Field, field_validator
 from ..core.pydantic_config import ApiModel, csv_or_array_str, loose_bool
 
 ProductSortLiteral = Literal[
-    "relevance", "newest", "price_asc", "price_desc", "best_rated", "popular",
+    "relevance", "newest",
 ]
 
 
@@ -24,12 +24,8 @@ class ProductListQuery(ApiModel):
     size: list[str] | None = None
     retailer: list[str] | None = None
     material: str | None = None
-    minPrice: float | None = Field(default=None, ge=0)
-    maxPrice: float | None = Field(default=None, ge=0)
     inStock: bool | None = None
-    onSale: bool | None = None
     isNew: bool | None = None
-    discount: float | None = Field(default=None, ge=0, le=100)
     sort: ProductSortLiteral | None = None
 
     @field_validator("brand", "color", "size", "retailer", mode="before")
@@ -37,7 +33,7 @@ class ProductListQuery(ApiModel):
     def _multi(cls, v):
         return csv_or_array_str(v) if v is not None else None
 
-    @field_validator("inStock", "onSale", "isNew", mode="before")
+    @field_validator("inStock", "isNew", mode="before")
     @classmethod
     def _b(cls, v):
         if v is None:

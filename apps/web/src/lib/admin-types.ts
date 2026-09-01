@@ -50,25 +50,12 @@ export interface ProductRow {
   slug: string;
   title: string;
   status: ProductStatus;
-  price: string;
-  mrp: string | null;
-  currency: string;
   tags: string[];
   createdAt: string;
   brand: { id: string; name: string; slug: string };
   category: { id: string; name: string; slug: string };
   images: Array<{ url: string; isAiGenerated: boolean }>;
   _count: { retailerListings: number; variants: number };
-}
-
-export interface Avatar {
-  id: string;
-  name: string;
-  referenceImageUrl: string;
-  promptTemplate: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface Page<T> {

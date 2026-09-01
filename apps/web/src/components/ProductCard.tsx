@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { useState, useMemo } from 'react';
 import { ProductCardData } from '@/lib/storefront-types';
 import { resolveBuyNowHref, resolveRetailerLabel } from '@/lib/click-tracking';
-import { formatINR } from '@/lib/format';
 import { m } from 'motion/react';
 import { useClickReturn } from './click-return/ClickReturnProvider';
 import { useWishlist } from './wishlist/WishlistProvider';

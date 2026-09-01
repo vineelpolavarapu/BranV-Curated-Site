@@ -30,8 +30,6 @@ interface ScrapeResult {
   canonicalUrl: string;
   title: string | null;
   brandHint: string | null;
-  price: number | null;
-  mrp: number | null;
   primaryImageUrl: string | null;
   images?: string[] | null;
   source: string;
@@ -52,8 +50,6 @@ interface FormState {
   brandId: string;
   categoryId: string;
   subcategoryId: string;
-  price: string;
-  mrp: string;
   color: string;
   sizesCsv: string;
   material: string;
@@ -73,8 +69,6 @@ const EMPTY: FormState = {
   brandId: '',
   categoryId: '',
   subcategoryId: '',
-  price: '',
-  mrp: '',
   color: '',
   sizesCsv: '',
   material: '',
@@ -306,7 +300,6 @@ const DEFAULT_BRANDS = [
       ...prev,
       retailer: scrapedRetailer,
       title: prev.title || s.title || '',
-      mrp: prev.mrp || (s.mrp ? String(s.mrp) : ''),
       retailerImageUrl: prev.retailerImageUrl || s.primaryImageUrl || '',
       imageUrls: Array.from(new Set([...(prev.imageUrls || []), ...(s.images || [])])),
     }));
@@ -421,8 +414,6 @@ const DEFAULT_BRANDS = [
       brandId: form.brandId,
       categoryId: form.categoryId,
       subcategoryId: form.subcategoryId || undefined,
-      price: form.price ? Number(form.price) : 0,
-      mrp: form.mrp ? Number(form.mrp) : undefined,
       color: form.color || undefined,
       sizes: form.sizesCsv
         ? form.sizesCsv.split(',').map((s) => s.trim()).filter(Boolean)

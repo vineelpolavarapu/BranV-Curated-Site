@@ -110,8 +110,6 @@ class ProductBase(ApiModel):
     subcategoryId: str | None = None
     slug: str | None = Field(default=None, max_length=200)
     description: str | None = Field(default=None, max_length=20_000)
-    price: float | None = Field(default=0.0)
-    mrp: float | None = None
     primaryRetailer: str | None = None
     status: ProductStatusLit | None = None
     metaTitle: str | None = None
@@ -138,8 +136,6 @@ class UpdateProductRequest(ApiModel):
     subcategoryId: str | None = None
     slug: str | None = None
     description: str | None = None
-    price: float | None = None
-    mrp: float | None = None
     primaryRetailer: str | None = None
     status: ProductStatusLit | None = None
     metaTitle: str | None = None
@@ -159,10 +155,6 @@ def _serialize_product(p: Product) -> dict[str, Any]:
         "categoryId": p.categoryId,
         "subcategoryId": p.subcategoryId,
         "description": p.description,
-        "price": _dec(p.price),
-        "mrp": _dec(p.mrp),
-        "discountPct": _dec(p.discountPct),
-        "currency": p.currency,
         "primaryRetailer": p.primaryRetailer,
         "status": p.status,
         "metaTitle": p.metaTitle,
@@ -249,10 +241,6 @@ async def _serialize_admin_products(db: AsyncSession, products: list[Product]) -
             "categoryId": p.categoryId,
             "subcategoryId": p.subcategoryId,
             "description": p.description,
-            "price": _dec(p.price),
-            "mrp": _dec(p.mrp),
-            "discountPct": _dec(p.discountPct),
-            "currency": p.currency,
             "primaryRetailer": p.primaryRetailer,
             "status": p.status,
             "metaTitle": p.metaTitle,
@@ -281,12 +269,6 @@ async def _unique_product_slug(db: AsyncSession, base: str, exclude_id: str | No
     return await ensure_unique_slug(base, taken)
 
 
-def _calc_discount(price: float | None, mrp: float | None) -> float | None:
-    if price is None or mrp is None or mrp <= 0 or price >= mrp:
-        return None
-    return round((mrp - price) / mrp * 100, 2)
-
-
 # ───────────── Scrape / Quick Add live BEFORE list so :id routes don't match ─
 
 
@@ -304,8 +286,6 @@ async def scrape_url(payload: ScrapeUrlRequest) -> dict[str, Any]:
         raise HTTPException(422, f"Scrape failed: {e}") from None
     return {
         "title": result.title,
-        "price": result.price,
-        "mrp": result.mrp,
         "primaryImageUrl": result.primaryImageUrl,
         "images": result.images or [],
         "color": result.color,
@@ -322,14 +302,12 @@ class QuickAddRequest(ApiModel):
     retailerDisplayName: str | None = Field(default=None, max_length=60)
     categoryId: str
     subcategoryId: str | None = None
-    price: float | None = Field(default=0.0)
     brandId: str | None = None
     newBrandName: str | None = Field(default=None, max_length=120)
     color: str | None = None
     sizes: list[str] | None = Field(default=None, max_length=20)
     material: str | None = None
     description: str | None = None
-    mrp: float | None = None
     tags: list[str] | None = Field(default=None, max_length=20)
     avatarImageUrl: str | None = None
     retailerImageUrl: str | None = None
@@ -385,25 +363,12 @@ async def quick_add(
         # 2. Product.
         from ...db.enums import AffiliatePartner, AvailabilityStatus, ProductStatus
         p_slug = await _unique_product_slug(db, slugify(payload.title))
-        discount = _calc_discount(payload.price, payload.mrp)
         pid = _cuid()
-
-        try:
-            price_val = Decimal(str(payload.price)) if payload.price is not None else Decimal("0")
-        except Exception:
-            price_val = Decimal("0")
-
-        try:
-            mrp_val = Decimal(str(payload.mrp)) if payload.mrp is not None else None
-        except Exception:
-            mrp_val = None
 
         try:
             status_enum = ProductStatus((payload.status or "ACTIVE").upper())
         except Exception:
             status_enum = ProductStatus.ACTIVE
-
-        discount_dec = Decimal(f"{discount:.2f}") if discount is not None else None
 
         db.add(Product(
             id_=pid,
@@ -413,15 +378,10 @@ async def quick_add(
             slug=p_slug,
             title=payload.title,
             description=payload.description,
-            price=price_val,
-            mrp=mrp_val,
-            discountPct=discount_dec,
-            currency="INR",
             primaryRetailer=payload.retailer,
             status=status_enum,
             createdByAdminId=user.id,
             tags=payload.tags or [],
-            reviewCount=0,
             createdAt=now,
             updatedAt=now,
         ))
@@ -458,7 +418,6 @@ async def quick_add(
             id_=listing_id, productId=pid, retailer=payload.retailer,
             retailerDisplayName=payload.retailerDisplayName,
             retailerProductUrl=payload.rawUrl, retailerImageUrl=payload.retailerImageUrl,
-            rawPrice=price_val,
             availabilityStatus=AvailabilityStatus.IN_STOCK,
             syncFailedCount=0,
             createdAt=now, updatedAt=now,
@@ -632,18 +591,12 @@ async def admin_create(
         slug=slug,
         title=payload.title,
         description=payload.description,
-        price=Decimal(str(payload.price if payload.price is not None else 0)),
-        mrp=Decimal(str(payload.mrp)) if payload.mrp is not None else None,
-        discountPct=Decimal(str(d)) if (d := _calc_discount(payload.price, payload.mrp)) is not None else None,
-        currency="INR",
         primaryRetailer=payload.primaryRetailer,
         status=payload.status or "DRAFT",
         createdByAdminId=user.id,
         metaTitle=payload.metaTitle,
         metaDescription=payload.metaDescription,
         tags=payload.tags or [],
-        avgRating=None,
-        reviewCount=0,
         featuredUntil=featured_until,
         createdAt=now,
         updatedAt=now,
@@ -701,15 +654,6 @@ async def admin_update(
         v = getattr(payload, k)
         if v is not None:
             values[k] = v
-    if payload.price is not None:
-        values["price"] = Decimal(str(payload.price))
-    if payload.mrp is not None:
-        values["mrp"] = Decimal(str(payload.mrp))
-    # Recompute discount if price/mrp moved.
-    new_price = payload.price if payload.price is not None else float(existing.price)
-    new_mrp = payload.mrp if payload.mrp is not None else (float(existing.mrp) if existing.mrp else None)
-    d = _calc_discount(new_price, new_mrp)
-    values["discountPct"] = Decimal(str(d)) if d is not None else None
     if payload.featureDays is not None:
         values["featuredUntil"] = (
             _now() + timedelta(days=payload.featureDays) if payload.featureDays > 0 else None

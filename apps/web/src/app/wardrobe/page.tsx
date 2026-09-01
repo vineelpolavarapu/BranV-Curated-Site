@@ -19,8 +19,6 @@ interface WardrobeItem {
     id: string;
     slug: string;
     title: string;
-    price: number;
-    currency: string;
     brand: { id: string; name: string; slug: string };
     primaryImage: {
       url: string;

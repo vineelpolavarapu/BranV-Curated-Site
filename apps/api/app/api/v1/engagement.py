@@ -1,5 +1,5 @@
 """
-Engagement routes - wishlist, wardrobe, reviews, notifications, newsletter.
+Engagement routes - wishlist, wardrobe, notifications.
 
 These domains share a critical pattern: SOME routes are @Public but expect to
 soft-read the access cookie and serve an anonymous-shaped payload when not
@@ -9,8 +9,6 @@ we co-locate them here rather than spreading across 5 separate files.
 Optional-auth surfaces ported here:
   GET  /api/me/wishlist/ids                    → [] when anon
   GET  /api/notifications/unread-count         → {count: 0} when anon
-  GET  /api/products/{id}/reviews/me           → {canReview:false, ...} when anon
-  POST /api/newsletter/subscribe               → succeeds anonymously
   POST /api/clicks/{id}/report                 → handled in clicks.py
 
 Full CRUD per domain (member-required) is included with minimal viable shapes
@@ -39,12 +37,10 @@ from ...core.pagination import make_page
 from ...core.pydantic_config import ApiModel
 from ...db.models import (
     Brand,
-    NewsletterSubscriber,
     Notification,
     NotificationPreference,
     Product,
     ProductImage,
-    Review,
     WardrobeItem,
     WishlistItem,
 )
@@ -151,10 +147,6 @@ async def wishlist_list(
                 "id": p.id_,
                 "slug": p.slug,
                 "title": p.title,
-                "price": float(p.price) if p.price is not None else None,
-                "mrp": float(p.mrp) if p.mrp is not None else None,
-                "discountPct": float(p.discountPct) if p.discountPct is not None else None,
-                "currency": p.currency,
                 "brand": {"id": b.id_, "name": b.name, "slug": b.slug} if b else None,
                 "primaryImage": {
                     "url": img.url,
@@ -305,8 +297,6 @@ async def wardrobe_list(
                 "id": p.id_,
                 "slug": p.slug,
                 "title": p.title,
-                "price": float(p.price) if p.price is not None else None,
-                "currency": p.currency,
                 "brand": {"id": b.id_, "name": b.name, "slug": b.slug} if b else None,
                 "primaryImage": {
                     "url": img.url,
@@ -323,20 +313,20 @@ async def wardrobe_list(
     )).scalars().all()
     all_prod_ids = [w.productId for w in all_items]
     all_products = (await db.execute(
-        select(Product.id_, Product.price, Brand.name, Brand.slug)
+        select(Product.id_, Brand.name, Brand.slug)
         .join(Brand, Brand.id_ == Product.brandId)
         .where(Product.id_.in_(all_prod_ids))
     )).all() if all_prod_ids else []
-    prod_price_brand_map = {p[0]: {"price": p[1], "brand_name": p[2], "brand_slug": p[3]} for p in all_products}
+    prod_brand_map = {p[0]: {"brand_name": p[1], "brand_slug": p[2]} for p in all_products}
 
     total_spend = 0.0
     brand_counts = {}
     for w in all_items:
-        p_info = prod_price_brand_map.get(w.productId)
+        p_info = prod_brand_map.get(w.productId)
         if not p_info:
             continue
-        price = float(w.selfReportedPrice) if w.selfReportedPrice else float(p_info["price"])
-        total_spend += price
+        if w.selfReportedPrice:
+            total_spend += float(w.selfReportedPrice)
         b_slug = p_info["brand_slug"]
         b_name = p_info["brand_name"]
         if b_slug not in brand_counts:
@@ -377,110 +367,6 @@ async def wardrobe_remove(
     )
     await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-# ───────────── REVIEWS ──────────────────────────────────────────────────────
-
-reviews_router = APIRouter(prefix="/products/{product_id}/reviews", tags=["reviews"])
-
-
-class CreateReviewRequest(ApiModel):
-    rating: int = Field(ge=1, le=5)
-    title: str | None = Field(default=None, max_length=140)
-    body: str | None = Field(default=None, max_length=4000)
-    imageUrls: list[str] | None = Field(default=None, max_length=6)
-
-
-@reviews_router.get("")
-async def reviews_list(
-    product_id: str,
-    db: DbDep,
-    page: Annotated[int, Query(ge=1)] = 1,
-    pageSize: Annotated[int, Query(ge=1, le=50)] = 12,
-) -> dict[str, Any]:
-    total = (await db.execute(
-        select(func.count(Review.id_)).where(
-            Review.productId == product_id, Review.status == "PUBLISHED"
-        )
-    )).scalar_one()
-    rows = (await db.execute(
-        select(Review)
-        .where(Review.productId == product_id, Review.status == "PUBLISHED")
-        .order_by(desc(Review.createdAt))
-        .offset((page - 1) * pageSize)
-        .limit(pageSize)
-    )).scalars().all()
-    data = [
-        {
-            "id": r.id_,
-            "rating": r.rating,
-            "title": r.title,
-            "body": r.body,
-            "imagesJson": r.imagesJson,
-            "createdAt": _iso_ms(r.createdAt),
-        }
-        for r in rows
-    ]
-    return make_page(data, total, page, pageSize)
-
-
-@reviews_router.get("/me")
-async def reviews_me(
-    product_id: str,
-    db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL - anonymous shape when not signed in
-) -> dict[str, Any]:
-    if user is None:
-        return {"canReview": False, "hasWardrobeItem": False, "ownReview": None}
-    in_wardrobe = (await db.execute(
-        select(WardrobeItem.id_).where(
-            WardrobeItem.userId == user.id, WardrobeItem.productId == product_id
-        )
-    )).scalar_one_or_none() is not None
-    own = (await db.execute(
-        select(Review).where(Review.userId == user.id, Review.productId == product_id)
-    )).scalar_one_or_none()
-    return {
-        "canReview": in_wardrobe and own is None,
-        "hasWardrobeItem": in_wardrobe,
-        "ownReview": (
-            {"id": own.id_, "rating": own.rating, "title": own.title, "body": own.body}
-            if own
-            else None
-        ),
-    }
-
-
-@reviews_router.post("", status_code=201)
-async def reviews_create(
-    product_id: str,
-    payload: CreateReviewRequest,
-    db: DbDep,
-    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
-) -> dict[str, Any]:
-    in_wardrobe = (await db.execute(
-        select(WardrobeItem.id_).where(
-            WardrobeItem.userId == user.id, WardrobeItem.productId == product_id
-        )
-    )).scalar_one_or_none() is not None
-    if not in_wardrobe:
-        raise HTTPException(status_code=403, detail="Must own product before reviewing")
-    now = _now()
-    review = Review(
-        id_=_cuid(),
-        productId=product_id,
-        userId=user.id,
-        rating=payload.rating,
-        title=payload.title,
-        body=payload.body,
-        imagesJson=payload.imageUrls or [],
-        status="PUBLISHED",
-        createdAt=now,
-        updatedAt=now,
-    )
-    db.add(review)
-    await db.commit()
-    return {"id": review.id_, "rating": review.rating, "status": review.status}
 
 
 # ───────────── NOTIFICATIONS ─────────────────────────────────────────────────
@@ -627,80 +513,3 @@ async def notification_prefs_update(
         ))
     await db.commit()
     return {"type": payload.type, "channel": payload.channel, "enabled": payload.enabled}
-
-
-# ───────────── NEWSLETTER ────────────────────────────────────────────────────
-
-newsletter_router = APIRouter(prefix="/newsletter", tags=["newsletter"])
-
-
-class SubscribeRequest(ApiModel):
-    email: str
-    source: str | None = Field(default=None, max_length=40)
-
-
-class TokenRequest(ApiModel):
-    token: str
-
-
-@newsletter_router.post("/subscribe", status_code=status.HTTP_200_OK)
-async def newsletter_subscribe(
-    payload: SubscribeRequest,
-    db: DbDep,
-    user=Depends(current_user_optional),  # OPTIONAL - capture user id if signed in
-) -> dict[str, str]:
-    email = payload.email.strip().lower()
-    existing = (await db.execute(
-        select(NewsletterSubscriber).where(NewsletterSubscriber.email == email)
-    )).scalar_one_or_none()
-    now = _now()
-    if existing is None:
-        # Token + double-opt-in flow is stubbed for the parity port; mark CONFIRMED
-        # directly for now and rely on the audit log for traceability.
-        from hashlib import sha256
-        confirmation = sha256(_cuid().encode()).hexdigest()
-        unsubscribe = sha256(_cuid().encode()).hexdigest()
-        db.add(NewsletterSubscriber(
-            id_=_cuid(),
-            email=email,
-            userId=user.id if user else None,
-            source=payload.source,
-            status="PENDING",
-            confirmationTokenHash=confirmation,
-            unsubscribeTokenHash=unsubscribe,
-            createdAt=now,
-            updatedAt=now,
-        ))
-        await db.commit()
-    return {"status": "ok"}
-
-
-@newsletter_router.post("/confirm", status_code=status.HTTP_200_OK)
-async def newsletter_confirm(payload: TokenRequest, db: DbDep) -> dict[str, str]:
-    from hashlib import sha256
-    th = sha256(payload.token.encode()).hexdigest()
-    row = (await db.execute(
-        select(NewsletterSubscriber).where(NewsletterSubscriber.confirmationTokenHash == th)
-    )).scalar_one_or_none()
-    if row is None:
-        raise HTTPException(status_code=400, detail="Invalid token")
-    await db.execute(
-        update(NewsletterSubscriber)
-        .where(NewsletterSubscriber.id_ == row.id_)
-        .values(status="CONFIRMED", confirmedAt=_now(), confirmationTokenHash=None)
-    )
-    await db.commit()
-    return {"status": "confirmed"}
-
-
-@newsletter_router.post("/unsubscribe", status_code=status.HTTP_200_OK)
-async def newsletter_unsubscribe(payload: TokenRequest, db: DbDep) -> dict[str, str]:
-    from hashlib import sha256
-    th = sha256(payload.token.encode()).hexdigest()
-    await db.execute(
-        update(NewsletterSubscriber)
-        .where(NewsletterSubscriber.unsubscribeTokenHash == th)
-        .values(status="UNSUBSCRIBED", unsubscribedAt=_now())
-    )
-    await db.commit()
-    return {"status": "ok"}

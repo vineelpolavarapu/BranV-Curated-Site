@@ -22,8 +22,6 @@ interface ProductDetail {
   slug: string;
   title: string;
   description: string | null;
-  price: string;
-  mrp: string | null;
   status: ProductStatus;
   tags: string[];
   featuredUntil: string | null;
@@ -135,8 +133,6 @@ function BasicsForm({
     : 7;
 
   const [title, setTitle] = useState(product.title);
-  const [price, setPrice] = useState(product.price);
-  const [mrp, setMrp] = useState(product.mrp ?? '');
   const [status, setStatus] = useState<ProductStatus>(product.status);
   const [description, setDescription] = useState(product.description ?? '');
   const [tags, setTags] = useState(product.tags.join(', '));
@@ -151,8 +147,6 @@ function BasicsForm({
     setError(null);
     const body = {
       title,
-      price: Number(price),
-      mrp: mrp ? Number(mrp) : null,
       status,
       description: description || null,
       tags: tags
@@ -188,26 +182,6 @@ function BasicsForm({
         />
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div>
-          <label className={adminLabel}>Price (₹) (optional)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className={adminInput}
-          />
-        </div>
-        <div>
-          <label className={adminLabel}>MRP (₹)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={mrp}
-            onChange={(e) => setMrp(e.target.value)}
-            className={adminInput}
-          />
-        </div>
         <div>
           <label className={adminLabel}>Status</label>
           <select

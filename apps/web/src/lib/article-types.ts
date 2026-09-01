@@ -15,10 +15,6 @@ export interface EmbeddedProduct {
   slug: string;
   title: string;
   brand: { id: string; name: string; slug: string };
-  price: number;
-  mrp: number | null;
-  discountPct: number | null;
-  currency: string;
   primaryImage: {
     url: string;
     altText: string | null;

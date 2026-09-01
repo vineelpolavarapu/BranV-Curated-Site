@@ -23,7 +23,6 @@ export interface DashboardPayload {
     notificationOutbox: { pending: number; failed: number };
     syncFailureCount: number;
     pendingAffiliateConversions: number;
-    hiddenReviewCount: number;
     apiP95Ms: number | null;
     errorRatePct: number | null;
   };

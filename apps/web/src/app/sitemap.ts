@@ -7,7 +7,7 @@ import { categoryHrefL1 } from '@/lib/category-href';
 
 /**
  * Dynamic sitemap. Articles get refreshed every time the scheduler publishes
- * one; brands + categories + edits + lookbooks track the catalog.
+ * one; brands + categories + edits track the catalog.
  * Phase 11 will add per-product URLs (large set, needs an index) and ISR-style
  * caching.
  */
@@ -33,17 +33,11 @@ const CATEGORY_SLUGS = [
   'hoodies',
 ];
 
-interface LookbookListItem {
-  slug: string;
-  publishedAt: string | null;
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, brands, edits, lookbooks] = await Promise.all([
+  const [articles, brands, edits] = await Promise.all([
     apiServer<{ data: ArticleSummary[] }>('/articles?pageSize=60'),
     apiServer<BrandCard[]>('/brands'),
     apiServer<EditSummary[]>('/edits'),
-    apiServer<LookbookListItem[]>('/lookbooks'),
   ]);
 
   const now = new Date();
@@ -53,7 +47,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/articles`, lastModified: now, changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE}/brands`, lastModified: now, changeFrequency: 'weekly', priority: 0.7 },
     { url: `${BASE}/new`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
-    { url: `${BASE}/sale`, lastModified: now, changeFrequency: 'daily', priority: 0.6 },
   ];
 
   const categoryEntries: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((slug) => ({
@@ -84,19 +77,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  const lookbookEntries: MetadataRoute.Sitemap = (lookbooks ?? []).map((l) => ({
-    url: `${BASE}/lookbooks/${l.slug}`,
-    lastModified: l.publishedAt ? new Date(l.publishedAt) : now,
-    changeFrequency: 'monthly',
-    priority: 0.5,
-  }));
-
   return [
     ...staticEntries,
     ...categoryEntries,
     ...brandEntries,
     ...articleEntries,
     ...editEntries,
-    ...lookbookEntries,
   ];
 }

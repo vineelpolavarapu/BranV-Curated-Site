@@ -2,8 +2,6 @@ export interface RecentlyViewedItem {
   slug: string;
   title: string;
   brandName: string;
-  price: number;
-  mrp: number | null;
   imageUrl: string | null;
   viewedAt: number;
 }

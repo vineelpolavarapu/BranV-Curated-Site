@@ -26,13 +26,7 @@ export interface ProductCardData {
   slug: string;
   title: string;
   description: string | null;
-  price: number;
-  mrp: number | null;
-  discountPct: number | null;
-  currency: string;
   tags: string[];
-  avgRating: number | null;
-  reviewCount: number;
   createdAt: string;
   isFeatured: boolean;
   featuredUntil: string | null;
