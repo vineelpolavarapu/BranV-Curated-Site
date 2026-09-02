@@ -6,13 +6,17 @@ Do NOT edit by hand - re-run scripts/generate_sa_models.py.
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Enum as SAEnum, Integer, TIMESTAMP, Text, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..enums import UserRole, UserStatus
 
 from .base import Base
+
+if TYPE_CHECKING:
+    from .member_profile import MemberProfile
 
 
 class User(Base):
@@ -30,3 +34,16 @@ class User(Base):
     lastLoginAt: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='lastLoginAt')
     createdAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, server_default=text('CURRENT_TIMESTAMP'), name='createdAt')
     updatedAt: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=False), nullable=False, onupdate=text('CURRENT_TIMESTAMP'), name='updatedAt')
+
+    # ── Relationships (hand-added; the generator emits scalar columns only) ──
+    # NOTE: re-running scripts/generate_sa_models.py wipes this block (it emits
+    # scalar columns only). It was silently lost in the 2026-09-01 schema
+    # regeneration, which broke GET /api/auth/me (auth_service.me joinedload's
+    # User.profile) with 500s for every logged-in user. Re-add after any regen.
+    profile: Mapped[MemberProfile | None] = relationship(
+        "MemberProfile",
+        primaryjoin="User.id_ == foreign(MemberProfile.userId)",
+        uselist=False,
+        lazy="noload",
+        back_populates="user",
+    )
