@@ -199,16 +199,19 @@ export default function ProductsAdminPage() {
               })}
             </ul>
 
-            {/* Tablet/desktop: table */}
-            <div className="hidden sm:block">
-              <table className="w-full table-fixed text-sm">
+            {/* Tablet/desktop: table. Wrapped in an overflow-x-auto container so
+               the row (esp. the Actions buttons) scrolls horizontally *inside*
+               the card instead of spilling outside it. min-w keeps every column
+               readable and the Actions column wide enough for all 3 buttons. */}
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="w-full min-w-[860px] table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-line text-left text-xs uppercase tracking-wider text-content-soft">
-                    <th className="w-[45%] px-2 pb-3 font-medium">Product</th>
-                    <th className="w-[18%] px-2 pb-3 font-medium">Brand</th>
-                    <th className="w-[18%] px-2 pb-3 font-medium">Category</th>
-                    <th className="w-[19%] px-2 pb-3 font-medium">Status</th>
-                    <th className="w-[20%] px-2 pb-3 font-medium text-right">Actions</th>
+                    <th className="w-[34%] px-2 pb-3 font-medium">Product</th>
+                    <th className="w-[14%] px-2 pb-3 font-medium">Brand</th>
+                    <th className="w-[14%] px-2 pb-3 font-medium">Category</th>
+                    <th className="w-[10%] px-2 pb-3 font-medium">Status</th>
+                    <th className="w-[28%] px-2 pb-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -255,7 +258,7 @@ export default function ProductsAdminPage() {
                         <td className="px-2 py-3">
                           <StatusPill status={p.status} />
                         </td>
-                        <td className="px-2 py-3 text-right">
+                        <td className="whitespace-nowrap px-2 py-3 text-right">
                           <div className="inline-flex items-center justify-end gap-2">
                             <Link
                               href={`/admin/products/${p.id}`}
