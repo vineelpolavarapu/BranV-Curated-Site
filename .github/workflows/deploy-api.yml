@@ -268,6 +268,19 @@ jobs:
             # wait for it to actually finish (`up -d` alone only starts it, it
             # doesn't block until the one-shot container exits).
             docker compose pull api migrate
+
+            # The still-running old API holds a pool of idle Postgres
+            # connections. Postgres on this 1 GB VM caps out at
+            # max_connections=20, so if the app is holding most of them the
+            # one-shot `migrate` below fails to even connect ("FATAL: sorry,
+            # too many clients already") and the whole deploy aborts. Free the
+            # app's *idle* connections first so migrate always has headroom -
+            # the app's pool (pool_pre_ping=True) transparently reopens them.
+            # Guarded with `|| true` so a transient hiccup here never blocks
+            # the deploy.
+            docker compose exec -T postgres psql -U branv -d branv -c \
+              "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE usename='branv' AND state='idle' AND pid<>pg_backend_pid();" || true
+
             docker compose up -d migrate
             for i in $(seq 1 30); do
               MIGRATE_ID=$(docker compose ps -a -q migrate)
@@ -278,7 +291,22 @@ jobs:
             MIGRATE_EXIT=$(docker inspect --format='{{.State.ExitCode}}' "$MIGRATE_ID")
             if [ "$MIGRATE_EXIT" != "0" ]; then
               echo "::error::Prisma migration failed (exit $MIGRATE_EXIT) - aborting before touching the api container."
-              docker compose logs migrate --tail 100
+              MIGRATE_LOGS=$(docker compose logs migrate --tail 100)
+              echo "$MIGRATE_LOGS"
+              # P3009 = a migration is recorded as FAILED in _prisma_migrations,
+              # which blocks every future deploy. Do NOT "fix" it by deleting the
+              # row from _prisma_migrations by hand: if the migration file is
+              # still present it just re-runs next deploy and fails again (the
+              # exact resolve-then-breaks-again loop we hit with the squashed
+              # init that re-declared CREATE TYPE "UserRole"). Instead mark it
+              # resolved so its state is durable and Prisma stops retrying it.
+              if echo "$MIGRATE_LOGS" | grep -q "P3009"; then
+                echo "::error::Detected P3009 (a failed migration is blocking all deploys). Do NOT delete rows from _prisma_migrations. Identify the failed migration in the log above, then run ONE of these on the VM and re-deploy:"
+                echo "  # objects the migration creates already exist in the DB (e.g. type UserRole) -> it's effectively already applied:"
+                echo "  cd $DEPLOY_PATH && docker compose run --rm migrate npx --yes prisma@5 migrate resolve --applied <MIGRATION_NAME> --schema=/prisma/schema.prisma"
+                echo "  # OR the migration half-applied and you want Prisma to retry it cleanly:"
+                echo "  cd $DEPLOY_PATH && docker compose run --rm migrate npx --yes prisma@5 migrate resolve --rolled-back <MIGRATION_NAME> --schema=/prisma/schema.prisma"
+              fi
               exit 1
             fi
 
