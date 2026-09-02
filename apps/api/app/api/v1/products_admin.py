@@ -29,10 +29,12 @@ from ...core.auth_deps import (
 )
 from ...core.pagination import make_page
 from ...core.pydantic_config import ApiModel
+from ...core.settings import get_settings
 from ...core.slug import ensure_unique_slug, slugify
 from ...db.models import (
     Brand,
     Category,
+    ClickIntent,
     Edit,
     EditProduct,
     Product,
@@ -40,6 +42,7 @@ from ...db.models import (
     ProductImage,
     ProductRetailerListing,
     ProductVariant,
+    WardrobeItem,
 )
 from ...db.session import get_db
 from ...services import audit_service
@@ -699,6 +702,59 @@ async def admin_delete(
     if result.rowcount == 0:
         raise HTTPException(404, "Product not found")
     await audit_service.record(actorId=user.id, action="product.archive", targetType="product", targetId=product_id)
+    return Response(status_code=204)
+
+
+@router.delete(
+    "/{product_id}/permanent", status_code=204, response_class=Response, dependencies=AdminDeps
+)
+async def admin_delete_permanent(
+    product_id: str,
+    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
+    db: DbDep,
+) -> Response:
+    """Hard-delete a product: remove the row and all its data permanently, and
+    reclaim its image files from object storage.
+
+    Unlike ``admin_delete`` (which only archives), this is irreversible. Most
+    child rows are removed by DB cascades (variants, images, retailer listings +
+    affiliate links, click events + conversions, wishlist items, category links,
+    edit links). Two relations are handled explicitly here:
+      - ``WardrobeItem`` has ``onDelete: Restrict`` and would otherwise block the
+        delete, so those rows are removed first (the product leaves users'
+        wardrobes).
+      - ``ClickIntent`` stores ``productId`` with no FK, so it is swept manually
+        to avoid orphan rows.
+    R2/S3 objects are deleted best-effort *after* the DB commit succeeds.
+    """
+    from starlette.concurrency import run_in_threadpool
+
+    from ...integrations import s3
+
+    exists = (await db.execute(select(Product.id_).where(Product.id_ == product_id))).scalar_one_or_none()
+    if not exists:
+        raise HTTPException(404, "Product not found")
+
+    # Collect image URLs before deletion so we can purge the objects afterwards.
+    image_urls = (
+        await db.execute(select(ProductImage.url).where(ProductImage.productId == product_id))
+    ).scalars().all()
+
+    # Clear the blocking / non-cascading relations, then delete the product.
+    await db.execute(delete(WardrobeItem).where(WardrobeItem.productId == product_id))
+    await db.execute(delete(ClickIntent).where(ClickIntent.productId == product_id))
+    await db.execute(delete(Product).where(Product.id_ == product_id))
+    await db.commit()
+
+    # Best-effort storage cleanup (never blocks the delete; skips external URLs).
+    settings = get_settings()
+    keys = [k for url in image_urls if (k := s3.key_from_url(settings, url))]
+    if keys:
+        await run_in_threadpool(s3.delete_objects, keys)
+
+    await audit_service.record(
+        actorId=user.id, action="product.delete.permanent", targetType="product", targetId=product_id
+    )
     return Response(status_code=204)
 
 

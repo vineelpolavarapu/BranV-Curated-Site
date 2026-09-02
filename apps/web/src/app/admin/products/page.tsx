@@ -57,6 +57,18 @@ export default function ProductsAdminPage() {
     else alert(result.error ?? 'Failed to archive');
   }
 
+  async function onPermanentDelete(id: string) {
+    if (
+      !confirm(
+        'Permanently delete this product and its images? This removes it from the database and storage, and cannot be undone.',
+      )
+    )
+      return;
+    const result = await apiFetch(`/admin/products/${id}/permanent`, { method: 'DELETE' });
+    if (result.ok) await refresh();
+    else alert(result.error ?? 'Failed to delete');
+  }
+
   return (
     <AdminShell
       title="Products"
@@ -164,8 +176,7 @@ export default function ProductsAdminPage() {
                           {p._count.variants} variants · {p._count.retailerListings} retailers
                           {primaryImage?.isAiGenerated && ' · AI hero'}
                         </p>
-                        <div className="mt-1 flex items-center justify-between gap-2">
-                          <div />
+                        <div className="mt-1 flex items-center justify-end gap-2">
                           {p.status !== 'ARCHIVED' && (
                             <button
                               onClick={() => onArchive(p.id)}
@@ -174,6 +185,12 @@ export default function ProductsAdminPage() {
                               Archive
                             </button>
                           )}
+                          <button
+                            onClick={() => onPermanentDelete(p.id)}
+                            className="inline-flex shrink-0 items-center justify-center rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -254,6 +271,12 @@ export default function ProductsAdminPage() {
                                 Archive
                               </button>
                             )}
+                            <button
+                              onClick={() => onPermanentDelete(p.id)}
+                              className="inline-flex items-center justify-center rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </td>
                       </tr>
