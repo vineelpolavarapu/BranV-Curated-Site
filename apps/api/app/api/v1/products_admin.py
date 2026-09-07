@@ -102,7 +102,6 @@ class RetailerListingInput(ApiModel):
     retailerDisplayName: str | None = Field(default=None, max_length=60)
     retailerProductUrl: str
     retailerImageUrl: str | None = None
-    rawPrice: float | None = Field(default=None)
     availabilityStatus: AvailabilityLit | None = None
 
 
@@ -535,7 +534,7 @@ async def admin_get(product_id: str, db: DbDep) -> dict[str, Any]:
     out["retailerListings"] = [
         {"id": l.id_, "retailer": l.retailer, "retailerDisplayName": l.retailerDisplayName,
          "retailerProductUrl": l.retailerProductUrl,
-         "retailerImageUrl": l.retailerImageUrl, "rawPrice": _dec(l.rawPrice),
+         "retailerImageUrl": l.retailerImageUrl,
          "availabilityStatus": l.availabilityStatus, "lastSyncedAt": _iso(l.lastSyncedAt)}
         for l in (await db.execute(
             select(ProductRetailerListing).where(ProductRetailerListing.productId == product_id)
@@ -624,7 +623,6 @@ async def admin_create(
             id_=_cuid(), productId=pid, retailer=l.retailer,
             retailerDisplayName=l.retailerDisplayName,
             retailerProductUrl=l.retailerProductUrl, retailerImageUrl=l.retailerImageUrl,
-            rawPrice=Decimal(str(l.rawPrice)) if l.rawPrice is not None else None,
             availabilityStatus=l.availabilityStatus or "IN_STOCK",
             syncFailedCount=0,
             createdAt=now, updatedAt=now,
@@ -912,7 +910,6 @@ async def admin_add_listing(
         id_=lid, productId=product_id, retailer=payload.retailer,
         retailerDisplayName=payload.retailerDisplayName,
         retailerProductUrl=payload.retailerProductUrl, retailerImageUrl=payload.retailerImageUrl,
-        rawPrice=Decimal(str(payload.rawPrice)),
         availabilityStatus=payload.availabilityStatus or "IN_STOCK",
         syncFailedCount=0,
         createdAt=now, updatedAt=now,

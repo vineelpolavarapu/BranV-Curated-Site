@@ -308,7 +308,6 @@ model ProductRetailerListing {
   retailerDisplayName String?
   retailerProductUrl String
   retailerImageUrl   String?
-  rawPrice           Decimal?           @db.Decimal(12, 2)
   lastSyncedAt       DateTime?
   /// Increments on each failed sync; reset to 0 on success. After 3
   /// consecutive failures the listing is flagged for admin review.

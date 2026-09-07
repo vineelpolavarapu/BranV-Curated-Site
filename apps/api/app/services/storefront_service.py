@@ -150,11 +150,11 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
             })()
         secondary = next((i for i in retailer_images if not i.isPrimary), None) or (retailer_images[0] if retailer_images else None)
 
-        sorted_listings = sorted(
-            p_listings,
-            key=lambda x: float(x.rawPrice) if x.rawPrice is not None else 0
-        )
-        best_listing = sorted_listings[0] if sorted_listings else None
+        # Price was removed from the schema, so "best" listing can no longer be
+        # the cheapest. Prefer the product's primary retailer, else the first.
+        best_listing = next(
+            (l for l in p_listings if l.retailer == p.primaryRetailer), None
+        ) or (p_listings[0] if p_listings else None)
         best_affiliate = link_map.get(best_listing.id_) if best_listing else None
 
         sizes = sorted(list(set(v.size for v in p_variants if v.size)))
@@ -223,7 +223,6 @@ async def _hydrate_cards(db: AsyncSession, products: list[Product]) -> list[dict
                 {
                     "retailer": l.retailer,
                     "retailerDisplayName": l.retailerDisplayName,
-                    "rawPrice": float(l.rawPrice) if l.rawPrice is not None else None,
                     "availabilityStatus": l.availabilityStatus,
                     "affiliateUrl": link_map.get(l.id_).convertedUrl if link_map.get(l.id_) else l.retailerProductUrl,
                     "affiliatePartner": link_map.get(l.id_).partner if link_map.get(l.id_) else None,

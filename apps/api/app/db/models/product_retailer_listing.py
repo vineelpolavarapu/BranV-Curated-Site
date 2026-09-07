@@ -6,9 +6,8 @@ Do NOT edit by hand - re-run scripts/generate_sa_models.py.
 from __future__ import annotations
 
 from datetime import datetime
-from decimal import Decimal
 
-from sqlalchemy import Enum as SAEnum, Index, Integer, Numeric, TIMESTAMP, Text, UniqueConstraint, text
+from sqlalchemy import Enum as SAEnum, Index, Integer, TIMESTAMP, Text, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..enums import AvailabilityStatus
@@ -24,7 +23,6 @@ class ProductRetailerListing(Base):
     retailerDisplayName: Mapped[str | None] = mapped_column(Text, nullable=True, name='retailerDisplayName')
     retailerProductUrl: Mapped[str] = mapped_column(Text, nullable=False, name='retailerProductUrl')
     retailerImageUrl: Mapped[str | None] = mapped_column(Text, nullable=True, name='retailerImageUrl')
-    rawPrice: Mapped[Decimal | None] = mapped_column(Numeric(12, 2), nullable=True, name='rawPrice')
     lastSyncedAt: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='lastSyncedAt')
     syncFailedCount: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'), name='syncFailedCount')
     availabilityStatus: Mapped[AvailabilityStatus] = mapped_column(SAEnum(AvailabilityStatus, name="AvailabilityStatus", create_type=False, native_enum=True), nullable=False, server_default=text('IN_STOCK'), name='availabilityStatus')

@@ -49,7 +49,6 @@ interface ProductDetail {
     retailerDisplayName: string | null;
     retailerProductUrl: string;
     retailerImageUrl: string | null;
-    rawPrice: string | null;
     availabilityStatus: string;
   }>;
   edits: Array<{ id: string; slug: string; title: string }>;
@@ -746,7 +745,6 @@ function RetailerListingsPanel({
   const [retailerDisplayName, setRetailerDisplayName] = useState('');
   const [url, setUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [rawPrice, setRawPrice] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   async function onAdd(e: FormEvent) {
@@ -761,7 +759,6 @@ function RetailerListingsPanel({
           retailerDisplayName: retailer === 'other' ? retailerDisplayName || undefined : undefined,
           retailerProductUrl: url,
           retailerImageUrl: imageUrl || undefined,
-          rawPrice: rawPrice ? Number(rawPrice) : undefined,
         }),
       },
     );
@@ -774,7 +771,6 @@ function RetailerListingsPanel({
     setRetailerDisplayName('');
     setUrl('');
     setImageUrl('');
-    setRawPrice('');
     onChanged();
   }
 
@@ -801,7 +797,6 @@ function RetailerListingsPanel({
             >
               <div className="min-w-0 break-words">
                 <strong className="capitalize">{l.retailerDisplayName || l.retailer}</strong>
-                {l.rawPrice && <span className="ml-2">₹{l.rawPrice}</span>}
                 <span className="ml-2 text-xs text-content-soft">
                   {l.availabilityStatus.replaceAll('_', ' ').toLowerCase()}
                 </span>
@@ -852,16 +847,6 @@ function RetailerListingsPanel({
               className={`${adminInput} mt-2`}
             />
           )}
-        </div>
-        <div>
-          <label className={adminLabel}>Raw price (₹)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={rawPrice}
-            onChange={(e) => setRawPrice(e.target.value)}
-            className={adminInput}
-          />
         </div>
         <div className="md:col-span-2">
           <label className={adminLabel}>Retailer product URL</label>
