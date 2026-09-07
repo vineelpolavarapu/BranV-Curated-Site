@@ -7,6 +7,7 @@ import { apiFetch } from '@/lib/api';
 import { uploadFileToStorage } from '@/lib/upload-helper';
 import { Page, ProductStatus } from '@/lib/admin-types';
 import { EditAdmin } from '@/lib/phase7-types';
+import { VISIBILITY_CATEGORIES } from '@/lib/visibility-categories';
 import {
   AdminShell,
   adminButtonDanger,
@@ -52,6 +53,7 @@ interface ProductDetail {
     availabilityStatus: string;
   }>;
   edits: Array<{ id: string; slug: string; title: string }>;
+  visibilityCategorySlugs?: string[];
 }
 
 export default function EditProductPage() {
@@ -98,6 +100,10 @@ export default function EditProductPage() {
 
       <div className="mt-8">
         <EditsPanel product={product} onChanged={reload} />
+      </div>
+
+      <div className="mt-8">
+        <VisibilityPanel product={product} onChanged={reload} />
       </div>
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -328,6 +334,83 @@ function EditsPanel({
           className={adminButtonPrimary}
         >
           {submitting ? 'Saving…' : 'Save collections'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function VisibilityPanel({
+  product,
+  onChanged,
+}: {
+  product: ProductDetail;
+  onChanged: () => void;
+}) {
+  const [slugs, setSlugs] = useState<string[]>(product.visibilityCategorySlugs ?? []);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  function toggle(slug: string) {
+    setSaved(false);
+    setSlugs((prev) =>
+      prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug],
+    );
+  }
+
+  async function onSave() {
+    setSubmitting(true);
+    setError(null);
+    // Send [] (not undefined) so clearing all boxes removes every link.
+    const result = await apiFetch(`/admin/products/${product.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ visibilityCategorySlugs: slugs }),
+    });
+    setSubmitting(false);
+    if (!result.ok) {
+      setError(result.error ?? 'Save failed');
+      return;
+    }
+    setSaved(true);
+    onChanged();
+  }
+
+  return (
+    <div className={adminCard}>
+      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wider text-content-soft">
+        Product Visibility
+      </h2>
+      <p className="mb-4 text-xs text-content-soft">
+        Also show this product on these category / collection landing pages (in
+        addition to its primary category).
+      </p>
+      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+        {VISIBILITY_CATEGORIES.map((cat) => (
+          <label
+            key={cat.slug}
+            className="inline-flex items-center gap-2 text-sm text-content select-none cursor-pointer hover:text-primary"
+          >
+            <input
+              type="checkbox"
+              checked={slugs.includes(cat.slug)}
+              onChange={() => toggle(cat.slug)}
+              className="h-4 w-4"
+            />
+            <span>{cat.name}</span>
+          </label>
+        ))}
+      </div>
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+      <div className="mt-4 flex items-center justify-end gap-3">
+        {saved && <span className="text-xs text-content-soft">Saved ✓</span>}
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={submitting}
+          className={adminButtonPrimary}
+        >
+          {submitting ? 'Saving…' : 'Save visibility'}
         </button>
       </div>
     </div>

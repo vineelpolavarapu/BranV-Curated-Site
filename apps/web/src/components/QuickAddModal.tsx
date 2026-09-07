@@ -16,6 +16,7 @@ import { apiFetch } from '@/lib/api';
 import { uploadFileToStorage } from '@/lib/upload-helper';
 import { AffiliatePartner, Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { VISIBILITY_CATEGORIES } from '@/lib/visibility-categories';
 import {
   adminButtonPrimary,
   adminButtonSecondary,
@@ -115,6 +116,14 @@ export function QuickAddModal({
   const [flash, setFlash] = useState<string | null>(null);
   const [showNewBrand, setShowNewBrand] = useState(false);
   const [showVisibility, setShowVisibility] = useState(false);
+  // Extra category landing pages this product should appear on (slugs).
+  const [visibilitySlugs, setVisibilitySlugs] = useState<string[]>([]);
+
+  function toggleVisibility(slug: string) {
+    setVisibilitySlugs((prev) =>
+      prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug],
+    );
+  }
 
   // Map server URLs → local blob URLs for instant preview
   const [blobPreviews, setBlobPreviews] = useState<Record<string, string>>({});
@@ -427,6 +436,7 @@ const DEFAULT_BRANDS = [
       imageUrls: form.imageUrls.length > 0 ? form.imageUrls : undefined,
       status: form.status,
       affiliatePartner: form.affiliatePartner,
+      visibilityCategorySlugs: visibilitySlugs.length ? visibilitySlugs : undefined,
     };
 
     const result = await apiFetch<{
@@ -456,6 +466,7 @@ const DEFAULT_BRANDS = [
     if (bulkMode) {
       // Clear and refocus URL for the next product.
       setForm({ ...EMPTY, status: form.status });
+      setVisibilitySlugs([]);
       setAutofillSource(null);
       setTimeout(() => {
         urlInputRef.current?.focus();
@@ -481,6 +492,7 @@ const DEFAULT_BRANDS = [
     });
     setBlobPreviews({});
     setForm(EMPTY);
+    setVisibilitySlugs([]);
     setAutofillSource(null);
   }
 
@@ -695,19 +707,15 @@ const DEFAULT_BRANDS = [
             </button>
             {showVisibility && (
               <div className="mt-3 border-t border-slate-200/60 pt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {[
-                  'Trendy Wear', 'Sports Wear', 'Classic Essentials', 'Easy Casuals',
-                  'Fashion Forward', 'Sharp Formals', 'Shirts', 'T-Shirts', 'Jeans',
-                  'Tracks', 'Footwear', 'Watches', 'Trousers', 'Shorts', 'Jackets',
-                  'Inners', 'Sweatshirts', 'Hoodies'
-                ].map((cat) => (
-                  <label key={cat} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
+                {VISIBILITY_CATEGORIES.map((cat) => (
+                  <label key={cat.slug} className="inline-flex items-center gap-2 text-xs font-medium text-slate-700 select-none cursor-pointer hover:text-primary">
                     <input
                       type="checkbox"
-                      defaultChecked={false}
+                      checked={visibilitySlugs.includes(cat.slug)}
+                      onChange={() => toggleVisibility(cat.slug)}
                       className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
                     />
-                    <span>{cat}</span>
+                    <span>{cat.name}</span>
                   </label>
                 ))}
               </div>

@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
+import { VISIBILITY_CATEGORIES } from '@/lib/visibility-categories';
 import { EditAdmin } from '@/lib/phase7-types';
 import {
   AdminShell,
@@ -16,30 +17,6 @@ import {
 } from '@/components/AdminShell';
 
 const FALLBACK_BRAND_SLUG = 'unbranded';
-
-// Extra category / collection landing pages a product can be surfaced on via
-// the "Product Visibility" checkboxes. Slugs must match the category rows so
-// the backend can resolve them (see product_category_links).
-const VISIBILITY_CATEGORIES: { name: string; slug: string }[] = [
-  { name: 'Trendy Wear', slug: 'trendy-wear' },
-  { name: 'Sports Wear', slug: 'sports-wear' },
-  { name: 'Classic Essentials', slug: 'classic-essentials' },
-  { name: 'Easy Casuals', slug: 'easy-casuals' },
-  { name: 'Fashion Forward', slug: 'fashion-forward' },
-  { name: 'Sharp Formals', slug: 'sharp-formals' },
-  { name: 'Shirts', slug: 'shirts' },
-  { name: 'T-Shirts', slug: 't-shirts' },
-  { name: 'Jeans', slug: 'jeans' },
-  { name: 'Tracks', slug: 'tracks' },
-  { name: 'Footwear', slug: 'footwear' },
-  { name: 'Watches', slug: 'watches' },
-  { name: 'Trousers', slug: 'trousers' },
-  { name: 'Shorts', slug: 'shorts' },
-  { name: 'Jackets', slug: 'jackets' },
-  { name: 'Inners', slug: 'inners' },
-  { name: 'Sweatshirts', slug: 'sweatshirts' },
-  { name: 'Hoodies', slug: 'hoodies' },
-];
 
 export default function NewProductPage() {
   const router = useRouter();

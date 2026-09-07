@@ -316,6 +316,9 @@ class QuickAddRequest(ApiModel):
     imageUrls: list[str] | None = Field(default=None)
     status: ProductStatusLit | None = None
     affiliatePartner: ManualAffiliatePartnerLit | None = None
+    # Extra category/collection landing pages this product should also appear on
+    # (the "Product Visibility" checkboxes). Slugs, e.g. ["easy-casuals"].
+    visibilityCategorySlugs: list[str] | None = Field(default=None, max_length=40)
 
 
 @router.post("/quick-add", status_code=201, dependencies=AdminDeps)
@@ -456,6 +459,13 @@ async def quick_add(
             createdAt=now, updatedAt=now,
         ))
 
+        # 7. Extra category-visibility links (the "Product Visibility"
+        # checkboxes). Same join-table the full create/update forms write, so a
+        # Quick-Add product lands on the collection landing pages too.
+        await _sync_visibility_links(
+            db, product_id=pid, slugs=payload.visibilityCategorySlugs, now=now
+        )
+
         await db.commit()
     except HTTPException:
         await db.rollback()
@@ -540,6 +550,13 @@ async def admin_get(product_id: str, db: DbDep) -> dict[str, Any]:
             select(ProductRetailerListing).where(ProductRetailerListing.productId == product_id)
         )).scalars().all()
     ]
+    # Current "Product Visibility" selections (extra category landing pages),
+    # as category slugs so the edit form can pre-check the right boxes.
+    out["visibilityCategorySlugs"] = (await db.execute(
+        select(Category.slug)
+        .join(ProductCategoryLink, ProductCategoryLink.categoryId == Category.id_)
+        .where(ProductCategoryLink.productId == product_id)
+    )).scalars().all()
     return out
 
 
