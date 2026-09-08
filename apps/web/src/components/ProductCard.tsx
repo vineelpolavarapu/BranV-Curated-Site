@@ -218,7 +218,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
         {/* Amount visibility removed per Task 4 */}
 
         {product.buyNow && (
-          <div className="mt-1 translate-y-1.5 opacity-0 transition-[opacity,transform] duration-200 group-hover:translate-y-0 group-hover:opacity-100">
+          <div className="mt-1">
             <BuyNowButton
               href={resolveBuyNowHref(product.buyNow)}
               retailer={product.buyNow.retailer}

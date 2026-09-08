@@ -936,6 +936,46 @@ async def admin_add_listing(
     return {"id": lid}
 
 
+class RetailerListingUpdateInput(ApiModel):
+    retailer: str | None = Field(default=None, min_length=1, max_length=40)
+    retailerDisplayName: str | None = Field(default=None, max_length=60)
+    retailerProductUrl: str | None = None
+    retailerImageUrl: str | None = None
+    availabilityStatus: AvailabilityLit | None = None
+
+
+@router.patch("/{product_id}/retailer-listings/{listing_id}", dependencies=AdminDeps)
+async def admin_update_listing(
+    product_id: str, listing_id: str,
+    payload: RetailerListingUpdateInput,
+    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
+    db: DbDep,
+) -> dict[str, Any]:
+    """Edit an existing retailer listing (e.g. change the product / buy link)."""
+    existing = (await db.execute(
+        select(ProductRetailerListing).where(
+            ProductRetailerListing.id_ == listing_id,
+            ProductRetailerListing.productId == product_id,
+        )
+    )).scalar_one_or_none()
+    if not existing:
+        raise HTTPException(404, "Retailer listing not found")
+    values: dict[str, Any] = {"updatedAt": _now()}
+    for k in ("retailer", "retailerDisplayName", "retailerProductUrl",
+              "retailerImageUrl", "availabilityStatus"):
+        v = getattr(payload, k)
+        if v is not None:
+            values[k] = v
+    await db.execute(
+        update(ProductRetailerListing)
+        .where(ProductRetailerListing.id_ == listing_id, ProductRetailerListing.productId == product_id)
+        .values(**values)
+    )
+    await db.commit()
+    await audit_service.record(actorId=user.id, action="product.listing.update", targetType="product", targetId=product_id)
+    return {"id": listing_id}
+
+
 @router.delete(
     "/{product_id}/retailer-listings/{listing_id}", status_code=204, response_class=Response, dependencies=AdminDeps
 )

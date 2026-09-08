@@ -5,7 +5,8 @@ import Image from 'next/image';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '@/lib/api';
 import { uploadFileToStorage } from '@/lib/upload-helper';
-import { Page, ProductStatus } from '@/lib/admin-types';
+import { Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
+import { SHOP_CATEGORIES } from '@/lib/shop-categories';
 import { EditAdmin } from '@/lib/phase7-types';
 import { VISIBILITY_CATEGORIES } from '@/lib/visibility-categories';
 import {
@@ -118,6 +119,8 @@ export default function EditProductPage() {
   );
 }
 
+const FALLBACK_BRAND_SLUG = 'unbranded';
+
 function BasicsForm({
   product,
   onSaved,
@@ -139,12 +142,85 @@ function BasicsForm({
 
   const [title, setTitle] = useState(product.title);
   const [status, setStatus] = useState<ProductStatus>(product.status);
+  const [brandId, setBrandId] = useState(product.brand.id);
+  const [categoryId, setCategoryId] = useState(product.category.id);
+  const [subcategoryId, setSubcategoryId] = useState(product.subcategory?.id ?? '');
   const [description, setDescription] = useState(product.description ?? '');
   const [tags, setTags] = useState(product.tags.join(', '));
   const [feature, setFeature] = useState(featuredActive);
   const [featureDays, setFeatureDays] = useState<number>(remainingDays);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<CategoryNode[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      let brandList: Brand[] = [];
+      const [bAdmin, c] = await Promise.all([
+        apiFetch<any>('/admin/brands?pageSize=200'),
+        apiFetch<CategoryNode[]>('/admin/categories'),
+      ]);
+      if (bAdmin.ok && bAdmin.data) {
+        const list = Array.isArray(bAdmin.data) ? bAdmin.data : bAdmin.data.data;
+        if (Array.isArray(list) && list.length > 0) brandList = list;
+      }
+      if (brandList.length === 0) {
+        const bPublic = await apiFetch<any>('/brands');
+        if (bPublic.ok && bPublic.data) {
+          const list = Array.isArray(bPublic.data) ? bPublic.data : bPublic.data.data;
+          if (Array.isArray(list) && list.length > 0) brandList = list;
+        }
+      }
+      setBrands(brandList);
+      if (c.ok && c.data) setCategories(c.data);
+    })();
+  }, []);
+
+  const l1 = (() => {
+    const apiL1 = categories.filter((c) => !c.parentId);
+    const existingSlugs = new Set(apiL1.map((c) => c.slug));
+    const merged = [...apiL1];
+    for (const sc of SHOP_CATEGORIES) {
+      if (!existingSlugs.has(sc.slug)) {
+        merged.push({
+          id: sc.slug,
+          parentId: null,
+          slug: sc.slug,
+          name: sc.name,
+          path: sc.slug,
+          displayOrder: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        } as CategoryNode);
+      }
+    }
+    return merged;
+  })();
+
+  const l2 = (() => {
+    const fromApi = categories.filter((c) => c.parentId === categoryId);
+    if (fromApi.length > 0) return fromApi;
+
+    const selectedCat = l1.find((c) => c.id === categoryId || c.slug === categoryId);
+    if (!selectedCat) return [];
+
+    const shopCat = SHOP_CATEGORIES.find(
+      (sc) => sc.slug === selectedCat.slug || sc.name.toLowerCase() === selectedCat.name.toLowerCase(),
+    );
+    if (!shopCat || !shopCat.subcategories) return [];
+
+    return shopCat.subcategories.map((sub) => ({
+      id: sub.slug,
+      parentId: selectedCat.id,
+      slug: sub.slug,
+      name: sub.name,
+      path: `${selectedCat.slug}/${sub.slug}`,
+      displayOrder: 0,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })) as CategoryNode[];
+  })();
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -153,6 +229,9 @@ function BasicsForm({
     const body = {
       title,
       status,
+      brandId: brandId || undefined,
+      categoryId: categoryId || undefined,
+      subcategoryId: subcategoryId || null,
       description: description || null,
       tags: tags
         ? tags.split(',').map((t) => t.trim()).filter(Boolean)
@@ -185,6 +264,63 @@ function BasicsForm({
           onChange={(e) => setTitle(e.target.value)}
           className={adminInput}
         />
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
+          <label className={adminLabel}>Brand</label>
+          <select
+            value={brandId}
+            onChange={(e) => setBrandId(e.target.value)}
+            className={adminInput}
+          >
+            {brands.length === 0 && (
+              <option value={product.brand.id}>{product.brand.name}</option>
+            )}
+            {brands
+              .filter((b) => b.slug !== FALLBACK_BRAND_SLUG)
+              .map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+          </select>
+        </div>
+        <div>
+          <label className={adminLabel}>Category</label>
+          <select
+            value={categoryId}
+            onChange={(e) => {
+              setCategoryId(e.target.value);
+              setSubcategoryId('');
+            }}
+            className={adminInput}
+          >
+            {l1.length === 0 && (
+              <option value={product.category.id}>{product.category.name}</option>
+            )}
+            {l1.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={adminLabel}>Subcategory</label>
+          <select
+            value={subcategoryId}
+            onChange={(e) => setSubcategoryId(e.target.value)}
+            disabled={!categoryId}
+            className={adminInput}
+          >
+            <option value="">- none -</option>
+            {l2.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <div>
@@ -829,6 +965,34 @@ function RetailerListingsPanel({
   const [url, setUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editUrl, setEditUrl] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  function startEdit(l: ProductDetail['retailerListings'][number]) {
+    setEditingId(l.id);
+    setEditUrl(l.retailerProductUrl);
+  }
+
+  async function onSaveEdit(listingId: string) {
+    if (!editUrl) return;
+    setSavingEdit(true);
+    const result = await apiFetch(
+      `/admin/products/${product.id}/retailer-listings/${listingId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ retailerProductUrl: editUrl }),
+      },
+    );
+    setSavingEdit(false);
+    if (!result.ok) {
+      alert(result.error ?? 'Failed to update link');
+      return;
+    }
+    setEditingId(null);
+    setEditUrl('');
+    onChanged();
+  }
 
   async function onAdd(e: FormEvent) {
     e.preventDefault();
@@ -876,28 +1040,63 @@ function RetailerListingsPanel({
           {product.retailerListings.map((l) => (
             <li
               key={l.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded border border-line px-3 py-2 text-sm"
+              className="rounded border border-line px-3 py-2 text-sm"
             >
-              <div className="min-w-0 break-words">
-                <strong className="capitalize">{l.retailerDisplayName || l.retailer}</strong>
-                <span className="ml-2 text-xs text-content-soft">
-                  {l.availabilityStatus.replaceAll('_', ' ').toLowerCase()}
-                </span>
-                <a
-                  href={l.retailerProductUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="ml-2 text-xs text-content-soft underline"
-                >
-                  open
-                </a>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0 break-words">
+                  <strong className="capitalize">{l.retailerDisplayName || l.retailer}</strong>
+                  <span className="ml-2 text-xs text-content-soft">
+                    {l.availabilityStatus.replaceAll('_', ' ').toLowerCase()}
+                  </span>
+                  <a
+                    href={l.retailerProductUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="ml-2 text-xs text-content-soft underline"
+                  >
+                    open
+                  </a>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      editingId === l.id ? setEditingId(null) : startEdit(l)
+                    }
+                    className={adminButtonSecondary}
+                  >
+                    {editingId === l.id ? 'Close' : 'Edit link'}
+                  </button>
+                  <button
+                    onClick={() => onDelete(l.id)}
+                    className={adminButtonDanger}
+                  >
+                    Remove
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => onDelete(l.id)}
-                className={`${adminButtonDanger} shrink-0`}
-              >
-                Remove
-              </button>
+              {editingId === l.id && (
+                <div className="mt-3 border-t border-line pt-3">
+                  <label className={adminLabel}>Product link (buy URL)</label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="url"
+                      value={editUrl}
+                      onChange={(e) => setEditUrl(e.target.value)}
+                      placeholder="https://…"
+                      className={`${adminInput} min-w-0 flex-1`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void onSaveEdit(l.id)}
+                      disabled={savingEdit || !editUrl}
+                      className={adminButtonPrimary}
+                    >
+                      {savingEdit ? 'Saving…' : 'Save link'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>
