@@ -56,12 +56,23 @@ services:
   # The FastAPI app does not own the schema - Prisma still owns it (the Python
   # SQLAlchemy models are read-only auto-generated views of the Prisma schema).
   migrate:
-    # node:20-alpine (musl libc) lacks the OpenSSL variant Prisma's schema
-    # engine binary needs - it crashes on startup and its error text gets fed
-    # into the JSON parser instead of a real response ("Could not parse
-    # schema engine response... 'Error load'... is not valid JSON"). Use
-    # bullseye-slim (glibc) and install openssl/ca-certificates explicitly.
-    image: node:20-bullseye-slim
+    # Prisma's schema-engine binary needs OpenSSL (glibc). Use the FULL Debian
+    # node image (node:20-bullseye), which already ships openssl +
+    # ca-certificates - NOT the -slim variant, which strips them.
+    #
+    # Previously this used node:20-bullseye-slim and ran a runtime
+    # `apt-get update && apt-get install openssl ca-certificates` here on every
+    # deploy. That made the migration depend on reaching the Debian mirrors from
+    # the 1 GB VM at deploy time: any transient mirror/DNS hiccup made apt-get
+    # exit 100, and because that happens BEFORE `prisma migrate deploy` ever
+    # runs, the container died with a bare "exit 100" and no Prisma error output
+    # at all (the exact "started then failed silently" symptom). Baking OpenSSL
+    # into the image removes that entire failure mode - no apt-get at deploy time.
+    #
+    # (node:20-alpine is musl and ships the wrong OpenSSL variant - it crashes
+    # the schema engine with a "Could not parse schema engine response" JSON
+    # error - so it can't be used here either.)
+    image: node:20-bullseye
     restart: "no"
     volumes:
       - ./prisma:/prisma:ro
@@ -72,7 +83,6 @@ services:
       - sh
       - -c
       - |
-        apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates && \
         npx --yes prisma@5 migrate deploy --schema=/prisma/schema.prisma
     depends_on:
       postgres:
