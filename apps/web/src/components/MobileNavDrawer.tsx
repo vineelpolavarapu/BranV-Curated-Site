@@ -95,7 +95,7 @@ export function MobileNavDrawer({ overlay = false }: { overlay?: boolean }) {
                       className="bv-nav-logo inline-flex items-center gap-0 text-l font-semibold tracking-tight leading-none"
                     >
                       <img
-                        src="/hero/logo.webp"
+                        src="/hero/logo.png"
                         alt="BranV"
                         className="h-10 w-10 object-contain translate-y-1"
                       />
