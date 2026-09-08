@@ -8,4 +8,8 @@
   the catalog physically cannot surface a price to the recommendation agent.
 */
 -- AlterTable
-ALTER TABLE "product_retailer_listings" DROP COLUMN "rawPrice";
+-- Idempotent: prod had `rawPrice` removed out-of-band before this migration
+-- ran, so a bare `DROP COLUMN` errored ("column ... does not exist") and failed
+-- the deploy. `IF EXISTS` makes the drop a no-op when the column is already
+-- gone, so the migration applies cleanly regardless of the DB's current state.
+ALTER TABLE "product_retailer_listings" DROP COLUMN IF EXISTS "rawPrice";
