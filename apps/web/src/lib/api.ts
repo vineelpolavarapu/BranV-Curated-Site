@@ -5,6 +5,15 @@
 const BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:5000/api';
 
+/**
+ * Absolute URL for the admin image-preview proxy. Used to display remote retailer
+ * images that block hotlinking in the browser (the proxy fetches them server-side
+ * with the right headers and streams them back). Preview-only — stores nothing.
+ */
+export function apiImageProxyUrl(remoteUrl: string): string {
+  return `${BASE}/admin/products/image-proxy?url=${encodeURIComponent(remoteUrl)}`;
+}
+
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('branv_access_token');

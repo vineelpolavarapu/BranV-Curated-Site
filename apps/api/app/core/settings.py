@@ -85,9 +85,22 @@ class Settings(BaseSettings):
 
     # ---- Sync tuning ----
     PRICE_SYNC_DRIFT_THRESHOLD_PCT: int = 5
+    # A realistic desktop-Chrome UA. Retailers block obvious bot UAs, so image
+    # scraping/ingestion must look like a normal browser. Kept overridable via env.
     SCRAPER_USER_AGENT: str = (
-        "Mozilla/5.0 (compatible; BranVBot/1.0; +https://branv.local/bot)"
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
     )
+
+    # ---- Scraper tuning ----
+    SCRAPER_TIMEOUT: float = 20.0
+    SCRAPER_MAX_IMAGES: int = 8
+    # Enable the free Playwright headless fallback (renders SPA pages / follows JS
+    # redirects) when static extraction comes back empty. Off by default so the base
+    # image stays lean; turn on where a real browser is installed.
+    SCRAPER_RENDER_JS: bool = False
+    # Max redirect hops when unwrapping affiliate / shortener links.
+    SCRAPER_MAX_REDIRECT_HOPS: int = 5
 
     # ---- Python-service-only (no Nest equivalent) ----
     SCHEDULER_OWNER: Literal["fastapi", "nest", "none"] = "none"

@@ -12,7 +12,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { apiFetch } from '@/lib/api';
+import { apiFetch, apiImageProxyUrl } from '@/lib/api';
 import { uploadFileToStorage } from '@/lib/upload-helper';
 import { AffiliatePartner, Brand, CategoryNode, Page, ProductStatus } from '@/lib/admin-types';
 import { SHOP_CATEGORIES } from '@/lib/shop-categories';
@@ -34,6 +34,13 @@ interface ScrapeResult {
   primaryImageUrl: string | null;
   images?: string[] | null;
   source: string;
+  resolvedUrl?: string | null;
+  debug?: {
+    blocked?: boolean;
+    images_found?: number;
+    status?: number;
+    strategy_used?: string;
+  } | null;
 }
 
 interface PresignResult {
@@ -112,6 +119,7 @@ export function QuickAddModal({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autofillSource, setAutofillSource] = useState<string | null>(null);
+  const [scrapeInfo, setScrapeInfo] = useState<string | null>(null);
   const [pendingAffiliate, setPendingAffiliate] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
   const [showNewBrand, setShowNewBrand] = useState(false);
@@ -320,6 +328,15 @@ const DEFAULT_BRANDS = [
       if (match) set('brandId', match.id);
     }
     setAutofillSource(s.source);
+    // Surface what the scraper actually did so an empty gallery is never silent.
+    const foundCount = s.images?.length ?? 0;
+    if (s.debug?.blocked) {
+      setScrapeInfo('⚠ The retailer blocked the request. Try again, or paste image URLs / upload manually below.');
+    } else if (foundCount === 0) {
+      setScrapeInfo('⚠ No images found on that page. Paste image URLs or upload manually below.');
+    } else {
+      setScrapeInfo(`✓ Found ${foundCount} image${foundCount === 1 ? '' : 's'}. Review and pick a primary below.`);
+    }
   }
 
   // ── Image upload (direct multipart with presign fallback) ──
@@ -468,6 +485,7 @@ const DEFAULT_BRANDS = [
       setForm({ ...EMPTY, status: form.status });
       setVisibilitySlugs([]);
       setAutofillSource(null);
+      setScrapeInfo(null);
       setTimeout(() => {
         urlInputRef.current?.focus();
         setFlash(null);
@@ -552,9 +570,22 @@ const DEFAULT_BRANDS = [
                 {scraping ? 'Scraping…' : '🪄 Autofill'}
               </button>
             </div>
+            <p className="mt-1 text-xs text-content-soft">
+              Pulls all product images from the retailer — pick a primary and remove any you
+              don&apos;t want below before posting. Only the images you keep are stored.
+            </p>
             {autofillSource && (
               <p className="mt-1 text-xs text-success">
                 ✓ Autofilled from {autofillSource}
+              </p>
+            )}
+            {scrapeInfo && (
+              <p
+                className={`mt-1 text-xs ${
+                  scrapeInfo.startsWith('⚠') ? 'text-amber-600' : 'text-success'
+                }`}
+              >
+                {scrapeInfo}
               </p>
             )}
           </section>
@@ -757,34 +788,9 @@ const DEFAULT_BRANDS = [
             />
           </section>
 
-          {/* Retailer image preview */}
-          {form.retailerImageUrl && (
-            <section>
-              <label className={adminLabel}>
-                📸 Product Image (from {form.retailer})
-              </label>
-              <div className="flex items-center gap-3 rounded-lg border border-line bg-surface-muted p-3">
-                <Image
-                  src={form.retailerImageUrl}
-                  alt=""
-                  width={64}
-                  height={80}
-                  unoptimized
-                  className="rounded object-cover"
-                />
-                <span className="text-xs text-success">
-                  ✓ Extracted from {form.retailer}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => set('retailerImageUrl', '')}
-                  className="ml-auto text-xs text-content-soft underline"
-                >
-                  Remove
-                </button>
-              </div>
-            </section>
-          )}
+          {/* The scraped primary already appears in the gallery above (use ⭐ Set
+              Primary). retailerImageUrl is still carried in form state for the
+              retailer-listing thumbnail; no separate preview needed. */}
 
           {/* Affiliate */}
           <section>
@@ -935,6 +941,13 @@ function ImagePreviewCard({
   const displayUrl = previewUrl || url;
   // Use native <img> for blob: URLs since next/image doesn't handle them well
   const isBlobUrl = displayUrl.startsWith('blob:');
+  // Remote retailer images may block hotlinking → route through our preview proxy
+  // so every scraped image renders for selection. Skip our own R2 / local / blob URLs.
+  const isRemote = /^https?:\/\//i.test(displayUrl);
+  const isOurs =
+    displayUrl.includes('.r2.dev') || displayUrl.includes('r2.cloudflarestorage');
+  const renderSrc =
+    isRemote && !isOurs && !isBlobUrl ? apiImageProxyUrl(displayUrl) : displayUrl;
 
   return (
     <div
@@ -948,14 +961,14 @@ function ImagePreviewCard({
         isBlobUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
           <img
-            src={displayUrl}
+            src={renderSrc}
             alt=""
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={() => setHasError(true)}
           />
         ) : (
           <Image
-            src={displayUrl}
+            src={renderSrc}
             alt=""
             fill
             unoptimized

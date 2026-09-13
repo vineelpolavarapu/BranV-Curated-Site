@@ -1,11 +1,10 @@
 """
 Products admin CRUD - port of apps/api/src/products/products.controller.ts.
 
-This batch ships the core CRUD + sub-resource endpoints (images, variants,
-retailer-listings). The Quick Add atomic transaction is intentionally stubbed
-because it depends on the scrape + affiliate-convert integrations which are
-themselves mock-only in this turn - adding it without those would lie about
-what works.
+Ships the core CRUD + sub-resource endpoints (images, variants, retailer-listings),
+plus the Quick Add atomic transaction and the live scrape + affiliate-convert
+integrations. Scraped/pasted retailer image URLs are mirrored into our own R2 bucket
+on save (see `_rehost_image_urls`) so the storefront never hotlinks a retailer CDN.
 """
 
 from __future__ import annotations
@@ -79,6 +78,39 @@ def _iso(dt: datetime | None) -> str | None:
 
 def _dec(v) -> str | None:
     return None if v is None else str(v) if isinstance(v, Decimal) else str(Decimal(str(v)))
+
+
+async def _rehost_image_urls(
+    urls: list[str], *, ownerId: str | None = None, referer: str | None = None
+) -> list[str]:
+    """Mirror remote (retailer-CDN) image URLs into our own R2/S3 bucket and return
+    the rewritten list, preserving order.
+
+    Retailer CDNs enforce hotlink/referer protection and expiry, so storing their
+    URLs directly leaves broken images on the storefront. Every URL that isn't
+    already one of ours (or a local ``/uploads/`` path) is downloaded and re-hosted;
+    the returned list holds the R2 public URL on success and falls back to the
+    original URL when ingestion is unavailable (dev/mock) or fails, so a save never
+    loses an image. Ingestion runs concurrently across the gallery.
+    """
+    import asyncio
+
+    from ...integrations import s3
+
+    settings = get_settings()
+
+    async def _one(u: str) -> str:
+        if not u:
+            return u
+        # Already ours or a local dev path → leave untouched.
+        if s3.key_from_url(settings, u) is not None or u.startswith("/uploads/"):
+            return u
+        rehosted = await s3.ingest_remote_image(
+            u, kind="product-image", ownerId=ownerId, referer=referer
+        )
+        return rehosted or u
+
+    return list(await asyncio.gather(*(_one(u) for u in urls)))
 
 
 class VariantInput(ApiModel):
@@ -294,7 +326,39 @@ async def scrape_url(payload: ScrapeUrlRequest) -> dict[str, Any]:
         "sizes": result.sizes or [],
         "material": result.material,
         "retailer": result.retailer or detect_retailer(payload.url),
+        "resolvedUrl": result.resolvedUrl,
+        "debug": result.debug or {},
     }
+
+
+@router.get("/image-proxy")
+async def image_proxy(url: Annotated[str, Query(min_length=1, max_length=2048)]) -> Response:
+    """Stream a remote image back to the browser so admins can *preview* scraped
+    retailer images that block hotlinking (referer protection). Read-only,
+    image-only, SSRF-guarded; stores nothing on R2 — it just passes the bytes
+    through so the Quick Add gallery renders every candidate for selection.
+
+    Intentionally not behind AdminDeps: an <img>/next-image request is a plain
+    cross-site GET that can't carry the admin session cookie, so gating it on auth
+    would break the preview. The `is_safe_public_url` guard + image-only + size cap
+    keep it from being a useful open proxy / SSRF vector.
+    """
+    from ...integrations import s3
+
+    if not await s3.is_safe_public_url(url):
+        raise HTTPException(400, "URL not allowed")
+    fetched = await s3.fetch_remote_image_bytes(url, min_bytes=0)
+    if not fetched:
+        raise HTTPException(404, "Image could not be fetched")
+    content, content_type = fetched
+    return Response(
+        content=content,
+        media_type=content_type,
+        headers={
+            "Cache-Control": "private, max-age=3600",
+            "Access-Control-Allow-Origin": "*",
+        },
+    )
 
 
 class QuickAddRequest(ApiModel):
@@ -409,6 +473,13 @@ async def quick_add(
             all_image_urls.insert(0, payload.avatarImageUrl)
         if not all_image_urls and payload.retailerImageUrl:
             all_image_urls.append(payload.retailerImageUrl)
+
+        # Mirror any remote retailer-CDN URLs into our own R2 bucket so the storefront
+        # serves images we control (retailer CDNs hotlink-block / expire). Uses the
+        # source retailer page as Referer to defeat hotlink protection on download.
+        all_image_urls = await _rehost_image_urls(
+            all_image_urls, ownerId=pid, referer=payload.rawUrl
+        )
 
         for idx, img_url in enumerate(all_image_urls):
             db.add(ProductImage(
@@ -797,14 +868,16 @@ async def admin_add_image(
             .where(ProductImage.productId == product_id)
             .values(isPrimary=False)
         )
+    # Mirror remote retailer URLs into R2 before persisting (see _rehost_image_urls).
+    stored_url = (await _rehost_image_urls([payload.url], ownerId=product_id))[0]
     db.add(ProductImage(
-        id_=img_id, productId=product_id, url=payload.url, altText=payload.altText,
+        id_=img_id, productId=product_id, url=stored_url, altText=payload.altText,
         isPrimary=is_primary, isAiGenerated=bool(payload.isAiGenerated),
         position=payload.position or 0, createdAt=now,
     ))
     await db.commit()
     await audit_service.record(actorId=user.id, action="product.image.add", targetType="product", targetId=product_id)
-    return {"id": img_id, "url": payload.url}
+    return {"id": img_id, "url": stored_url}
 
 
 class BatchImagesInput(ApiModel):
@@ -825,8 +898,10 @@ async def admin_add_images_batch(
         select(func.count(ProductImage.id_)).where(ProductImage.productId == product_id)
     )).scalar() or 0
 
+    # Mirror remote retailer URLs into R2 before persisting (see _rehost_image_urls).
+    stored_urls = await _rehost_image_urls(list(payload.urls), ownerId=product_id)
     added = []
-    for idx, url in enumerate(payload.urls):
+    for idx, url in enumerate(stored_urls):
         img_id = _cuid()
         is_primary = (existing_count == 0 and idx == 0)
         db.add(ProductImage(
