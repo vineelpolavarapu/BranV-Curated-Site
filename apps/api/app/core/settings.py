@@ -94,7 +94,10 @@ class Settings(BaseSettings):
 
     # ---- Scraper tuning ----
     SCRAPER_TIMEOUT: float = 20.0
-    SCRAPER_MAX_IMAGES: int = 8
+    # At most 2 real product images per scrape: the main + one more, taken from static
+    # page data only. Keeps server load / R2 storage low and avoids needing a headless
+    # browser for full galleries — buyers see all photos on the retailer via "Buy".
+    SCRAPER_MAX_IMAGES: int = 2
     # Enable the free Playwright headless fallback (renders SPA pages / follows JS
     # redirects) when static extraction comes back empty. Off by default so the base
     # image stays lean; turn on where a real browser is installed.

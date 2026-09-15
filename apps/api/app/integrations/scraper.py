@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, urljoin, urlparse
 
 import httpx
 from selectolax.parser import HTMLParser
@@ -65,6 +65,19 @@ def detect_retailer(url: str) -> str:
         if needle in host:
             return name
     return "unknown"
+
+
+def _canonicalize_url(url: str, retailer: str) -> str:
+    """Strip marketing/tracking query params from a resolved product URL so the stored
+    buy link + Referer are clean. Flipkart product URLs only need ``pid``; the rest
+    (lid, marketplace, srno, otracker, …) are tracking noise."""
+    if retailer == "flipkart":
+        p = urlparse(url)
+        if "/p/" in p.path:
+            pid = parse_qs(p.query).get("pid", [None])[0]
+            base = f"{p.scheme}://{p.netloc}{p.path}"
+            return f"{base}?pid={pid}" if pid else base
+    return url
 
 
 # ───────────── affiliate / redirect unwrapping (generic) ────────────────────
@@ -152,17 +165,23 @@ def _browser_headers() -> dict[str, str]:
 
 async def _fetch_httpx(url: str) -> FetchResult:
     s = get_settings()
-    async with httpx.AsyncClient(
-        timeout=s.SCRAPER_TIMEOUT, follow_redirects=True, headers=_browser_headers()
-    ) as client:
-        r = await client.get(url)
-        blocked = r.status_code in (401, 403, 429, 503)
-        return FetchResult(
-            html=r.text if not blocked else "",
-            final_url=str(r.url),
-            status=r.status_code,
-            blocked=blocked,
-        )
+    try:
+        async with httpx.AsyncClient(
+            timeout=s.SCRAPER_TIMEOUT, follow_redirects=True, headers=_browser_headers()
+        ) as client:
+            r = await client.get(url)
+    except Exception as e:
+        # Marketplaces reset/drop connections from datacenter IPs as a bot defense.
+        # Degrade gracefully to a "blocked" result instead of crashing the scrape.
+        log.warning("fetch_httpx_network_error", extra={"url": url, "error": str(e)})
+        return FetchResult(html="", final_url=url, status=0, blocked=True)
+    blocked = r.status_code in (401, 403, 429, 503)
+    return FetchResult(
+        html=r.text if not blocked else "",
+        final_url=str(r.url),
+        status=r.status_code,
+        blocked=blocked,
+    )
 
 
 async def _fetch_headless(url: str) -> FetchResult | None:
@@ -245,7 +264,40 @@ _IMG_URL_IN_TEXT_RE = re.compile(
 _JUNK_TOKENS = (
     "sprite", "icon", "logo", "placeholder", "loader", "loading", "blank",
     "pixel", "spinner", "1x1", "transparent", "grey.", "gray.",
+    # Marketing / non-product creative that share-tags and carousels expose.
+    # (No "hero" — too collision-prone with legit product paths.)
+    "banner", "carousel", "seasonal", "promo", "swatch",
+    "advertisement", "/ads/",
 )
+
+# Hosts that serve brand banners / marketing assets, never the product photo.
+_JUNK_HOSTS = (
+    "static-assets-web.flixcart.com",   # Flipkart logo/brand banner
+    "myntrassets.blob.core.windows.net",  # Myntra seasonal/marketing banners
+    "constant.myntassets.com",           # Myntra static UI assets
+)
+
+# Positive allow-list: the CDN host(s) each retailer serves REAL product photos from.
+# When the retailer is recognized we keep ONLY images matching these — so a logo /
+# banner on any other host can never masquerade as the product. Each entry is
+# (host substring, required path substring or "").
+_PRODUCT_CDN: dict[str, tuple[tuple[str, str], ...]] = {
+    "flipkart": (("rukminim", "/image/"),),
+    "myntra": (("assets.myntassets.com", ""), ("images.myntra.com", "")),
+    "amazon": (("media-amazon.com", "/images/i/"), ("ssl-images-amazon.com", "/images/i/")),
+    "ajio": (("assets.ajio.com", ""),),
+    "meesho": (("images.meesho.com", ""),),
+    "nykaa": (("images-static.nykaa.com", ""), ("adn-static", "")),
+}
+
+
+def _is_product_cdn(url: str, retailer: str) -> bool:
+    """True when `url` is on the retailer's real product-image CDN (allow-list)."""
+    patterns = _PRODUCT_CDN.get(retailer)
+    if not patterns:
+        return True  # unknown retailer → no allow-list, keep everything (generic path)
+    lowered = url.lower()
+    return any(host in lowered and (not path or path in lowered) for host, path in patterns)
 
 
 def _looks_like_image_url(u: str) -> bool:
@@ -409,17 +461,28 @@ _GENERIC_DOWNSCALE_RE = re.compile(
 
 
 def _upgrade_amazon(u: str) -> str:
-    # Strip Amazon's per-thumbnail size tokens (…_SX38_SY50_CR,0,0,38,50_.jpg → …jpg).
-    return re.sub(r"\._[^.]+_\.", ".", u)
+    # Strip Amazon's per-thumbnail size tokens (…_SX38_SY50_CR,0,0,38,50_.jpg → …jpg,
+    # …214aTrUk8lL._RC → …214aTrUk8lL.jpg is left as-is; the ._XX_ strip covers sizes).
+    return re.sub(r"\._[^./]+_?\.", ".", u)
 
 
 def _upgrade_myntra(u: str) -> str:
-    return re.sub(r"/h_\d+,q_\d+/", "/h_1440,q_90/", u)
+    # Myntra nests a small thumbnail transform in front of the real one, e.g.
+    # …/h_200,w_200,c_fill,g_auto/h_1440,q_75,w_1080/v1/…  → strip the leading
+    # downscale segment and bump quality on the remaining transform.
+    u = re.sub(r"/h_\d+,w_\d+,c_fill[^/]*/(?=h_\d+)", "/", u)
+    return re.sub(r"/h_\d+,q_\d+(,w_\d+)?/", "/h_1440,q_90/", u)
+
+
+def _upgrade_flipkart(u: str) -> str:
+    # Flipkart encodes the render size in the path: /image/480/640/…  → bump to 832.
+    return re.sub(r"/image/\d{2,4}/\d{2,4}/", "/image/832/832/", u)
 
 
 _PER_SITE_HIRES = {
     "amazon": _upgrade_amazon,
     "myntra": _upgrade_myntra,
+    "flipkart": _upgrade_flipkart,
 }
 
 
@@ -437,6 +500,12 @@ def _upgrade_hires(u: str, retailer: str) -> str:
 
 
 def _postprocess(images: list[str], retailer: str) -> list[str]:
+    """Normalize, filter to real product photos, dedup, upgrade to hi-res, cap.
+
+    For a recognized retailer this is an *allow-list*: only URLs on that retailer's
+    product-image CDN survive, so a banner/logo can never masquerade as the product.
+    Junk hosts/tokens are a secondary net for the generic (unknown-retailer) path.
+    """
     s = get_settings()
     seen, out = set(), []
     for raw in images:
@@ -447,9 +516,17 @@ def _postprocess(images: list[str], retailer: str) -> list[str]:
             u = "https:" + u
         if not u.startswith(("http://", "https://")):
             continue
-        if any(tok in u.lower() for tok in _JUNK_TOKENS):
+        lowered = u.lower()
+        if any(h in lowered for h in _JUNK_HOSTS):
+            continue
+        if any(tok in lowered for tok in _JUNK_TOKENS):
+            continue
+        # Recognized retailer → keep only its real product CDN (positive allow-list).
+        if not _is_product_cdn(u, retailer):
             continue
         u = _upgrade_hires(u, retailer)
+        # Dedup on the CDN path AFTER upgrade so thumbnail+hi-res of the same asset
+        # collapse to one; ignore query so ?q=20 vs ?q=90 don't count as two.
         key = u.split("?", 1)[0]
         if key in seen:
             continue
@@ -460,30 +537,102 @@ def _postprocess(images: list[str], retailer: str) -> list[str]:
     return out
 
 
+_TITLE_TAIL_RE = re.compile(
+    r"\s*[-|:–]\s*(?:buy\b|shop\b|online\b|best price\b|price in\b|lowest price\b|"
+    r"amazon\b|flipkart\b|myntra\b|ajio\b|meesho\b|nykaa\b).*$",
+    re.IGNORECASE,
+)
+_GENERIC_TITLES = {
+    "", "flipkart", "flipkart.com", "myntra", "ajio", "meesho", "nykaa",
+    "amazon", "amazon.in", "online shopping", "online shopping site",
+    "online shopping india",
+}
+# Myntra-style category tail: "… - Tshirts for Men" / "… | Dresses for Women".
+# Separator must be whitespace-padded so a word-internal hyphen ("T-shirt") is safe.
+_CATEGORY_TAIL_RE = re.compile(
+    r"\s+[-|]\s+[\w][\w\s&'./-]*\bfor\s+(?:men|women|boys|girls|kids|unisex|him|her)\s*$",
+    re.IGNORECASE,
+)
+
+
+_BLOCKED_TITLE_TERMS = ("captcha", "robot check", "are you a human", "access denied", "security check")
+
+
+def _clean_title(raw: str | None, retailer: str) -> str:
+    """Strip marketing prefixes/suffixes and reject generic / bot-wall titles.
+
+    e.g. 'Buy HRX … T Shirt - Tshirts for Men' → 'HRX … T Shirt';
+    'Amazon.in: Apple iPhone 15' → 'Apple iPhone 15'; 'Flipkart reCAPTCHA' → ''.
+    """
+    if not raw:
+        return ""
+    t = raw.strip()
+    if any(term in t.lower() for term in _BLOCKED_TITLE_TERMS):
+        return ""
+    t = re.sub(r"^\s*(?:buy|shop)\s+", "", t, flags=re.IGNORECASE)
+    t = re.sub(r"^amazon\.in\s*:\s*", "", t, flags=re.IGNORECASE)
+    t = _TITLE_TAIL_RE.sub("", t)
+    t = _CATEGORY_TAIL_RE.sub("", t).strip(" -|:–")
+    if t.lower() in _GENERIC_TITLES or len(t) < 3:
+        return ""
+    return t
+
+
+def _looks_soft_blocked(html: str) -> bool:
+    """A 200-status page that is really a captcha / bot wall (no product content)."""
+    if not html:
+        return False
+    head = html[:5000].lower()
+    return any(term in head for term in _BLOCKED_TITLE_TERMS)
+
+
+def _extract_title_tag(tree: HTMLParser) -> str:
+    node = tree.css_first("title")
+    return node.text(strip=True) if node else ""
+
+
+def _extract_h1(tree: HTMLParser) -> str:
+    node = tree.css_first("h1")
+    return node.text(strip=True) if node else ""
+
+
 def extract_from_html(html: str, base_url: str, retailer: str) -> tuple[str, list[str]]:
-    """Run the full waterfall on already-fetched HTML. Returns (title, images)."""
+    """Run the waterfall on already-fetched HTML. Returns (title, images).
+
+    Images come from structured product data (JSON-LD → embedded state → DOM). For a
+    RECOGNIZED retailer we never trust ``og:image`` (it's the share banner/logo) — the
+    product-CDN allow-list in ``_postprocess`` guarantees only real product photos pass.
+    For an unknown/generic site, ``og:image`` remains a good primary. Capped by
+    ``SCRAPER_MAX_IMAGES``.
+    """
     tree = HTMLParser(html)
-    title, images = "", []
 
     ld_title, ld_imgs = _extract_jsonld(tree)
-    title = title or ld_title
-    images.extend(ld_imgs)
-
-    if len(images) < 2:
-        images.extend(_extract_embedded_state(tree, html))
-
     meta_title, meta_imgs = _extract_meta(tree)
-    title = title or meta_title
-    if len(images) < 2:
-        images.extend(meta_imgs)
+    embedded = _extract_embedded_state(tree, html)
+    dom = _extract_dom(tree, base_url)
+
+    if retailer in ("unknown", "generic"):
+        # Generic site: prefer authoritative JSON-LD product images, then og:image as
+        # a good primary when JSON-LD is absent, then embedded/DOM.
+        candidates = ld_imgs + meta_imgs[:1] + embedded + meta_imgs[1:] + dom
     else:
-        # og:image is a good primary even when we have gallery images.
-        images = meta_imgs[:1] + images
+        # Known marketplace: structured data + product-CDN allow-list only; no og.
+        candidates = ld_imgs + embedded + dom
 
-    if len(images) < 2:
-        images.extend(_extract_dom(tree, base_url))
+    images = _postprocess(candidates, retailer)
+    if not images:
+        # Last resort: run og/meta + DOM through the same filter (keeps a valid
+        # product-CDN og for known retailers, or any image for generic).
+        images = _postprocess(meta_imgs + dom, retailer)
 
-    return title, _postprocess(images, retailer)
+    title = (
+        _clean_title(ld_title, retailer)
+        or _clean_title(_extract_title_tag(tree), retailer)
+        or _clean_title(meta_title, retailer)
+        or _clean_title(_extract_h1(tree), retailer)
+    )
+    return title, images
 
 
 _MOCK_RETAILER_IMAGES = {
@@ -515,23 +664,25 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
         )
 
     fetched = await _resolve_and_fetch(url)
-    resolved_url = fetched.final_url
-    retailer = detect_retailer(resolved_url)
+    retailer = detect_retailer(fetched.final_url)
+    resolved_url = _canonicalize_url(fetched.final_url, retailer)
 
     title, images = ("", [])
-    if fetched.html:
+    soft_blocked = _looks_soft_blocked(fetched.html)
+    if fetched.html and not soft_blocked:
         title, images = extract_from_html(fetched.html, resolved_url, retailer)
 
+    blocked = fetched.blocked or soft_blocked
     debug = {
         "resolvedUrl": resolved_url,
         "html_bytes": len(fetched.html),
         "status": fetched.status,
-        "blocked": fetched.blocked,
+        "blocked": blocked,
         "images_found": len(images),
         "strategy_used": "static" if not s.SCRAPER_RENDER_JS else "hybrid",
     }
-    if fetched.blocked:
-        log.warning("scrape_blocked", extra={"url": url, "status": fetched.status})
+    if blocked:
+        log.warning("scrape_blocked", extra={"url": url, "status": fetched.status, "soft": soft_blocked})
     elif not images:
         log.warning("scrape_no_images", extra={"url": url, "resolved": resolved_url})
 
