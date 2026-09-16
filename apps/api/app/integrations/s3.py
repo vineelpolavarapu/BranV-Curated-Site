@@ -213,8 +213,14 @@ async def fetch_remote_image_bytes(
         if parsed.scheme and parsed.netloc:
             referer = f"{parsed.scheme}://{parsed.netloc}/"
 
+    ua = s.SCRAPER_USER_AGENT
+    if not ua or "bot" in ua.lower():
+        ua = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+        )
     headers = {
-        "User-Agent": s.SCRAPER_USER_AGENT,
+        "User-Agent": ua,
         "Accept": "image/avif,image/webp,image/png,image/*,*/*;q=0.8",
         "Accept-Language": "en-IN,en;q=0.9",
     }

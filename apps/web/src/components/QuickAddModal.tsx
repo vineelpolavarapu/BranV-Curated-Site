@@ -316,9 +316,9 @@ const DEFAULT_BRANDS = [
     setForm((prev) => ({
       ...prev,
       retailer: scrapedRetailer,
-      title: prev.title || s.title || '',
-      retailerImageUrl: prev.retailerImageUrl || s.primaryImageUrl || '',
-      imageUrls: Array.from(new Set([...(prev.imageUrls || []), ...(s.images || [])])),
+      title: s.title || prev.title || '',
+      retailerImageUrl: s.primaryImageUrl || (s.images && s.images[0]) || prev.retailerImageUrl || '',
+      imageUrls: s.images && s.images.length > 0 ? s.images : prev.imageUrls,
     }));
     // If brand hint matches an existing brand, pre-select it.
     if (s.brandHint && !form.brandId) {
@@ -525,9 +525,15 @@ const DEFAULT_BRANDS = [
     >
       <div className="mt-8 w-full max-w-2xl rounded-2xl bg-surface shadow-2xl">
         <header className="flex items-center justify-between border-b border-line px-6 py-4">
-          <div>
+          <div className="flex items-center gap-3">
             <h2 className="text-lg font-semibold">Quick Add Product</h2>
-           
+            <button
+              type="button"
+              onClick={clearDraft}
+              className="text-xs text-content-muted hover:text-red-500 transition underline"
+            >
+              Clear draft
+            </button>
           </div>
           <button
             onClick={onClose}
@@ -939,6 +945,9 @@ function ImagePreviewCard({
   const [hasError, setHasError] = useState(false);
   // Prefer local blob URL for instant preview, fall back to server URL
   const displayUrl = previewUrl || url;
+  useEffect(() => {
+    setHasError(false);
+  }, [displayUrl]);
   // Use native <img> for blob: URLs since next/image doesn't handle them well
   const isBlobUrl = displayUrl.startsWith('blob:');
   // Remote retailer images may block hotlinking → route through our preview proxy

@@ -151,8 +151,14 @@ class FetchResult:
 
 def _browser_headers() -> dict[str, str]:
     s = get_settings()
+    ua = s.SCRAPER_USER_AGENT
+    if not ua or "bot" in ua.lower():
+        ua = (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+        )
     return {
-        "User-Agent": s.SCRAPER_USER_AGENT,
+        "User-Agent": ua,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,"
         "image/webp,*/*;q=0.8",
         "Accept-Language": "en-IN,en;q=0.9",
@@ -517,6 +523,8 @@ def _postprocess(images: list[str], retailer: str) -> list[str]:
         if not u.startswith(("http://", "https://")):
             continue
         lowered = u.lower()
+        if lowered.endswith(".svg") or ".svg?" in lowered or ".svg#" in lowered:
+            continue
         if any(h in lowered for h in _JUNK_HOSTS):
             continue
         if any(tok in lowered for tok in _JUNK_TOKENS):
@@ -606,31 +614,48 @@ def extract_from_html(html: str, base_url: str, retailer: str) -> tuple[str, lis
     ``SCRAPER_MAX_IMAGES``.
     """
     tree = HTMLParser(html)
+    s = get_settings()
 
     ld_title, ld_imgs = _extract_jsonld(tree)
     meta_title, meta_imgs = _extract_meta(tree)
-    embedded = _extract_embedded_state(tree, html)
-    dom = _extract_dom(tree, base_url)
 
-    if retailer in ("unknown", "generic"):
-        # Generic site: prefer authoritative JSON-LD product images, then og:image as
-        # a good primary when JSON-LD is absent, then embedded/DOM.
-        candidates = ld_imgs + meta_imgs[:1] + embedded + meta_imgs[1:] + dom
-    else:
-        # Known marketplace: structured data + product-CDN allow-list only; no og.
-        candidates = ld_imgs + embedded + dom
+    # 1. Primary: Authoritative Schema.org JSON-LD images
+    images = _postprocess(ld_imgs, retailer) if ld_imgs else []
 
-    images = _postprocess(candidates, retailer)
-    if not images:
-        # Last resort: run og/meta + DOM through the same filter (keeps a valid
-        # product-CDN og for known retailers, or any image for generic).
-        images = _postprocess(meta_imgs + dom, retailer)
+    # 2. Secondary: Embedded SPA state (Next.js __NEXT_DATA__ / inline state)
+    if len(images) < s.SCRAPER_MAX_IMAGES:
+        embedded = _extract_embedded_state(tree, html)
+        if embedded:
+            more = _postprocess(embedded, retailer)
+            for u in more:
+                if u not in images:
+                    images.append(u)
+                if len(images) >= s.SCRAPER_MAX_IMAGES:
+                    break
+
+    # 3. Tertiary: DOM <img> and <source>
+    if len(images) < s.SCRAPER_MAX_IMAGES:
+        dom = _extract_dom(tree, base_url)
+        if retailer in ("unknown", "generic"):
+            candidates = meta_imgs[:1] + dom + meta_imgs[1:]
+        else:
+            candidates = dom
+        more = _postprocess(candidates, retailer)
+        for u in more:
+            if u not in images:
+                images.append(u)
+            if len(images) >= s.SCRAPER_MAX_IMAGES:
+                break
+
+    # 4. Last resort fallback: og/meta
+    if not images and meta_imgs:
+        images = _postprocess(meta_imgs, retailer)
 
     title = (
         _clean_title(ld_title, retailer)
-        or _clean_title(_extract_title_tag(tree), retailer)
         or _clean_title(meta_title, retailer)
         or _clean_title(_extract_h1(tree), retailer)
+        or _clean_title(_extract_title_tag(tree), retailer)
     )
     return title, images
 
@@ -665,6 +690,8 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
 
     fetched = await _resolve_and_fetch(url)
     retailer = detect_retailer(fetched.final_url)
+    if retailer == "unknown":
+        retailer = detect_retailer(url)
     resolved_url = _canonicalize_url(fetched.final_url, retailer)
 
     title, images = ("", [])

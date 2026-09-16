@@ -8,12 +8,14 @@ from __future__ import annotations
 import pytest
 
 from app.integrations.scraper import (
+    _browser_headers,
     _canonicalize_url,
     _clean_title,
     _extract_redirect_target,
     _is_product_cdn,
     _largest_from_srcset,
     _looks_like_wrapper,
+    _postprocess,
     _upgrade_flipkart,
     _upgrade_myntra,
     detect_retailer,
@@ -153,3 +155,37 @@ def test_hires_upgraders():
 def test_canonicalize_flipkart_strips_tracking():
     dirty = "https://www.flipkart.com/apple-iphone-15/p/itm1?pid=MOBXYZ&lid=LST9&marketplace=FLIPKART&srno=b_1_1"
     assert _canonicalize_url(dirty, "flipkart") == "https://www.flipkart.com/apple-iphone-15/p/itm1?pid=MOBXYZ"
+
+
+def test_jsonld_priority_ignores_dom_junk():
+    html = (
+        '<html><head>'
+        '<script type="application/ld+json">'
+        '{"@context":"https://schema.org","@type":"Product","name":"Real Shirt","image":["https://rukminim2.flixcart.com/image/480/640/shirt.jpg"]}'
+        '</script>'
+        '</head><body>'
+        '<img src="https://rukminim2.flixcart.com/image/480/640/ad_banner.jpg">'
+        '</body></html>'
+    )
+    title, images = extract_from_html(html, "https://www.flipkart.com/p/1", "flipkart")
+    assert title == "Real Shirt"
+    assert images == ["https://rukminim2.flixcart.com/image/832/832/shirt.jpg"]
+
+
+def test_postprocess_drops_svg():
+    images = [
+        "https://rukminim2.flixcart.com/image/480/640/icon.svg",
+        "https://rukminim2.flixcart.com/image/480/640/photo.jpg",
+    ]
+    res = _postprocess(images, "flipkart")
+    assert len(res) == 1
+    assert res[0].endswith(".jpg")
+
+
+def test_browser_headers_sanitizes_bot_ua(monkeypatch):
+    from app.core.settings import get_settings
+    monkeypatch.setattr(get_settings(), "SCRAPER_USER_AGENT", "Mozilla/5.0 (compatible; BranVBot/1.0)")
+    headers = _browser_headers()
+    assert "bot" not in headers["User-Agent"].lower()
+    assert "Chrome" in headers["User-Agent"]
+
