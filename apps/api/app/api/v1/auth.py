@@ -8,10 +8,7 @@ POST   /api/auth/verify-email            - public, HTTP 200
 POST   /api/auth/resend-verification     - public, rate-limited, HTTP 200
 POST   /api/auth/forgot-password         - public, rate-limited, HTTP 200
 POST   /api/auth/reset-password          - public, HTTP 200
-POST   /api/auth/2fa/setup               - authenticated (Skip2FA), HTTP 200
-POST   /api/auth/2fa/verify              - authenticated (Skip2FA), HTTP 200
-POST   /api/auth/2fa/disable             - authenticated, MEMBER only, HTTP 200
-GET    /api/auth/me                      - authenticated (Skip2FA)
+GET    /api/auth/me                      - authenticated
 
 Mirrors `apps/api/src/auth/auth.controller.ts` byte-for-byte where the wire
 contract is concerned. Captured fixtures live under tests/parity/fixtures/auth-*.
@@ -44,9 +41,6 @@ from ...schemas.auth import (
     LogoutRequest,
     ResetPasswordRequest,
     StatusOk,
-    TwoFactorDisableRequest,
-    TwoFactorSetupResponse,
-    TwoFactorVerifyRequest,
 )
 from ...services import auth_service
 from ...services.auth_service import AuthError
@@ -70,7 +64,6 @@ def _to_public_user(
         id=u.id_,
         email=u.email,
         role=u.role,
-        totpEnabled=u.totpEnabled,
         emailVerified=u.emailVerifiedAt is not None,
         accessToken=access_token,
         refreshToken=refresh_token,
@@ -140,7 +133,6 @@ async def login(
             db,
             email=payload.email,
             password=payload.password,
-            totpCode=payload.totpCode,
             expectedRole="MEMBER",
             ip=ip,
             userAgent=ua,
@@ -174,7 +166,6 @@ async def admin_login(
             db,
             email=payload.email,
             password=payload.password,
-            totpCode=payload.totpCode,
             expectedRole="ADMIN",
             ip=ip,
             userAgent=ua,
@@ -307,76 +298,10 @@ async def reset_password(
 ) -> StatusOk:
     ip, ua = _client_ip_and_ua(request)
     try:
-        totp_reset = await auth_service.reset_password(
+        await auth_service.reset_password(
             db,
             token=payload.token,
             newPassword=payload.newPassword,
-            ip=ip,
-            userAgent=ua,
-            background=background,
-        )
-    except AuthError as e:
-        _raise_auth_error(e)
-    if totp_reset:
-        return StatusOk(
-            status="ok",
-            message="Two-factor authentication was also turned off - re-enroll after signing in.",
-        )
-    return StatusOk(status="ok")
-
-
-# ───────────── 2FA ───────────────────────────────────────────────────────────
-
-
-@router.post(
-    "/2fa/setup",
-    response_model=TwoFactorSetupResponse,
-    status_code=status.HTTP_200_OK,
-)
-async def setup_2fa(
-    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
-    db: DbDep,
-) -> TwoFactorSetupResponse:
-    otpauth, qr = await auth_service.begin_two_factor_setup(db, user_id=user.id)
-    return TwoFactorSetupResponse(otpauthUrl=otpauth, qrCodeDataUrl=qr)
-
-
-@router.post("/2fa/verify", response_model=StatusOk, status_code=status.HTTP_200_OK)
-async def verify_2fa(
-    payload: TwoFactorVerifyRequest,
-    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
-    request: Request,
-    background: BackgroundTasks,
-    db: DbDep,
-) -> StatusOk:
-    ip, ua = _client_ip_and_ua(request)
-    try:
-        await auth_service.confirm_two_factor_setup(
-            db, user_id=user.id, code=payload.code, ip=ip, userAgent=ua, background=background
-        )
-    except AuthError as e:
-        _raise_auth_error(e)
-    return StatusOk(status="ok")
-
-
-@router.post("/2fa/disable", response_model=StatusOk, status_code=status.HTTP_200_OK)
-async def disable_2fa(
-    payload: TwoFactorDisableRequest,
-    user: Annotated[AuthenticatedUser, Depends(current_user_required)],
-    request: Request,
-    background: BackgroundTasks,
-    db: DbDep,
-) -> StatusOk:
-    # Mirror NestJS: only MEMBER role can disable.
-    if user.role != "MEMBER":
-        raise HTTPException(status_code=403, detail="Insufficient role")
-    ip, ua = _client_ip_and_ua(request)
-    try:
-        await auth_service.disable_two_factor(
-            db,
-            user_id=user.id,
-            password=payload.password,
-            code=payload.code,
             ip=ip,
             userAgent=ua,
             background=background,
@@ -401,7 +326,6 @@ async def me(
         role=body["role"],
         status=body["status"],
         emailVerified=body["emailVerified"],
-        totpEnabled=body["totpEnabled"],
         profile=MeProfile(**body["profile"]) if body["profile"] else None,
         createdAt=body["createdAt"],
     )

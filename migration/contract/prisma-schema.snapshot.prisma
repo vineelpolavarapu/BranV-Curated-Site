@@ -32,8 +32,6 @@ model User {
   role              UserRole   @default(MEMBER)
   status            UserStatus @default(ACTIVE)
   emailVerifiedAt   DateTime?
-  totpSecret        String?
-  totpEnabled       Boolean    @default(false)
   failedLoginCount  Int        @default(0)
   lockedUntil       DateTime?
   lastLoginAt       DateTime?

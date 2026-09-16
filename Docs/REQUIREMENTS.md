@@ -66,8 +66,6 @@ Managed by **uv** (`pyproject.toml` in `apps/api/`).
 | greenlet | >=3.1 | Required for SQLAlchemy async |
 | pyjwt | >=2.10 | JWT authentication |
 | argon2-cffi | >=23.1 | Password hashing |
-| pyotp | >=2.9 | TOTP two-factor authentication |
-| qrcode[pil] | >=8.0 | QR code generation for 2FA setup |
 | httpx | >=0.28 | Async HTTP client (outbound requests) |
 | aioboto3 | >=13.2 | Async S3 client (MinIO / Cloudflare R2) |
 | boto3 | >=1.35 | S3 presigned URL generation |

@@ -147,6 +147,5 @@ def _user_to_authed(u: User) -> AuthenticatedUser:
         id=u.id_,
         email=u.email,
         role=u.role,  # type: ignore[arg-type]
-        totpEnabled=u.totpEnabled,
         emailVerified=u.emailVerifiedAt is not None,
     )

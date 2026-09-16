@@ -1,13 +1,12 @@
 """
-Cross-cutting security primitives - port of `apps/api/src/auth/{password,token,two-factor}.service.ts`
+Cross-cutting security primitives - port of `apps/api/src/auth/{password,token}.service.ts`
 plus the cookie helpers from `apps/api/src/auth/auth.controller.ts`.
 
 Exact parity rules (do not change without re-running the parity suite):
 
   * Argon2id, OWASP defaults: memoryCost 19 MiB, timeCost 2, parallelism 1.
-  * JWT HS256. Access payload: {sub, email, role, totp, ev, iat, exp}.
+  * JWT HS256. Access payload: {sub, email, role, ev, iat, exp}.
   * Refresh token: 48 bytes of entropy, base64url-encoded, SHA-256 hashed in DB.
-  * TOTP: pyotp Default30s + ±1 window to forgive clock drift.
   * Cookie names: `branv_access` and `branv_refresh`.
   * Cookie options honor COOKIE_SECURE / COOKIE_SAMESITE / COOKIE_DOMAIN env vars.
   * Path='/' always, HttpOnly=True always.
@@ -23,7 +22,6 @@ from typing import Any, Literal
 
 import bcrypt
 import jwt
-import pyotp
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
 from fastapi import Response
@@ -61,7 +59,6 @@ class AccessTokenPayload:
     sub: str
     email: str
     role: UserRole
-    totp: bool   # totpEnabled
     ev: bool     # emailVerified (i.e. emailVerifiedAt is not null)
     iat: int | None = None
     exp: int | None = None
@@ -71,15 +68,13 @@ class AccessTokenPayload:
 class AuthenticatedUser:
     """Mirror of `AuthenticatedUser` (current-user.decorator.ts).
 
-    Note the field rename: JWT payload uses short keys (`totp`, `ev`);
-    the resolved request user uses descriptive names (`totpEnabled`,
-    `emailVerified`).
+    Note the field rename: JWT payload uses short keys (`ev`);
+    the resolved request user uses descriptive names (`emailVerified`).
     """
 
     id: str
     email: str
     role: UserRole
-    totpEnabled: bool
     emailVerified: bool
 
 
@@ -182,12 +177,11 @@ def sign_access_token(user: AuthenticatedUser | dict[str, Any]) -> str:
     s = get_settings()
     if isinstance(user, AuthenticatedUser):
         sub, email, role = user.id, user.email, user.role
-        totp, ev = user.totpEnabled, user.emailVerified
+        ev = user.emailVerified
     else:
         sub = user["id"]
         email = user["email"]
         role = user["role"]
-        totp = bool(user.get("totpEnabled", False))
         # Match Nest's `user.emailVerifiedAt !== null` check.
         ev_at = user.get("emailVerifiedAt")
         ev = ev_at is not None
@@ -197,7 +191,6 @@ def sign_access_token(user: AuthenticatedUser | dict[str, Any]) -> str:
         "sub": sub,
         "email": email,
         "role": role,
-        "totp": totp,
         "ev": ev,
         "iat": int(now.timestamp()),
         "exp": int((now + timedelta(seconds=s.JWT_ACCESS_TTL_SECONDS)).timestamp()),
@@ -216,7 +209,6 @@ def decode_access_token(token: str) -> AccessTokenPayload | None:
         sub=raw["sub"],
         email=raw["email"],
         role=raw["role"],
-        totp=bool(raw["totp"]),
         ev=bool(raw["ev"]),
         iat=raw.get("iat"),
         exp=raw.get("exp"),
@@ -228,7 +220,6 @@ def payload_to_authenticated_user(p: AccessTokenPayload) -> AuthenticatedUser:
         id=p.sub,
         email=p.email,
         role=p.role,  # type: ignore[arg-type]
-        totpEnabled=p.totp,
         emailVerified=p.ev,
     )
 
@@ -244,34 +235,6 @@ def mint_refresh_token() -> str:
 def hash_refresh_token(token: str) -> str:
     """SHA-256 hex digest. Identical bytes to Node's createHash('sha256').digest('hex')."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
-
-
-# ───────────── TOTP (pyotp port of otplib config) ────────────────────────────
-
-
-def generate_totp_secret() -> str:
-    """Base32 secret (length 32) - same algorithm as otplib.authenticator.generateSecret()."""
-    return pyotp.random_base32()
-
-
-def totp_uri(account_email: str, secret: str) -> str:
-    s = get_settings()
-    return pyotp.TOTP(secret).provisioning_uri(name=account_email, issuer_name=s.TOTP_ISSUER)
-
-
-def verify_totp(code: str, secret: str) -> bool:
-    """Accept ±3 step window (= ±90 s clock drift).
-
-    Increased from ±1 because Oracle Cloud VM containers inherit the host
-    clock, which frequently drifts 30–90 s without chrony active. ±90 s is
-    within TOTP security recommendations for VM-hosted services (Google
-    Authenticator itself defaults to ±90 s on Android via the 'valid_window'
-    / 'window' parameter in otplib / pyotp).
-    """
-    try:
-        return pyotp.TOTP(secret).verify(code, valid_window=3)
-    except Exception:  # noqa: BLE001 - same defensive catch Nest does
-        return False
 
 
 # ───────────── cookie helpers ────────────────────────────────────────────────

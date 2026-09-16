@@ -26,7 +26,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...core.auth_deps import (
     AuthenticatedUser,
     current_user_required,
-    enforce_two_factor,
     require_roles,
 )
 from ...core.pydantic_config import ApiModel
@@ -38,7 +37,6 @@ DbDep = Annotated[AsyncSession, Depends(get_db)]
 AdminDeps = [
     Depends(current_user_required),
     Depends(require_roles("ADMIN")),
-    Depends(enforce_two_factor),
 ]
 
 _ALPH = string.ascii_lowercase + string.digits

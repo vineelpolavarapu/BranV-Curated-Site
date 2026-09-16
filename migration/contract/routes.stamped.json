@@ -27,8 +27,7 @@
     "enableImplicitConversion": true
   },
   "globalGuards": [
-    "JwtAuthGuard",
-    "TwoFactorGuard"
+    "JwtAuthGuard"
   ],
   "routes": [
     {
@@ -40,7 +39,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -65,7 +63,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -84,7 +81,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -122,7 +118,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -148,7 +143,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -174,7 +168,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -193,7 +186,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -212,7 +204,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -231,7 +222,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -250,7 +240,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -269,7 +258,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -288,7 +276,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -313,7 +300,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -343,7 +329,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -374,7 +359,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -400,7 +384,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -436,7 +419,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -461,7 +443,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -480,7 +461,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -510,7 +490,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -541,7 +520,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -567,7 +545,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -603,7 +580,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -622,7 +598,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -652,7 +627,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -683,7 +657,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -709,7 +682,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -745,7 +717,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -770,7 +741,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -800,7 +770,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -826,7 +795,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -862,7 +830,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -893,7 +860,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -919,7 +885,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -955,7 +920,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -974,7 +938,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1000,7 +963,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1036,7 +998,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1072,7 +1033,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1109,7 +1069,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1134,7 +1093,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1164,7 +1122,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1195,7 +1152,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1221,7 +1177,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1257,7 +1212,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1282,7 +1236,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1312,7 +1265,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1343,7 +1295,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1369,7 +1320,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1405,7 +1355,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1437,7 +1386,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1456,7 +1404,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1481,7 +1428,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1511,7 +1457,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1542,7 +1487,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1568,7 +1512,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1604,7 +1547,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1640,7 +1582,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1677,7 +1618,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1713,7 +1653,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1749,7 +1688,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1786,7 +1724,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1822,7 +1759,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -1859,7 +1795,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1889,7 +1824,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1914,7 +1848,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1939,7 +1872,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1975,7 +1907,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -1994,7 +1925,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2022,7 +1952,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2043,7 +1972,6 @@
       "handler": "detail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2065,7 +1993,6 @@
       "handler": "related",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2082,107 +2009,11 @@
     },
     {
       "method": "POST",
-      "path": "/auth/2fa/disable",
-      "controller": "AuthController",
-      "handler": "disable2fa",
-      "authMode": "authenticated",
-      "roles": [
-        "MEMBER"
-      ],
-      "skipTwoFactor": false,
-      "rateLimit": null,
-      "httpCode": 200,
-      "guards": [
-        "JwtAuthGuard",
-        "RateLimitGuard",
-        "RolesGuard"
-      ],
-      "interceptors": [],
-      "paramDecorators": [
-        {
-          "index": 0,
-          "type": "CUSTOM",
-          "dtoClass": null
-        },
-        {
-          "index": 1,
-          "type": "BODY",
-          "dtoClass": null
-        },
-        {
-          "index": 2,
-          "type": "REQUEST",
-          "dtoClass": null
-        }
-      ],
-      "sourceFile": null
-    },
-    {
-      "method": "POST",
-      "path": "/auth/2fa/setup",
-      "controller": "AuthController",
-      "handler": "setup2fa",
-      "authMode": "authenticated",
-      "roles": [],
-      "skipTwoFactor": true,
-      "rateLimit": null,
-      "httpCode": 200,
-      "guards": [
-        "JwtAuthGuard",
-        "RateLimitGuard"
-      ],
-      "interceptors": [],
-      "paramDecorators": [
-        {
-          "index": 0,
-          "type": "CUSTOM",
-          "dtoClass": null
-        }
-      ],
-      "sourceFile": null
-    },
-    {
-      "method": "POST",
-      "path": "/auth/2fa/verify",
-      "controller": "AuthController",
-      "handler": "verify2fa",
-      "authMode": "authenticated",
-      "roles": [],
-      "skipTwoFactor": true,
-      "rateLimit": null,
-      "httpCode": 200,
-      "guards": [
-        "JwtAuthGuard",
-        "RateLimitGuard"
-      ],
-      "interceptors": [],
-      "paramDecorators": [
-        {
-          "index": 0,
-          "type": "CUSTOM",
-          "dtoClass": null
-        },
-        {
-          "index": 1,
-          "type": "BODY",
-          "dtoClass": null
-        },
-        {
-          "index": 2,
-          "type": "REQUEST",
-          "dtoClass": null
-        }
-      ],
-      "sourceFile": null
-    },
-    {
-      "method": "POST",
       "path": "/auth/admin/login",
       "controller": "AuthController",
       "handler": "adminLogin",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": {
         "limit": 5,
         "window": 60,
@@ -2219,7 +2050,6 @@
       "handler": "forgotPassword",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": {
         "limit": 3,
         "window": 60,
@@ -2251,7 +2081,6 @@
       "handler": "login",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": {
         "limit": 5,
         "window": 60,
@@ -2288,7 +2117,6 @@
       "handler": "logout",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [
@@ -2316,7 +2144,6 @@
       "handler": "me",
       "authMode": "authenticated",
       "roles": [],
-      "skipTwoFactor": true,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2340,7 +2167,6 @@
       "handler": "refresh",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [
@@ -2368,7 +2194,6 @@
       "handler": "register",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": {
         "limit": 5,
         "window": 60,
@@ -2400,7 +2225,6 @@
       "handler": "resendVerification",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": {
         "limit": 3,
         "window": 60,
@@ -2427,7 +2251,6 @@
       "handler": "resetPassword",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [
@@ -2455,7 +2278,6 @@
       "handler": "verifyEmail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [
@@ -2483,7 +2305,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2498,7 +2319,6 @@
       "handler": "detail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2520,7 +2340,6 @@
       "handler": "story",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2542,7 +2361,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2557,7 +2375,6 @@
       "handler": "getOne",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2579,7 +2396,6 @@
       "handler": "getFilters",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2601,7 +2417,6 @@
       "handler": "report",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [],
@@ -2633,7 +2448,6 @@
       "handler": "track",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2654,7 +2468,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2669,7 +2482,6 @@
       "handler": "detail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2691,7 +2503,6 @@
       "handler": "redirect",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2723,7 +2534,6 @@
       "handler": "liveness",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [],
@@ -2738,7 +2548,6 @@
       "handler": "overview",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2753,7 +2562,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2768,7 +2576,6 @@
       "handler": "detail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -2793,7 +2600,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2831,7 +2637,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2869,7 +2674,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2892,7 +2696,6 @@
       "handler": "confirm",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [],
@@ -2913,7 +2716,6 @@
       "handler": "subscribe",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [],
@@ -2939,7 +2741,6 @@
       "handler": "unsubscribe",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 200,
       "guards": [],
@@ -2963,7 +2764,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -2989,7 +2789,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3020,7 +2819,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3051,7 +2849,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -3083,7 +2880,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -3109,7 +2905,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3132,7 +2927,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3153,7 +2947,6 @@
       "handler": "list",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3183,7 +2976,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3217,7 +3009,6 @@
       "handler": "getMine",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3244,7 +3035,6 @@
       "handler": "detail",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3266,7 +3056,6 @@
       "handler": "related",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3288,7 +3077,6 @@
       "handler": "readiness",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3309,7 +3097,6 @@
       "handler": "autocomplete",
       "authMode": "public",
       "roles": [],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [],
@@ -3332,7 +3119,6 @@
       "roles": [
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3358,7 +3144,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3390,7 +3175,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [
@@ -3421,7 +3205,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": 204,
       "guards": [
@@ -3453,7 +3236,6 @@
         "MEMBER",
         "ADMIN"
       ],
-      "skipTwoFactor": false,
       "rateLimit": null,
       "httpCode": null,
       "guards": [

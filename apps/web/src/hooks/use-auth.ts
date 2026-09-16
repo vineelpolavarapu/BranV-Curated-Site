@@ -23,7 +23,7 @@ export function useCurrentUser(options?: { enabled?: boolean }) {
 export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (payload: { email: string; password: string; totpCode?: string }) => {
+    mutationFn: async (payload: { email: string; password: string }) => {
       const res = await apiFetch<AuthSummary>('/auth/login', {
         method: 'POST',
         body: JSON.stringify(payload),

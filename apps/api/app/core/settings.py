@@ -52,7 +52,6 @@ class Settings(BaseSettings):
     COOKIE_SECURE: bool = False
     COOKIE_DOMAIN: str = ""  # empty means no Domain attribute
     COOKIE_SAMESITE: Literal["lax", "strict", "none"] = "lax"
-    TOTP_ISSUER: str = "BranV"
     AUTH_LOCKOUT_MAX_ATTEMPTS: int = 5
     AUTH_LOCKOUT_WINDOW_MIN: int = 15
     AUTH_LOCKOUT_DURATION_MIN: int = 15

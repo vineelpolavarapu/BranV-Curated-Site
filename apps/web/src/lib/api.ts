@@ -57,7 +57,7 @@ export interface ApiResult<T> {
   status: number;
   data: T | null;
   error: string | null;
-  /** Server-supplied payload alongside the error (e.g. `requires2fa: true`). */
+  /** Server-supplied payload alongside the error. */
   details: Record<string, unknown> | null;
 }
 
@@ -232,7 +232,6 @@ export interface CurrentUser {
   role: Role;
   status: 'ACTIVE' | 'SUSPENDED' | 'DELETED';
   emailVerified: boolean;
-  totpEnabled: boolean;
   profile: {
     firstName: string | null;
     lastName: string | null;
@@ -244,7 +243,6 @@ export interface AuthSummary {
   id: string;
   email: string;
   role: Role;
-  totpEnabled: boolean;
   emailVerified: boolean;
   accessToken?: string;
   refreshToken?: string;

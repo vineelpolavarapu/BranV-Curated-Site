@@ -10,7 +10,7 @@ SO I Build a platform that curates men's fashion products from multiple affiliat
 
 I Designed and built the full system end-to-end:
 - A modern storefront (Next.js + React) that shoppers browse, backed by a Python API (FastAPI) that does all the real work behind the scenes: managing the product catalog, validating and routing affiliate links to the right network, powering the admin curation workflows, and serving fast, reliable endpoints for the frontend, all on top of a PostgreSQL database.
-- Secure member accounts and a separate admin dashboard protected by two-factor authentication, so only I can curate the catalog.
+- Secure member accounts and a separate admin dashboard, so only I can curate the catalog.
 - Full-text and typo-tolerant product search, so shoppers find what they want fast.
 - Automated deployment pipelines (CI/CD via GitHub Actions) and containerized infrastructure (Docker) hosted across free-tier cloud services (Oracle Cloud, Cloudflare, Vercel) with nightly automated database backups, giving enterprise-grade reliability on a startup budget.
 
@@ -97,8 +97,7 @@ Then:
 2. **Mock mailer**: the verification link is logged to the API console
    (`pnpm dev` window). Copy the link and open it.
 3. Sign in at `/login` → lands on `/account`.
-4. Sign in as admin at `/admin/login` → prompted to set up TOTP 2FA → scan QR
-   in your authenticator app → enter 6-digit code → land on `/admin`.
+4. Sign in as admin at `/admin/login` → land on `/admin`.
 
 ## Repo layout
 

@@ -1,6 +1,6 @@
 """
 FastAPI dependencies - port of NestJS's JwtAuthGuard / RolesGuard /
-TwoFactorGuard / tryReadUserId(), expressed as FastAPI `Depends(...)`.
+tryReadUserId(), expressed as FastAPI `Depends(...)`.
 
 Parity notes:
   * `current_user_required` raises 401 with Nest's `{statusCode, message, error}` shape
@@ -11,13 +11,11 @@ Parity notes:
     serve an anonymous-shaped payload.
   * `require_roles(*roles)` returns 403 with Nest's RolesGuard message text
     ('Insufficient role' / 'Authentication required').
-  * `require_no_2fa_skip` is the analog of `@Skip2FA()` opt-out - it's a marker
-    dependency a router can use to opt out of admin 2FA enforcement.
 
-NestJS applies JwtAuthGuard + TwoFactorGuard globally via APP_GUARD. FastAPI's
-equivalent is a thin app-level middleware OR a dependency baked into every
-router include - we use the dependency approach because it shows up in the
-auto-generated OpenAPI docs.
+NestJS applies JwtAuthGuard globally via APP_GUARD. FastAPI's equivalent is a
+thin app-level middleware OR a dependency baked into every router include -
+we use the dependency approach because it shows up in the auto-generated
+OpenAPI docs.
 """
 
 from __future__ import annotations
@@ -111,24 +109,5 @@ def require_email_verified(user: CurrentUser) -> AuthenticatedUser:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email verification required",
-        )
-    return user
-
-
-def enforce_two_factor(user: CurrentUser) -> AuthenticatedUser:
-    """
-    TwoFactorGuard analog. Apply on routes that require admin 2FA enforcement.
-
-    Mirrors Nest's logic:
-      * Skipped entirely by routes that opt out via NOT including this dep
-        (equivalent to the @Skip2FA() decorator). The setup/verify endpoints
-        and /auth/me purposely omit it.
-      * If the role is ADMIN and totpEnabled is false → 403.
-      * Non-admin or already-2FA-enabled admin → pass through.
-    """
-    if user.role == "ADMIN" and not user.totpEnabled:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin must enable 2FA before this action",
         )
     return user

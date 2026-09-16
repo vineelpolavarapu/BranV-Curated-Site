@@ -244,24 +244,14 @@ jobs:
             DEPLOY_PATH="${{ vars.OCI_DEPLOY_PATH }}"
             cd "$DEPLOY_PATH"
 
-            # ── 1. Fix clock drift (root cause of TOTP "Invalid 2FA code") ──
-            if command -v chronyc &>/dev/null; then
-              sudo chronyc makestep
-            elif command -v ntpdate &>/dev/null; then
-              sudo ntpdate -u pool.ntp.org
-            fi
-            if command -v timedatectl &>/dev/null; then
-              sudo timedatectl set-ntp true
-            fi
-
-            # ── 2. Record the currently-running api image so we can roll back ──
+            # ── 1. Record the currently-running api image so we can roll back ──
             PREV_IMAGE=""
             RUNNING_ID=$(docker compose ps -q api || true)
             if [ -n "$RUNNING_ID" ]; then
               PREV_IMAGE=$(docker inspect --format='{{.Image}}' "$RUNNING_ID" || true)
             fi
 
-            # ── 3. Pull latest images and apply pending Prisma migrations ──────
+            # ── 2. Pull latest images and apply pending Prisma migrations ──────
             # Previously this ran `docker compose up -d --no-deps api`, which
             # skips the migrate service entirely - new migrations committed to
             # git were never applied automatically. Run migrate explicitly and
@@ -310,10 +300,10 @@ jobs:
               exit 1
             fi
 
-            # ── 4. Restart the API container ────────────────────────────────
+            # ── 3. Restart the API container ────────────────────────────────
             docker compose up -d --no-deps --force-recreate api
 
-            # ── 5. Health-check gate - a Restarting container used to still
+            # ── 4. Health-check gate - a Restarting container used to still
             # report success here (`docker compose ps` never fails the job).
             # The api service only `expose`s port 5000 to the internal Docker
             # network (no `ports:` mapping to the host), so a plain

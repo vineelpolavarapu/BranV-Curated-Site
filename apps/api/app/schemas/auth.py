@@ -8,7 +8,6 @@ Validator parity table:
     @IsString         → automatic (Pydantic str)
     @IsOptional       → Optional[T] = None
     @Matches(re)      → pattern=...
-    @Length(6,6)      → min_length=6, max_length=6
     @IsNotEmpty       → min_length=1
 """
 
@@ -19,8 +18,6 @@ from typing import Literal
 from pydantic import Field
 
 from ..core.pydantic_config import ApiModel, PermissiveEmailStr as EmailStr
-
-_TOTP_PATTERN = r"^\d{6}$"
 
 
 # ───────────── requests ──────────────────────────────────────────────────────
@@ -36,7 +33,6 @@ class RegisterRequest(ApiModel):
 class LoginRequest(ApiModel):
     email: EmailStr = Field(max_length=254)
     password: str = Field(min_length=1, max_length=128)
-    totpCode: str | None = Field(default=None, pattern=_TOTP_PATTERN)
 
 
 class VerifyEmailRequest(ApiModel):
@@ -50,15 +46,6 @@ class ForgotPasswordRequest(ApiModel):
 class ResetPasswordRequest(ApiModel):
     token: str = Field(min_length=1)
     newPassword: str = Field(min_length=8, max_length=128)
-
-
-class TwoFactorVerifyRequest(ApiModel):
-    code: str = Field(pattern=_TOTP_PATTERN)
-
-
-class TwoFactorDisableRequest(ApiModel):
-    password: str = Field(min_length=1)
-    code: str = Field(min_length=6, max_length=6)
 
 
 class RefreshRequest(ApiModel):
@@ -78,7 +65,6 @@ class PublicUser(ApiModel):
     id: str
     email: str
     role: Literal["MEMBER", "ADMIN"]
-    totpEnabled: bool
     emailVerified: bool
     accessToken: str | None = None
     refreshToken: str | None = None
@@ -89,11 +75,6 @@ class StatusOk(ApiModel):
 
     status: Literal["ok"] = "ok"
     message: str | None = None
-
-
-class TwoFactorSetupResponse(ApiModel):
-    otpauthUrl: str
-    qrCodeDataUrl: str
 
 
 class MeProfile(ApiModel):
@@ -117,6 +98,5 @@ class MeResponse(ApiModel):
     role: Literal["MEMBER", "ADMIN"]
     status: Literal["ACTIVE", "SUSPENDED", "DELETED"]
     emailVerified: bool
-    totpEnabled: bool
     profile: MeProfile | None
     createdAt: str  # ISO 8601 string, matches Nest's JSON serialization of Date

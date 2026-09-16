@@ -206,7 +206,6 @@ async def login(
     *,
     email: str,
     password: str,
-    totpCode: str | None,
     expectedRole: str | None,
     ip: str | None,
     userAgent: str | None,
@@ -437,7 +436,7 @@ async def forgot_password(
     )
     await db.flush()
     link = f"{s.WEB_ORIGIN}/reset-password?token={raw}"
-    await get_mail_service().send_password_reset(user.email, link, totp_will_reset=user.totpEnabled)
+    await get_mail_service().send_password_reset(user.email, link)
     await db.commit()
     background.add_task(
         audit_service.record,
@@ -456,17 +455,13 @@ async def reset_password(
     ip: str | None,
     userAgent: str | None,
     background: BackgroundTasks,
-) -> bool:
-    """Returns True if this reset also cleared an active TOTP enrollment."""
+) -> None:
     token_hash = _sha256(token)
     row = (await db.execute(
         select(PasswordReset).where(PasswordReset.tokenHash == token_hash)
     )).scalar_one_or_none()
     if row is None or row.usedAt is not None or row.expiresAt < _utcnow_naive():
         raise AuthError(400, "Invalid or expired reset token")
-
-    user = (await db.execute(select(User).where(User.id_ == row.userId))).scalar_one()
-    had_totp = user.totpEnabled
 
     new_hash = await security.async_hash_password(newPassword)
     now = _utcnow_naive()
@@ -480,12 +475,6 @@ async def reset_password(
             passwordHash=new_hash,
             failedLoginCount=0,
             lockedUntil=None,
-            # Proving email ownership is also our TOTP-recovery path: an admin who
-            # lost their authenticator can't reach /2fa/setup without first logging
-            # in, and login requires the (now-missing) code. Clearing it here lets
-            # them log in and re-enroll via /admin/setup-2fa.
-            totpEnabled=False,
-            totpSecret=None,
             updatedAt=now,
         )
     )
@@ -500,102 +489,6 @@ async def reset_password(
         audit_service.record,
         actorId=row.userId,
         action="auth.password.reset",
-        ip=ip,
-        userAgent=userAgent,
-        metadata={"totpReset": had_totp},
-    )
-    return had_totp
-
-
-# ───────────── 2FA ───────────────────────────────────────────────────────────
-
-
-async def begin_two_factor_setup(db: AsyncSession, *, user_id: str) -> tuple[str, str]:
-    """Returns (otpauthUrl, qrCodeDataUrl). Stores unconfirmed secret on the user row."""
-    try:
-        import qrcode  # type: ignore[import]
-    except ImportError as exc:
-        raise RuntimeError("The qrcode package is required for 2FA setup") from exc
-    import io
-    import base64
-
-    user = (await db.execute(select(User).where(User.id_ == user_id))).scalar_one()
-    secret_b32 = security.generate_totp_secret()
-    otpauth = security.totp_uri(user.email, secret_b32)
-
-    # QR as data URL - match Nest's qrcode.toDataURL() output shape.
-    img = qrcode.make(otpauth)
-    buf = io.BytesIO()
-    img.save(buf)
-    qr_data_url = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
-
-    await db.execute(
-        update(User)
-        .where(User.id_ == user_id)
-        .values(totpSecret=secret_b32, totpEnabled=False, updatedAt=_utcnow_naive())
-    )
-    await db.commit()
-    return otpauth, qr_data_url
-
-
-async def confirm_two_factor_setup(
-    db: AsyncSession,
-    *,
-    user_id: str,
-    code: str,
-    ip: str | None,
-    userAgent: str | None,
-    background: BackgroundTasks,
-) -> None:
-    user = (await db.execute(select(User).where(User.id_ == user_id))).scalar_one()
-    if not user.totpSecret:
-        raise AuthError(400, "No 2FA setup in progress")
-    if not security.verify_totp(code, user.totpSecret):
-        raise AuthError(400, "Invalid 2FA code")
-    await db.execute(
-        update(User)
-        .where(User.id_ == user_id)
-        .values(totpEnabled=True, updatedAt=_utcnow_naive())
-    )
-    await db.commit()
-    background.add_task(
-        audit_service.record,
-        actorId=user_id,
-        action="auth.2fa.enabled",
-        ip=ip,
-        userAgent=userAgent,
-    )
-
-
-async def disable_two_factor(
-    db: AsyncSession,
-    *,
-    user_id: str,
-    password: str,
-    code: str,
-    ip: str | None,
-    userAgent: str | None,
-    background: BackgroundTasks,
-) -> None:
-    user = (await db.execute(select(User).where(User.id_ == user_id))).scalar_one()
-    if user.role == "ADMIN":
-        raise AuthError(403, "Admins cannot disable 2FA")
-    if not await security.async_verify_password(user.passwordHash, password):
-        raise AuthError(401, "Invalid password")
-    if not user.totpEnabled or not user.totpSecret:
-        raise AuthError(400, "2FA is not enabled")
-    if not security.verify_totp(code, user.totpSecret):
-        raise AuthError(400, "Invalid 2FA code")
-    await db.execute(
-        update(User)
-        .where(User.id_ == user_id)
-        .values(totpEnabled=False, totpSecret=None, updatedAt=_utcnow_naive())
-    )
-    await db.commit()
-    background.add_task(
-        audit_service.record,
-        actorId=user_id,
-        action="auth.2fa.disabled",
         ip=ip,
         userAgent=userAgent,
     )
@@ -615,7 +508,6 @@ async def me(db: AsyncSession, *, user_id: str) -> dict[str, Any]:
         "role": user.role,
         "status": user.status,
         "emailVerified": user.emailVerifiedAt is not None,
-        "totpEnabled": user.totpEnabled,
         "profile": (
             {
                 "id": profile.id_,
@@ -652,6 +544,5 @@ def _user_to_authed(u: User) -> AuthenticatedUser:
         id=u.id_,
         email=u.email,
         role=u.role,  # type: ignore[arg-type]
-        totpEnabled=u.totpEnabled,
         emailVerified=u.emailVerifiedAt is not None,
     )

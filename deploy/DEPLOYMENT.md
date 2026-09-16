@@ -441,7 +441,7 @@ Run `docker compose exec api prisma generate` once, then `docker compose restart
 **`502 Bad Gateway` from Cloudflare:**
 Caddy is up but the API container is down. `docker compose ps` - bring back any exited containers with `docker compose up -d`. Check API logs for the crash reason.
 
-**Wishlist / wardrobe / 2FA / member features look broken:**
+**Wishlist / wardrobe / member features look broken:**
 Member auth is wired but those flows weren't part of the catalog+affiliate MVP scope. They'll function once the seed data and email-sending are configured. Not blockers for launch.
 
 ---

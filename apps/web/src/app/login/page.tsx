@@ -31,8 +31,6 @@ function MemberLoginPageInner() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [totpCode, setTotpCode] = useState('');
-  const [needs2fa, setNeeds2fa] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -45,17 +43,11 @@ function MemberLoginPageInner() {
       body: JSON.stringify({
         email,
         password,
-        totpCode: totpCode || undefined,
       }),
     });
     setSubmitting(false);
 
     if (!result.ok) {
-      if (result.details?.requires2fa) {
-        setNeeds2fa(true);
-        setError('Enter the 6-digit code from your authenticator app.');
-        return;
-      }
       setError(result.error ?? 'Login failed');
       return;
     }
@@ -126,23 +118,6 @@ function MemberLoginPageInner() {
             Forgot password?
           </Link>
         </div>
-        {needs2fa && (
-          <div>
-            <label className={labelClass} htmlFor="totp">2FA code</label>
-            <input
-              id="totp"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="\d{6}"
-              maxLength={6}
-              required
-              value={totpCode}
-              onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ''))}
-              className={inputClass}
-              placeholder="000000"
-            />
-          </div>
-        )}
         {error && (
           <p className="text-sm text-danger" role="alert">{error}</p>
         )}

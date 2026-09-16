@@ -186,7 +186,21 @@ const DEFAULT_BRANDS = [
         brandList = DEFAULT_BRANDS;
       }
       setBrands(brandList);
-      if (c.ok && c.data) setCategories(c.data);
+
+      let categoryList: CategoryNode[] = [];
+      if (c.ok && c.data) {
+        const list = Array.isArray(c.data) ? c.data : (c.data as any).data;
+        if (Array.isArray(list)) categoryList = list;
+      }
+      if (categoryList.length === 0) {
+        // Fallback to public categories if admin endpoint is 403 or unauthenticated
+        const cPublic = await apiFetch<any>('/categories');
+        if (cPublic.ok && cPublic.data) {
+          const list = Array.isArray(cPublic.data) ? cPublic.data : cPublic.data.data;
+          if (Array.isArray(list) && list.length > 0) categoryList = list;
+        }
+      }
+      setCategories(categoryList);
     })();
   }, [open]);
 
@@ -196,8 +210,12 @@ const DEFAULT_BRANDS = [
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
-        const draft = JSON.parse(raw) as FormState;
-        setForm(draft);
+        const draft = JSON.parse(raw) as Partial<FormState>;
+        setForm({
+          ...EMPTY,
+          ...draft,
+          imageUrls: Array.isArray(draft.imageUrls) ? draft.imageUrls : [],
+        });
       }
     } catch {
       /* ignore */
@@ -450,7 +468,7 @@ const DEFAULT_BRANDS = [
         : undefined,
       avatarImageUrl: form.avatarImageUrl || undefined,
       retailerImageUrl: form.retailerImageUrl || undefined,
-      imageUrls: form.imageUrls.length > 0 ? form.imageUrls : undefined,
+      imageUrls: (form.imageUrls || []).length > 0 ? form.imageUrls : undefined,
       status: form.status,
       affiliatePartner: form.affiliatePartner,
       visibilityCategorySlugs: visibilitySlugs.length ? visibilitySlugs : undefined,
@@ -764,10 +782,10 @@ const DEFAULT_BRANDS = [
           {/* Product images: drag + paste + pick + gallery grid */}
           <section>
             <label className={adminLabel}>
-              📸 Product Images ({form.imageUrls.length})
+              📸 Product Images ({(form.imageUrls || []).length})
             </label>
             <ImageDropPaste
-              imageUrls={form.imageUrls}
+              imageUrls={form.imageUrls || []}
               currentUrl={form.avatarImageUrl}
               blobPreviews={blobPreviews}
               uploading={uploading}
@@ -784,11 +802,18 @@ const DEFAULT_BRANDS = [
                     return next;
                   });
                 }
-                setForm((prev) => ({
-                  ...prev,
-                  imageUrls: prev.imageUrls.filter((u) => u !== url),
-                  avatarImageUrl: prev.avatarImageUrl === url ? (prev.imageUrls.find((u) => u !== url) || '') : prev.avatarImageUrl,
-                }));
+                setForm((prev) => {
+                  const currentList = prev.imageUrls || [];
+                  const filtered = currentList.filter((u) => u !== url);
+                  return {
+                    ...prev,
+                    imageUrls: filtered,
+                    avatarImageUrl:
+                      prev.avatarImageUrl === url
+                        ? filtered[0] || ''
+                        : prev.avatarImageUrl,
+                  };
+                });
               }}
               onSetPrimary={(url) => set('avatarImageUrl', url)}
             />

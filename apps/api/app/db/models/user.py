@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Enum as SAEnum, Integer, TIMESTAMP, Text, text
+from sqlalchemy import Enum as SAEnum, Integer, TIMESTAMP, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..enums import UserRole, UserStatus
@@ -27,8 +27,6 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(SAEnum(UserRole, name="UserRole", create_type=False, native_enum=True), nullable=False, server_default=text('MEMBER'), name='role')
     status: Mapped[UserStatus] = mapped_column(SAEnum(UserStatus, name="UserStatus", create_type=False, native_enum=True), nullable=False, server_default=text('ACTIVE'), name='status')
     emailVerifiedAt: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='emailVerifiedAt')
-    totpSecret: Mapped[str | None] = mapped_column(Text, nullable=True, name='totpSecret')
-    totpEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text('false'), name='totpEnabled')
     failedLoginCount: Mapped[int] = mapped_column(Integer, nullable=False, server_default=text('0'), name='failedLoginCount')
     lockedUntil: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='lockedUntil')
     lastLoginAt: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=False), nullable=True, name='lastLoginAt')

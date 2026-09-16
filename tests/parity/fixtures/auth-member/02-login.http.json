@@ -24,7 +24,6 @@
       "id": "<cuid>",
       "email": "parity-member-fixture@branv.local",
       "role": "MEMBER",
-      "totpEnabled": false,
       "emailVerified": false
     },
     "setCookies": [

@@ -90,7 +90,7 @@
 
 ## Phase 1 - Identity (Member + Admin)
 
-**Objective:** Two login flows with JWT, refresh rotation, email verification, mandatory 2FA for admin.
+**Objective:** Two login flows with JWT, refresh rotation, email verification.
 
 ### 1.1 Data Model
 
@@ -100,22 +100,20 @@
 
 1. Argon2id password hashing.
 2. JWT access (15 min) + rotating refresh (7 days) in `httpOnly`, `Secure`, `SameSite=Lax` cookies.
-3. Endpoints: `/api/auth/register` (member only), `/api/auth/login` (both roles), `/api/auth/refresh`, `/api/auth/logout`, `/api/auth/verify-email`, `/api/auth/forgot-password`, `/api/auth/reset-password`, `/api/auth/2fa/setup`, `/verify`, `/disable`.
+3. Endpoints: `/api/auth/register` (member only), `/api/auth/login` (both roles), `/api/auth/refresh`, `/api/auth/logout`, `/api/auth/verify-email`, `/api/auth/forgot-password`, `/api/auth/reset-password`.
 4. RBAC guard (NestJS `RolesGuard` + `@Roles('ADMIN')` decorator; FastAPI `require_role(role)` dependency).
-5. **Admin: mandatory TOTP 2FA** before any non-auth action.
-6. Rate limit auth endpoints to 5/min/IP via Redis sliding window.
-7. Account lockout: 5 failed logins in 15 min → 15-min lockout.
-8. Two frontend login routes: `/login` (member) and `/admin/login` (admin). Backend returns role-claimed JWT; frontend redirects.
-9. Member self-registration at `/register`. Admin not self-serve.
-10. CLI seed script creates the first admin: `pnpm seed:admin` or `python -m api.seed_admin`.
-11. Audit log on every auth event (register, login success, login fail, password reset, 2FA toggle).
-12. Google OAuth optional, behind `GOOGLE_OAUTH_ENABLED` flag.
+5. Rate limit auth endpoints to 5/min/IP via Redis sliding window.
+6. Account lockout: 5 failed logins in 15 min → 15-min lockout.
+7. Two frontend login routes: `/login` (member) and `/admin/login` (admin). Backend returns role-claimed JWT; frontend redirects.
+8. Member self-registration at `/register`. Admin not self-serve.
+9. CLI seed script creates the first admin: `pnpm seed:admin` or `python -m api.seed_admin`.
+10. Audit log on every auth event (register, login success, login fail, password reset).
+11. Google OAuth optional, behind `GOOGLE_OAUTH_ENABLED` flag.
 
 ### 1.3 Acceptance Checks
 
 - [ ] Member can register, verify email, log in.
 - [ ] Member cannot reach `/admin/*` (403).
-- [ ] Admin must complete 2FA setup before any admin action.
 - [ ] Refresh rotation works; old refresh tokens rejected after use.
 - [ ] 6 failed logins → 15-min lockout.
 - [ ] Audit log records every auth event.
@@ -732,7 +730,7 @@ Migrate: `drops`, `drop_products`, `drop_notify_signups`, `lookbooks`, `lookbook
 
 3. **E2E (Playwright):**
    - **Member journey:** register → verify email → browse → filter → product page → Buy Now (new tab opens, click logged) → return → "Yes I bought it" → Nice Pick celebration → check Wardrobe → leave review.
-   - **Admin Quick Add journey:** login with 2FA → click "+" → paste Flipkart URL → auto-fill → paste avatar from clipboard → publish → see live on storefront.
+   - **Admin Quick Add journey:** login → click "+" → paste Flipkart URL → auto-fill → paste avatar from clipboard → publish → see live on storefront.
    - **Drop journey:** schedule a drop 1 min in future → see pre-launch state → wait for scheduler → see LIVE → click product → Nice Pick → admin sees real-time drop dashboard.
 
 4. **Concurrency:** 1000 concurrent `/go/:trackingId` requests; verify no lost rows and p95 < 100ms.
@@ -830,7 +828,7 @@ Run these manually on production after Phase 13.
 
 ### Admin Journey
 
-1. Log in to `/admin/login` with 2FA.
+1. Log in to `/admin/login`.
 2. Open `/admin/avatars`; verify base reference avatars are present.
 3. Generate an outfit image in Gemini using the stored prompt template.
 4. Press `N` to open Quick Add modal.

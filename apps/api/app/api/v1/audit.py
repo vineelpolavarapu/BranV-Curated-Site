@@ -12,7 +12,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...core.auth_deps import current_user_required, enforce_two_factor, require_roles
+from ...core.auth_deps import current_user_required, require_roles
 from ...db.session import get_db
 from ...services import audit_service
 from ...services.audit_service import AuditListQuery
@@ -37,7 +37,6 @@ def _parse_iso(value: str | None, *, field: str) -> datetime | None:
     dependencies=[
         Depends(current_user_required),
         Depends(require_roles("ADMIN")),
-        Depends(enforce_two_factor),
     ],
 )
 async def list_audit(

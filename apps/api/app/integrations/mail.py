@@ -112,13 +112,7 @@ class MailService:
             )
         )
 
-    async def send_password_reset(self, to: str, link: str, *, totp_will_reset: bool = False) -> None:
-        totp_note = (
-            "\n\nCompleting this reset will also turn off two-factor authentication "
-            "on your account - you'll need to re-enroll a new authenticator app afterward."
-            if totp_will_reset
-            else ""
-        )
+    async def send_password_reset(self, to: str, link: str) -> None:
         await self.send(
             MailMessage(
                 to=to,
@@ -126,7 +120,7 @@ class MailService:
                 text=(
                     f"Reset your BranV password by visiting:\n{link}\n\n"
                     "This link expires in 1 hour. If you didn't request this, "
-                    f"ignore this message.{totp_note}"
+                    "ignore this message."
                 ),
             )
         )

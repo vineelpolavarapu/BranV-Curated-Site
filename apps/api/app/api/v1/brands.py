@@ -16,7 +16,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...core.auth_deps import (
     AuthenticatedUser,
     current_user_required,
-    enforce_two_factor,
     require_roles,
 )
 from ...db.session import get_db
@@ -30,7 +29,6 @@ DbDep = Annotated[AsyncSession, Depends(get_db)]
 AdminDeps = [
     Depends(current_user_required),
     Depends(require_roles("ADMIN")),
-    Depends(enforce_two_factor),
 ]
 
 

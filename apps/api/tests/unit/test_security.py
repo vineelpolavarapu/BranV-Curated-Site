@@ -1,12 +1,10 @@
-"""Unit tests for app.core.security - Argon2, JWT, refresh tokens, TOTP."""
+"""Unit tests for app.core.security - Argon2, JWT, refresh tokens."""
 
 from __future__ import annotations
 
 import base64
-import time
 
 import jwt
-import pyotp
 import pytest
 from fastapi import Response
 
@@ -64,32 +62,27 @@ def test_jwt_payload_shape_matches_nest():
         id="user-abc",
         email="a@b.test",
         role="ADMIN",
-        totpEnabled=True,
         emailVerified=False,
     )
     token = security.sign_access_token(user)
     s = get_settings()
     raw = jwt.decode(token, s.JWT_ACCESS_SECRET, algorithms=["HS256"])
-    assert set(raw.keys()) == {"sub", "email", "role", "totp", "ev", "iat", "exp"}
+    assert set(raw.keys()) == {"sub", "email", "role", "ev", "iat", "exp"}
     assert raw["sub"] == "user-abc"
     assert raw["email"] == "a@b.test"
     assert raw["role"] == "ADMIN"
-    assert raw["totp"] is True
     assert raw["ev"] is False
     # exp ≈ iat + TTL.
     assert abs((raw["exp"] - raw["iat"]) - s.JWT_ACCESS_TTL_SECONDS) <= 1
 
 
 def test_jwt_signed_by_python_decodable_by_python():
-    user = security.AuthenticatedUser(
-        id="x", email="x@y.z", role="MEMBER", totpEnabled=False, emailVerified=True
-    )
+    user = security.AuthenticatedUser(id="x", email="x@y.z", role="MEMBER", emailVerified=True)
     token = security.sign_access_token(user)
     decoded = security.decode_access_token(token)
     assert decoded is not None
     assert decoded.sub == "x"
     assert decoded.role == "MEMBER"
-    assert decoded.totp is False
     assert decoded.ev is True
 
 
@@ -102,13 +95,13 @@ def test_sign_access_token_from_dict_handles_emailVerifiedAt_null():
     # The fresh-login path passes the raw DB row; the JWT 'ev' must reflect
     # `user.emailVerifiedAt !== null` exactly like the Nest implementation.
     t1 = security.sign_access_token(
-        {"id": "u1", "email": "u@v.w", "role": "MEMBER", "totpEnabled": False, "emailVerifiedAt": None}
+        {"id": "u1", "email": "u@v.w", "role": "MEMBER", "emailVerifiedAt": None}
     )
     p1 = security.decode_access_token(t1)
     assert p1 is not None and p1.ev is False
 
     t2 = security.sign_access_token(
-        {"id": "u1", "email": "u@v.w", "role": "MEMBER", "totpEnabled": False, "emailVerifiedAt": "2026-01-01T00:00:00Z"}
+        {"id": "u1", "email": "u@v.w", "role": "MEMBER", "emailVerifiedAt": "2026-01-01T00:00:00Z"}
     )
     p2 = security.decode_access_token(t2)
     assert p2 is not None and p2.ev is True
@@ -127,34 +120,6 @@ def test_refresh_token_mint_and_hash():
     assert len(h) == 64  # sha256 hex
     assert all(c in "0123456789abcdef" for c in h)
     assert security.hash_refresh_token(a) == h  # deterministic
-
-
-def test_totp_secret_and_verify():
-    secret = security.generate_totp_secret()
-    # otplib + pyotp both use base32; length 32 by default.
-    assert len(secret) == 32
-    assert set(secret).issubset(set("ABCDEFGHIJKLMNOPQRSTUVWXYZ234567"))
-    code = pyotp.TOTP(secret).now()
-    assert security.verify_totp(code, secret) is True
-    assert security.verify_totp("000000", secret) is False
-    assert security.verify_totp("not-numeric", secret) is False
-
-
-def test_totp_window_tolerance():
-    # ±1 30-second window should be honored. Generate a code one step in the
-    # past and confirm it still verifies - matches `authenticator.options = {window:1}`.
-    secret = security.generate_totp_secret()
-    totp = pyotp.TOTP(secret)
-    prev_code = totp.at(int(time.time()) - 30)
-    assert security.verify_totp(prev_code, secret) is True
-
-
-def test_totp_uri_includes_issuer_and_email():
-    s = get_settings()
-    uri = security.totp_uri("vineel@example.com", "JBSWY3DPEHPK3PXP")
-    assert uri.startswith("otpauth://totp/")
-    assert f"issuer={s.TOTP_ISSUER}" in uri
-    assert "vineel%40example.com" in uri or "vineel@example.com" in uri
 
 
 def test_set_auth_cookies_emits_both_with_expected_attrs():
