@@ -138,6 +138,22 @@ def _extract_redirect_target(html: str, base_url: str) -> str | None:
     return None
 
 
+def _extract_query_redirect(url: str) -> str | None:
+    """Extract destination URL from affiliate / redirector query parameters (e.g. ?dl=, ?url=)."""
+    p = urlparse(url)
+    if not p.query:
+        return None
+    qs = parse_qs(p.query)
+    for k in _REDIRECT_QUERY_KEYS:
+        vals = qs.get(k)
+        if vals:
+            target = vals[0].strip()
+            if target.startswith(("http://", "https://")):
+                return target
+    return None
+
+
+
 # ───────────── fetcher abstraction (hybrid, free tooling only) ──────────────
 
 
@@ -215,21 +231,69 @@ async def _fetch_headless(url: str) -> FetchResult | None:
         return None
 
 
+async def _fetch_managed_scraper(url: str) -> FetchResult | None:
+    """Fetch using configured managed scraper (e.g. ScrapingAnt) when direct fetch is blocked."""
+    s = get_settings()
+    if not s.SCRAPER_API_KEY:
+        return None
+
+    if s.SCRAPER_PROVIDER == "scrapingant":
+        import urllib.parse
+        sa_url = (
+            f"https://api.scrapingant.com/v2/general"
+            f"?url={urllib.parse.quote_plus(url)}&x-api-key={s.SCRAPER_API_KEY}&browser=false"
+        )
+        try:
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                r = await client.get(sa_url)
+                if r.status_code == 200 and r.text:
+                    return FetchResult(html=r.text, final_url=url, status=200, blocked=False)
+                log.warning("scrapingant_error", extra={"status": r.status_code, "text": r.text[:200]})
+        except Exception as e:
+            log.warning("scrapingant_fetch_failed", extra={"error": str(e), "url": url})
+            return None
+
+    return None
+
+
+def _is_product_url(url: str) -> bool:
+    path = urlparse(url).path.lower()
+    return "/dp/" in path or "/gp/product/" in path or "/p/itm" in path
+
+
 async def _resolve_and_fetch(url: str) -> FetchResult:
     """Unwrap affiliate/redirect links, then return the fetched real product page.
 
-    Follows HTTP redirects (httpx) plus client-side (meta-refresh / JS) interstitials,
-    and escalates to the free headless fetcher when configured and the page still
-    looks empty/blocked. Site-agnostic: stops when it lands on a real page, not when
-    it matches a retailer list.
+    Follows HTTP redirects (httpx) plus client-side (meta-refresh / JS / query-param)
+    interstitials, and escalates to a managed scraper (ScrapingAnt) or headless fetcher
+    when anti-bot systems block direct connection.
     """
     s = get_settings()
     current = url
+
+    # Immediate query unwrap if input URL already embeds destination (?dl=, ?url=)
+    query_target = _extract_query_redirect(current)
+    if query_target:
+        current = query_target
+
     result = await _fetch_httpx(current)
 
-    # Follow client-side redirect interstitials (affiliate networks often JS-bounce).
+    # Follow client-side redirect interstitials (affiliate networks often JS-bounce or query redirect).
     hops = 0
     while hops < s.SCRAPER_MAX_REDIRECT_HOPS:
+        if not result.blocked and result.status == 200 and (
+            _is_product_url(result.final_url) or _has_product_markup(result.html)
+        ):
+            break
+
+        # Check if landed URL contains a query redirect target (e.g. linkredirect.in?...&dl=https://...)
+        query_target = _extract_query_redirect(result.final_url)
+        if query_target and query_target != result.final_url:
+            current = query_target
+            result = await _fetch_httpx(current)
+            hops += 1
+            continue
+
         target = _extract_redirect_target(result.html, result.final_url)
         if not target or target == result.final_url:
             break
@@ -237,14 +301,27 @@ async def _resolve_and_fetch(url: str) -> FetchResult:
         result = await _fetch_httpx(current)
         hops += 1
 
-    # Escalate to headless when the page is blocked/empty or still a wrapper.
-    needs_render = result.blocked or not result.html or (
+    # Check query param one more time on final landed URL
+    query_target = _extract_query_redirect(result.final_url)
+    if query_target and query_target != result.final_url:
+        current = query_target
+        result = await _fetch_httpx(current)
+
+    # Escalate to managed scraper (ScrapingAnt) or headless when blocked/empty or soft-blocked
+    soft_blocked = _looks_soft_blocked(result.html)
+    needs_render = result.blocked or soft_blocked or not result.html or (
         _looks_like_wrapper(result.final_url) and not _has_product_markup(result.html)
     )
-    if needs_render and s.SCRAPER_RENDER_JS:
-        rendered = await _fetch_headless(current)
-        if rendered and rendered.html:
-            result = rendered
+
+    if needs_render:
+        if s.SCRAPER_API_KEY:
+            managed = await _fetch_managed_scraper(current)
+            if managed and managed.html and not _looks_soft_blocked(managed.html):
+                return managed
+        if s.SCRAPER_RENDER_JS:
+            rendered = await _fetch_headless(current)
+            if rendered and rendered.html:
+                result = rendered
 
     return result
 
@@ -278,9 +355,12 @@ _JUNK_TOKENS = (
 
 # Hosts that serve brand banners / marketing assets, never the product photo.
 _JUNK_HOSTS = (
-    "static-assets-web.flixcart.com",   # Flipkart logo/brand banner
-    "myntrassets.blob.core.windows.net",  # Myntra seasonal/marketing banners
-    "constant.myntassets.com",           # Myntra static UI assets
+    "static-assets-web.flixcart.com",     # Flipkart logo/brand banner
+    "myntrassets.blob.core.windows.net",    # Myntra seasonal/marketing banners
+    "constant.myntassets.com",             # Myntra static UI assets
+    "asset21.ckassets.com",                # CashKaro / EarnKaro store logos
+    "ckassets.com",
+    "facebook.com",                        # Tracking pixels
 )
 
 # Positive allow-list: the CDN host(s) each retailer serves REAL product photos from.

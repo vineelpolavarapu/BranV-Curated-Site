@@ -104,6 +104,9 @@ class Settings(BaseSettings):
     SCRAPER_RENDER_JS: bool = False
     # Max redirect hops when unwrapping affiliate / shortener links.
     SCRAPER_MAX_REDIRECT_HOPS: int = 5
+    # Optional managed scraper API (e.g. "scrapingant", "scraperapi", "zenrows")
+    SCRAPER_PROVIDER: str = "scrapingant"
+    SCRAPER_API_KEY: str = ""
 
     # ---- Python-service-only (no Nest equivalent) ----
     SCHEDULER_OWNER: Literal["fastapi", "nest", "none"] = "none"
