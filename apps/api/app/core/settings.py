@@ -106,6 +106,14 @@ class Settings(BaseSettings):
     # Optional managed scraper API (e.g. "scrapingant", "scraperapi", "zenrows")
     SCRAPER_PROVIDER: str = "scrapingant"
     SCRAPER_API_KEY: str = ""
+    # Firecrawl (https://firecrawl.dev) — managed fetch that unwraps affiliate/shortlinks
+    # and bypasses anti-bot in one call. When set, it's tried FIRST in the escalation
+    # ladder (before ScrapingAnt/headless). Empty = disabled, ladder is unchanged.
+    FIRECRAWL_API_KEY: str = ""
+    # Last-resort safety net: if the HTML waterfall returns 0 images on a recognized
+    # retailer, do one Firecrawl AI-extraction (json) pass. Its URLs still flow through
+    # _postprocess (allow-list + hi-res), so the zero-logo-leak guarantee is preserved.
+    FIRECRAWL_JSON_FALLBACK: bool = True
 
     # ---- Python-service-only (no Nest equivalent) ----
     SCHEDULER_OWNER: Literal["fastapi", "nest", "none"] = "none"

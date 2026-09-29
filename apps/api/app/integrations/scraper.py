@@ -256,6 +256,98 @@ async def _fetch_managed_scraper(url: str) -> FetchResult | None:
     return None
 
 
+_FIRECRAWL_BASE = "https://api.firecrawl.dev/v2"
+
+
+async def _fetch_firecrawl(url: str) -> FetchResult | None:
+    """Fetch via Firecrawl: unwraps affiliate/shortlinks and bypasses anti-bot, then
+    returns the resolved page's raw HTML so the normal waterfall (JSON-LD → SPA → DOM)
+    and the positive CDN allow-list run unchanged. Returns None (caller degrades to the
+    next provider) when no key is set or the call fails/soft-blocks."""
+    s = get_settings()
+    if not s.FIRECRAWL_API_KEY:
+        return None
+    try:
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            r = await client.post(
+                f"{_FIRECRAWL_BASE}/scrape",
+                headers={"Authorization": f"Bearer {s.FIRECRAWL_API_KEY}"},
+                json={"url": url, "formats": ["rawHtml"]},
+            )
+    except Exception as e:  # noqa: BLE001
+        log.warning("firecrawl_fetch_failed", extra={"error": str(e), "url": url})
+        return None
+    if r.status_code != 200:
+        log.warning("firecrawl_error", extra={"status": r.status_code, "text": r.text[:200]})
+        return None
+    body = r.json()
+    data = body.get("data") or {}
+    html = data.get("rawHtml") or data.get("html") or ""
+    meta = data.get("metadata") or {}
+    # metadata.url is the resolved final URL after all affiliate/redirect hops.
+    final_url = meta.get("url") or meta.get("sourceURL") or url
+    if not html:
+        return None
+    return FetchResult(html=html, final_url=final_url, status=200, blocked=False)
+
+
+async def _fetch_firecrawl_images(url: str) -> tuple[str, list[str]]:
+    """Last-resort AI extraction: ask Firecrawl for the title + full product gallery
+    directly. Returns (title, raw_image_urls) — the caller still runs the URLs through
+    _postprocess so the allow-list and hi-res rewrite apply. ('' , []) on failure."""
+    s = get_settings()
+    if not s.FIRECRAWL_API_KEY:
+        return "", []
+    # A schema pins the output keys (the freeform prompt renames them every call:
+    # productImageUrls / highResolutionImages / …), so extraction stays deterministic.
+    payload = {
+        "url": url,
+        "formats": [
+            {
+                "type": "json",
+                "prompt": (
+                    "Extract the product title and ALL high-resolution product "
+                    "image URLs (studio catalog photos only — no logos, banners, "
+                    "icons, or tracking pixels)."
+                ),
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "images": {"type": "array", "items": {"type": "string"}},
+                    },
+                    "required": ["images"],
+                },
+            }
+        ],
+    }
+    try:
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            r = await client.post(
+                f"{_FIRECRAWL_BASE}/scrape",
+                headers={"Authorization": f"Bearer {s.FIRECRAWL_API_KEY}"},
+                json=payload,
+            )
+    except Exception as e:  # noqa: BLE001
+        log.warning("firecrawl_json_failed", extra={"error": str(e), "url": url})
+        return "", []
+    if r.status_code != 200:
+        log.warning("firecrawl_json_error", extra={"status": r.status_code, "text": r.text[:200]})
+        return "", []
+    obj = ((r.json().get("data") or {}).get("json")) or {}
+    title = obj.get("title") or obj.get("productTitle") or ""
+    images = _coerce_images(obj.get("images"))
+    # Fallback: schema ignored → find the first value that's a list of image URLs.
+    if not images:
+        for val in obj.values():
+            if isinstance(val, list) and any(
+                isinstance(x, str) and _looks_like_image_url(x) for x in val
+            ):
+                images = _coerce_images(val)
+                break
+    return title, images
+
+
 def _is_product_url(url: str) -> bool:
     path = urlparse(url).path.lower()
     return "/dp/" in path or "/gp/product/" in path or "/p/itm" in path
@@ -314,6 +406,11 @@ async def _resolve_and_fetch(url: str) -> FetchResult:
     )
 
     if needs_render:
+        # Firecrawl first: it unwraps affiliate links AND bypasses anti-bot in one call.
+        if s.FIRECRAWL_API_KEY:
+            fc = await _fetch_firecrawl(current)
+            if fc and fc.html and not _looks_soft_blocked(fc.html):
+                return fc
         if s.SCRAPER_API_KEY:
             managed = await _fetch_managed_scraper(current)
             if managed and managed.html and not _looks_soft_blocked(managed.html):
@@ -779,7 +876,26 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
     if fetched.html and not soft_blocked:
         title, images = extract_from_html(fetched.html, resolved_url, retailer)
 
-    blocked = fetched.blocked or soft_blocked
+    # Last-resort safety net: HTML waterfall found nothing on a recognized retailer.
+    # Ask Firecrawl to AI-extract the gallery, then run its URLs through _postprocess
+    # so the allow-list + hi-res rewrite still apply (no raw/logo URLs slip through).
+    used_firecrawl_json = False
+    if (
+        not images
+        and s.FIRECRAWL_JSON_FALLBACK
+        and s.FIRECRAWL_API_KEY
+        and retailer not in ("unknown", "generic")
+    ):
+        fc_title, fc_imgs = await _fetch_firecrawl_images(resolved_url)
+        if fc_imgs:
+            images = _postprocess(fc_imgs, retailer)
+            used_firecrawl_json = True
+        if fc_title and not title:
+            title = _clean_title(fc_title, retailer)
+
+    # If the JSON fallback recovered the gallery, the earlier soft-block no longer
+    # matters — don't flag the scrape as blocked (else the modal shows a false ⚠).
+    blocked = (fetched.blocked or soft_blocked) and not used_firecrawl_json
     debug = {
         "resolvedUrl": resolved_url,
         "html_bytes": len(fetched.html),
@@ -787,6 +903,7 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
         "blocked": blocked,
         "images_found": len(images),
         "strategy_used": "static" if not s.SCRAPER_RENDER_JS else "hybrid",
+        "firecrawl_json_fallback": used_firecrawl_json,
     }
     if blocked:
         log.warning("scrape_blocked", extra={"url": url, "status": fetched.status, "soft": soft_blocked})
