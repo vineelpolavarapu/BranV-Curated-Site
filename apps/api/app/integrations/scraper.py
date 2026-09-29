@@ -465,7 +465,10 @@ _JUNK_HOSTS = (
 # banner on any other host can never masquerade as the product. Each entry is
 # (host substring, required path substring or "").
 _PRODUCT_CDN: dict[str, tuple[tuple[str, str], ...]] = {
-    "flipkart": (("rukminim", "/image/"),),
+    # Flipkart serves product photos from BOTH rukminimN (DOM/embedded) and rukminiN
+    # (JSON-LD, e.g. rukmini1.flixcart.com) hosts. The token must be "rukmini" (no
+    # trailing m) to match both — "rukminim" silently dropped every JSON-LD image.
+    "flipkart": (("rukmini", "/image/"),),
     "myntra": (("assets.myntassets.com", ""), ("images.myntra.com", "")),
     "amazon": (("media-amazon.com", "/images/i/"), ("ssl-images-amazon.com", "/images/i/")),
     "ajio": (("assets.ajio.com", ""),),
@@ -796,11 +799,16 @@ def extract_from_html(html: str, base_url: str, retailer: str) -> tuple[str, lis
     ld_title, ld_imgs = _extract_jsonld(tree)
     meta_title, meta_imgs = _extract_meta(tree)
 
-    # 1. Primary: Authoritative Schema.org JSON-LD images
+    # 1. Primary: Authoritative Schema.org JSON-LD images.
+    # SOVEREIGN: JSON-LD lists every angle of THIS product in order. Once it yields any
+    # valid image we trust it exclusively and never top up from embedded/DOM — those
+    # sweep the whole page and pull in recommendation-carousel neighbors (a DIFFERENT
+    # product) as image #2. Fewer-but-correct beats more-but-mixed.
     images = _postprocess(ld_imgs, retailer) if ld_imgs else []
 
-    # 2. Secondary: Embedded SPA state (Next.js __NEXT_DATA__ / inline state)
-    if len(images) < s.SCRAPER_MAX_IMAGES:
+    # 2. Secondary: Embedded SPA state (Next.js __NEXT_DATA__ / inline state).
+    # Only when JSON-LD gave us nothing.
+    if not images:
         embedded = _extract_embedded_state(tree, html)
         if embedded:
             more = _postprocess(embedded, retailer)
@@ -810,8 +818,8 @@ def extract_from_html(html: str, base_url: str, retailer: str) -> tuple[str, lis
                 if len(images) >= s.SCRAPER_MAX_IMAGES:
                     break
 
-    # 3. Tertiary: DOM <img> and <source>
-    if len(images) < s.SCRAPER_MAX_IMAGES:
+    # 3. Tertiary: DOM <img> and <source>. Only when both above gave us nothing.
+    if not images:
         dom = _extract_dom(tree, base_url)
         if retailer in ("unknown", "generic"):
             candidates = meta_imgs[:1] + dom + meta_imgs[1:]
