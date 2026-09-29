@@ -743,7 +743,15 @@ _CATEGORY_TAIL_RE = re.compile(
 )
 
 
-_BLOCKED_TITLE_TERMS = ("captcha", "robot check", "are you a human", "access denied", "security check")
+_BLOCKED_TITLE_TERMS = (
+    "captcha", "robot check", "are you a human", "access denied", "security check",
+    # Amazon interstitials / robot walls that return HTTP 200.
+    "sorry, we just need to make sure", "enter the characters you see below",
+    "to discuss automated access", "api-services-support@amazon",
+    # Myntra / PerimeterX (HUMAN) bot wall.
+    "px-captcha", "perimeterx", "please verify you are a human",
+    "access to this page has been denied",
+)
 
 
 def _clean_title(raw: str | None, retailer: str) -> str:
@@ -767,10 +775,14 @@ def _clean_title(raw: str | None, retailer: str) -> str:
 
 
 def _looks_soft_blocked(html: str) -> bool:
-    """A 200-status page that is really a captcha / bot wall (no product content)."""
+    """A 200-status page that is really a captcha / bot wall (no product content).
+
+    Scans a wide window (not just the <head>): Myntra's PerimeterX wall and Amazon's
+    robot-check markup can sit well past the first few KB.
+    """
     if not html:
         return False
-    head = html[:5000].lower()
+    head = html[:20000].lower()
     return any(term in head for term in _BLOCKED_TITLE_TERMS)
 
 
@@ -884,26 +896,62 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
     if fetched.html and not soft_blocked:
         title, images = extract_from_html(fetched.html, resolved_url, retailer)
 
-    # Last-resort safety net: HTML waterfall found nothing on a recognized retailer.
-    # Ask Firecrawl to AI-extract the gallery, then run its URLs through _postprocess
-    # so the allow-list + hi-res rewrite still apply (no raw/logo URLs slip through).
+    known_retailer = retailer not in ("unknown", "generic")
+
+    # Escalation 1 — Firecrawl HTML re-fetch. The direct fetch can return a
+    # technically-200 page that is content-degraded (Amazon ships stripped HTML with
+    # no JSON-LD to datacenter IPs; Myntra serves a PerimeterX wall). Neither trips the
+    # `blocked` flag inside _resolve_and_fetch, so escalation never ran there. When a
+    # RECOGNIZED retailer comes back with 0 images (or a soft-block), re-fetch the
+    # resolved URL through Firecrawl and re-run the FULL waterfall (JSON-LD → SPA → DOM
+    # → allow-list → hi-res). This is the path that rescues Amazon/Myntra.
+    used_firecrawl_html = False
+    if (
+        (not images or soft_blocked)
+        and known_retailer
+        and s.FIRECRAWL_API_KEY
+        and not _looks_like_wrapper(fetched.final_url)  # already Firecrawl'd in resolve step
+    ):
+        fc = await _fetch_firecrawl(resolved_url)
+        if fc and fc.html and not _looks_soft_blocked(fc.html):
+            fc_title, fc_images = extract_from_html(fc.html, resolved_url, retailer)
+            if fc_images:
+                images = fc_images
+                used_firecrawl_html = True
+            if fc_title and not title:
+                title = fc_title
+
+    # Escalation 2 — AI extraction top-up. Fires when a recognized retailer is still
+    # SHORT of SCRAPER_MAX_IMAGES (not just at zero). Some retailers expose only one
+    # image in JSON-LD (Myntra), and the sovereignty rule correctly refuses to top up
+    # from the page DOM (which would pull neighbor products). Firecrawl's AI extract is
+    # same-product BY CONSTRUCTION (prompted for "ALL images of THIS product"), so it's
+    # a safe source to fill the gap. URLs still pass through _postprocess (allow-list +
+    # hi-res). Merged after any images we already trust, deduped, capped.
     used_firecrawl_json = False
     if (
-        not images
+        len(images) < s.SCRAPER_MAX_IMAGES
         and s.FIRECRAWL_JSON_FALLBACK
         and s.FIRECRAWL_API_KEY
-        and retailer not in ("unknown", "generic")
+        and known_retailer
     ):
         fc_title, fc_imgs = await _fetch_firecrawl_images(resolved_url)
-        if fc_imgs:
-            images = _postprocess(fc_imgs, retailer)
+        clean = _postprocess(fc_imgs, retailer) if fc_imgs else []
+        before = len(images)
+        for u in clean:
+            if u not in images:
+                images.append(u)
+            if len(images) >= s.SCRAPER_MAX_IMAGES:
+                break
+        if len(images) > before:
             used_firecrawl_json = True
         if fc_title and not title:
             title = _clean_title(fc_title, retailer)
 
-    # If the JSON fallback recovered the gallery, the earlier soft-block no longer
-    # matters — don't flag the scrape as blocked (else the modal shows a false ⚠).
-    blocked = (fetched.blocked or soft_blocked) and not used_firecrawl_json
+    # If either Firecrawl escalation recovered the gallery, the earlier block/soft-block
+    # no longer matters — don't flag the scrape as blocked (else the modal shows a false ⚠).
+    recovered = used_firecrawl_html or used_firecrawl_json
+    blocked = (fetched.blocked or soft_blocked) and not recovered
     debug = {
         "resolvedUrl": resolved_url,
         "html_bytes": len(fetched.html),
@@ -911,6 +959,7 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
         "blocked": blocked,
         "images_found": len(images),
         "strategy_used": "static" if not s.SCRAPER_RENDER_JS else "hybrid",
+        "firecrawl_html_refetch": used_firecrawl_html,
         "firecrawl_json_fallback": used_firecrawl_json,
     }
     if blocked:
