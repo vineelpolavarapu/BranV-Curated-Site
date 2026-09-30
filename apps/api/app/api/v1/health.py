@@ -40,49 +40,6 @@ async def liveness() -> dict[str, Any]:
     }
 
 
-@router.get("/scraper-config")
-async def scraper_config() -> dict[str, Any]:
-    """TEMP config probe — shows whether the running container actually has the
-    scraper keys loaded. Booleans only (never the key values). Remove after debug."""
-    s = get_settings()
-    return {
-        "firecrawl_configured": bool(s.FIRECRAWL_API_KEY),
-        "firecrawl_key_len": len(s.FIRECRAWL_API_KEY or ""),
-        "managed_scraper_configured": bool(s.SCRAPER_API_KEY),
-        "scraper_provider": s.SCRAPER_PROVIDER,
-        "mock_mode": s.USE_MOCK_INTEGRATIONS,
-        "user_agent_is_bot": ("bot" in (s.SCRAPER_USER_AGENT or "").lower()),
-        "timestamp": _now_iso(),
-    }
-
-
-@router.get("/scraper-probe")
-async def scraper_probe(response: Response, token: str = "", url: str = "") -> dict[str, Any]:
-    """TEMP: scrape ONE caller-supplied URL on the deployed VM to verify prod end-to-end
-    with a FRESH (uncached) link. Token-gated. Returns booleans/counts + resolved URL
-    only — no image URLs, no secrets. Remove after verification."""
-    s = get_settings()
-    expected = getattr(s, "SCRAPER_SELFTEST_TOKEN", "") or ""
-    if not expected or token != expected or not url:
-        response.status_code = status.HTTP_404_NOT_FOUND
-        return {"detail": "Not Found"}
-    from ...integrations.scraper import scrape_product_url
-
-    r = await scrape_product_url(url)
-    imgs = len(r.images or [])
-    blocked = bool((r.debug or {}).get("blocked"))
-    return {
-        "input": url,
-        "resolved": r.resolvedUrl,
-        "retailer": r.retailer,
-        "images": imgs,
-        "blocked": blocked,
-        "has_title": bool(r.title),
-        "modal_would_block": blocked or imgs == 0,
-        "firecrawl_json_fallback": bool((r.debug or {}).get("firecrawl_json_fallback")),
-    }
-
-
 @router.get("/ready")
 async def readiness(response: Response) -> dict[str, Any]:
     settings = get_settings()

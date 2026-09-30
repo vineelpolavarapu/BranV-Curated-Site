@@ -114,8 +114,6 @@ class Settings(BaseSettings):
     # retailer, do one Firecrawl AI-extraction (json) pass. Its URLs still flow through
     # _postprocess (allow-list + hi-res), so the zero-logo-leak guarantee is preserved.
     FIRECRAWL_JSON_FALLBACK: bool = True
-    # TEMP token for the /api/scraper-probe diagnostic. Empty = endpoint 404s. Remove after verify.
-    SCRAPER_SELFTEST_TOKEN: str = ""
 
     # ---- Python-service-only (no Nest equivalent) ----
     SCHEDULER_OWNER: Literal["fastapi", "nest", "none"] = "none"
