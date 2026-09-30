@@ -77,6 +77,8 @@ async def scraper_selftest(response: Response, token: str = "") -> dict[str, Any
         "amazon_affiliate": "https://link.amazon/B09lgPKwW",
         "amazon_direct": "https://amzn.in/d/0aC2gMj0",
         "flipkart_earnkaro": "https://fktr.in/2rQ04Ew",
+        "myntra_direct": "https://www.myntra.com/tshirts/blackberrys/blackberrys-brand-logo-polo-collar-t-shirt/45224312/buy",
+        "ajio_direct": "https://www.ajio.com/flying-machine-slim-tapered-whiskered-jeans/p/442821739_indigo",
     }
     results: dict[str, Any] = {}
     for name, url in fixed.items():
