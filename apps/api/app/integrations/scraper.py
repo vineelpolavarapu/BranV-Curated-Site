@@ -209,6 +209,44 @@ async def _fetch_httpx(url: str) -> FetchResult:
     )
 
 
+async def _resolve_redirects_only(url: str) -> str:
+    """Follow the redirect chain WITHOUT fetching page content, returning the final URL.
+
+    Affiliate shortlinks (link.amazon, amzn.in, fktr.in, ekaro.in) answer the redirect
+    hops with 3xx + Location and only 403 on the *product page content*. On a blocked
+    (datacenter) IP the content fetch fails, but the cheap redirect hops still succeed —
+    so we can recover the real /dp/ or /p/itm URL and hand THAT to the managed scraper,
+    instead of handing it the bare shortlink (which resolves to the site homepage).
+    Best-effort: returns the deepest URL reached, or the input on any error.
+    """
+    current = url
+    try:
+        async with httpx.AsyncClient(
+            timeout=s_timeout(), follow_redirects=False, headers=_browser_headers()
+        ) as client:
+            for _ in range(get_settings().SCRAPER_MAX_REDIRECT_HOPS):
+                # First, unwrap any ?dl=/?url= style redirect embedded in the query.
+                q = _extract_query_redirect(current)
+                if q and q != current:
+                    current = q
+                    continue
+                r = await client.get(current)
+                loc = r.headers.get("location")
+                if r.status_code in (301, 302, 303, 307, 308) and loc:
+                    current = urljoin(current, loc)
+                    if _is_product_url(current):
+                        break
+                    continue
+                break
+    except Exception as e:  # noqa: BLE001
+        log.info("resolve_redirects_only_failed", extra={"url": url, "error": str(e)})
+    return current
+
+
+def s_timeout() -> float:
+    return get_settings().SCRAPER_TIMEOUT
+
+
 async def _fetch_headless(url: str) -> FetchResult | None:
     """Free Playwright fallback — renders SPA pages / JS redirects. Returns None when
     Playwright isn't installed or the render fails, so callers degrade gracefully."""
@@ -409,13 +447,25 @@ async def _resolve_and_fetch(url: str) -> FetchResult:
     )
 
     if needs_render:
+        # CRITICAL for blocked (datacenter) IPs: if the direct fetch was blocked before
+        # it could follow the affiliate redirect, `current` is still the bare shortlink
+        # (e.g. link.amazon/XXXX). Handing that to a managed scraper lands on the site
+        # HOMEPAGE (no product). Resolve the redirect chain cheaply first so the managed
+        # scraper gets the real /dp/ or /p/itm URL.
+        escalate_url = current
+        if not _is_product_url(escalate_url):
+            resolved = await _resolve_redirects_only(escalate_url)
+            if resolved and resolved != escalate_url:
+                escalate_url = resolved
+                log.info("escalation_url_resolved", extra={"from": current, "to": escalate_url})
+
         # Firecrawl first: it unwraps affiliate links AND bypasses anti-bot in one call.
         if s.FIRECRAWL_API_KEY:
-            fc = await _fetch_firecrawl(current)
+            fc = await _fetch_firecrawl(escalate_url)
             if fc and fc.html and not _looks_soft_blocked(fc.html):
                 return fc
         if s.SCRAPER_API_KEY:
-            managed = await _fetch_managed_scraper(current)
+            managed = await _fetch_managed_scraper(escalate_url)
             if managed and managed.html and not _looks_soft_blocked(managed.html):
                 return managed
         if s.SCRAPER_RENDER_JS:
