@@ -148,8 +148,6 @@ services:
       FIRECRAWL_JSON_FALLBACK: "true"
       SCRAPER_PROVIDER: ${SCRAPER_PROVIDER:-scrapingant}
       SCRAPER_API_KEY: ${SCRAPER_API_KEY}
-      # Temporary token for the /api/health/scraper-selftest diagnostic (remove after verify).
-      SCRAPER_SELFTEST_TOKEN: ${SCRAPER_SELFTEST_TOKEN}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:5000/api/health', timeout=3).status == 200 else 1)"]
       interval: 15s

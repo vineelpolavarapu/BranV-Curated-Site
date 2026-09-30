@@ -236,14 +236,12 @@ jobs:
       - name: Deploy image + migrate + health-check on VM
         uses: appleboy/ssh-action@v1.0.3
         env:
-          # Prefer GitHub Actions secrets; fall back to the values already committed in
-          # this repo (deploy/enable-scraper-keys.sh) so the deploy is self-contained.
-          # These keys are already in git history — no new exposure. ROTATE them and
-          # move to secrets-only once prod is verified.
-          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY || 'fc-0ec1b554d8cc41b681e4ed4b9ed43972' }}
-          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY || '03b53f374ac34d8f910090e7418ae9eb' }}
+          # Scraper escalation keys, injected into the VM's deploy/.env by the remote
+          # script below. Set these under Settings > Secrets and variables > Actions.
+          # Empty values are skipped by upsert_env, so the VM keeps its existing keys.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
           SCRAPER_PROVIDER: ${{ vars.SCRAPER_PROVIDER || 'scrapingant' }}
-          SCRAPER_SELFTEST_TOKEN: ${{ secrets.SCRAPER_SELFTEST_TOKEN || 'branv-selftest-9271' }}
         with:
           host: ${{ secrets.OCI_SSH_HOST }}
           username: ${{ secrets.OCI_SSH_USER }}
@@ -251,7 +249,7 @@ jobs:
           # Pass scraper keys through to the remote script so it can upsert them into
           # the VM's deploy/.env. Values come from GitHub Actions secrets/variables —
           # never committed to git. Empty values are skipped (existing .env untouched).
-          envs: FIRECRAWL_API_KEY,SCRAPER_API_KEY,SCRAPER_PROVIDER,SCRAPER_SELFTEST_TOKEN
+          envs: FIRECRAWL_API_KEY,SCRAPER_API_KEY,SCRAPER_PROVIDER
           script: |
             set -e
             DEPLOY_PATH="${{ vars.OCI_DEPLOY_PATH }}"
@@ -270,10 +268,9 @@ jobs:
                 echo "${name}=${val}" >> .env
               fi
             }
-            upsert_env FIRECRAWL_API_KEY     "${FIRECRAWL_API_KEY:-}"
-            upsert_env SCRAPER_API_KEY       "${SCRAPER_API_KEY:-}"
-            upsert_env SCRAPER_PROVIDER      "${SCRAPER_PROVIDER:-scrapingant}"
-            upsert_env SCRAPER_SELFTEST_TOKEN "${SCRAPER_SELFTEST_TOKEN:-}"
+            upsert_env FIRECRAWL_API_KEY "${FIRECRAWL_API_KEY:-}"
+            upsert_env SCRAPER_API_KEY   "${SCRAPER_API_KEY:-}"
+            upsert_env SCRAPER_PROVIDER  "${SCRAPER_PROVIDER:-scrapingant}"
 
             # ── 1. Record the currently-running api image so we can roll back ──
             PREV_IMAGE=""
