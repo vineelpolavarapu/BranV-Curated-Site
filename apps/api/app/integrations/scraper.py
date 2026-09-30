@@ -91,8 +91,11 @@ _WRAPPER_BRAND_LABELS = (
     "earnkaro", "cuelinks", "inrdeals", "wishlink", "linkredirect", "tinyurl",
 )
 _WRAPPER_DOMAINS = (
-    "amzn.to", "fkrt.it", "myntr.it", "bit.ly", "cutt.ly", "t.co", "goo.gl",
-    "rebrand.ly", "extp.in", "da.gd", "prf.hn", "go.skimresources.com", "clnk.in",
+    "amzn.to", "amzn.in", "fkrt.it", "fktr.in", "myntr.it", "bit.ly", "cutt.ly",
+    "t.co", "goo.gl", "rebrand.ly", "extp.in", "da.gd", "prf.hn",
+    "go.skimresources.com", "clnk.in",
+    # EarnKaro short domains (used for Flipkart/Myntra/Ajio deep links).
+    "ekaro.in", "earnkaro.com",
 )
 _REDIRECT_QUERY_KEYS = ("url", "dl", "u", "redirect", "deeplink", "murl", "ued", "link")
 
