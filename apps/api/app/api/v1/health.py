@@ -56,6 +56,52 @@ async def readiness(response: Response) -> dict[str, Any]:
     }
 
 
+@router.get("/scraper-selftest")
+async def scraper_selftest(response: Response, token: str = "") -> dict[str, Any]:
+    """TEMPORARY diagnostic — proves the deployed scraper works from the VM's IP.
+
+    Token-gated (SCRAPER_SELFTEST_TOKEN) so it isn't a public endpoint. Takes NO
+    user URL input — it scrapes a FIXED set of retailer links, so there's no SSRF
+    surface. Returns only booleans/counts (never image URLs or secrets). Remove
+    after production verification.
+    """
+    settings = get_settings()
+    expected = getattr(settings, "SCRAPER_SELFTEST_TOKEN", "") or ""
+    if not expected or token != expected:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail": "Not Found"}
+
+    from ...integrations.scraper import scrape_product_url
+
+    fixed = {
+        "amazon_affiliate": "https://link.amazon/B09lgPKwW",
+        "amazon_direct": "https://amzn.in/d/0aC2gMj0",
+        "flipkart_earnkaro": "https://fktr.in/2rQ04Ew",
+    }
+    results: dict[str, Any] = {}
+    for name, url in fixed.items():
+        try:
+            r = await scrape_product_url(url)
+            imgs = len(r.images or [])
+            blocked = bool((r.debug or {}).get("blocked"))
+            results[name] = {
+                "images": imgs,
+                "blocked": blocked,
+                "has_title": bool(r.title),
+                # This is exactly what QuickAddModal:351 checks — false is the good case.
+                "modal_would_block": blocked or imgs == 0,
+            }
+        except Exception as e:  # noqa: BLE001
+            results[name] = {"error": type(e).__name__}
+    return {
+        "firecrawl_configured": bool(settings.FIRECRAWL_API_KEY),
+        "managed_scraper_configured": bool(settings.SCRAPER_API_KEY),
+        "mock_mode": settings.USE_MOCK_INTEGRATIONS,
+        "results": results,
+        "timestamp": _now_iso(),
+    }
+
+
 async def _check_db() -> dict[str, Any]:
     # Step 3 wires a real SQLAlchemy ping. Until then, attempt asyncpg connect
     # so /ready means something even pre-ORM. Best-effort - failures are reported,

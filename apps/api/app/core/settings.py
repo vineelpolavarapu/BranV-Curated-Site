@@ -114,6 +114,10 @@ class Settings(BaseSettings):
     # retailer, do one Firecrawl AI-extraction (json) pass. Its URLs still flow through
     # _postprocess (allow-list + hi-res), so the zero-logo-leak guarantee is preserved.
     FIRECRAWL_JSON_FALLBACK: bool = True
+    # Temporary token that unlocks GET /api/health/scraper-selftest (a booleans-only
+    # diagnostic that scrapes fixed retailer URLs to verify prod scraping works).
+    # Empty = endpoint returns 404. Remove after production verification.
+    SCRAPER_SELFTEST_TOKEN: str = ""
 
     # ---- Python-service-only (no Nest equivalent) ----
     SCHEDULER_OWNER: Literal["fastapi", "nest", "none"] = "none"
