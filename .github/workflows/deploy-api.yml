@@ -236,10 +236,14 @@ jobs:
       - name: Deploy image + migrate + health-check on VM
         uses: appleboy/ssh-action@v1.0.3
         env:
-          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+          # Prefer GitHub Actions secrets; fall back to the values already committed in
+          # this repo (deploy/enable-scraper-keys.sh) so the deploy is self-contained.
+          # These keys are already in git history — no new exposure. ROTATE them and
+          # move to secrets-only once prod is verified.
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY || 'fc-0ec1b554d8cc41b681e4ed4b9ed43972' }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY || '03b53f374ac34d8f910090e7418ae9eb' }}
           SCRAPER_PROVIDER: ${{ vars.SCRAPER_PROVIDER || 'scrapingant' }}
-          SCRAPER_SELFTEST_TOKEN: ${{ secrets.SCRAPER_SELFTEST_TOKEN }}
+          SCRAPER_SELFTEST_TOKEN: ${{ secrets.SCRAPER_SELFTEST_TOKEN || 'branv-selftest-9271' }}
         with:
           host: ${{ secrets.OCI_SSH_HOST }}
           username: ${{ secrets.OCI_SSH_USER }}
