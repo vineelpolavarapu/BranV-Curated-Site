@@ -136,8 +136,18 @@ services:
       MAIL_PROVIDER: "resend"
       MAIL_API_KEY: ${MAIL_API_KEY}
       MAIL_FROM: ${MAIL_FROM}
-      # ── Scraper ───────────────────────────────────────────────────────────
-      SCRAPER_USER_AGENT: "Mozilla/5.0 (compatible; BranVBot/1.0)"
+      # ── Scraper / anti-bot ─────────────────────────────────────────────────
+      # Must be a real desktop-Chrome UA. A UA containing "bot" or "compatible;"
+      # is instantly 403'd by Akamai / AWS WAF (see SCRAPING_ARCHITECTURE Bug D),
+      # which blocks EVERY retailer scrape on this datacenter IP.
+      SCRAPER_USER_AGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+      # Escalation keys — REQUIRED in prod: the VM's datacenter IP is hard-blocked
+      # on direct fetch, so these managed scrapers are the only way to recover.
+      # Set the values in the VM's deploy/.env (never commit them).
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY}
+      FIRECRAWL_JSON_FALLBACK: "true"
+      SCRAPER_PROVIDER: ${SCRAPER_PROVIDER:-scrapingant}
+      SCRAPER_API_KEY: ${SCRAPER_API_KEY}
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:5000/api/health', timeout=3).status == 200 else 1)"]
       interval: 15s
