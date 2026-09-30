@@ -239,8 +239,8 @@ jobs:
           # Scraper escalation keys, injected into the VM's deploy/.env by the remote
           # script below. Set these under Settings > Secrets and variables > Actions.
           # Empty values are skipped by upsert_env, so the VM keeps its existing keys.
-          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY || 'fc-0ec1b554d8cc41b681e4ed4b9ed43972' }}
+          SCRAPER_API_KEY: ${{ secrets.SCRAPER_API_KEY || '03b53f374ac34d8f910090e7418ae9eb' }}
           SCRAPER_PROVIDER: ${{ vars.SCRAPER_PROVIDER || 'scrapingant' }}
         with:
           host: ${{ secrets.OCI_SSH_HOST }}

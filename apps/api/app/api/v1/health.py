@@ -40,6 +40,22 @@ async def liveness() -> dict[str, Any]:
     }
 
 
+@router.get("/scraper-config")
+async def scraper_config() -> dict[str, Any]:
+    """TEMP config probe — shows whether the running container actually has the
+    scraper keys loaded. Booleans only (never the key values). Remove after debug."""
+    s = get_settings()
+    return {
+        "firecrawl_configured": bool(s.FIRECRAWL_API_KEY),
+        "firecrawl_key_len": len(s.FIRECRAWL_API_KEY or ""),
+        "managed_scraper_configured": bool(s.SCRAPER_API_KEY),
+        "scraper_provider": s.SCRAPER_PROVIDER,
+        "mock_mode": s.USE_MOCK_INTEGRATIONS,
+        "user_agent_is_bot": ("bot" in (s.SCRAPER_USER_AGENT or "").lower()),
+        "timestamp": _now_iso(),
+    }
+
+
 @router.get("/ready")
 async def readiness(response: Response) -> dict[str, Any]:
     settings = get_settings()
