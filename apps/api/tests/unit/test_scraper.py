@@ -57,12 +57,46 @@ def test_dom_srcset_lazy_and_relative_resolution():
 
 
 def test_amazon_hires_upgrade():
+    # A real main-image token (e.g. _AC_SX679_) is stripped to the full-res base. The
+    # 38×50 thumbnail-strip crop (_SX38_SY50_CR,0,0,38,50_) is a nav thumbnail and is
+    # dropped entirely (its base is often a blank/low-res slot), so only the main survives.
     html = (
-        '<img id="landingImage" '
-        'src="https://m.media-amazon.com/images/I/71abc._SX38_SY50_CR,0,0,38,50_.jpg">'
+        '<img src="https://m.media-amazon.com/images/I/71abc._AC_SX679_.jpg">'
+        '<img src="https://m.media-amazon.com/images/I/31junk._SX38_SY50_CR,0,0,38,50_.jpg">'
     )
     _, images = extract_from_html(html, "https://www.amazon.in/dp/X", "amazon")
     assert images == ["https://m.media-amazon.com/images/I/71abc.jpg"]
+
+
+def test_amazon_prefers_hires_array_over_thumbnails():
+    # Amazon's authoritative gallery is the "hiRes" array; the "large"/thumbnail arrays
+    # include low-res brand/size-chart slots that must not win image #1.
+    html = (
+        '"large":"https://m.media-amazon.com/images/I/31blank.jpg",'
+        '"hiRes":"https://m.media-amazon.com/images/I/71real._SL1440_.jpg"'
+    )
+    _, images = extract_from_html(html, "https://www.amazon.in/dp/X", "amazon")
+    assert images == ["https://m.media-amazon.com/images/I/71real.jpg"]
+
+
+def test_ajio_dedup_and_model_filter():
+    # Same photo at two sizes (different hash dirs) must collapse; SWATCH/TRUST_MARKER
+    # must be dropped; distinct MODEL shots must both survive.
+    base = "https://assets.ajio.com/medias/sys_master/root1/2025/AA/hash{h}"
+    html = "".join(
+        f'<img src="{base.format(h=h)}/-{sz}-443107376-navy-{role}.jpg">'
+        for h, sz, role in [
+            ("1", "78Wx98H", "MODEL"),
+            ("2", "473Wx593H", "MODEL"),   # same photo, bigger → dedup with above
+            ("3", "78Wx98H", "MODEL2"),    # distinct product shot
+            ("4", "309Wx123H", "TRUST_MARKER1"),  # junk badge → dropped
+            ("5", "78Wx98H", "SWATCH"),    # colour chip → dropped
+        ]
+    )
+    _, images = extract_from_html(html, "https://www.ajio.com/x/p/443107376_navy", "ajio")
+    assert len(images) == 2
+    assert all("-MODEL" in u.upper() for u in images)
+    assert all("1117Wx1400H" in u for u in images)  # upgraded to master size
 
 
 def test_largest_from_srcset():

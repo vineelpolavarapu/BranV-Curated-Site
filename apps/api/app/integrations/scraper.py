@@ -531,12 +531,20 @@ _PRODUCT_CDN: dict[str, tuple[tuple[str, str], ...]] = {
 
 
 def _is_product_cdn(url: str, retailer: str) -> bool:
-    """True when `url` is on the retailer's real product-image CDN (allow-list)."""
+    """True when `url` is on the retailer's real product-image CDN (allow-list).
+
+    Matches the host against the URL's ACTUAL hostname (not a substring of the whole
+    URL) so a share link that embeds the CDN host in a query param — e.g.
+    pinterest.com/pin/create/?media=https://assets.ajio.com/…jpg — is correctly rejected.
+    """
     patterns = _PRODUCT_CDN.get(retailer)
     if not patterns:
         return True  # unknown retailer → no allow-list, keep everything (generic path)
+    host = (urlparse(url).hostname or "").lower()
     lowered = url.lower()
-    return any(host in lowered and (not path or path in lowered) for host, path in patterns)
+    return any(
+        (h in host) and (not path or path in lowered) for h, path in patterns
+    )
 
 
 def _looks_like_image_url(u: str) -> bool:
@@ -718,10 +726,18 @@ def _upgrade_flipkart(u: str) -> str:
     return re.sub(r"/image/\d{2,4}/\d{2,4}/", "/image/832/832/", u)
 
 
+def _upgrade_ajio(u: str) -> str:
+    # Ajio encodes the render size as a filename prefix: -78Wx98H-443107376-navy-MODEL.jpg
+    # Normalize every size to one large master so all variants of the same asset collapse
+    # to one URL at dedup time (dedup key = path sans size token → per-asset uniqueness).
+    return re.sub(r"-\d+Wx\d+H-", "-1117Wx1400H-", u)
+
+
 _PER_SITE_HIRES = {
     "amazon": _upgrade_amazon,
     "myntra": _upgrade_myntra,
     "flipkart": _upgrade_flipkart,
+    "ajio": _upgrade_ajio,
 }
 
 
@@ -736,6 +752,35 @@ def _upgrade_hires(u: str, retailer: str) -> str:
 
 
 # ───────────── orchestration ────────────────────────────────────────────────
+
+
+_AJIO_SUFFIX_RE = re.compile(r"-(\d{6,})-([a-z0-9]+)-([a-z0-9]+)\.(?:jpe?g|png|webp)", re.IGNORECASE)
+# Ajio real product shots are tagged …-MODEL.jpg / …-MODEL2.jpg … in the filename.
+# Everything else (SWATCH colour chip, TRUST_MARKER badge banners) is not a product photo.
+_AJIO_MODEL_RE = re.compile(r"-model\d*\.(?:jpe?g|png|webp)$", re.IGNORECASE)
+# Amazon thumbnail-strip crops: …_SX38_SY50_CR,0,0,38,50_… or small _SS40_/_US40_ etc.
+# These are 38-50px nav thumbnails whose stripped base can be a blank/low-res asset.
+_AMAZON_THUMB_RE = re.compile(r"_(?:CR,\d+,\d+,\d+,\d+|S[SXY]\d{1,2}|US\d{1,2})_", re.IGNORECASE)
+# Amazon's authoritative zoomable gallery: "hiRes":"https://…/I/XXXX._SL1440_.jpg".
+_AMAZON_HIRES_RE = re.compile(r'"hiRes":"(https://[^"]+?\.jpg)"', re.IGNORECASE)
+
+
+def _dedup_key(u: str, retailer: str) -> str:
+    """Stable per-photo key so the same shot at different sizes collapses to one.
+
+    Ajio stores each size-crop of a photo under a DIFFERENT hash dir, so the path
+    differs per size — but the filename suffix is stable and semantic
+    (…-443107376-navy-MODEL.jpg, …-MODEL2.jpg). Key on {styleId}-{colour}-{slot}
+    so the two crops of MODEL collapse and MODEL2… become distinct images.
+    Other retailers: key on the path without query (thumbnail+hi-res already share
+    a path after _upgrade_hires).
+    """
+    base = u.split("?", 1)[0]
+    if retailer == "ajio":
+        m = _AJIO_SUFFIX_RE.search(base)
+        if m:
+            return f"ajio:{m.group(1)}-{m.group(2)}-{m.group(3)}".lower()
+    return base
 
 
 def _postprocess(images: list[str], retailer: str) -> list[str]:
@@ -765,10 +810,19 @@ def _postprocess(images: list[str], retailer: str) -> list[str]:
         # Recognized retailer → keep only its real product CDN (positive allow-list).
         if not _is_product_cdn(u, retailer):
             continue
+        # Ajio tags each asset by role in the filename; keep only MODEL shots and drop
+        # SWATCH (colour chip) + TRUST_MARKER (the "100% original" badge banners).
+        if retailer == "ajio" and not _AJIO_MODEL_RE.search(u.split("?", 1)[0]):
+            continue
+        # Amazon: drop the 38×50 thumbnail-strip crops (…_CR,0,0,38,50_… / tiny _SS40_).
+        # Their stripped base is often a low-res brand/size-chart asset that renders blank.
+        # The real gallery images carry large tokens (_SL1440_, _AC_SX…) instead.
+        if retailer == "amazon" and _AMAZON_THUMB_RE.search(u):
+            continue
         u = _upgrade_hires(u, retailer)
         # Dedup on the CDN path AFTER upgrade so thumbnail+hi-res of the same asset
         # collapse to one; ignore query so ?q=20 vs ?q=90 don't count as two.
-        key = u.split("?", 1)[0]
+        key = _dedup_key(u, retailer)
         if key in seen:
             continue
         seen.add(key)
@@ -852,12 +906,23 @@ def extract_from_html(html: str, base_url: str, retailer: str) -> tuple[str, lis
     ld_title, ld_imgs = _extract_jsonld(tree)
     meta_title, meta_imgs = _extract_meta(tree)
 
+    # 0. Amazon has no JSON-LD images, but its page embeds a `"hiRes":"…"` array that is
+    # the authoritative zoomable product gallery (real 1080×1440 photos, in order) —
+    # distinct from the `"large"`/thumbnail arrays that include low-res brand/size-chart
+    # slots. Prefer it so we never pick a blank thumbnail as image #1.
+    images: list[str] = []
+    if retailer == "amazon":
+        hires = _AMAZON_HIRES_RE.findall(html)
+        if hires:
+            images = _postprocess(hires, retailer)
+
     # 1. Primary: Authoritative Schema.org JSON-LD images.
     # SOVEREIGN: JSON-LD lists every angle of THIS product in order. Once it yields any
     # valid image we trust it exclusively and never top up from embedded/DOM — those
     # sweep the whole page and pull in recommendation-carousel neighbors (a DIFFERENT
     # product) as image #2. Fewer-but-correct beats more-but-mixed.
-    images = _postprocess(ld_imgs, retailer) if ld_imgs else []
+    if not images:
+        images = _postprocess(ld_imgs, retailer) if ld_imgs else []
 
     # 2. Secondary: Embedded SPA state (Next.js __NEXT_DATA__ / inline state).
     # Only when JSON-LD gave us nothing.
@@ -937,19 +1002,38 @@ async def scrape_product_url(url: str) -> ScrapedProduct:
     if fetched.html and not soft_blocked:
         title, images = extract_from_html(fetched.html, resolved_url, retailer)
 
-    # Last-resort safety net: HTML waterfall found nothing on a recognized retailer.
-    # Ask Firecrawl to AI-extract the gallery, then run its URLs through _postprocess
-    # so the allow-list + hi-res rewrite still apply (no raw/logo URLs slip through).
+    # AI-extraction top-up. Fires when a recognized retailer is still SHORT of
+    # SCRAPER_MAX_IMAGES (not just at zero). Some retailers expose only one image in
+    # JSON-LD (Myntra), and the sovereignty rule correctly refuses to top up from the
+    # page DOM (which would pull recommendation-carousel neighbors — a DIFFERENT
+    # product). Firecrawl's AI extract is same-product BY CONSTRUCTION (prompted for
+    # "ALL images of THIS product"), so it's a safe gap-filler. URLs still pass through
+    # _postprocess (allow-list + hi-res + dedup). Merged after what we already trust.
     used_firecrawl_json = False
+    # Myntra is EXCLUDED from the top-up: its DOM/embedded/AI-extract sources all pull
+    # "customers also viewed" recommendations (a DIFFERENT style id), so a 2nd image is
+    # almost always the wrong product. Its JSON-LD single image is authoritative — one
+    # correct image beats one correct + one wrong-product. (Fires only when at 0 images.)
+    topup_floor = 1 if retailer == "myntra" else s.SCRAPER_MAX_IMAGES
     if (
-        not images
+        len(images) < topup_floor
         and s.FIRECRAWL_JSON_FALLBACK
         and s.FIRECRAWL_API_KEY
         and retailer not in ("unknown", "generic")
     ):
         fc_title, fc_imgs = await _fetch_firecrawl_images(resolved_url)
-        if fc_imgs:
-            images = _postprocess(fc_imgs, retailer)
+        clean = _postprocess(fc_imgs, retailer) if fc_imgs else []
+        before = len(images)
+        seen_keys = {_dedup_key(u, retailer) for u in images}
+        for u in clean:
+            k = _dedup_key(u, retailer)
+            if k in seen_keys:
+                continue
+            seen_keys.add(k)
+            images.append(u)
+            if len(images) >= s.SCRAPER_MAX_IMAGES:
+                break
+        if len(images) > before:
             used_firecrawl_json = True
         if fc_title and not title:
             title = _clean_title(fc_title, retailer)
