@@ -2,8 +2,8 @@
 
 > **Project:** BranV Curated Site
 > **Scope:** `apps/api` scraper engine + settings + production deployment
-> **Date:** 2026-09-29 (code) · updated 2026-09-30 (production deployment)
-> **Status:** ✅ Complete & verified on production `api.branv.in` with fresh (uncached) links — Amazon affiliate/direct + Flipkart all return images, `blocked=false` (see §7.6c). 79/79 unit tests pass.
+> **Date:** 2026-09-29 (code) · 2026-09-30 (production deployment) · 2026-10-01 (per-retailer image quality)
+> **Status:** ✅ Complete & verified on production `api.branv.in` with fresh links. Per-retailer image-quality fixes applied for Amazon/Myntra/Ajio (see §8). 81/81 unit tests pass.
 > **Companion doc:** [SCRAPING_ARCHITECTURE_AND_KNOWLEDGE_BASE.md](SCRAPING_ARCHITECTURE_AND_KNOWLEDGE_BASE.md)
 
 ---
@@ -204,3 +204,50 @@ The config probe was decisive: **when a deployed system behaves differently from
 - ⚠️ **Still present (deliberately):** hardcoded key fallback in `.github/workflows/deploy-api.yml`. It keeps prod working until you create the GitHub Actions secrets. **Action for you:** create `FIRECRAWL_API_KEY` + `SCRAPER_API_KEY` repo secrets, **rotate both keys**, then delete the literal fallbacks (the deploy already prefers the secrets).
 - Helper scripts `deploy/enable-scraper-keys.sh`, `deploy/fix-and-verify-prod.sh`, `deploy/verify-scraper-prod.sh` remain as optional manual tools; safe to delete.
 - (`GET /api/scraper-selftest` was removed earlier in `1183df6`.)
+
+---
+
+## 8. Per-retailer image-quality fixes (2026-10-01)
+
+Once scraping worked end-to-end, three retailers returned the *wrong or low-quality* images (correct product, bad gallery). All three were distinct bugs. Commit `07815af`.
+
+### 8.1 Amazon — image #1 was blank
+- **Symptom:** one image correct, the other a blank/near-white tile.
+- **Root cause:** Amazon serves no JSON-LD, so extraction fell to the DOM, which exposes the **38×50 thumbnail strip** (`…_SX38_SY50_CR,0,0,38,50_.jpg`). Stripping the size token gave the thumbnail's *base* asset — and for the first slot that base is a **375×500 low-res brand/size-chart image** (15 KB), not a product photo. The real product photos (1080×1440) live in a different array.
+- **Fix:** read Amazon's authoritative **`"hiRes"` gallery array** (`_AMAZON_HIRES_RE`) first — these are the real zoomable 1080×1440 photos, in order. Also drop thumbnail-strip crops via `_AMAZON_THUMB_RE` (`_CR,0,0,38,50_`, tiny `_SX\d{1,2}_`/`_SS\d{1,2}_`).
+- **Result:** both images are now real 1080×1440 product photos.
+
+### 8.2 Ajio — two images were the same photo
+- **Symptom:** 2 images returned but both the same shot (one tiny, one larger).
+- **Root cause (two parts):**
+  1. Ajio stores each *size* of a photo under a **different hash directory**, so `…/bd096/-78Wx98H-…MODEL.jpg` and `…/bd07f/-473Wx593H-…MODEL.jpg` are the same photo but different paths → the path-based dedup kept both, and the distinct shots (`MODEL2…MODEL5`) got pushed past the 2-image cap.
+  2. The page also exposes `SWATCH` (colour chip) and `TRUST_MARKER1/2/3` ("100% original" badge banners) on the same CDN, plus a **Pinterest share URL** that embedded the Ajio CDN host in a query param and slipped past the (substring-based) allow-list.
+- **Fixes:**
+  - `_upgrade_ajio` normalizes the size token to one master size (`-1117Wx1400H-`).
+  - `_dedup_key` keys Ajio on the stable **`{styleId}-{colour}-{slot}` filename suffix** (so all crops of `MODEL` collapse and `MODEL2` becomes image #2).
+  - Keep only `-MODEL\d*` files (`_AJIO_MODEL_RE`) → drops SWATCH / TRUST_MARKER.
+  - `_is_product_cdn` now matches the URL's **real hostname** (via `urlparse`), not a substring of the whole URL → the Pinterest share link is rejected.
+- **Result:** 2 distinct product shots (`MODEL`, `MODEL2`), both hi-res, no dupes/junk.
+
+### 8.3 Myntra — second image was a *different* product
+- **Symptom:** for style `30477200` the gallery showed images from the neighbouring style `29810122` (and vice-versa).
+- **Root cause:** Myntra's JSON-LD gives exactly **one** authoritative image. To reach `SCRAPER_MAX_IMAGES=2`, the top-up pulled a second image from DOM / embedded state / Firecrawl AI-extract — all of which include the **"customers also viewed"** carousel (a different style id). Even Firecrawl's "ALL images of THIS product" prompt returned the neighbour's photo, and the correct product's JSON-LD image uses an older path format with no style id, so style-id filtering wasn't reliable either.
+- **Fix:** **cap Myntra at its single JSON-LD image** (`topup_floor = 1` for Myntra). One guaranteed-correct image beats one correct + one wrong-product — the project's "fewer-but-correct beats more-but-mixed" rule.
+- **Result:** 1 correct image, never a neighbour's.
+- **Future option:** Myntra's internal product API (`/gateway/v2/product/{styleId}`) is style-id-keyed and would give the full correct gallery — a larger change if 2+ Myntra images become a hard requirement.
+
+### 8.4 Shared mechanism added
+- `_dedup_key(url, retailer)` — retailer-aware dedup so same-photo-different-size variants collapse (Ajio suffix key; path key for the rest).
+- Restored the `< SCRAPER_MAX_IMAGES` **AI-extract top-up** (dedup-key aware, merged after trusted images) for retailers where a 2nd same-product image is safe — Myntra excluded per §8.3.
+
+### 8.5 Verification
+Fresh links, all retailers:
+
+| Retailer | Images | Notes |
+| :--- | :---: | :--- |
+| Flipkart | 2 | unique, same product (unchanged) |
+| Amazon | 2 | real 1080×1440 photos, no blank |
+| Myntra | 1 | correct product, no cross-contamination |
+| Ajio | 2 | distinct MODEL shots, hi-res, deduped |
+
+**81/81 unit tests pass** (2 new: `test_amazon_prefers_hires_array_over_thumbnails`, `test_ajio_dedup_and_model_filter`; `test_amazon_hires_upgrade` updated for the realistic main-image token).
