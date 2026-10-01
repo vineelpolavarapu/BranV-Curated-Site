@@ -63,10 +63,28 @@ function CategoryHeader({
   total: number;
 }) {
   const isBannerCollection = isCollectionSlug(category.slug);
-  const subcategories =
-    category.children && category.children.length > 0
-      ? category.children
-      : (SHOP_CATEGORIES.find((c) => c.slug === category.slug)?.subcategories ?? []);
+  const shopCat = SHOP_CATEGORIES.find((c) => c.slug === category.slug);
+
+  const seenSlugs = new Set<string>();
+  const subcategories: Array<{ slug: string; name: string }> = [];
+
+  if (category.children && category.children.length > 0) {
+    for (const ch of category.children) {
+      if (!seenSlugs.has(ch.slug)) {
+        seenSlugs.add(ch.slug);
+        subcategories.push({ slug: ch.slug, name: ch.name });
+      }
+    }
+  }
+
+  if (shopCat?.subcategories) {
+    for (const sc of shopCat.subcategories) {
+      if (!seenSlugs.has(sc.slug)) {
+        seenSlugs.add(sc.slug);
+        subcategories.push({ slug: sc.slug, name: sc.name });
+      }
+    }
+  }
 
   return (
     <AnimateOnScroll>

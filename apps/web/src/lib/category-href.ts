@@ -1,7 +1,7 @@
 import { isCollectionSlug } from '@/lib/collections';
 
 // The canonical URL for an L1 category: collection slugs have a dedicated
-// bare-URL landing page (e.g. /inners), everything else uses /category/<slug>.
+// bare-URL landing page (e.g. /sweatshirts), everything else uses /category/<slug>.
 export function categoryHrefL1(slug: string): string {
   return isCollectionSlug(slug) ? `/${slug}` : `/category/${slug}`;
 }

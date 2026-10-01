@@ -259,21 +259,6 @@
       {
         "id": "<cuid>",
         "parentId": "<cuid>",
-        "slug": "inners",
-        "name": "Inners",
-        "path": "inners",
-        "displayOrder": 7,
-        "createdAt": "<iso-datetime>",
-        "updatedAt": "<iso-datetime>",
-        "_count": {
-          "productsAsCategory": 0,
-          "productsAsSubcategory": 0,
-          "attributeSchemas": 0
-        }
-      },
-      {
-        "id": "<cuid>",
-        "parentId": "<cuid>",
         "slug": "clothing-sweatshirts-and-hoodies",
         "name": "Sweatshirts & Hoodies",
         "path": "clothing/sweatshirts-and-hoodies",

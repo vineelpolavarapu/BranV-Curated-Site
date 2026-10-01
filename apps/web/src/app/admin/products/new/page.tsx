@@ -117,27 +117,46 @@ export default function NewProductPage() {
   })();
 
   const l2 = (() => {
-    const fromApi = categories.filter((c) => c.parentId === categoryId);
-    if (fromApi.length > 0) return fromApi;
-
     const selectedCat = l1.find((c) => c.id === categoryId || c.slug === categoryId);
     if (!selectedCat) return [];
+
+    const fromApi = categories.filter(
+      (c) => c.parentId === categoryId || (selectedCat && c.parentId === selectedCat.id)
+    );
+    const seen = new Set<string>();
+    const merged: CategoryNode[] = [];
+
+    for (const c of fromApi) {
+      if (!seen.has(c.slug)) {
+        seen.add(c.slug);
+        merged.push(c);
+      }
+    }
 
     const shopCat = SHOP_CATEGORIES.find(
       (sc) => sc.slug === selectedCat.slug || sc.name.toLowerCase() === selectedCat.name.toLowerCase()
     );
-    if (!shopCat || !shopCat.subcategories) return [];
-
-    return shopCat.subcategories.map((sub) => ({
-      id: sub.slug,
-      parentId: selectedCat.id,
-      slug: sub.slug,
-      name: sub.name,
-      path: `${selectedCat.slug}/${sub.slug}`,
-      displayOrder: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })) as CategoryNode[];
+    if (shopCat?.subcategories) {
+      for (const sub of shopCat.subcategories) {
+        if (!seen.has(sub.slug)) {
+          seen.add(sub.slug);
+          const existingInCategories = categories.find((c) => c.slug === sub.slug);
+          merged.push(
+            existingInCategories || ({
+              id: `cat_${sub.slug}`,
+              parentId: selectedCat.id,
+              slug: sub.slug,
+              name: sub.name,
+              path: `${selectedCat.slug}/${sub.slug}`,
+              displayOrder: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            } as CategoryNode)
+          );
+        }
+      }
+    }
+    return merged;
   })();
 
   async function onSubmit(e: FormEvent) {

@@ -726,18 +726,14 @@ def _upgrade_flipkart(u: str) -> str:
     return re.sub(r"/image/\d{2,4}/\d{2,4}/", "/image/832/832/", u)
 
 
-def _upgrade_ajio(u: str) -> str:
-    # Ajio encodes the render size as a filename prefix: -78Wx98H-443107376-navy-MODEL.jpg
-    # Normalize every size to one large master so all variants of the same asset collapse
-    # to one URL at dedup time (dedup key = path sans size token → per-asset uniqueness).
-    return re.sub(r"-\d+Wx\d+H-", "-1117Wx1400H-", u)
-
-
+# NB: Ajio is intentionally NOT in _PER_SITE_HIRES. Each size-crop of an Ajio photo lives
+# under a DIFFERENT hash dir, and forcing a bigger size token onto the wrong hash yields a
+# ~2 KB placeholder (the "blurry Ajio image" bug). Instead _select_ajio_images() picks each
+# MODEL slot's largest NATIVE variant verbatim — see _postprocess.
 _PER_SITE_HIRES = {
     "amazon": _upgrade_amazon,
     "myntra": _upgrade_myntra,
     "flipkart": _upgrade_flipkart,
-    "ajio": _upgrade_ajio,
 }
 
 
@@ -783,6 +779,34 @@ def _dedup_key(u: str, retailer: str) -> str:
     return base
 
 
+_AJIO_SIZE_RE = re.compile(r"-(\d+)Wx(\d+)H-", re.IGNORECASE)
+
+
+def _select_ajio_largest(images: list[str]) -> list[str]:
+    """Collapse Ajio's per-size hash variants to ONE best URL per MODEL slot.
+
+    Ajio serves each size of a photo from a different hash dir, and the size is both in
+    the filename (-473Wx593H-) and baked into that specific hash. Forcing a bigger size
+    token onto the wrong hash returns a ~2 KB placeholder (the blurry-image bug). So we
+    never rewrite: we group by slot ({styleId}-{colour}-{MODELn}) and keep the variant
+    whose NATIVE WxH is largest — that URL verbatim is the real hi-res master.
+    Order (MODEL, MODEL2, …) is preserved by first appearance.
+    """
+    best: dict[str, tuple[int, str]] = {}
+    order: list[str] = []
+    for u in images:
+        base = u.split("?", 1)[0]
+        slot = _dedup_key(base, "ajio")
+        m = _AJIO_SIZE_RE.search(base)
+        area = (int(m.group(1)) * int(m.group(2))) if m else 0
+        if slot not in best:
+            order.append(slot)
+            best[slot] = (area, u)
+        elif area > best[slot][0]:
+            best[slot] = (area, u)
+    return [best[slot][1] for slot in order]
+
+
 def _postprocess(images: list[str], retailer: str) -> list[str]:
     """Normalize, filter to real product photos, dedup, upgrade to hi-res, cap.
 
@@ -791,6 +815,10 @@ def _postprocess(images: list[str], retailer: str) -> list[str]:
     Junk hosts/tokens are a secondary net for the generic (unknown-retailer) path.
     """
     s = get_settings()
+    # Ajio: pre-collapse per-size hash variants to each slot's largest native URL so the
+    # loop below never picks a thumbnail-hash that 404s/placeholders when kept verbatim.
+    if retailer == "ajio":
+        images = _select_ajio_largest(images)
     seen, out = set(), []
     for raw in images:
         if not raw:

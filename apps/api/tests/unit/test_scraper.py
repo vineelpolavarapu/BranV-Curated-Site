@@ -80,23 +80,27 @@ def test_amazon_prefers_hires_array_over_thumbnails():
 
 
 def test_ajio_dedup_and_model_filter():
-    # Same photo at two sizes (different hash dirs) must collapse; SWATCH/TRUST_MARKER
-    # must be dropped; distinct MODEL shots must both survive.
+    # Each size of an Ajio photo lives under a DIFFERENT hash dir; the largest NATIVE
+    # variant per MODEL slot must be kept VERBATIM (never size-rewritten — that yields a
+    # placeholder). Same slot at two sizes collapses to the bigger one; SWATCH/
+    # TRUST_MARKER dropped; distinct MODEL shots both survive.
     base = "https://assets.ajio.com/medias/sys_master/root1/2025/AA/hash{h}"
     html = "".join(
         f'<img src="{base.format(h=h)}/-{sz}-443107376-navy-{role}.jpg">'
         for h, sz, role in [
             ("1", "78Wx98H", "MODEL"),
-            ("2", "473Wx593H", "MODEL"),   # same photo, bigger → dedup with above
-            ("3", "78Wx98H", "MODEL2"),    # distinct product shot
+            ("2", "1117Wx1400H", "MODEL"),  # same slot, bigger native → this one wins
+            ("3", "78Wx98H", "MODEL2"),     # distinct product shot
             ("4", "309Wx123H", "TRUST_MARKER1"),  # junk badge → dropped
-            ("5", "78Wx98H", "SWATCH"),    # colour chip → dropped
+            ("5", "78Wx98H", "SWATCH"),     # colour chip → dropped
         ]
     )
     _, images = extract_from_html(html, "https://www.ajio.com/x/p/443107376_navy", "ajio")
     assert len(images) == 2
     assert all("-MODEL" in u.upper() for u in images)
-    assert all("1117Wx1400H" in u for u in images)  # upgraded to master size
+    # MODEL slot kept its largest native variant (hash2/1117), NOT size-rewritten.
+    assert "hash2/-1117Wx1400H-443107376-navy-MODEL.jpg" in images[0]
+    assert "MODEL2" in images[1]
 
 
 def test_largest_from_srcset():

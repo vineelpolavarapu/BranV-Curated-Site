@@ -28,7 +28,6 @@ export const VISIBILITY_CATEGORIES: VisibilityCategory[] = [
   { name: 'Trousers', slug: 'trousers' },
   { name: 'Shorts', slug: 'shorts' },
   { name: 'Jackets', slug: 'jackets' },
-  { name: 'Inners', slug: 'inners' },
   { name: 'Sweatshirts', slug: 'sweatshirts' },
   { name: 'Hoodies', slug: 'hoodies' },
 ];

@@ -113,17 +113,6 @@ export const SHOP_CATEGORIES: ShopCategory[] = [
     ],
   },
   {
-    name: 'Inners',
-    slug: 'inners',
-    subcategories: [
-      { name: 'Banniens / Vests', slug: 'inners-banniens' },
-      { name: 'Briefs', slug: 'inners-briefs' },
-      { name: 'Trunks', slug: 'inners-trunks' },
-      { name: 'Boxers', slug: 'inners-boxers' },
-      { name: 'Thermals', slug: 'inners-thermals' },
-    ],
-  },
-  {
     name: 'Sweatshirts',
     slug: 'sweatshirts',
     subcategories: [

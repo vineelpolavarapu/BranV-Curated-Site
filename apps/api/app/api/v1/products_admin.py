@@ -78,6 +78,32 @@ def _dec(v) -> str | None:
     return None if v is None else str(v) if isinstance(v, Decimal) else str(Decimal(str(v)))
 
 
+async def _resolve_category_id(db: AsyncSession, id_or_slug: str | None) -> str | None:
+    if not id_or_slug:
+        return None
+    val = id_or_slug.strip()
+    if not val:
+        return None
+    # 1. Exact match on category id
+    row = (await db.execute(select(Category.id_).where(Category.id_ == val))).scalar_one_or_none()
+    if row:
+        return row
+    # 2. Exact match on category slug
+    row = (await db.execute(select(Category.id_).where(Category.slug == val))).scalar_one_or_none()
+    if row:
+        return row
+    # 3. Slug without 'cat_' prefix
+    if val.startswith("cat_"):
+        row = (await db.execute(select(Category.id_).where(Category.slug == val[4:]))).scalar_one_or_none()
+        if row:
+            return row
+    else:
+        row = (await db.execute(select(Category.id_).where(Category.id_ == f"cat_{val}"))).scalar_one_or_none()
+        if row:
+            return row
+    return val
+
+
 async def _rehost_image_urls(
     urls: list[str], *, ownerId: str | None = None, referer: str | None = None
 ) -> list[str]:
@@ -398,8 +424,8 @@ async def quick_add(
     from ...core.slug import ensure_unique_slug
 
     brand_id = payload.brandId.strip() if payload.brandId and payload.brandId.strip() else None
-    cat_id = payload.categoryId.strip() if payload.categoryId and payload.categoryId.strip() else None
-    subcat_id = payload.subcategoryId.strip() if payload.subcategoryId and payload.subcategoryId.strip() else None
+    cat_id = await _resolve_category_id(db, payload.categoryId)
+    subcat_id = await _resolve_category_id(db, payload.subcategoryId)
 
     if not brand_id and not (payload.newBrandName and payload.newBrandName.strip()):
         raise HTTPException(400, "brandId or newBrandName required")
@@ -671,11 +697,13 @@ async def admin_create(
     featured_until = (
         now + timedelta(days=payload.featureDays) if payload.featureDays and payload.featureDays > 0 else None
     )
+    resolved_cat_id = await _resolve_category_id(db, payload.categoryId) or payload.categoryId
+    resolved_subcat_id = await _resolve_category_id(db, payload.subcategoryId)
     db.add(Product(
         id_=pid,
         brandId=payload.brandId,
-        categoryId=payload.categoryId,
-        subcategoryId=payload.subcategoryId,
+        categoryId=resolved_cat_id,
+        subcategoryId=resolved_subcat_id,
         slug=slug,
         title=payload.title,
         description=payload.description,
@@ -741,6 +769,10 @@ async def admin_update(
         v = getattr(payload, k)
         if v is not None:
             values[k] = v
+    if "categoryId" in values and values["categoryId"]:
+        values["categoryId"] = await _resolve_category_id(db, values["categoryId"]) or values["categoryId"]
+    if "subcategoryId" in values and values["subcategoryId"]:
+        values["subcategoryId"] = await _resolve_category_id(db, values["subcategoryId"])
     if payload.featureDays is not None:
         values["featuredUntil"] = (
             _now() + timedelta(days=payload.featureDays) if payload.featureDays > 0 else None

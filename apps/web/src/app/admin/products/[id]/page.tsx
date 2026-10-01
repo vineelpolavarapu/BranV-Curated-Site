@@ -18,6 +18,7 @@ import {
   adminInput,
   adminLabel,
 } from '@/components/AdminShell';
+import { AdminImageLightboxModal } from '@/components/admin/AdminImageLightboxModal';
 
 interface ProductDetail {
   id: string;
@@ -199,27 +200,46 @@ function BasicsForm({
   })();
 
   const l2 = (() => {
-    const fromApi = categories.filter((c) => c.parentId === categoryId);
-    if (fromApi.length > 0) return fromApi;
-
     const selectedCat = l1.find((c) => c.id === categoryId || c.slug === categoryId);
     if (!selectedCat) return [];
+
+    const fromApi = categories.filter(
+      (c) => c.parentId === categoryId || (selectedCat && c.parentId === selectedCat.id),
+    );
+    const seen = new Set<string>();
+    const merged: CategoryNode[] = [];
+
+    for (const c of fromApi) {
+      if (!seen.has(c.slug)) {
+        seen.add(c.slug);
+        merged.push(c);
+      }
+    }
 
     const shopCat = SHOP_CATEGORIES.find(
       (sc) => sc.slug === selectedCat.slug || sc.name.toLowerCase() === selectedCat.name.toLowerCase(),
     );
-    if (!shopCat || !shopCat.subcategories) return [];
-
-    return shopCat.subcategories.map((sub) => ({
-      id: sub.slug,
-      parentId: selectedCat.id,
-      slug: sub.slug,
-      name: sub.name,
-      path: `${selectedCat.slug}/${sub.slug}`,
-      displayOrder: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    })) as CategoryNode[];
+    if (shopCat?.subcategories) {
+      for (const sub of shopCat.subcategories) {
+        if (!seen.has(sub.slug)) {
+          seen.add(sub.slug);
+          const existingInCategories = categories.find((c) => c.slug === sub.slug);
+          merged.push(
+            existingInCategories || ({
+              id: `cat_${sub.slug}`,
+              parentId: selectedCat.id,
+              slug: sub.slug,
+              name: sub.name,
+              path: `${selectedCat.slug}/${sub.slug}`,
+              displayOrder: 0,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            } as CategoryNode),
+          );
+        }
+      }
+    }
+    return merged;
   })();
 
   async function onSubmit(e: FormEvent) {
@@ -567,6 +587,7 @@ function ImagesPanel({
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   async function uploadSingleFile(file: File) {
     setUploading(true);
@@ -706,35 +727,65 @@ function ImagesPanel({
         Images ({product.images.length})
       </h2>
       {product.images.length > 0 && (
-        <ul className="mb-4 grid grid-cols-3 gap-2">
-          {product.images.map((img) => (
-            <li key={img.id} className="relative">
+        <ul className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {product.images.map((img, idx) => (
+            <li
+              key={img.id}
+              onClick={() => setLightboxIndex(idx)}
+              className="group relative aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-xl border border-slate-200 bg-slate-100 transition-all duration-200 hover:border-blue-400 hover:shadow-md"
+              title="Click to view complete image in pop-up window"
+            >
               <Image
                 src={img.url}
                 alt={img.altText ?? ''}
-                width={120}
-                height={150}
+                fill
                 unoptimized
-                className="aspect-[4/5] w-full rounded object-cover"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
               />
-              <div className="absolute left-1 top-1 flex flex-col gap-0.5">
+              {/* Hover Zoom Overlay Pill */}
+              <div className="absolute inset-0 bg-slate-950/30 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center pointer-events-none z-10">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/90 px-3 py-1 text-xs font-semibold text-white shadow-lg backdrop-blur-md">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    <line x1="11" y1="8" x2="11" y2="14" />
+                    <line x1="8" y1="11" x2="14" y2="11" />
+                  </svg>
+                  Full View
+                </span>
+              </div>
+              <div className="absolute left-1.5 top-1.5 z-20 flex flex-col gap-1 pointer-events-none">
                 {img.isPrimary && (
-                  <span className="rounded bg-primary px-1.5 py-0.5 text-[9px] font-medium uppercase text-primary-fg">
-                    Primary
+                  <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-md">
+                    ★ Primary
                   </span>
                 )}
                 {img.isAiGenerated && (
-                  <span className="rounded bg-purple-600 px-1.5 py-0.5 text-[9px] font-medium uppercase text-primary-fg">
+                  <span className="rounded-full bg-purple-600 px-2 py-0.5 text-[9px] font-bold uppercase text-white shadow-md">
                     AI
                   </span>
                 )}
               </div>
               <button
-                onClick={() => onDelete(img.id)}
-                className="absolute right-1 top-1 rounded bg-surface/90 px-1.5 py-0.5 text-[10px] font-medium text-red-700 hover:bg-surface"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(img.id);
+                }}
+                className="absolute right-1.5 top-1.5 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-slate-900/80 text-xs font-bold text-white shadow transition hover:bg-red-600"
               >
                 ✕
               </button>
+              {/* Index Tag */}
+              <div className="absolute bottom-1.5 left-1.5 z-10 rounded-full bg-slate-900/80 px-2 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm pointer-events-none">
+                #{idx + 1}
+              </div>
+              {/* Expand Pill Badge */}
+              <div className="absolute bottom-1.5 right-1.5 z-10 pointer-events-none">
+                <span className="inline-flex items-center gap-1 rounded-full bg-slate-900/80 px-2 py-0.5 text-[9px] font-semibold text-white shadow-sm backdrop-blur-sm group-hover:bg-blue-600 transition">
+                  🔍 Full
+                </span>
+              </div>
             </li>
           ))}
         </ul>
@@ -825,6 +876,15 @@ function ImagesPanel({
             {submitting ? 'Saving to database…' : 'Save to database'}
           </button>
         </form>
+
+      {/* Full complete image pop-up modal */}
+      <AdminImageLightboxModal
+        open={lightboxIndex !== null}
+        initialIndex={lightboxIndex ?? 0}
+        images={product.images.map((img) => img.url)}
+        isPrimary={(u) => product.images.find((img) => img.url === u)?.isPrimary ?? false}
+        onClose={() => setLightboxIndex(null)}
+      />
     </div>
   );
 }

@@ -19,9 +19,8 @@ INSERT INTO categories (id, "parentId", slug, name, path, "displayOrder", "creat
   ('cat_trousers',                NULL, 'trousers',                'Trousers',              'trousers',                6,  now(), now()),
   ('cat_shorts',                  NULL, 'shorts',                  'Shorts',                'shorts',                  7,  now(), now()),
   ('cat_jackets',                 NULL, 'jackets',                 'Jackets',               'jackets',                 8,  now(), now()),
-  ('cat_inners',      NULL, 'inners',      'Inners',        'inners',      9,  now(), now()),
-  ('cat_sweatshirts', NULL, 'sweatshirts', 'Sweatshirts', 'sweatshirts', 10, now(), now()),
-  ('cat_hoodies',     NULL, 'hoodies',     'Hoodies',     'hoodies',     11, now(), now()),
+  ('cat_sweatshirts', NULL, 'sweatshirts', 'Sweatshirts', 'sweatshirts', 9, now(), now()),
+  ('cat_hoodies',     NULL, 'hoodies',     'Hoodies',     'hoodies',     10, now(), now()),
   -- Collection categories (banner landing pages). Real categories so products
   -- can be assigned to them, but hidden from the Shop grid / nav in the
   -- frontend and reached only via the homepage banner CTAs at bare URLs.
@@ -50,6 +49,7 @@ FROM (VALUES
   ('jeans', 'jeans-formal-jeans',                       'Formal Jeans',         'jeans/formal-jeans',                1),
   ('jeans', 'jeans-cotton-jeans',                       'Cotton Jeans',         'jeans/cotton-jeans',                2),
   ('jeans', 'jeans-slim-fit',                           'Slim Fit',             'jeans/slim-fit',                    3),
+  ('jeans', 'jeans-straight-fit',                       'Straight Fit',         'jeans/straight-fit',                4),
 
   ('shirts', 'shirts-half-sleeves',                     'Half Sleeves',         'shirts/half-sleeves',               0),
   ('shirts', 'shirts-full-sleeves',                     'Full Sleeves',         'shirts/full-sleeves',                1),
@@ -60,6 +60,8 @@ FROM (VALUES
   ('t-shirts', 't-shirts-polo-t-shirts',                 'Polo T-Shirts',        't-shirts/polo-t-shirts',            0),
   ('t-shirts', 't-shirts-full-neck-t-shirts',             'Full Neck T-Shirts',  't-shirts/full-neck-t-shirts',        1),
   ('t-shirts', 't-shirts-collar-t-shirts',                'Collar T-Shirts',     't-shirts/collar-t-shirts',           2),
+  ('t-shirts', 't-shirts-graphic-tees',                  'Graphic Tees',         't-shirts/graphic-tees',             3),
+  ('t-shirts', 't-shirts-oversized-tees',                'Oversized Tees',       't-shirts/oversized-tees',           4),
 
   ('tracks', 'tracks-joggers',                           'Joggers',              'tracks/joggers',                    0),
   ('tracks', 'tracks-slim-fit-tracks',                    'Slim Fit Tracks',     'tracks/slim-fit-tracks',             1),
@@ -95,12 +97,6 @@ FROM (VALUES
   ('jackets', 'jackets-bomber-jackets',                     'Bomber Jackets',     'jackets/bomber-jackets',              2),
   ('jackets', 'jackets-puffer-jackets',                     'Puffer Jackets',     'jackets/puffer-jackets',              3),
   ('jackets', 'jackets-windbreakers',                       'Windbreakers',       'jackets/windbreakers',                4),
-
-  ('inners', 'inners-banniens', 'Banniens / Vests', 'inners/banniens', 0),
-  ('inners', 'inners-briefs',   'Briefs',           'inners/briefs',   1),
-  ('inners', 'inners-trunks',   'Trunks',           'inners/trunks',   2),
-  ('inners', 'inners-boxers',   'Boxers',           'inners/boxers',   3),
-  ('inners', 'inners-thermals', 'Thermals',         'inners/thermals', 4),
 
   ('sweatshirts', 'sweatshirts-crew-neck-sweatshirts',      'Crew Neck Sweatshirts', 'sweatshirts/crew-neck-sweatshirts', 0),
   ('sweatshirts', 'sweatshirts-oversized-sweatshirts',      'Oversized Sweatshirts', 'sweatshirts/oversized-sweatshirts', 1),

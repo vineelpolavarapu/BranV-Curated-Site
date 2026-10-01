@@ -45,7 +45,6 @@ const STATIC_CATEGORIES = [
   { title: 'Trousers', slug: 'trousers' },
   { title: 'Shorts', slug: 'shorts' },
   { title: 'Jackets', slug: 'jackets' },
-  { title: 'Inners', slug: 'inners' },
   { title: 'Sweatshirts', slug: 'sweatshirts' },
   { title: 'Hoodies', slug: 'hoodies' },
 ];

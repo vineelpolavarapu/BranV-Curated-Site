@@ -16,9 +16,6 @@ export function getCategoryIconImageBySlug(slug?: string): string {
   if (lower.includes('t-shirt') || lower.includes('tshirt') || lower.includes('polo') || lower.includes('tee')) {
     return '/category-icons/tshirt.png';
   }
-  if (lower.includes('inner') || lower === 'inners') {
-    return '/category-icons/inner.png';
-  }
   if (lower.includes('sweatshirt')) {
     return '/category-icons/sweatshirts.png';
   }
@@ -101,9 +98,6 @@ export function WatchCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) 
   return <CategoryIcon slug="watches" className={className} />;
 }
 
-export function InnerCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
-  return <CategoryIcon slug="inners" className={className} />;
-}
 
 export function SweatshirtCategoryIcon({ className = 'h-6 w-6' }: CategoryIconProps) {
   return <CategoryIcon slug="sweatshirts" className={className} />;

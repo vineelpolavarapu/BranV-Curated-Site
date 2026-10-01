@@ -9,9 +9,9 @@
  * categories, deliberately hidden from the Shop grid/nav and reached only via
  * the homepage banner "Explore Collection" CTAs.
  *
- * Inners, Sweatshirts and Hoodies are regular Shop-menu L1 categories that
+ * Sweatshirts and Hoodies are regular Shop-menu L1 categories that
  * ALSO get a dedicated bare-URL landing page; they stay in the Shop menu
- * (SHOP_CATEGORIES) and the nav links point straight at /inners etc.
+ * (SHOP_CATEGORIES) and the nav links point straight at /sweatshirts etc.
  */
 export const COLLECTION_SLUGS = [
   'sharp-formals',
@@ -20,7 +20,6 @@ export const COLLECTION_SLUGS = [
   'sports-wear',
   'fashion-forward',
   'easy-casuals',
-  'inners',
   'sweatshirts',
   'hoodies',
 ] as const;
