@@ -40,6 +40,8 @@ import {
   LogOut,
   Eye,
   EyeOff,
+  WandSparkles,
+  Loader2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -82,6 +84,8 @@ export const Icon = {
   Trending: Flame,
   Delete: Trash2,
   Logout: LogOut,
+  Magic: WandSparkles,
+  Loading: Loader2,
 } satisfies Record<string, LucideIcon>;
 
 export type { LucideIcon };

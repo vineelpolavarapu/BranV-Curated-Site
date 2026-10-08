@@ -25,6 +25,7 @@ import {
 } from './AdminShell';
 import { AdminImageLightboxModal } from './admin/AdminImageLightboxModal';
 import { BrandFormModal } from './BrandFormModal';
+import { Icon } from '@/components/icons';
 
 interface ScrapeResult {
   retailer: string;
@@ -609,9 +610,15 @@ const DEFAULT_BRANDS = [
                 type="button"
                 onClick={onAutofill}
                 disabled={scraping || !form.rawUrl}
-                className={adminButtonSecondary}
+                title="Scrape this retailer URL to auto-fill title, brand & images"
+                className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border border-primary/30 bg-primary/5 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/10 active:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-primary/5"
               >
-                {scraping ? 'Scraping…' : '🪄 Autofill'}
+                {scraping ? (
+                  <Icon.Loading className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Icon.Magic className="h-4 w-4" />
+                )}
+                {scraping ? 'Scraping…' : 'Autofill'}
               </button>
             </div>
             <p className="mt-1 text-xs text-content-soft">
